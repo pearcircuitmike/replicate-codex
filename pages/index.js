@@ -15,6 +15,8 @@ import {
   Button,
 } from "@chakra-ui/react";
 
+import ModelsTable from "./components/ModelsTable.js";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
@@ -31,6 +33,7 @@ export default function Home() {
       </Head>
       <main>
         <Heading>Hi</Heading>
+        <ModelsTable />
       </main>
     </>
   );
