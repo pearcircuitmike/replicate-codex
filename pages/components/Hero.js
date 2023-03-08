@@ -7,6 +7,7 @@ import {
   Text,
   Button,
   Image,
+  Link,
 } from "@chakra-ui/react";
 
 const Hero = () => {
@@ -36,7 +37,9 @@ const Hero = () => {
         </Text>
         <HStack spacing={5}>
           <Button colorScheme="teal" variant="solid" rounded="md" size="lg">
-            👉 Get the emails
+            <Link href="https://replicatecodex.substack.com/?r=24w7du&utm_campaign=pub-share-checklist">
+              👉 Get the emails
+            </Link>
           </Button>
         </HStack>
         <Text fontSize="lg" textAlign="left" color="gray.500"></Text>
