@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 
 import ModelsTable from "./components/ModelsTable.js";
+import Hero from "./components/Hero.js";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,10 +32,12 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <Heading>Hi</Heading>
-        <ModelsTable />
-      </main>
+      <Container maxW="8xl">
+        <main>
+          <Hero />
+          <ModelsTable />
+        </main>
+      </Container>
     </>
   );
 }
