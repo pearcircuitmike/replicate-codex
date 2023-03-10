@@ -59,7 +59,7 @@ export default function Home() {
             </TabList>
 
             <TabPanels>
-              <TabPanel pl={0} pr={0}>
+              <TabPanel pl={0}>
                 <ModelsTable searchedVal={searchedVal} />
               </TabPanel>
               <TabPanel>

@@ -35,8 +35,8 @@ const Navbar = () => {
 
           <Flex display={["none", "none", "flex", "flex"]}>
             <HStack spacing={10}>
-              <Link href="/link1" aria-label="Countries" m={5} w="100%">
-                Link 1
+              <Link href="/creators" aria-label="Countries" m={5} w="100%">
+                Creators
               </Link>
               <Link href="/link2" aria-label="States" m={5} w="100%">
                 Link 2
@@ -78,7 +78,7 @@ const Navbar = () => {
               <Heading fontSize="2xl">
                 <Link href="/" aria-label="Home" my={5} w="100%">
                   <span onClick={() => changeDisplay("none")}>
-                    MonkeypoxTracker
+                    🤖 Replicate Codex
                   </span>
                 </Link>
               </Heading>
@@ -95,8 +95,8 @@ const Navbar = () => {
             </Flex>
           </HStack>
           <Flex flexDir="column" align="center">
-            <Link href="/link1" aria-label="link1" m={"10px"} w="100%">
-              <span onClick={() => changeDisplay("none")}>Link1</span>
+            <Link href="/creators" aria-label="creators" m={"10px"} w="100%">
+              <span onClick={() => changeDisplay("none")}>Creators</span>
             </Link>
             <Link href="/link2" aria-label="link2" m={"10px"} w="100%">
               <span onClick={() => changeDisplay("none")}>Link2 </span>

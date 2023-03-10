@@ -76,36 +76,61 @@ export default function DataTable({ searchedVal }) {
 
   const sorting = (col, datatype) => {
     setSortedCol(col);
+    const sortOrder = order === "ASC" ? 1 : -1;
 
-    if (datatype === "string") {
-      if (order === "ASC") {
-        const sorted = [...data].sort((a, b) =>
-          a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
-        );
-        setData(sorted);
-        setOrder("DSC");
+    const sorted = [...data].sort((a, b) => {
+      let compareValue = 0;
+      if (datatype === "string") {
+        compareValue = a[col].toLowerCase().localeCompare(b[col].toLowerCase());
+      } else if (datatype === "float") {
+        compareValue = a[col] - b[col];
       }
-      if (order === "DSC") {
-        const sorted = [...data].sort((a, b) =>
-          a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
-        );
-        setData(sorted);
-        setOrder("ASC");
-      }
-    }
-    if (datatype === "float") {
-      if (order === "ASC") {
-        const sorted = [...data].sort((a, b) => (a[col] > b[col] ? 1 : -1));
-        setData(sorted);
-        setOrder("DSC");
-      }
-      if (order === "DSC") {
-        const sorted = [...data].sort((a, b) => (a[col] < b[col] ? 1 : -1));
-        setData(sorted);
-        setOrder("ASC");
-      }
-    }
+      return compareValue * sortOrder;
+    });
+
+    setData(sorted);
+    setOrder(order === "ASC" ? "DSC" : "ASC");
   };
+
+  const columns = [
+    {
+      key: "creator",
+      label: "Creator",
+      type: "string",
+      render: (val) => (
+        <a
+          href={`https://cnn.com`}
+          style={{ color: "teal", textDecoration: "underline" }}
+        >
+          {val}
+        </a>
+      ),
+    },
+    {
+      key: "modelName",
+      label: "Model Name",
+      type: "string",
+      maxWidth: 50,
+      isTruncated: true,
+    },
+    {
+      key: "description",
+      label: "Description",
+      type: "string",
+      maxWidth: "200px",
+      render: (val) => (
+        <Box maxHeight="100px">
+          <Text noOfLines={[1, 2, 5]}>{val}</Text>
+        </Box>
+      ),
+    },
+    { key: "tags", label: "Tags", type: "string" },
+    { key: "example", label: "Example", type: "string" },
+    { key: "modelUrl", label: "Replicate Url", type: "string" },
+    { key: "runs", label: "Runs", type: "float" },
+    { key: "costToRun", label: "Cost to Run", type: "float" },
+    { key: "lastUpdated", label: "Last Updated", type: "string" },
+  ];
 
   return (
     <>
@@ -113,91 +138,17 @@ export default function DataTable({ searchedVal }) {
         <Table size="sm">
           <Thead position="sticky" top={0} bgColor="white">
             <Tr>
-              <Th
-                maxWidth={75}
-                isTruncated
-                onClick={() => sorting("lastUpdated", "string")}
-              >
-                Last Updated{" "}
-                {order === "ASC" && sortedCol === "lastUpdated" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "lastUpdated" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("creator", "string")}>
-                Creator{" "}
-                {order === "ASC" && sortedCol === "creator" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "creator" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("modelName", "string")}>
-                Model Name
-                {order === "ASC" && sortedCol === "modelName" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "modelName" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("description", "string")}>
-                Description
-                {order === "ASC" && sortedCol === "description" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "description" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("tags", "string")}>
-                Tags
-                {order === "ASC" && sortedCol === "tags" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "tags" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("example", "string")}>
-                Example
-                {order === "ASC" && sortedCol === "example" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "example" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("modelUrl", "string")}>
-                Replicate Url
-                {order === "ASC" && sortedCol === "modelUrl" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "modelUrl" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("runs", "float")}>
-                Runs
-                {order === "ASC" && sortedCol === "runs" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "runs" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
-              <Th onClick={() => sorting("costToRun", "float")}>
-                Cost to Run
-                {order === "ASC" && sortedCol === "costToRun" && (
-                  <GrAscend style={{ display: "inline" }} />
-                )}
-                {order === "DSC" && sortedCol === "costToRun" && (
-                  <GrDescend style={{ display: "inline" }} />
-                )}
-              </Th>
+              {columns.map((col) => (
+                <Th key={col.key} onClick={() => sorting(col.key, col.type)}>
+                  {col.label}
+                  {order === "ASC" && sortedCol === col.key && (
+                    <GrAscend style={{ display: "inline" }} />
+                  )}
+                  {order === "DSC" && sortedCol === col.key && (
+                    <GrDescend style={{ display: "inline" }} />
+                  )}
+                </Th>
+              ))}
             </Tr>
           </Thead>
           <Tbody whiteSpace="normal">
@@ -225,7 +176,6 @@ export default function DataTable({ searchedVal }) {
                 )
                 .map(
                   ({
-                    lastUpdated,
                     creator,
                     modelName,
                     description,
@@ -235,12 +185,12 @@ export default function DataTable({ searchedVal }) {
                     runs,
                     costToRun,
                     id,
+                    lastUpdated,
                   }) => (
                     <Tr key={id} style={{ verticalAlign: "top" }}>
-                      <Td>{lastUpdated}</Td>
                       <Td>
                         <a
-                          href={`https://cnn.com`}
+                          href={`/creators/${creator}`}
                           style={{
                             color: "teal",
                             textDecoration: "underline",
@@ -257,13 +207,23 @@ export default function DataTable({ searchedVal }) {
                           <Text noOfLines={[1, 2, 5]}>{description}</Text>
                         </Box>
                       </Td>
-                      <Td minWidth="180px">
-                        <Tag colorScheme="gray">{tags}</Tag>
+                      <Td minW="180px">
+                        <Tag>{tags}</Tag>
                       </Td>
                       <Td>
-                        <Image src={example} boxSize="40px" />
+                        {example && (
+                          <img
+                            src={example}
+                            alt="example"
+                            style={{
+                              width: "64px",
+                              height: "64px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        )}
                       </Td>
-                      <Td maxWidth="50px">
+                      <Td maxW="180px">
                         <Link
                           href={modelUrl}
                           style={{
@@ -274,8 +234,9 @@ export default function DataTable({ searchedVal }) {
                           {modelUrl}
                         </Link>
                       </Td>
-                      <Td isNumeric>{runs.toLocaleString()}</Td>
-                      <Td isNumeric>{costToRun.toLocaleString()}</Td>
+                      <Td>{runs}</Td>
+                      <Td>{costToRun}</Td>
+                      <Td>{lastUpdated}</Td>
                     </Tr>
                   )
                 )}
