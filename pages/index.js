@@ -23,6 +23,9 @@ import {
 } from "@chakra-ui/react";
 
 import ModelsTable from "./components/ModelsTable.js";
+import ModelsLeaderboard from "./components/ModelsLeaderboard.js";
+import Table from "./components/ModelsTable.js";
+
 import Hero from "./components/Hero.js";
 import GalleryView from "./components/GalleryView.js";
 
@@ -52,22 +55,22 @@ export default function Home() {
               onChange={(e) => setSearchedVal(e.target.value)}
             />
           </Box>
-          <Tabs>
+          <Tabs colorScheme="teal">
             <TabList>
               <Tab>List view</Tab>
               <Tab>Gallery</Tab>
-              <Tab>Three</Tab>
+              <Tab>Top Models</Tab>
             </TabList>
 
             <TabPanels>
               <TabPanel pl={0}>
-                <ModelsTable searchedVal={searchedVal} />
+                <Table searchedVal={searchedVal} />
               </TabPanel>
               <TabPanel>
                 <GalleryView searchedVal={searchedVal} />
               </TabPanel>
               <TabPanel>
-                <p>three!</p>
+                <ModelsLeaderboard searchedVal={searchedVal} />
               </TabPanel>
             </TabPanels>
           </Tabs>
