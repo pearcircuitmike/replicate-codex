@@ -1,129 +1,139 @@
-import { useRouter } from "next/router";
 import {
   Box,
   Container,
-  Divider,
-  Image,
-  Text,
-  Link,
-  VStack,
   Heading,
-  Stack,
+  Text,
   Badge,
-  Flex,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Td,
+  Image,
+  Link,
 } from "@chakra-ui/react";
 import data from "../data/data.json";
 
-const CreatorDetails = ({ model, otherModels }) => {
-  const {
-    modelName,
-    description,
-    example,
-    displayCost,
-    displayRuns,
-    lastUpdated,
-    modelUrl,
-    tags,
-  } = model;
+export default function Creator({ creator }) {
+  const models = data.filter((model) => model.creator === creator);
+
+  const avgCost =
+    models
+      .filter((model) => model.costToRun !== "") // Filters out models that have an empty string as the costToRun value
+      .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
+
+  const modelTypes = {};
+  models.forEach((model) => {
+    if (model.tags in modelTypes) {
+      modelTypes[model.tags]++;
+    } else {
+      modelTypes[model.tags] = 1;
+    }
+  });
+
+  // calc rank
+  function calculateCreatorRank(data, creator) {
+    // Sort array in descending order based on runs
+    const sortedData = data.sort((a, b) => b.runs - a.runs);
+
+    let rank = 0;
+    // Loop through sorted array and find the given creator's position
+    for (let i = 0; i < sortedData.length; i++) {
+      if (sortedData[i].creator === creator) {
+        rank = i + 1; // Add 1 since rank starts at 1
+        break;
+      }
+    }
+
+    return rank;
+  }
 
   return (
     <Container maxW="container.xl" py="12">
-      <Stack spacing="8">
-        <Box>
-          <Heading as="h2" size="xl">
-            {modelName}
-          </Heading>
-          <Text fontSize="lg" color="gray.500" mt="2">
-            {description}
-          </Text>
-          <Image
-            src={example}
-            alt={modelName}
-            mt="8"
-            boxShadow="md"
-            rounded="md"
-          />
-          <Stack direction={{ base: "column", md: "row" }} mt="8" spacing="4">
-            <Badge colorScheme="purple">{tags}</Badge>
-            <Text fontSize="lg">{displayCost}</Text>
-            <Text fontSize="lg">{displayRuns}</Text>
-            <Text fontSize="lg" color="gray.500">
-              {lastUpdated}
-            </Text>
-            <Link href={modelUrl} target="_blank" fontSize="lg">
-              View Model
+      <Box>
+        <Heading as="h2" size="xl" mb="2">
+          {creator}
+          {calculateCreatorRank(data, creator) == 1 ? " 🥇" : ""}
+          {calculateCreatorRank(data, creator) == 2 ? " 🥈" : ""}
+          {calculateCreatorRank(data, creator) == 3 ? " 🥉" : ""}
+        </Heading>
+        Rank: {calculateCreatorRank(data, creator)}
+        <Text fontSize="lg" color="gray.500">
+          Average Model Cost: ${avgCost.toFixed(4)}
+        </Text>
+        <Text fontSize="lg" color="gray.500" mb="8">
+          Number of Runs:{" "}
+          {models.reduce((sum, model) => sum + model.runs, 0).toLocaleString()}
+        </Text>
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Model Type</Th>
+              <Th>Count</Th>
+            </Tr>
+          </Thead>
+          <tbody>
+            {Object.entries(modelTypes).map(([tag, count]) => (
+              <Tr key={tag}>
+                <Td>{tag}</Td>
+                <Td>{count}</Td>
+              </Tr>
+            ))}
+          </tbody>
+        </Table>
+      </Box>
+
+      <Box mt="12" display="flex" flexWrap="wrap">
+        {models.map((model) => (
+          <Box
+            key={model.id}
+            width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
+            p="4"
+          >
+            <Link href={`/models/${model.id}`}>
+              <Image
+                src={
+                  model.example !== ""
+                    ? model.example
+                    : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
+                }
+                alt="Model Preview"
+                w="full"
+                h="64"
+                objectFit="cover"
+                mb="4"
+              />
             </Link>
-          </Stack>
-        </Box>
 
-        {otherModels.length > 0 && (
-          <Box>
-            <Divider mt="8" mb="4" />
-
-            <Stack spacing="4">
-              <Heading as="h3" size="lg">
-                Other Models by {model.creator}
-              </Heading>
-              <Flex overflowX="auto" w="100%" pb="4">
-                {otherModels.map((otherModel) => (
-                  <Box
-                    key={otherModel.id}
-                    borderWidth="1px"
-                    p="6"
-                    rounded="md"
-                    shadow="md"
-                    mr="4"
-                    w={{ base: "80%", md: "25%" }}
-                    flexShrink={0}
-                  >
-                    <Heading as="h4" size="lg">
-                      {otherModel.modelName}
-                    </Heading>
-                    <Text fontSize="lg" color="gray.500" mt="2">
-                      {otherModel.description}
-                    </Text>
-                    <Image
-                      src={otherModel.example}
-                      alt={otherModel.modelName}
-                      mt="8"
-                      boxShadow="md"
-                      rounded="md"
-                    />
-                    <Stack
-                      direction={{ base: "column", md: "row" }}
-                      mt="8"
-                      spacing="4"
-                    >
-                      <Badge colorScheme="purple">{otherModel.tags}</Badge>
-                      <Text fontSize="lg">{otherModel.displayCost}</Text>
-                      <Text fontSize="lg">{otherModel.displayRuns}</Text>
-                      <Text fontSize="lg" color="gray.500">
-                        {otherModel.lastUpdated}
-                      </Text>
-                      <Link
-                        href={otherModel.modelUrl}
-                        target="_blank"
-                        fontSize="lg"
-                      >
-                        View Model
-                      </Link>
-                    </Stack>
-                  </Box>
-                ))}
-              </Flex>
-            </Stack>
+            <Heading as="h3" size="lg" mb="2">
+              {model.modelName}
+            </Heading>
+            <Text fontSize="lg" color="gray.500" mb="4">
+              {model.description}
+            </Text>
+            <Badge colorScheme="teal" mb="4">
+              {model.tags}
+            </Badge>
+            <Text fontSize="lg" mb="4">
+              Cost/run: ${model.costToRun}
+            </Text>
+            <Text fontSize="lg" mb="4">
+              Runs: {model.runs.toLocaleString()}
+            </Text>
+            <Text fontSize="lg" color="gray.500" mb="4">
+              Last Updated: {model.lastUpdated}
+            </Text>
           </Box>
-        )}
-      </Stack>
+        ))}
+      </Box>
     </Container>
   );
-};
-
-export default CreatorDetails;
+}
 
 export async function getStaticPaths() {
-  const paths = data.map((model) => ({
-    params: { creator: model.creator.toString() },
+  const creators = Array.from(new Set(data.map((model) => model.creator)));
+  const paths = creators.map((creator) => ({
+    params: { creator: creator.toLowerCase() },
   }));
 
   return { paths, fallback: false };
@@ -131,10 +141,25 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const creator = params.creator;
-  const model = data.find((model) => model.creator === creator);
-  const otherModels = data.filter(
-    (otherModel) => otherModel.creator === creator && otherModel.id !== model.id
-  );
 
-  return { props: { model, otherModels } };
+  const models = data.filter((model) => model.creator === creator);
+
+  const avgCost =
+    models.reduce((sum, model) => {
+      if (model.costToRun) {
+        return sum + model.costToRun;
+      }
+      return sum;
+    }, 0) / models.filter((model) => model.costToRun).length;
+
+  const modelTypes = {};
+  models.forEach((model) => {
+    if (model.tags in modelTypes) {
+      modelTypes[model.tags]++;
+    } else {
+      modelTypes[model.tags] = 1;
+    }
+  });
+
+  return { props: { creator, models, avgCost, modelTypes } };
 }
