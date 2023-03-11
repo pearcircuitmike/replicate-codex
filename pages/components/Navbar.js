@@ -38,8 +38,8 @@ const Navbar = () => {
               <Link href="/creators" aria-label="Countries" m={5} w="100%">
                 Creators
               </Link>
-              <Link href="/link2" aria-label="States" m={5} w="100%">
-                Link 2
+              <Link href="/models" aria-label="States" m={5} w="100%">
+                Models
               </Link>
               <Link href="/link3" aria-label="Blog" m={5} w="100%">
                 Link3
@@ -98,8 +98,8 @@ const Navbar = () => {
             <Link href="/creators" aria-label="creators" m={"10px"} w="100%">
               <span onClick={() => changeDisplay("none")}>Creators</span>
             </Link>
-            <Link href="/link2" aria-label="link2" m={"10px"} w="100%">
-              <span onClick={() => changeDisplay("none")}>Link2 </span>
+            <Link href="/models" aria-label="link2" m={"10px"} w="100%">
+              <span onClick={() => changeDisplay("none")}>Models </span>
             </Link>
 
             <Link href="/link3" aria-label="link3" m={"10px"} w="100%">

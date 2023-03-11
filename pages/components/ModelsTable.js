@@ -223,7 +223,7 @@ export default function DataTable({ searchedVal }) {
                           />
                         )}
                       </Td>
-                      <Td maxW="180px">
+                      <Td>
                         <Link
                           href={modelUrl}
                           style={{

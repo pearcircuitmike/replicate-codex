@@ -4,23 +4,18 @@ import {
   Flex,
   Text,
   Box,
-  Spacer,
-  Button,
-  Center,
   Input,
   InputGroup,
   InputRightElement,
-  Tooltip,
 } from "@chakra-ui/react";
 import Link from "next/link";
 
 import React, { useState } from "react";
-import { colors } from "../../styles/colors.js";
+
 import testData from "../data/data.json";
 
 export const getStaticProps = async () => {
   const data = testData;
-  console.log(data);
 
   return {
     props: { creatorVals: data },
@@ -59,49 +54,44 @@ const Creators = ({ creatorVals }) => {
               creatorVal.toLowerCase().includes(stateFilter.toLowerCase())
             )
             .map((creatorVal) => (
-              <Link href={`creators/${creatorVal}`} key={creatorVal}>
-                <Box
-                  as="button"
-                  m={3}
-                  p={3}
-                  w="280px"
-                  h="280px"
-                  borderRadius="md"
-                  shadow="xl"
-                  bg="white"
-                >
-                  <Flex align="center" direction="column" p={4}>
-                    {creatorVals.find((c) => c.creator === creatorVal)
-                      .example ? (
-                      <Box
-                        as="img"
-                        src={
-                          creatorVals.find((c) => c.creator === creatorVal)
-                            .example
-                        }
-                        alt="creator"
-                        w="150px"
-                        h="150px"
-                        objectFit="cover"
-                        borderRadius="full"
-                      />
-                    ) : (
-                      <Box
-                        as="img"
-                        src={"/default-creator.jpg"}
-                        alt="creator"
-                        w="150px"
-                        h="150px"
-                        objectFit="cover"
-                        borderRadius="full"
-                      />
-                    )}
-                    <Text mt={3} fontSize="xl" fontWeight="bold">
-                      {creatorVal}
-                    </Text>
-                  </Flex>
-                </Box>
-              </Link>
+              <Box
+                m={3}
+                p={3}
+                w="280px"
+                h="280px"
+                borderRadius="md"
+                shadow="xl"
+                bg="white"
+                key={creatorVal}
+              >
+                <Flex align="center" direction="column" p={4}>
+                  {creatorVals.find((c) => c.creator === creatorVal).example ? (
+                    <Box
+                      as="img"
+                      src={
+                        creatorVals.find((c) => c.creator === creatorVal)
+                          .example
+                      }
+                      alt="creator"
+                      w="150px"
+                      h="150px"
+                      objectFit="cover"
+                    />
+                  ) : (
+                    <Box
+                      as="img"
+                      src={"/default-creator.jpg"}
+                      alt="creator"
+                      w="150px"
+                      h="150px"
+                      objectFit="cover"
+                    />
+                  )}
+                  <Text mt={3} fontSize="xl" fontWeight="bold">
+                    <Link href={`/creators/${creatorVal}`}>{creatorVal}</Link>
+                  </Text>
+                </Flex>
+              </Box>
             ))}
         </Flex>
       </Container>

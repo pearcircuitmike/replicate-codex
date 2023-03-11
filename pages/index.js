@@ -24,6 +24,7 @@ import {
 
 import ModelsTable from "./components/ModelsTable.js";
 import Hero from "./components/Hero.js";
+import GalleryView from "./components/GalleryView.js";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -63,7 +64,7 @@ export default function Home() {
                 <ModelsTable searchedVal={searchedVal} />
               </TabPanel>
               <TabPanel>
-                <p>two!</p>
+                <GalleryView searchedVal={searchedVal} />
               </TabPanel>
               <TabPanel>
                 <p>three!</p>
