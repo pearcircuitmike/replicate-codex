@@ -14,6 +14,7 @@ import {
   Tag,
 } from "@chakra-ui/react";
 import data from "../data/data.json";
+import Head from "next/head";
 
 export async function getStaticPaths() {
   const paths = data.map((model) => ({

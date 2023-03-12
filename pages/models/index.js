@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import testData from "../data/data.json";
+import Head from "next/head";
 
 export const getStaticProps = async () => {
   const data = testData;

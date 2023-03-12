@@ -13,6 +13,7 @@ import {
   Link,
 } from "@chakra-ui/react";
 import data from "../data/data.json";
+import Head from "next/head";
 
 export default function Creator({ creator }) {
   const models = data.filter((model) => model.creator === creator);

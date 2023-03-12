@@ -9,6 +9,7 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import Link from "next/link";
+import Head from "next/head";
 
 import React, { useState } from "react";
 
