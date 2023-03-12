@@ -57,7 +57,7 @@ export default function Creator({ creator }) {
         <title>AI model creator details: {creator}</title>
         <meta
           name="description"
-          content={`Details about ${model.creator}'s account on Replicate and their AI models`}
+          content={`Details about ${creator}'s account on Replicate and their AI models`}
         />
 
         <meta
@@ -66,7 +66,7 @@ export default function Creator({ creator }) {
         />
         <meta
           property="og:description"
-          content={`Details about ${model.creator}'s account on Replicate and their AI models`}
+          content={`Details about ${creator}'s account on Replicate and their AI models`}
         />
 
         <meta property="og:url" content="https://replicatecodex.com" />
@@ -79,7 +79,7 @@ export default function Creator({ creator }) {
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           property="twitter:description"
-          content={`Details about ${model.creator}'s account on Replicate and their AI models`}
+          content={`Details about ${creator}'s account on Replicate and their AI models`}
         />
         <meta
           property="twitter:image"
