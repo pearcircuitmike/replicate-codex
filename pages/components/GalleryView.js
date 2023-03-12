@@ -12,6 +12,7 @@ import {
   Input,
   Grid,
   SimpleGrid,
+  Checkbox,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { colors } from "../../styles/colors";
@@ -22,11 +23,72 @@ import testData from "../data/data.json";
 export default function GalleryView({ searchedVal }) {
   const data = testData;
 
+  const [filter, setFilter] = useState("");
+  const [sort, setSort] = useState({ field: "", direction: "" });
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value);
+  };
+
+  const handleSortChange = (field) => {
+    if (sort.field === field) {
+      setSort({
+        ...sort,
+        direction: sort.direction === "asc" ? "desc" : "asc",
+      });
+    } else {
+      setSort({ field, direction: "asc" });
+    }
+  };
+
+  const handleTagSelect = (event) => {
+    const tagName = event.target.value;
+    const checked = event.target.checked;
+    if (checked) {
+      setSelectedTags([...selectedTags, tagName]);
+    } else {
+      setSelectedTags(selectedTags.filter((tags) => tags !== tagName));
+    }
+  };
+
+  const filteredData = data.filter(
+    (item) =>
+      item.tags.toLowerCase().includes(filter.toLowerCase()) &&
+      (selectedTags.length === 0 || selectedTags.includes(item.tags))
+  );
+
+  const sortedData = filteredData.sort((a, b) => {
+    if (a[sort.field] < b[sort.field]) {
+      return sort.direction === "asc" ? -1 : 1;
+    }
+    if (a[sort.field] > b[sort.field]) {
+      return sort.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
+  const models = Array.from(new Set(data.map((item) => item.tags)));
+
   return (
     <>
+      <Box mt="5px" mb="15px">
+        {models.map((tags) => (
+          <Checkbox
+            mr="20px"
+            value={tags}
+            isChecked={selectedTags.includes(tags)}
+            onChange={handleTagSelect}
+            color="gray.600"
+            key={models.id}
+          >
+            {tags}
+          </Checkbox>
+        ))}
+      </Box>
       <SimpleGrid columns={[2, null, 3]} minChildWidth="250px" gap={5}>
-        {data &&
-          data
+        {sortedData &&
+          sortedData
             .filter(
               (row) =>
                 typeof searchedVal !== "undefined" &&
