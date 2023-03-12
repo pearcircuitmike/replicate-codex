@@ -37,7 +37,7 @@ const Hero = () => {
         </Text>
         <HStack spacing={5}>
           <Button colorScheme="teal" variant="solid" rounded="md" size="lg">
-            <Link href="https://replicatecodex.substack.com/?r=24w7du&utm_campaign=pub-share-checklist">
+            <Link href="https://notes.replicatecodex.com/subscribe/">
               👉 Get the emails
             </Link>
           </Button>

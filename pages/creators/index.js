@@ -68,9 +68,6 @@ const Creators = ({ creatorVals }) => {
         <Heading as="h1" mt={5}>
           Creators
         </Heading>
-
-        <Text size="md">Lorem ispum.</Text>
-
         <Text mt={5}>Search through the list of amazing creators below!</Text>
 
         <InputGroup mt={5}>
