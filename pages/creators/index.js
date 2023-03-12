@@ -29,6 +29,40 @@ const Creators = ({ creatorVals }) => {
 
   return (
     <>
+      <Head>
+        <meta httpEquiv="content-language" content="en-us" />
+
+        <title>Replicate Codex | All Creators</title>
+        <meta
+          name="description"
+          content="Search AI model creators on the Replicate platform."
+        />
+
+        <meta property="og:title" content="Replicate Codex | All Creators" />
+        <meta
+          property="og:description"
+          content="Search AI model creators on the Replicate platform."
+        />
+
+        <meta property="og:url" content="https://replicatecodex.com" />
+        <meta
+          property="og:image"
+          content="https://replicatecodex.com/socialImg.png"
+        />
+        <meta property="og:type" content="website" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          property="twitter:description"
+          content="Search AI model creators on the Replicate platform."
+        />
+        <meta
+          property="twitter:image"
+          content="https://replicatecodex.com/socialImg.png"
+        />
+
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>
           Creators

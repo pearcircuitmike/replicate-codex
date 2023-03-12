@@ -42,7 +42,7 @@ export default function Home() {
         <title>Replicate Codex | Explore and find AI models</title>
         <meta
           name="description"
-          content="Search, filter, sort and explore AI models on the Replicate platform."
+          content="Discover new AI models to play and build with on Replicate."
         />
 
         <meta
@@ -51,7 +51,7 @@ export default function Home() {
         />
         <meta
           property="og:description"
-          content="Search, filter, sort and explore AI models on the Replicate platform."
+          content="Discover new AI models to play and build with on Replicate."
         />
 
         <meta property="og:url" content="https://replicatecodex.com" />
@@ -64,7 +64,7 @@ export default function Home() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           property="twitter:description"
-          content="Search, filter, sort and explore AI models on the Replicate platform."
+          content="Discover new AI models to play and build with on Replicate."
         />
         <meta
           property="twitter:image"
