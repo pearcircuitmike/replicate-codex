@@ -1284,7 +1284,7 @@
     "example": "https://replicate.delivery/mgxm/cb6264b8-c2c4-4a4d-99cd-2a4ecac00b23/dog.jpeg",
     "lastUpdated": "03/05/2023",
     "modelUrl": "https://replicate.com/facebookresearch/swag",
-    "runs": "",
+    "runs": 1,
     "tags": "Image-to-Text"
   }
 ]

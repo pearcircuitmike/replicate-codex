@@ -19,54 +19,7 @@ import { colors } from "../../styles/colors";
 import testData from "../data/data.json";
 
 export default function GalleryView({ searchedVal }) {
-  const [data, setData] = useState([]);
-  const [didLoad, setDidLoad] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // const modelsUrl = "../data/data.json";
-        // const modelsRes = await fetch(modelsUrl);
-        //  const modelsData = await modelsRes.json();
-        const modelsData = testData;
-
-        console.log(modelsData);
-
-        const sortedArray = modelsData.sort(
-          (a, b) =>
-            new Date(b.modelName).getTime() - new Date(a.modelName).getTime()
-        );
-
-        const unique = sortedArray
-          .map((e) => e["id"])
-
-          // store the keys of the unique objects
-          .map((e, i, final) => final.indexOf(e) === i && i)
-
-          // eliminate the dead keys & store unique objects
-          .filter((e) => sortedArray[e])
-          .map((e) => sortedArray[e]);
-
-        const uniqueSortedAlpha = unique.sort((a, b) => {
-          var modelNameA = a.modelName.toLowerCase(),
-            modelNameB = b.modelName.toLowerCase();
-          if (modelNameA < modelNameB)
-            //sort string ascending
-            return -1;
-          if (modelNameA > modelNameB) return 1;
-          return 0; //default return value (no sorting)
-        });
-        setData(uniqueSortedAlpha);
-
-        setDidLoad(true);
-      } catch (error) {
-        console.log("error", error);
-      }
-    };
-    if (!didLoad) {
-      fetchData();
-    }
-  }, []);
+  const data = testData;
 
   return (
     <>

@@ -40,23 +40,31 @@ function ModelLeaderboard({ searchedVal }) {
             {sortedModels
               .filter(
                 (row) =>
-                  !searchedVal.length ||
-                  row.modelName
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase()) ||
-                  row.creator
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase()) ||
-                  row.description
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase()) ||
-                  row.tags
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase())
+                  typeof searchedVal !== "undefined" &&
+                  ((row.modelName &&
+                    row.modelName
+                      .toString()
+                      .toLowerCase()
+                      .includes(searchedVal.toString().toLocaleLowerCase())) ||
+                    (row.creator &&
+                      row.creator
+                        .toString()
+                        .toLowerCase()
+                        .includes(
+                          searchedVal.toString().toLocaleLowerCase()
+                        )) ||
+                    (row.description &&
+                      row.description
+                        .toString()
+                        .toLowerCase()
+                        .includes(
+                          searchedVal.toString().toLocaleLowerCase()
+                        )) ||
+                    (row.tags &&
+                      row.tags
+                        .toString()
+                        .toLowerCase()
+                        .includes(searchedVal.toString().toLocaleLowerCase())))
               )
               .map((model, index) => (
                 <Tr key={model.id}>
@@ -66,6 +74,7 @@ function ModelLeaderboard({ searchedVal }) {
                     {index + 1 == "3" ? "🥉" : ""}
                     {index + 1}
                   </Td>
+
                   <Td isNumeric>{model.runs.toLocaleString()}</Td>
                   <Td maxWidth="200px" isTruncated>
                     <a

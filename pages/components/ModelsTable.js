@@ -73,11 +73,11 @@ export default function TableTest({ searchedVal }) {
         {models.map((tags) => (
           <Checkbox
             mr="20px"
-            key={tags}
             value={tags}
             isChecked={selectedTags.includes(tags)}
             onChange={handleTagSelect}
             color="gray.600"
+            key={models.id}
           >
             {tags}
           </Checkbox>
@@ -140,23 +140,31 @@ export default function TableTest({ searchedVal }) {
             {sortedData
               .filter(
                 (row) =>
-                  !searchedVal.length ||
-                  row.modelName
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase()) ||
-                  row.creator
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase()) ||
-                  row.description
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase()) ||
-                  row.tags
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchedVal.toString().toLocaleLowerCase())
+                  typeof searchedVal !== "undefined" &&
+                  ((row.modelName &&
+                    row.modelName
+                      .toString()
+                      .toLowerCase()
+                      .includes(searchedVal.toString().toLocaleLowerCase())) ||
+                    (row.creator &&
+                      row.creator
+                        .toString()
+                        .toLowerCase()
+                        .includes(
+                          searchedVal.toString().toLocaleLowerCase()
+                        )) ||
+                    (row.description &&
+                      row.description
+                        .toString()
+                        .toLowerCase()
+                        .includes(
+                          searchedVal.toString().toLocaleLowerCase()
+                        )) ||
+                    (row.tags &&
+                      row.tags
+                        .toString()
+                        .toLowerCase()
+                        .includes(searchedVal.toString().toLocaleLowerCase())))
               )
               .map((item) => (
                 <Tr key={item.id} style={{ verticalAlign: "top" }}>
