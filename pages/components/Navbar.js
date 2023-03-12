@@ -35,14 +35,19 @@ const Navbar = () => {
 
           <Flex display={["none", "none", "flex", "flex"]}>
             <HStack spacing={10}>
-              <Link href="/creators" aria-label="Countries" m={5} w="100%">
+              <Link href="/creators" aria-label="Creators" m={5} w="100%">
                 Creators
               </Link>
-              <Link href="/models" aria-label="States" m={5} w="100%">
+              <Link href="/models" aria-label="Models" m={5} w="100%">
                 Models
               </Link>
-              <Link href="/link3" aria-label="Blog" m={5} w="100%">
-                Link3
+              <Link
+                href="https://notes.replicatecodex.com"
+                aria-label="notes"
+                m={5}
+                w="100%"
+              >
+                Notes
               </Link>
             </HStack>
           </Flex>
@@ -98,12 +103,17 @@ const Navbar = () => {
             <Link href="/creators" aria-label="creators" m={"10px"} w="100%">
               <span onClick={() => changeDisplay("none")}>Creators</span>
             </Link>
-            <Link href="/models" aria-label="link2" m={"10px"} w="100%">
+            <Link href="/models" aria-label="models" m={"10px"} w="100%">
               <span onClick={() => changeDisplay("none")}>Models </span>
             </Link>
 
-            <Link href="/link3" aria-label="link3" m={"10px"} w="100%">
-              <span onClick={() => changeDisplay("none")}>Link3 </span>
+            <Link
+              href="https://notes.replicatecodex.com"
+              aria-label="notes"
+              m={"10px"}
+              w="100%"
+            >
+              <span onClick={() => changeDisplay("none")}>Notes</span>
             </Link>
           </Flex>
         </Flex>
