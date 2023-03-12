@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { colors } from "../../styles/colors";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import testData from "../data/data.json";
 
@@ -75,7 +76,7 @@ export default function GalleryView({ searchedVal }) {
                   p={2}
                 >
                   <Box height="250px" m="1px">
-                    <Link href={modelUrl}>
+                    <Link href={`/models/${id}`}>
                       <Image
                         src={
                           example !== ""
@@ -90,33 +91,44 @@ export default function GalleryView({ searchedVal }) {
                       />
                     </Link>
                   </Box>
-                  <Heading fontSize="md" as="h2">
-                    {modelName}
-                  </Heading>
-                  <Text fontSize="sm" color={colors.grey}>
-                    {description}
-                  </Text>
-                  <Stack isInline align="center" spacing={3}>
-                    <Tag>{tags}</Tag>
-                  </Stack>
 
-                  <Text fontSize="sm" color={colors.grey}>
-                    Runs: {runs.toLocaleString()}
+                  <Heading fontSize="lg" as="h2">
+                    <a href={`/models/${id}`}>{modelName}</a>
+                  </Heading>
+
+                  <Text mt={1}>
+                    <Tag colorScheme={"teal"}>{tags}</Tag>
                   </Text>
-                  <Text fontSize="sm" color={colors.grey}>
+
+                  <Box height="80px" mt={1}>
+                    <Text fontSize="sm" color={"gray.500"} noOfLines={3}>
+                      {description}
+                    </Text>
+                  </Box>
+
+                  <Text fontSize="sm">Runs: {runs.toLocaleString()}</Text>
+                  <Text fontSize="sm">
                     Cost to Run: $
                     {costToRun !== "" ? costToRun.toLocaleString() : "-"}
                   </Text>
-                  <Text fontSize="sm" color={colors.grey}>
+                  <Text fontSize="sm">
                     Creator:{" "}
                     <Link href={`/creators/${creator}`}>
                       <span
                         style={{ textDecoration: "underline", color: "teal" }}
                       >
-                        {" "}
                         {creator}
                       </span>
                     </Link>
+                  </Text>
+                  <Text fontSize="sm" color={colors.grey}>
+                    <a href={modelUrl}>
+                      <span
+                        style={{ textDecoration: "underline", color: "teal" }}
+                      >
+                        Try on Replicate <ExternalLinkIcon />{" "}
+                      </span>
+                    </a>
                   </Text>
                 </Box>
               )

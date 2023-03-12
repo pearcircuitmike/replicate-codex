@@ -37,12 +37,40 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Replicate Codex</title>
+        <meta httpEquiv="content-language" content="en-gb" />
+
+        <title>Replicate Codex | Explore and find AI models</title>
         <meta
           name="description"
-          content="Search, filter, sort, and explore Replicate AI models"
+          content="Search, filter, sort and explore AI models on the Replicate platform."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta
+          property="og:title"
+          content="Replicate Codex | Explore and find AI models"
+        />
+        <meta
+          property="og:description"
+          content="Search, filter, sort and explore AI models on the Replicate platform."
+        />
+
+        <meta property="og:url" content="https://replicatecodex.com" />
+        <meta
+          property="og:image"
+          content="https://replicatecodex.com/socialImg.png"
+        />
+        <meta property="og:type" content="website" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          property="twitter:description"
+          content="Search, filter, sort and explore AI models on the Replicate platform."
+        />
+        <meta
+          property="twitter:image"
+          content="https://replicatecodex.com/socialImg.png"
+        />
+
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container maxW="8xl">
