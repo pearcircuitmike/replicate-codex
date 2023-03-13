@@ -1,4 +1,5 @@
 import { Box, Heading, Image, Link, Text } from "@chakra-ui/react";
+import PreviewImage from "./PreviewImage";
 
 export default function SimilarCreators({ similarCreators, data }) {
   return (
@@ -37,9 +38,8 @@ export default function SimilarCreators({ similarCreators, data }) {
                   width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
                   p="4"
                 >
-                  <Image
+                  <PreviewImage
                     src={previewImage}
-                    alt={`${creator} preview image`}
                     w="full"
                     h="64"
                     objectFit="cover"
@@ -50,12 +50,16 @@ export default function SimilarCreators({ similarCreators, data }) {
                       <Link href={`/creators/${creator}`}>{creator}</Link>
                     </Heading>
                     <Box d="flex" alignItems="baseline">
-                      Runs: {totalRuns}
-                      Total models: {creatorTotalModels}
+                      <Text>Runs: {totalRuns}</Text>
+                      <Text> Total models: {creatorTotalModels}</Text>
                     </Box>
                     <Box>
                       <Link href={`/creators/${creator}`}>
-                        Check out the {creator} details page
+                        <span
+                          style={{ textDecoration: "underline", color: "teal" }}
+                        >
+                          View creator page
+                        </span>
                       </Link>
                     </Box>
                   </Box>

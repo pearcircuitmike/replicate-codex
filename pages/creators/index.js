@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import Head from "next/head";
 import MetaTags from "../components/MetaTags";
+import PreviewImage from "../components/PreviewImage";
 
 import React, { useState } from "react";
 
@@ -68,28 +69,14 @@ const Creators = ({ creatorVals }) => {
                 key={creatorVal}
               >
                 <Flex align="center" direction="column" p={4}>
-                  {creatorVals.find((c) => c.creator === creatorVal).example ? (
-                    <Box
-                      as="img"
+                  <Box w="150px" h="150px" objectFit="cover">
+                    <PreviewImage
                       src={
                         creatorVals.find((c) => c.creator === creatorVal)
                           .example
                       }
-                      alt="creator"
-                      w="150px"
-                      h="150px"
-                      objectFit="cover"
                     />
-                  ) : (
-                    <Box
-                      as="img"
-                      src={"/default-creator.jpg"}
-                      alt="creator"
-                      w="150px"
-                      h="150px"
-                      objectFit="cover"
-                    />
-                  )}
+                  </Box>
                   <Text mt={3} fontSize="xl" fontWeight="bold">
                     <Link href={`/creators/${creatorVal}`}>{creatorVal}</Link>
                   </Text>
