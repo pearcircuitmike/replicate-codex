@@ -32,28 +32,6 @@ import GalleryView from "./components/GalleryView.js";
 
 export default function Home() {
   const [searchedVal, setSearchedVal] = useState("");
-  const [activeTab, setActiveTab] = useState(
-    typeof window !== "undefined" && window.localStorage
-      ? parseInt(
-          localStorage.getItem("activeTab") === null
-            ? 0
-            : localStorage.getItem("activeTab")
-        )
-      : 0
-  );
-
-  // Load the active tab index from local storage on page load
-  useEffect(() => {
-    const storedTab = localStorage.getItem("activeTab");
-    if (storedTab !== null) {
-      setActiveTab(parseInt(localStorage.getItem("activeTab")));
-    }
-  }, []);
-
-  // Save the active tab index to local storage when it changes
-  useEffect(() => {
-    localStorage.setItem("activeTab", activeTab.toString());
-  }, [activeTab]);
 
   return (
     <>
@@ -74,11 +52,7 @@ export default function Home() {
               onChange={(e) => setSearchedVal(e.target.value)}
             />
           </Box>
-          <Tabs
-            colorScheme="teal"
-            index={activeTab}
-            onChange={(index) => setActiveTab(index)}
-          >
+          <Tabs colorScheme="teal">
             <TabList>
               <Tab>List view</Tab>
               <Tab>Gallery</Tab>
