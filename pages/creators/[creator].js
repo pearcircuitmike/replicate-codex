@@ -11,12 +11,22 @@ import {
   Td,
   Image,
   Link,
+  List,
+  Flex,
+  ListItem,
 } from "@chakra-ui/react";
 import data from "../data/data.json";
 import Head from "next/head";
+import SimilarCreators from "../components/SimilarCreators";
+import ShareLinkButton from "../components/ShareLinkButton";
+import ShareTweetButton from "../components/ShareTweetButton";
+import calculateCreatorRank from "../components/utils/CreatorRank";
+import PreviewImage from "../components/PreviewImage";
+import MetaTags from "../components/MetaTags";
 
 export default function Creator({ creator }) {
   const models = data.filter((model) => model.creator === creator);
+  const allModels = data;
 
   const avgCost =
     models
@@ -32,98 +42,62 @@ export default function Creator({ creator }) {
     }
   });
 
-  // calc rank
-  function calculateCreatorRank(data, creator) {
-    // Sort array in descending order based on runs
-    const sortedData = data.sort((a, b) => b.runs - a.runs);
-
-    let rank = 0;
-    // Loop through sorted array and find the given creator's position
-    for (let i = 0; i < sortedData.length; i++) {
-      if (sortedData[i].creator === creator) {
-        rank = i + 1; // Add 1 since rank starts at 1
-        break;
-      }
-    }
-
-    return rank;
+  function getSimilarCreators(creator) {
+    const creatorModels = data.filter((model) => model.creator === creator);
+    const creatorTags = creatorModels.flatMap((model) => model.tags.split(","));
+    const similarCreators = data
+      .filter((item) => item.creator !== creator)
+      .filter((item) => item.tags)
+      .filter((item) => {
+        const itemTags = item.tags.split(",");
+        return itemTags.some((tag) => creatorTags.includes(tag));
+      })
+      .map((item) => item.creator);
+    return [...new Set(similarCreators)];
   }
+
+  const similarCreators = getSimilarCreators(creator);
 
   return (
     <>
-      <Head>
-        <meta httpEquiv="content-language" content="en-us" />
+      <MetaTags
+        title={`AI model creator details for ${creator}`}
+        description={`Details about ${creator}'s account on Replicate and their AI models`}
+      />
 
-        <title>AI model creator details: {creator}</title>
-        <meta
-          name="description"
-          content={`Details about ${creator}'s account on Replicate and their AI models`}
-        />
-
-        <meta
-          property="og:title"
-          content={`AI model creator details: ${creator}`}
-        />
-        <meta
-          property="og:description"
-          content={`Details about ${creator}'s account on Replicate and their AI models`}
-        />
-
-        <meta property="og:url" content="https://replicatecodex.com" />
-        <meta
-          property="og:image"
-          content="https://replicatecodex.com/socialImg.png"
-        />
-        <meta property="og:type" content="website" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          property="twitter:description"
-          content={`Details about ${creator}'s account on Replicate and their AI models`}
-        />
-        <meta
-          property="twitter:image"
-          content="https://replicatecodex.com/socialImg.png"
-        />
-
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <Container maxW="container.xl" py="12">
-        <Box>
-          <Heading as="h2" size="xl" mb="2">
-            {creator}
-            {calculateCreatorRank(data, creator) == 1 ? " 🥇" : ""}
-            {calculateCreatorRank(data, creator) == 2 ? " 🥈" : ""}
-            {calculateCreatorRank(data, creator) == 3 ? " 🥉" : ""}
-          </Heading>
-          Rank: {calculateCreatorRank(data, creator)}
-          <Text fontSize="lg" color="gray.500">
-            Average Model Cost: ${avgCost.toFixed(4)}
-          </Text>
-          <Text fontSize="lg" color="gray.500" mb="8">
-            Number of Runs:{" "}
-            {models
-              .reduce((sum, model) => sum + model.runs, 0)
-              .toLocaleString()}
-          </Text>
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>Model Type</Th>
-                <Th>Count</Th>
+        <Heading as="h2" size="xl" mb="2">
+          {creator}
+          {calculateCreatorRank(data, creator) == 1 ? " 🥇" : ""}
+          {calculateCreatorRank(data, creator) == 2 ? " 🥈" : ""}
+          {calculateCreatorRank(data, creator) == 3 ? " 🥉" : ""}
+        </Heading>
+        Rank: {calculateCreatorRank(allModels, creator)}
+        <Text fontSize="lg" color="gray.500">
+          Average Model Cost: ${avgCost.toFixed(4)}
+        </Text>
+        <Text fontSize="lg" color="gray.500" mb="8">
+          Number of Runs:{" "}
+          {models.reduce((sum, model) => sum + model.runs, 0).toLocaleString()}
+        </Text>
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Model Type</Th>
+              <Th>Count</Th>
+            </Tr>
+          </Thead>
+          <tbody>
+            {Object.entries(modelTypes).map(([tag, count]) => (
+              <Tr key={tag}>
+                <Td>{tag}</Td>
+                <Td>{count}</Td>
               </Tr>
-            </Thead>
-            <tbody>
-              {Object.entries(modelTypes).map(([tag, count]) => (
-                <Tr key={tag}>
-                  <Td>{tag}</Td>
-                  <Td>{count}</Td>
-                </Tr>
-              ))}
-            </tbody>
-          </Table>
-        </Box>
-
+            ))}
+          </tbody>
+        </Table>
+        <ShareLinkButton />
+        <ShareTweetButton />
         <Box mt="12" display="flex" flexWrap="wrap">
           {models.map((model) => (
             <Box
@@ -132,18 +106,7 @@ export default function Creator({ creator }) {
               p="4"
             >
               <Link href={`/models/${model.id}`}>
-                <Image
-                  src={
-                    model.example !== ""
-                      ? model.example
-                      : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
-                  }
-                  alt="Model Preview"
-                  w="full"
-                  h="64"
-                  objectFit="cover"
-                  mb="4"
-                />
+                <PreviewImage src={model.example} />
               </Link>
 
               <Heading as="h3" size="lg" mb="2">
@@ -167,6 +130,7 @@ export default function Creator({ creator }) {
             </Box>
           ))}
         </Box>
+        <SimilarCreators similarCreators={similarCreators} data={data} />
       </Container>
     </>
   );

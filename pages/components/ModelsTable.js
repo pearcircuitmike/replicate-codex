@@ -77,7 +77,7 @@ export default function TableTest({ searchedVal }) {
             isChecked={selectedTags.includes(tags)}
             onChange={handleTagSelect}
             color="gray.600"
-            key={models.id}
+            key={models.tags}
           >
             {tags}
           </Checkbox>
