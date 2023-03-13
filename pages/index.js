@@ -26,12 +26,34 @@ import ModelsTable from "./components/ModelsTable.js";
 import ModelsLeaderboard from "./components/ModelsLeaderboard.js";
 import Table from "./components/ModelsTable.js";
 import MetaTags from "./components/MetaTags.js";
-
+import CreatorsLeaderboard from "./components/CreatorsLeaderboard.js";
 import Hero from "./components/Hero.js";
 import GalleryView from "./components/GalleryView.js";
 
 export default function Home() {
   const [searchedVal, setSearchedVal] = useState("");
+  const [activeTab, setActiveTab] = useState(
+    typeof window !== "undefined" && window.localStorage
+      ? parseInt(
+          localStorage.getItem("activeTab") === null
+            ? 0
+            : localStorage.getItem("activeTab")
+        )
+      : 0
+  );
+
+  // Load the active tab index from local storage on page load
+  useEffect(() => {
+    const storedTab = localStorage.getItem("activeTab");
+    if (storedTab !== null) {
+      setActiveTab(parseInt(localStorage.getItem("activeTab")));
+    }
+  }, []);
+
+  // Save the active tab index to local storage when it changes
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab.toString());
+  }, [activeTab]);
 
   return (
     <>
@@ -52,11 +74,16 @@ export default function Home() {
               onChange={(e) => setSearchedVal(e.target.value)}
             />
           </Box>
-          <Tabs colorScheme="teal">
+          <Tabs
+            colorScheme="teal"
+            index={activeTab}
+            onChange={(index) => setActiveTab(index)}
+          >
             <TabList>
               <Tab>List view</Tab>
               <Tab>Gallery</Tab>
               <Tab>Top Models</Tab>
+              <Tab>Top Creators</Tab>
             </TabList>
 
             <TabPanels>
@@ -68,6 +95,9 @@ export default function Home() {
               </TabPanel>
               <TabPanel>
                 <ModelsLeaderboard searchedVal={searchedVal} />
+              </TabPanel>
+              <TabPanel>
+                <CreatorsLeaderboard searchedVal={searchedVal} />
               </TabPanel>
             </TabPanels>
           </Tabs>
