@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import testData from "../data/data.json";
 import Head from "next/head";
+import MetaTags from "../components/MetaTags";
 
 export const getStaticProps = async () => {
   const data = testData;
@@ -29,40 +30,11 @@ const Models = ({ modelVals }) => {
 
   return (
     <>
-      <Head>
-        <meta httpEquiv="content-language" content="en-us" />
+      <MetaTags
+        title={"Replicate Codex | All Models"}
+        description={"List of all AI models on the Replicate platform."}
+      />
 
-        <title>Replicate Codex | All Models</title>
-        <meta
-          name="description"
-          content="List of all AI models on the Replicate platform."
-        />
-
-        <meta property="og:title" content="Replicate Codex | All Models" />
-        <meta
-          property="og:description"
-          content="List of all AI models on the Replicate platform."
-        />
-
-        <meta property="og:url" content="https://replicatecodex.com" />
-        <meta
-          property="og:image"
-          content="https://replicatecodex.com/socialImg.png"
-        />
-        <meta property="og:type" content="website" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          property="twitter:description"
-          content="List of all AI models on the Replicate platform."
-        />
-        <meta
-          property="twitter:image"
-          content="https://replicatecodex.com/socialImg.png"
-        />
-
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>
           Models

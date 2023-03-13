@@ -1,20 +1,7 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Badge,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Td,
-  Image,
-  Link,
-  Tag,
-} from "@chakra-ui/react";
+import { Box, Container, Heading, Text, Image, Tag } from "@chakra-ui/react";
 import data from "../data/data.json";
-import Head from "next/head";
+import MetaTags from "../components/MetaTags";
+import PreviewImage from "../components/PreviewImage";
 
 export async function getStaticPaths() {
   const paths = data.map((model) => ({
@@ -35,48 +22,10 @@ export default function ModelPage({ model }) {
   const rank = sortedData.findIndex((m) => m.id === model.id) + 1; // Calculate the rank of the current model
   return (
     <>
-      <Head>
-        <meta httpEquiv="content-language" content="en-us" />
-
-        <title>AI model details - {model.modelName}</title>
-        <meta
-          name="description"
-          content={`Details about the ${model.modelName} model by ${model.creator}`}
-        />
-
-        <meta property="og:title" content="Replicate Codex | All Models" />
-        <meta
-          property="og:description"
-          content={`Details about the ${model.modelName} model by ${model.creator}`}
-        />
-
-        <meta property="og:url" content="https://replicatecodex.com" />
-        {model.example !== "" ? (
-          <meta property="og:image" content={model.example} />
-        ) : (
-          <meta
-            property="og:image"
-            content="https://replicatecodex.com/socialImg.png"
-          />
-        )}
-        <meta property="og:type" content="website" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          property="twitter:description"
-          content={`Details about the ${model.modelName} model by ${model.creator}`}
-        />
-        {model.example !== "" ? (
-          <meta property="twitter:image" content={model.example} />
-        ) : (
-          <meta
-            property="twitter:image"
-            content="https://replicatecodex.com/socialImg.png"
-          />
-        )}
-
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <MetaTags
+        title={`AI model details - ${model.modelName}`}
+        description={`Details about the ${model.modelName} model by ${model.creator}`}
+      />
       <Container maxW="container.xl" py="12">
         <Box>
           <Heading as="h1" size="xl" mb="2">
@@ -97,16 +46,8 @@ export default function ModelPage({ model }) {
           <Text fontSize="lg" color="gray.500" mb="4">
             {model.description}
           </Text>
+          <PreviewImage src={model.example} />
 
-          <Image
-            src={
-              model.example !== ""
-                ? model.example
-                : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
-            }
-            alt={`Example of ${model.modelName}`}
-            mb="8"
-          />
           <Text fontSize="lg" mb="4">
             Model Rank: {rank}
             {rank == 1 ? " 🥇" : ""}

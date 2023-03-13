@@ -10,5 +10,9 @@ export default function ShareTweetButton() {
     window.open(shareUrl, "_blank");
   }
 
-  return <Button onClick={shareOnTwitter}>Share on Twitter</Button>;
+  return (
+    <Button onClick={shareOnTwitter} m={1}>
+      Share on Twitter
+    </Button>
+  );
 }

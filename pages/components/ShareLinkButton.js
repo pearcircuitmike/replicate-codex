@@ -10,7 +10,7 @@ export default function ShareLinkButton() {
   }
 
   return (
-    <Button onClick={copyToClipboard}>
+    <Button onClick={copyToClipboard} m={1}>
       {copySuccess ? "Copied!" : "Share Link"}
     </Button>
   );

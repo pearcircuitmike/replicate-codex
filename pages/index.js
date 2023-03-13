@@ -25,54 +25,23 @@ import {
 import ModelsTable from "./components/ModelsTable.js";
 import ModelsLeaderboard from "./components/ModelsLeaderboard.js";
 import Table from "./components/ModelsTable.js";
+import MetaTags from "./components/MetaTags.js";
 
 import Hero from "./components/Hero.js";
 import GalleryView from "./components/GalleryView.js";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [searchedVal, setSearchedVal] = useState("");
 
   return (
     <>
-      <Head>
-        <meta httpEquiv="content-language" content="en-gb" />
+      <MetaTags
+        title={"Replicate Codex | Explore and find AI models"}
+        description={
+          "Discover new AI models to play and build with on Replicate."
+        }
+      />
 
-        <title>Replicate Codex | Explore and find AI models</title>
-        <meta
-          name="description"
-          content="Discover new AI models to play and build with on Replicate."
-        />
-
-        <meta
-          property="og:title"
-          content="Replicate Codex | Explore and find AI models"
-        />
-        <meta
-          property="og:description"
-          content="Discover new AI models to play and build with on Replicate."
-        />
-
-        <meta property="og:url" content="https://replicatecodex.com" />
-        <meta
-          property="og:image"
-          content="https://replicatecodex.com/socialImg.png"
-        />
-        <meta property="og:type" content="website" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          property="twitter:description"
-          content="Discover new AI models to play and build with on Replicate."
-        />
-        <meta
-          property="twitter:image"
-          content="https://replicatecodex.com/socialImg.png"
-        />
-
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <Container maxW="8xl">
         <main>
           <Hero />
