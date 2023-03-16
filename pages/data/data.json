@@ -1710,7 +1710,7 @@
     "modelName": "wavyfusion",
     "description": "trained on a very diverse dataset ranging from photographs to paintings",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/X3QiWcxedlyrekButiNlJqVDdfRfcy9merjX6yfOSzAaqZACE/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/wavyfusion",
     "runs": 2600,
     "costToRun": ""
@@ -1722,7 +1722,7 @@
     "modelName": "arbgen",
     "description": "testing dreambooth on self",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/5TVPPsDiIRKTKJT8oWf2gekhaSpvtYezyEDhuJpG2AAESXRgA/out-0.png",
     "modelUrl": "https://replicate.com/arjunbanker/arbgen",
     "runs": 286,
     "costToRun": ""
@@ -1734,7 +1734,7 @@
     "modelName": "altdiffusion-m9",
     "description": "Multilingual Stable Diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/po4e5mtsfZiGv0CF3z8BDgNBcBSIHZdJ7yPvuy8J0QSfKiOgA/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/altdiffusion-m9",
     "runs": 505,
     "costToRun": ""
@@ -1746,7 +1746,7 @@
     "modelName": "stable-diffusion-v2",
     "description": "sd-v2 with diffusers, test version!",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/Z1qXRKCfPlXuXKl2nhfb3eL3Y1TfqGylycuig9eClEOsi8aAC/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/stable-diffusion-v2",
     "runs": 149600,
     "costToRun": ""
@@ -1758,7 +1758,7 @@
     "modelName": "stable_diffusion2_upscaling",
     "description": "Image super-resolution with stable-diffusion V2",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/bKBrxkXJ7LZrEpFI3q33lnmmDveQBFVDcnek3pSOMb6wM5FQA/output-0.png",
     "modelUrl": "https://replicate.com/arielreplicate/stable_diffusion2_upscaling",
     "runs": 2100,
     "costToRun": ""
@@ -1770,7 +1770,7 @@
     "modelName": "stable-diffusion-v2-inpainting",
     "description": "stable-diffusion-v2-inpainting",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/R0kqaA8PUMarFx2SoelD46bYGO8MwPUx1XiMUdq82YiUv3CIA/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/stable-diffusion-v2-inpainting",
     "runs": 6400,
     "costToRun": ""
@@ -1782,7 +1782,7 @@
     "modelName": "dogbooth",
     "description": "A DreamBooth model trained using GitHub Actions. Prompt identifier is dgg",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/r2naKsI29b5MC5sDBdkOeL3NurfYa6vMtcqsbVW9yCxvtsFQA/out-0.png",
     "modelUrl": "https://replicate.com/zeke/dogbooth",
     "runs": 207,
     "costToRun": ""
@@ -1794,7 +1794,7 @@
     "modelName": "paella_fast_text2image",
     "description": "Fast text2image model",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/ZRtsJWC8Mu4RI5uKqslp5xB9hPuoWQhXkb8EIc4e2fzgLpFQA/output-0.png",
     "modelUrl": "https://replicate.com/arielreplicate/paella_fast_text2image",
     "runs": 274,
     "costToRun": ""
@@ -1806,7 +1806,7 @@
     "modelName": "rembg",
     "description": "remove images background",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/2hczaMwD9xrsIR8h3Cl8iYGbHaCdFhIOMZ0LfoYfHlKuuIBQA/out.png",
     "modelUrl": "https://replicate.com/cjwbw/rembg",
     "runs": 53900,
     "costToRun": ""
@@ -1818,7 +1818,7 @@
     "modelName": "zekebooth",
     "description": "My own personal dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/tek9kZI140xOKiQZbb812qzOeRvJra44oUYNiqfenMKaVXAAB/out-0.png",
     "modelUrl": "https://replicate.com/zeke/zekebooth",
     "runs": 487,
     "costToRun": ""
@@ -1830,7 +1830,7 @@
     "modelName": "chloebooth",
     "description": "Dreambooth model for my cat, Chloé",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/SvVN8x9Ge0SpbaCFlpRxGbTWdBqHPwuPlBVpIxTVJIMt4WCIA/out-0.png",
     "modelUrl": "https://replicate.com/jelleve/chloebooth",
     "runs": 434,
     "costToRun": ""
@@ -1842,7 +1842,7 @@
     "modelName": "clip-interrogator",
     "description": "The CLIP Interrogator is a prompt engineering tool that combines OpenAI’s CLIP and Salesforce’s BLIP to optimize text prompts to match a given image. Use the resulting prompts with text-to-image models like Stable Diffusion to create cool art!",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/HrXsgowfhbZi3dImGZoIcvnz7oZfMtFY4UAEU8vBIakTd8JQ/watercolour-4799014_960_720.jpg",
     "modelUrl": "https://replicate.com/pharmapsychotic/clip-interrogator",
     "runs": 231000,
     "costToRun": ""
@@ -1854,7 +1854,7 @@
     "modelName": "conceptual-image-to-image-1.5",
     "description": "Conceptual image-to-image model for Stable Diffusion 1.5",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/pmqMglIgxipPF9P3cWJot0Rf0dvmVxgBerkcyQCLu1wqHMEQA/out-0.png",
     "modelUrl": "https://replicate.com/vivalapanda/conceptual-image-to-image-1.5",
     "runs": 681,
     "costToRun": ""
@@ -1866,7 +1866,7 @@
     "modelName": "conceptual-image-to-image",
     "description": "Conceptual image-to-image model for Stable Diffusion 2.0",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/VqHkTNSqVRqbLVqeXlHPecfeN71uyqcRzTQOHzUmSzxnXrQAB/out-1.png",
     "modelUrl": "https://replicate.com/vivalapanda/conceptual-image-to-image",
     "runs": 1300,
     "costToRun": ""
@@ -1878,7 +1878,7 @@
     "modelName": "camcorgi",
     "description": "camcorgi generates photos that feature the cam corgi known as @corgi.cam",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/i0nwwnuqsHoOMVeApc0Alo8lw4zvhW2VjsiNqTb5XhNMhFCIA/out-0.png",
     "modelUrl": "https://replicate.com/yosun/camcorgi",
     "runs": 888,
     "costToRun": ""
@@ -1890,7 +1890,7 @@
     "modelName": "pplpointing",
     "description": "Generate images of people pointing",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/Otxj9YfZMY2wZCfTkDUFLdZRl0lHpCvoQHgHePbTf8PAKAPAB/out-0.png",
     "modelUrl": "https://replicate.com/jiht76/pplpointing",
     "runs": 873,
     "costToRun": ""
@@ -1902,7 +1902,7 @@
     "modelName": "multi-stage-blended-diffusion",
     "description": "Multi stage image editing of images using stable-diffusion with a mask and a prompt",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/HqopAAYEyqpSmf1OP2cw3Dl8pcZI6IWXdp1sxnMy2KuRvh3K/bedroom_painting.jpg",
     "modelUrl": "https://replicate.com/arielreplicate/multi-stage-blended-diffusion",
     "runs": 306,
     "costToRun": ""
@@ -1914,7 +1914,7 @@
     "modelName": "bfirshbooth",
     "description": "Generates bfirshes",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/61tAUJMcbx4pPRknVmfxue9MgX24EKSXbfaHwa2O9cfobdIAB/out-0.png",
     "modelUrl": "https://replicate.com/bfirsh/bfirshbooth",
     "runs": 5700,
     "costToRun": ""
@@ -1926,7 +1926,7 @@
     "modelName": "sdv2-preview",
     "description": "Stable Diffusion 2.0 Preview",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/3JlNy0OCE6JZFN2huaoJFjfGO9tDRHRDQs6QIWeRoEP7sLDQA/out-0.png",
     "modelUrl": "https://replicate.com/anotherjesse/sdv2-preview",
     "runs": 28000,
     "costToRun": ""
@@ -1938,7 +1938,7 @@
     "modelName": "antiquemetalcreator",
     "description": "Create cool looking gold metal things!",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/6DyY0K0Apj75MRVrt8c9R83yp22uDsxyhseTYlVqGlwXeJDQA/out-0.png",
     "modelUrl": "https://replicate.com/myaiteam2/antiquemetalcreator",
     "runs": 375,
     "costToRun": ""
@@ -1950,7 +1950,7 @@
     "modelName": "story-dalle",
     "description": "A model trained for the task of story visualization; generating images to pair with captions in a story.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/bq0mFYH8NTYGEZOOp05uW94OyWRfQ8sm1nG7pnQJwGnQO1EIA/gradio_demo_pororo_415.png",
     "modelUrl": "https://replicate.com/adymaharana/story-dalle",
     "runs": 116,
     "costToRun": ""
@@ -1962,7 +1962,7 @@
     "modelName": "stable-diffusion",
     "description": "stable-diffusion with negative prompts, more scheduler",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/HR9BqOj0nezdSif52eDFLFClW8AIemuiYQvxDMTp5SEkv6KAB/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/stable-diffusion",
     "runs": 39500,
     "costToRun": ""
@@ -1974,7 +1974,7 @@
     "modelName": "ghibli-diffusion",
     "description": "",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/TmzjKcu0ewQiZS3QCfUTCeZcLqSov7MQI0SPQjsaNzlUlVFgA/out-0.png",
     "modelUrl": "https://replicate.com/m1guelpf/ghibli-diffusion",
     "runs": 859,
     "costToRun": ""
@@ -1986,7 +1986,7 @@
     "modelName": "emoji-diffusion",
     "description": "Emojis on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/KFyqEQeeEEutbUaUxeCf2tDdyfUXQNeZz1zOT3QNvx1wB0pAE/out-0.png",
     "modelUrl": "https://replicate.com/m1guelpf/emoji-diffusion",
     "runs": 1900,
     "costToRun": ""
@@ -1998,7 +1998,7 @@
     "modelName": "safe-latent-diffusion",
     "description": "Stable Diffusion, but NSFW images return the closest non-NSFW image instead of a black square.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/4XDbfY87DDX1Vio3ewwHM9fDJTHQ8AXgQ1Mt4LmJk0TreIKAB/out-0.png",
     "modelUrl": "https://replicate.com/m1guelpf/safe-latent-diffusion",
     "runs": 535,
     "costToRun": ""
@@ -2010,7 +2010,7 @@
     "modelName": "nsfw-filter",
     "description": "Run any image through the Stable Diffusion content filter",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/HopNzJn8F7MbMq47EpzTOubJgxT4N4DWZwb5dWURi885Zm6C/kid.jpeg",
     "modelUrl": "https://replicate.com/m1guelpf/nsfw-filter",
     "runs": 42500,
     "costToRun": ""
@@ -2022,7 +2022,7 @@
     "modelName": "aesthetic-predictor",
     "description": "A linear estimator on top of clip to predict the aesthetic quality of pictures",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/HnxgWuBCi6XFLNmLkJZ4syITRhL5stYvNnAX5axgE8Uox68s/lovely-cat-as-domestic-animal-view-pictures-182393057.jpg",
     "modelUrl": "https://replicate.com/cjwbw/aesthetic-predictor",
     "runs": 2700,
     "costToRun": ""
@@ -2034,7 +2034,7 @@
     "modelName": "backgroundmatting",
     "description": "Real-Time High-Resolution Background Matting",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/cUzNjzc65YoqIhj3Kbq7qCHOgn0v3J8k8fsrFf87A7AYGDBQA/out.png",
     "modelUrl": "https://replicate.com/cjwbw/backgroundmatting",
     "runs": 750,
     "costToRun": ""
@@ -2046,7 +2046,7 @@
     "modelName": "poolsuite-diffusion",
     "description": "Reproduce Poolsuite vibes with a fine tuned Dreambooth model",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/E6hztf2wfEq1DUaIzTnLHl0bS5SJpdFoTlY64wnX6TlbQcAQA/out-0.png",
     "modelUrl": "https://replicate.com/prompthero/poolsuite-diffusion",
     "runs": 500,
     "costToRun": ""
@@ -2058,9 +2058,9 @@
     "modelName": "funko-diffusion",
     "description": "Stable Diffusion fine tuned on Funko Pop",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/AKYKbvhgl06rPdPdFq6nJYMJpzTsQOEQiiJWh8x5ncqNTHAE/out-0.png",
     "modelUrl": "https://replicate.com/prompthero/funko-diffusion",
-    "runs": 3900,
+    "runs": 3400000,
     "costToRun": ""
   },
   {
@@ -2082,7 +2082,7 @@
     "modelName": "",
     "description": "pixi-2000-200class",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/yxfgxTTbrE1WPCL37eqfJIVAfcj5aAEnzGJhGLcYkeFihCEAC/out-0.png",
     "modelUrl": "https://replicate.com/sullyo/pixi-2000-200class",
     "runs": 141,
     "costToRun": ""
@@ -2094,9 +2094,9 @@
     "modelName": "inkpunk-diffusion",
     "description": "Stable Diffusion fine tuned on Midjourney v4 images.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/dxf6penvKmh1okgMgyMcrWI54PcCkfe75BX5WgzQUhRjbjfEC/out-0.png",
     "modelUrl": "https://replicate.com/adithram/inkpunk-diffusion",
-    "runs": 3400000,
+    "runs": 32,
     "costToRun": ""
   },
   {
@@ -2106,7 +2106,7 @@
     "modelName": "sd_pixelart_spritesheet_generator",
     "description": "generate pixel art sprite sheets from four different angles with Stable-diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/XOtc8okRRWofCSuvakqgczhIffSdsfPvn2aHQZquDutcMmAAB/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/sd_pixelart_spritesheet_generator",
     "runs": 1900,
     "costToRun": ""
@@ -2118,7 +2118,7 @@
     "modelName": "sd-naruto-diffusers",
     "description": "Stable Diffusion fine tuned on Naruto",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/8SpyV6FOr8qaFBeoG5MCuH6b1me1cFvixulYllqhSyv52vffA/out-0.png",
     "modelUrl": "https://replicate.com/lambdal/sd-naruto-diffusers",
     "runs": 1300,
     "costToRun": ""
@@ -2130,7 +2130,7 @@
     "modelName": "material-diffusion",
     "description": "Stable diffusion fork for generating tileable outputs using v1.5 model",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/XcklpSF1o7Z1I91xQQQHFvJfltWEa3HuQpoeVVTvN7GVJhffA/out-0.png",
     "modelUrl": "https://replicate.com/tstramer/material-diffusion",
     "runs": 73400,
     "costToRun": ""
@@ -2142,7 +2142,7 @@
     "modelName": "disco-diffusion-style",
     "description": "Disco Diffusion style on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/7hkEoMctCQr4JJltbx9fYzw2ZC1R31kcJ6yRRbuCPKSErAfPA/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/disco-diffusion-style",
     "runs": 1500,
     "costToRun": ""
@@ -2154,7 +2154,7 @@
     "modelName": "tron-legacy-diffusion",
     "description": "Tron Legacy Diffusion on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/DCrB6rfbSCQoWaDASvzIxZe0jtfJWf19Nk4i2in5jxx0qE4fB/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/tron-legacy-diffusion",
     "runs": 1100,
     "costToRun": ""
@@ -2166,7 +2166,7 @@
     "modelName": "classic-anim-diffusion",
     "description": "Animation Studio on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/2gTh9Htp2Ko1CRHuYs5R7gP3ongWA0eyL7qCLQIp9HAEdAfPA/out-0.png",
     "modelUrl": "https://replicate.com/nitrosocke/classic-anim-diffusion",
     "runs": 3100,
     "costToRun": ""
@@ -2178,7 +2178,7 @@
     "modelName": "dreambooth-pikachu",
     "description": "Pikachu on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/fgSWe4pUA9u6EEkHTmlY1il4eK1ZNjA9r3EQn9Y1Dk5JwB8fA/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/dreambooth-pikachu",
     "runs": 299,
     "costToRun": ""
@@ -2190,7 +2190,7 @@
     "modelName": "redshift-diffusion",
     "description": "3D artworks on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/ezdgqSe7QZlsLEDZMzGZ4RERf6SRR981TvxnyQLewh9jfAwfD/out-0.png",
     "modelUrl": "https://replicate.com/nitrosocke/redshift-diffusion",
     "runs": 25500,
     "costToRun": ""
@@ -2202,7 +2202,7 @@
     "modelName": "herge-style",
     "description": "herge_style on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/t1BB2kXO4So4KlwiwkZw2e7JgZfibuxoeeFHCWNHD9K3RevfD/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/herge-style",
     "runs": 1300,
     "costToRun": ""
@@ -2214,7 +2214,7 @@
     "modelName": "van-gogh-diffusion",
     "description": "Van Gough on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/gVidGfayGfulGkTWWSGCCpQuA0sjkycleounGgfEoGQQr93fB/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/van-gogh-diffusion",
     "runs": 1400,
     "costToRun": ""
@@ -2226,7 +2226,7 @@
     "modelName": "tron-legacy-diffusion",
     "description": "Updated 4 months, 1 week ago 1.4K runs",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/BIgc37Myv6K2Mxmfg79McDvfFY7B2UdB67HbRhsr4tqdW29PA/out-0.png",
     "modelUrl": "https://replicate.com/tstramer/tron-legacy-diffusion",
     "runs": 1400,
     "costToRun": ""
@@ -2238,7 +2238,7 @@
     "modelName": "robo-diffusion",
     "description": "Updated 4 months, 1 week ago 383 runs",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/XazouHZ7ePw8PCdiROGkIJtGEfIKXUy7IqNM5ev2JR310s7fA/out-0.png",
     "modelUrl": "https://replicate.com/tstramer/robo-diffusion",
     "runs": 383,
     "costToRun": ""
@@ -2250,7 +2250,7 @@
     "modelName": "pony-diffusion",
     "description": "Updated 4 months, 1 week ago 2.6K runs",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/Sg4pdhqGbvL8H1xa9qfiYnQfeBTVegjOWhetTCNiFS45ilufD/out-0.png",
     "modelUrl": "https://replicate.com/tstramer/pony-diffusion",
     "runs": 2600,
     "costToRun": ""
@@ -2262,7 +2262,7 @@
     "modelName": "tonalamatl-diffusion",
     "description": "Stable Diffusion fine-tuned of the Codex Borgia, a 16th century Meso-American manuscript.",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/xRCegWfi5Wpki0BtwYmfOzoHrrvfGdqm7PXufSd3wL1Fd5yfD/out-0.png",
     "modelUrl": "https://replicate.com/venkr/tonalamatl-diffusion",
     "runs": 2000,
     "costToRun": ""
@@ -2274,7 +2274,7 @@
     "modelName": "elden-ring-diffusion",
     "description": "fine-tuned Stable Diffusion model trained on the game art from Elden Ring",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/xXh8lSe8UOQMCSW4kpnOneWRGuBtXNfDFTtqfjsQ9rq87rwfB/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/elden-ring-diffusion",
     "runs": 2100,
     "costToRun": ""
@@ -2310,7 +2310,7 @@
     "modelName": "monkey-island-sd",
     "description": "Stable Diffusion fined-tuned on frames from Monkey Island 1 and 2",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/68bI5Djdj9Z8KBrm6k7Gc0pykccNe7z2MGtVM5QdNfIsi07PA/out-0.png",
     "modelUrl": "https://replicate.com/andreasjansson/monkey-island-sd",
     "runs": 2000,
     "costToRun": ""
@@ -2322,7 +2322,7 @@
     "modelName": "waifu-diffusion-16bit",
     "description": "Waifu Diffusion v1.4 16bit",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/K5bcmkvJzCbJLtz4scQqWBXo35MHTdu1bYErRxcmD7ZXcx9D/out-0.png",
     "modelUrl": "https://replicate.com/multitrickfox/waifu-diffusion-16bit",
     "runs": 21500,
     "costToRun": ""
@@ -2358,7 +2358,7 @@
     "modelName": "prompt-to-prompt",
     "description": "Prompt-to-prompt image editing with cross-attention control",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/TifLlbfgWtlJwEW7PqVR0rNXKfOcUstERBnr5bcXhQpegarfB/out_ori.png",
     "modelUrl": "https://replicate.com/cjwbw/prompt-to-prompt",
     "runs": 1100,
     "costToRun": ""
@@ -2370,7 +2370,7 @@
     "modelName": "arcane-diffusion",
     "description": "Arcane on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/S3Vuk626HB6jHZOCZfBUx9Pfehj6rZWOZChTVlI1WLmknfqfB/out-0.png",
     "modelUrl": "https://replicate.com/nitrosocke/arcane-diffusion",
     "runs": 26900,
     "costToRun": ""
@@ -2382,7 +2382,7 @@
     "modelName": "swin2sr",
     "description": "1 Million Runs! Swin2SR Transformer for Image Super-Resolution and Restoration",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/KUIcw7v0GKZtDByjISRnRrcMer7J80cikHOCcnvdnefhFcChA/out.png",
     "modelUrl": "https://replicate.com/mv-lab/swin2sr",
     "runs": 1000000,
     "costToRun": ""
@@ -2394,7 +2394,7 @@
     "modelName": "archer-diffusion",
     "description": "Archer on Stable Diffusion via Dreambooth",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/QuptS0j7eC3YPy5rlS5di7je6LbVCHYfY7IESlQwfUliKDqfB/out-0.png",
     "modelUrl": "https://replicate.com/nitrosocke/archer-diffusion",
     "runs": 4200,
     "costToRun": ""
@@ -2406,7 +2406,7 @@
     "modelName": "",
     "description": "pixray-vqgan",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/bf1a4d4e-179e-4753-aefe-b3d6b14c03c5/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-vqgan",
     "runs": 87000,
     "costToRun": ""
@@ -2418,7 +2418,7 @@
     "modelName": "",
     "description": "pixray-pixel",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4039227c-199b-470d-a2cc-a9ec561109b6/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-pixel",
     "runs": 19400,
     "costToRun": ""
@@ -2430,7 +2430,7 @@
     "modelName": "pixray-text2image",
     "description": "Uses pixray to generate an image from text prompt",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/cbd88190-7873-4fd9-8bfb-9a89451c0451/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-text2image",
     "runs": 219300,
     "costToRun": ""
@@ -2442,7 +2442,7 @@
     "modelName": "pixray-text2pixel",
     "description": "Turn any description into pixel art",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b0df1f88-1ee2-4496-ba11-8becd0b93993/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-text2pixel",
     "runs": 100600,
     "costToRun": ""
@@ -2454,7 +2454,7 @@
     "modelName": "pixray",
     "description": "Pixray with custom settings",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/1dcab14a-418f-4ece-b9f6-3a164057fd6b/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray",
     "runs": 57900,
     "costToRun": ""
@@ -2466,7 +2466,7 @@
     "modelName": "pixray-api",
     "description": "Uses pixray with raw settings.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d1649fbe-e5cb-4374-871b-1c5f51bbd8d2/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-api",
     "runs": 29100,
     "costToRun": ""
@@ -2478,7 +2478,7 @@
     "modelName": "8bidoug",
     "description": "A pixray tool for 24x24 pixelart",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/123f4e29-f526-41ca-b734-670121ece852/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/8bidoug",
     "runs": 1500,
     "costToRun": ""
@@ -2490,7 +2490,7 @@
     "modelName": "glid-3-xl-stable",
     "description": "Stable diffusion, but with more powerful in-painting & out-painting capabilities",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/devxpy/glid-3-xl-stable/files/9143aab6-0adf-4c5b-a58c-e38166a48c58/00000.png",
     "modelUrl": "https://replicate.com/devxpy/glid-3-xl-stable",
     "runs": 6300,
     "costToRun": ""
@@ -2502,7 +2502,7 @@
     "modelName": "stable-diffusion-v1-5",
     "description": "stable-diffusion with v1-5 checkpoint",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/Dp8ewmDVzYTBRCTzWflZLPLpAxNOOh4ITj3WZYFPO217leyfA/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/stable-diffusion-v1-5",
     "runs": 30900,
     "costToRun": ""
@@ -2514,7 +2514,7 @@
     "modelName": "stable-diffusion-aesthetic-gradients",
     "description": "Stable Diffusion with Aesthetic Gradients",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/gk2Y0pI9XzaeKiHzf88u86BKa9bkvaKMyTjeVlFb5LW8p6yfA/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/stable-diffusion-aesthetic-gradients",
     "runs": 297,
     "costToRun": ""
@@ -2538,7 +2538,7 @@
     "modelName": "dichotomous_image_segmentation",
     "description": "Highly Accurate Dichotomous Image Segmentation （ECCV 2022）",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/pbxt/wbh1VJGJp8L9FtByKN2s9bisCEuyrfAJwWTPk62Oz7clmf3PA/output.png",
     "modelUrl": "https://replicate.com/arielreplicate/dichotomous_image_segmentation",
     "runs": 1200,
     "costToRun": ""
@@ -2550,7 +2550,7 @@
     "modelName": "laionide",
     "description": "Generate images from text quickly. See https://replicate.com/afiaka87/laionide-v2 for a new checkpoint.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/6e152613-c32a-438c-a7d6-56d8f1d9dc48/upsample_predictions.png",
     "modelUrl": "https://replicate.com/laion-ai/laionide",
     "runs": 7100,
     "costToRun": ""
@@ -2562,7 +2562,7 @@
     "modelName": "clip-guided-diffusion",
     "description": "Generate image from text by guiding a denoising diffusion model. Inference is somewhat slow.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/19de71e0-8fe2-486c-9ab2-cd71f1e4ca88/0249.png",
     "modelUrl": "https://replicate.com/afiaka87/clip-guided-diffusion",
     "runs": 34100,
     "costToRun": ""
@@ -2574,7 +2574,7 @@
     "modelName": "laionide-v3",
     "description": "GLIDE finetuned on LAION5B, then more on curated datasets.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4b4137a8-0dab-4c71-82ed-ef42219717da/upsample_predictions.png",
     "modelUrl": "https://replicate.com/laion-ai/laionide-v3",
     "runs": 59800,
     "costToRun": ""
@@ -2586,7 +2586,7 @@
     "modelName": "pyglide",
     "description": "The predecessor to DALLE-2, GLIDE (filtered) with faster PRK/PLMS sampling.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/fcddf21c-6531-4295-8a29-813674150d98/upsample_predictions.png",
     "modelUrl": "https://replicate.com/afiaka87/pyglide",
     "runs": 18400,
     "costToRun": ""
@@ -2598,7 +2598,7 @@
     "modelName": "styleclip",
     "description": "Text-Driven Manipulation of StyleGAN Imagery",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4c20b80a-2bd3-4d75-8483-d5b1e2413b08/out.jpg",
     "modelUrl": "https://replicate.com/orpatashnik/styleclip",
     "runs": 643800,
     "costToRun": ""
@@ -2610,7 +2610,7 @@
     "modelName": "",
     "description": "segformer-b0-finetuned-ade-512-512",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/8b0ccb6f-f124-43a2-b7c2-9687b09d1e78/Fe5FTEPXgAEXTFY.jpeg",
     "modelUrl": "https://replicate.com/bfirsh/segformer-b0-finetuned-ade-512-512",
     "runs": 66500,
     "costToRun": ""
@@ -2622,7 +2622,7 @@
     "modelName": "",
     "description": "img2aestheticscore",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/910bec07-0895-45b0-8b4a-888294a9e5c2/cyborg_unicorn_ultra_hd_Painting_By_Simon_Stalenhag_unreal_.png",
     "modelUrl": "https://replicate.com/methexis-inc/img2aestheticscore",
     "runs": 94700,
     "costToRun": ""
@@ -2634,7 +2634,7 @@
     "modelName": "waifu-diffusion",
     "description": "Stable Diffusion on Danbooru images",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/cjwbw/waifu-diffusion/files/1c8bf05e-f1ed-4ab7-8297-ddc4eaa90935/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/waifu-diffusion",
     "runs": 924100,
     "costToRun": ""
@@ -2658,7 +2658,7 @@
     "modelName": "strotss",
     "description": "Image to image style transfer using STROTSS loss",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/1f23e3c8-7c05-4d55-a4b8-1d8be9811068/out.png",
     "modelUrl": "https://replicate.com/eleazhong/strotss",
     "runs": 8100,
     "costToRun": ""
@@ -2694,7 +2694,7 @@
     "modelName": "fastgan-pytorch",
     "description": "A Fast and Stable GAN for Small and High Resolution Imagesets",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d9eddb84-bb5a-4b67-84fc-0b5d11e6c183/generated.png",
     "modelUrl": "https://replicate.com/odegeasslbc/fastgan-pytorch",
     "runs": 2700,
     "costToRun": ""
@@ -2706,7 +2706,7 @@
     "modelName": "chromagan",
     "description": "An Adversarial Approach for Picture Colorization",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/f73ef115-ab8a-43ab-9beb-ef52b797006e/output.png",
     "modelUrl": "https://replicate.com/pvitoria/chromagan",
     "runs": 8400,
     "costToRun": ""
@@ -2754,7 +2754,7 @@
     "modelName": "tedigan",
     "description": "Text-Guided Diverse Face Image Manipulation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9d05df03-1e52-4687-8fa2-086af6eb7d3a/142.jpg",
     "modelUrl": "https://replicate.com/iigroup/tedigan",
     "runs": 5200,
     "costToRun": ""
@@ -2766,7 +2766,7 @@
     "modelName": "style-clip-draw",
     "description": "Styled text-to-drawing synthesis method.",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a4da7f60-bff9-48c7-b96a-78734c1e335b/out.png",
     "modelUrl": "https://replicate.com/pschaldenbrand/style-clip-draw",
     "runs": 1400,
     "costToRun": ""
@@ -2790,7 +2790,7 @@
     "modelName": "zero-shot-image-to-text",
     "description": "image to text generation",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/0958ab0c-8d26-45f8-a5f1-a27a1f2259cc/baby.jpg",
     "modelUrl": "https://replicate.com/yoadtew/zero-shot-image-to-text",
     "runs": 3800,
     "costToRun": ""
@@ -2802,7 +2802,7 @@
     "modelName": "arbsr",
     "description": "Scale-Arbitrary Super-Resolution",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/081e33eb-f798-445c-ad39-43962f167758/out.png",
     "modelUrl": "https://replicate.com/longguangwang/arbsr",
     "runs": 6000,
     "costToRun": ""
@@ -2814,7 +2814,7 @@
     "modelName": "stylized-neural-painting-oil",
     "description": "Image to oil painting generation",
     "tags": "Image-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/7350b737-c4f6-4bef-a4c5-e365a5cd3884/out.gif",
     "modelUrl": "https://replicate.com/jiupinjia/stylized-neural-painting-oil",
     "runs": 2500,
     "costToRun": ""
@@ -2850,7 +2850,7 @@
     "modelName": "stylecarigan",
     "description": "Caricature Generation via StyleGAN Feature Map Modulation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/064978a7-5bcc-46aa-9de3-8580728caf91/out.png",
     "modelUrl": "https://replicate.com/wonjongg/stylecarigan",
     "runs": 3500,
     "costToRun": ""
@@ -2862,7 +2862,7 @@
     "modelName": "srrescgan",
     "description": "Intelligent image scaling to 4x resolution",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b110cc62-0c0f-4022-9e9b-465665c10c1d/out.png",
     "modelUrl": "https://replicate.com/raoumer/srrescgan",
     "runs": 9000,
     "costToRun": ""
@@ -2874,7 +2874,7 @@
     "modelName": "pytorch-animegan",
     "description": "PyTorch implementation of AnimeGAN for fast photo animation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/cfc9360c-a94c-432f-bb10-5c662d18c1de/out.png",
     "modelUrl": "https://replicate.com/ptran1203/pytorch-animegan",
     "runs": 4700,
     "costToRun": ""
@@ -2886,7 +2886,7 @@
     "modelName": "adaattn",
     "description": "Arbitrary Neural Style Transfer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/088e9652-042e-4a67-85c9-98d668ffcbaa/out.png",
     "modelUrl": "https://replicate.com/huage001/adaattn",
     "runs": 4600,
     "costToRun": ""
@@ -2898,7 +2898,7 @@
     "modelName": "ifan-defocus-deblur",
     "description": "Removes defocus blur in an image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d2d8381b-0c38-4be1-a625-fe84ba63885a/out.png",
     "modelUrl": "https://replicate.com/codeslake/ifan-defocus-deblur",
     "runs": 9300,
     "costToRun": ""
@@ -2910,7 +2910,7 @@
     "modelName": "ic_gan",
     "description": "Instance-Conditioned GAN",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/99239e60-7c28-4214-9503-fd4f4f0e8409/out.png",
     "modelUrl": "https://replicate.com/facebookresearch/ic_gan",
     "runs": 25900,
     "costToRun": ""
@@ -2934,7 +2934,7 @@
     "modelName": "hcflow-sr",
     "description": "Image Super-Resolution",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/88ee0f71-4356-4c77-9af4-58fcd21d3847/out.png",
     "modelUrl": "https://replicate.com/jingyunliang/hcflow-sr",
     "runs": 42000,
     "costToRun": ""
@@ -2946,7 +2946,7 @@
     "modelName": "esrgan",
     "description": "Image 4x super-resolution",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/f3d56217-cf86-4bce-8e0f-151ae9578215/out.png",
     "modelUrl": "https://replicate.com/xinntao/esrgan",
     "runs": 12100,
     "costToRun": ""
@@ -2994,7 +2994,7 @@
     "modelName": "hfgi",
     "description": "High-Fidelity GAN Inversion for Image Attribute Editing",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/bd5bccb0-b834-4f03-817b-393c7d30175d/out.png",
     "modelUrl": "https://replicate.com/tengfei-wang/hfgi",
     "runs": 16000,
     "costToRun": ""
@@ -3006,7 +3006,7 @@
     "modelName": "pixel2style2pixel",
     "description": "a StyleGAN Encoder for Image-to-Image Translation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/ad94def7-0808-4f65-ab1f-c3e157df82cd/out.png",
     "modelUrl": "https://replicate.com/eladrich/pixel2style2pixel",
     "runs": 23300,
     "costToRun": ""
@@ -3018,7 +3018,7 @@
     "modelName": "restyle_​encoder",
     "description": "ReStyle: A Residual-Based StyleGAN Encoder via Iterative Refinement",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/0245cab7-1ed2-40fe-a3b4-e7b81471135f/output.png",
     "modelUrl": "https://replicate.com/yuval-alaluf/restyle_encoder",
     "runs": 31100,
     "costToRun": ""
@@ -3030,7 +3030,7 @@
     "modelName": "jojogan",
     "description": "JoJoGAN: One Shot Face Stylization",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/ea4f0533-01f1-4331-b0f4-410174df5d8e/out.jpg",
     "modelUrl": "https://replicate.com/mchong6/jojogan",
     "runs": 21500,
     "costToRun": ""
@@ -3042,7 +3042,7 @@
     "modelName": "stylegan-nada",
     "description": "StyleGAN-NADA: CLIP-Guided Domain Adaptation of Image Generators",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/35b6cee8-6416-4dad-bd9e-335252e44959/out.jpg",
     "modelUrl": "https://replicate.com/rinongal/stylegan-nada",
     "runs": 58500,
     "costToRun": ""
@@ -3054,7 +3054,7 @@
     "modelName": "rudalle-sr",
     "description": "Real-ESRGAN super-resolution model from ruDALL-E",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/588170af-559f-454e-967d-8fb6c7f8304b/out.png",
     "modelUrl": "https://replicate.com/cjwbw/rudalle-sr",
     "runs": 184100,
     "costToRun": ""
@@ -3066,7 +3066,7 @@
     "modelName": "detic",
     "description": "Detects any class given class names",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/20b554e3-da67-4c80-ad38-b17b9ca84bb5/out.png",
     "modelUrl": "https://replicate.com/facebookresearch/detic",
     "runs": 12400,
     "costToRun": ""
@@ -3078,7 +3078,7 @@
     "modelName": "swinir",
     "description": "Image Restoration Using Swin Transformer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/1e3c0b87-01a7-4795-abac-aaf17479cf84/out.png",
     "modelUrl": "https://replicate.com/jingyunliang/swinir",
     "runs": 3200000,
     "costToRun": ""
@@ -3090,7 +3090,7 @@
     "modelName": "blip",
     "description": "Bootstrapping Language-Image Pre-training",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/f4e50a7b-e8ca-432f-8e68-082034ebcc70/demo.jpg",
     "modelUrl": "https://replicate.com/salesforce/blip",
     "runs": 8500000,
     "costToRun": ""
@@ -3102,7 +3102,7 @@
     "modelName": "gpen",
     "description": "Blind Face Restoration in the Wild",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a79d403f-ab71-4a23-a976-59a25341dcb3/out.png",
     "modelUrl": "https://replicate.com/yangxy/gpen",
     "runs": 41300,
     "costToRun": ""
@@ -3114,7 +3114,7 @@
     "modelName": "sam",
     "description": "Age Transformation Using a Style-Based Regression Model",
     "tags": "Image-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/806bea64-bb51-4c8a-bf4d-15602eb60fdd/1287.jpg",
     "modelUrl": "https://replicate.com/yuval-alaluf/sam",
     "runs": 121000,
     "costToRun": ""
@@ -3126,7 +3126,7 @@
     "modelName": "clip_prefix_caption",
     "description": "Simple image captioning model using CLIP and GPT-2",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4dc7763a-f234-4a7c-a85f-cb9e05e37cf8/COCO_val2014_000000579664.jpg",
     "modelUrl": "https://replicate.com/rmokady/clip_prefix_caption",
     "runs": 226100,
     "costToRun": ""
@@ -3138,7 +3138,7 @@
     "modelName": "blendgan",
     "description": "Arbitrary Stylized Face Generation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/79ccc9ff-82f5-49f6-94b2-d295ce8198d4/out.png",
     "modelUrl": "https://replicate.com/onion-liu/blendgan",
     "runs": 4200,
     "costToRun": ""
@@ -3150,7 +3150,7 @@
     "modelName": "bringing-old-photos-back-to-life",
     "description": "Bringing Old Photos Back to Life",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/18b02ad9-ae81-4044-800e-65732df6bdc7/out.png",
     "modelUrl": "https://replicate.com/microsoft/bringing-old-photos-back-to-life",
     "runs": 138200,
     "costToRun": ""
@@ -3162,7 +3162,7 @@
     "modelName": "pix2pix_tf_albedo2pbrmaps",
     "description": "pix2pix model for predicting pbr texture maps from an albedo texture",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/tommoore515/pix2pix_tf_albedo2pbrmaps/files/6ae67768-8b1b-4f54-a2f3-83737eae454f/output.jpg",
     "modelUrl": "https://replicate.com/tommoore515/pix2pix_tf_albedo2pbrmaps",
     "runs": 891,
     "costToRun": ""
@@ -3186,7 +3186,7 @@
     "modelName": "stable-diffusion-high-resolution",
     "description": "Detailed, higher-resolution images from Stable Diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/cjwbw/stable-diffusion-high-resolution/files/e1b194af-e903-4efb-8bb2-8016b0863507/out.png",
     "modelUrl": "https://replicate.com/cjwbw/stable-diffusion-high-resolution",
     "runs": 50500,
     "costToRun": ""
@@ -3210,7 +3210,7 @@
     "modelName": "material_stable_diffusion",
     "description": "Stable diffusion fork for generating tileable outputs",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a5f7f356-99b4-4b7c-85b9-b084960f7552/out-0.png",
     "modelUrl": "https://replicate.com/tommoore515/material_stable_diffusion",
     "runs": 294800,
     "costToRun": ""
@@ -3222,7 +3222,7 @@
     "modelName": "clip-vit-large-patch14",
     "description": "openai/clip-vit-large-patch14 with Transformers",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/36b04aec-efe2-4dea-9c9d-a5faca68b2b2/000000039769.jpg",
     "modelUrl": "https://replicate.com/cjwbw/clip-vit-large-patch14",
     "runs": 191,
     "costToRun": ""
@@ -3234,7 +3234,7 @@
     "modelName": "text-to-pokemon",
     "description": "Generate Pokémon from a text description",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/lambdal/text-to-pokemon/files/4d12a241-fd84-4b0a-8321-80dd8c6ae784/out-0.png",
     "modelUrl": "https://replicate.com/lambdal/text-to-pokemon",
     "runs": 6100000,
     "costToRun": ""
@@ -3246,7 +3246,7 @@
     "modelName": "sd-textual-inversion-ugly-sonic",
     "description": "stable-diffusion-textual-inversion fine-tuned with ugly sonic",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/cjwbw/sd-textual-inversion-ugly-sonic/files/d3c1458b-c2a7-446d-8799-9bd0bf2d6cbc/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/sd-textual-inversion-ugly-sonic",
     "runs": 1600,
     "costToRun": ""
@@ -3258,7 +3258,7 @@
     "modelName": "sam",
     "description": "Age transformation using a style-based regression model",
     "tags": "Image-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/806bea64-bb51-4c8a-bf4d-15602eb60fdd/1287.jpg",
     "modelUrl": "https://replicate.com/yuval-alaluf/sam",
     "runs": 121300,
     "costToRun": ""
@@ -3270,7 +3270,7 @@
     "modelName": "clip_prefix_caption",
     "description": "Simple image captioning model using CLIP and GPT-2",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4dc7763a-f234-4a7c-a85f-cb9e05e37cf8/COCO_val2014_000000579664.jpg",
     "modelUrl": "https://replicate.com/rmokady/clip_prefix_caption",
     "runs": 226100,
     "costToRun": ""
@@ -3282,7 +3282,7 @@
     "modelName": "blendgan",
     "description": "",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/79ccc9ff-82f5-49f6-94b2-d295ce8198d4/out.png",
     "modelUrl": "https://replicate.com/onion-liu/blendgan",
     "runs": 4200,
     "costToRun": ""
@@ -3294,7 +3294,7 @@
     "modelName": "gpdm",
     "description": "Generating natural images with direct patch distribution matching",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/6e6ea32c-abbc-478b-9a31-af5e3b7702c6/output.png",
     "modelUrl": "https://replicate.com/ariel415el/gpdm",
     "runs": 4000,
     "costToRun": ""
@@ -3330,7 +3330,7 @@
     "modelName": "gfpgan",
     "description": "Practical face restoration algorithm for old photos or AI-generated faces",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/85f53415-0dc7-4703-891f-1e6f912119ad/output.png",
     "modelUrl": "https://replicate.com/tencentarc/gfpgan",
     "runs": 11500000,
     "costToRun": ""
@@ -3342,7 +3342,7 @@
     "modelName": "gfpgan",
     "description": "Practical face restoration algorithm for old photos or AI-generated faces",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/85f53415-0dc7-4703-891f-1e6f912119ad/output.png",
     "modelUrl": "https://replicate.com/xinntao/gfpgan",
     "runs": 458100,
     "costToRun": ""
@@ -3354,7 +3354,7 @@
     "modelName": "japanese-stable-diffusion",
     "description": "Japanese-specific latent text-to-image diffusion model",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/cjwbw/japanese-stable-diffusion/files/fa193a69-05e6-471f-a8bf-96fe1ed65b1b/out-0.png",
     "modelUrl": "https://replicate.com/rinnakk/japanese-stable-diffusion",
     "runs": 2300,
     "costToRun": ""
@@ -3366,7 +3366,7 @@
     "modelName": "sd-textual-inversion-spyro-dragon",
     "description": "Stable Diffusion Textual Inversion fine-tuned with Spyro of the Dragon style",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/cjwbw/sd-textual-inversion-spyro-dragon/files/190cf37d-32d0-45fd-b5f4-3460f8c76c64/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/sd-textual-inversion-spyro-dragon",
     "runs": 328,
     "costToRun": ""
@@ -3378,7 +3378,7 @@
     "modelName": "sd-textual-inversion",
     "description": "Stable Diffusion Textual Inversion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.com/api/models/cjwbw/sd-textual-inversion/files/33ff65c8-d24c-4ac4-bf0b-6b0f6a186b90/out-0.png",
     "modelUrl": "https://replicate.com/cjwbw/sd-textual-inversion",
     "runs": 407,
     "costToRun": ""
@@ -3390,7 +3390,7 @@
     "modelName": "codeformer",
     "description": "Robust face restoration algorithm for old photos or AI-generated faces",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/fa3fe3d1-76b0-4ca8-ac0d-0a925cb0ff54/06.png",
     "modelUrl": "https://replicate.com/sczhou/codeformer",
     "runs": 7100000,
     "costToRun": ""
@@ -3414,7 +3414,7 @@
     "modelName": "realesrgan",
     "description": "Practical Image Restoration Algorithms for General/Anime Images",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/64bfb221-6b36-4e5d-8f81-77d7b2adecf9/out..jpg",
     "modelUrl": "https://replicate.com/xinntao/realesrgan",
     "runs": 980600,
     "costToRun": ""
@@ -3426,7 +3426,7 @@
     "modelName": "sd-aesthetic-guidance",
     "description": "Use stable diffusion and aesthetic CLIP embeddings to guide boring outputs to be more aesthetically pleasing.",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/43afdbae-2343-4c99-8cc3-ba876820c0fa/out-0.png",
     "modelUrl": "https://replicate.com/afiaka87/sd-aesthetic-guidance",
     "runs": 3400,
     "costToRun": ""
@@ -3437,7 +3437,7 @@
     "creator": "deforum",
     "modelName": "deforum_stable_diffusion",
     "description": "Animating prompts with stable diffusion",
-    "tags": "Image-to-Video",
+    "tags": "Text-to-Vido",
     "example": "",
     "modelUrl": "https://replicate.com/deforum/deforum_stable_diffusion",
     "runs": 54000,
@@ -3450,7 +3450,7 @@
     "modelName": "hat",
     "description": "Activating More Pixels in Image Super-Resolution Transformer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/83101122-3778-41ff-80be-4f7a1a59b727/output.png",
     "modelUrl": "https://replicate.com/xpixelgroup/hat",
     "runs": 5800,
     "costToRun": ""
@@ -3462,7 +3462,7 @@
     "modelName": "docentr",
     "description": "End-to-End Document Image Enhancement Transformer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/7bb1c92e-0b30-4107-9a95-5b8f0040a80e/14.png",
     "modelUrl": "https://replicate.com/cjwbw/docentr",
     "runs": 717,
     "costToRun": ""
@@ -3474,7 +3474,7 @@
     "modelName": "stable-diffusion-wip",
     "description": "(development branch) Inpainting for Stable Diffusion",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/23f303ac-3324-499f-9053-c11243d9ea8e/out-0.png",
     "modelUrl": "https://replicate.com/andreasjansson/stable-diffusion-wip",
     "runs": 12700,
     "costToRun": ""
@@ -3558,7 +3558,7 @@
     "modelName": "img2prompt",
     "description": "Get an approximate text prompt, with style, matching an image...",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/8b4d747d-feca-477d-8069-ee4d5f89ad8e/a_high_detail_shot_of_a_cat_wearing_a_suit_realism_8k_-n_9_.png",
     "modelUrl": "https://replicate.com/methexis-inc/img2prompt",
     "runs": 795300,
     "costToRun": ""
@@ -3642,7 +3642,7 @@
     "modelName": "style-your-hair",
     "description": "Pose-Invariant Hairstyle Transfer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c9f54dd4-66fe-4379-b9e5-64e29fb5827d/output.png",
     "modelUrl": "https://replicate.com/cjwbw/style-your-hair",
     "runs": 2900,
     "costToRun": ""
@@ -3678,7 +3678,7 @@
     "modelName": "retrieval-augmented-diffusion",
     "description": "Generate 768px images from text using CompVis retrieval-augmented-diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/744e1554-805c-4c34-b6c6-d700e687d504/sample_000__an-astronaut-riding-a-horse-in-photorealistic-s.png",
     "modelUrl": "https://replicate.com/afiaka87/retrieval-augmented-diffusion",
     "runs": 34600,
     "costToRun": ""
@@ -3690,7 +3690,7 @@
     "modelName": "monkey-island-rdm",
     "description": "Monkey Island database for Retrieval-augmented Diffusion model",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a006fb86-eba8-47d4-8c15-297064af68f0/out.png",
     "modelUrl": "https://replicate.com/andreasjansson/monkey-island-rdm",
     "runs": 567,
     "costToRun": ""
@@ -3702,7 +3702,7 @@
     "modelName": "repaint",
     "description": "Inpainting using Denoising Diffusion Probabilistic Models",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c198394c-a879-48f4-9b18-7e406f30bec8/inpaint.png",
     "modelUrl": "https://replicate.com/cjwbw/repaint",
     "runs": 775,
     "costToRun": ""
@@ -3714,7 +3714,7 @@
     "modelName": "night-enhancement",
     "description": "Unsupervised Night Image Enhancement",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/60c4c0d8-c82f-42e0-96ee-71392d32b6fe/output.png",
     "modelUrl": "https://replicate.com/cjwbw/night-enhancement",
     "runs": 3900,
     "costToRun": ""
@@ -3726,7 +3726,7 @@
     "modelName": "latent-diffusion-text2img",
     "description": "text-to-image with latent diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/991cae39-26f0-4f03-8de8-03261841437a/output_4.png",
     "modelUrl": "https://replicate.com/cjwbw/latent-diffusion-text2img",
     "runs": 3200,
     "costToRun": ""
@@ -3738,7 +3738,7 @@
     "modelName": "openpsg",
     "description": "Panoptic Scene Graph Generation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c012e661-7d9a-447d-851e-a0ec409fcd8f/output_0.png",
     "modelUrl": "https://replicate.com/cjwbw/openpsg",
     "runs": 366,
     "costToRun": ""
@@ -3750,7 +3750,7 @@
     "modelName": "diffusionclip",
     "description": "DiffusionCLIP: Text-Guided Diffusion Models for Robust Image Manipulation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/76f197d2-1594-4a64-89fe-788d3d441cea/output.png",
     "modelUrl": "https://replicate.com/gwang-kim/diffusionclip",
     "runs": 2100,
     "costToRun": ""
@@ -3762,7 +3762,7 @@
     "modelName": "mindall-e",
     "description": "text-to-image generation",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/ef5c3a1d-3777-474b-826c-4d987af916e9/output_1.png",
     "modelUrl": "https://replicate.com/cjwbw/mindall-e",
     "runs": 1200,
     "costToRun": ""
@@ -3774,7 +3774,7 @@
     "modelName": "vq-diffusion",
     "description": "VQ-Diffusion for Text-to-Image Synthesis",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/fc34de91-d71f-423d-a6c4-d6723831ccf8/output_1.png",
     "modelUrl": "https://replicate.com/cjwbw/vq-diffusion",
     "runs": 20100,
     "costToRun": ""
@@ -3786,7 +3786,7 @@
     "modelName": "adampi",
     "description": "Create a 3D photo from single in-the-wild 2D images",
     "tags": "Image-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9adf3aaf-7314-47a9-bdc8-795070dcb74c/progress_00490.jpg",
     "modelUrl": "https://replicate.com/pollinations/adampi",
     "runs": 2700,
     "costToRun": ""
@@ -3798,7 +3798,7 @@
     "modelName": "min-dalle",
     "description": "",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d894de44-b441-4c09-a24c-ef2b9d015813/dali-painting-of-walle.jpg",
     "modelUrl": "https://replicate.com/ravespaceio/min-dalle",
     "runs": 4700,
     "costToRun": ""
@@ -3810,7 +3810,7 @@
     "modelName": "latent-viz",
     "description": "Visualize the encoded latents of an image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/f267c07f-5701-4a38-8c3f-ea6d4612b163/0-latent-0.png",
     "modelUrl": "https://replicate.com/nightmareai/latent-viz",
     "runs": 170,
     "costToRun": ""
@@ -3822,7 +3822,7 @@
     "modelName": "ongo",
     "description": "Generate a painting using text.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a33510a3-92b2-432e-a778-92753c78d936/current_0.png",
     "modelUrl": "https://replicate.com/laion-ai/ongo",
     "runs": 63600,
     "costToRun": ""
@@ -3834,7 +3834,7 @@
     "modelName": "erlich",
     "description": "Generate a logo using text.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/0dae8f90-d30f-4bc6-a21d-98d2e6918ba5/ts_99-batch_1.png",
     "modelUrl": "https://replicate.com/laion-ai/erlich",
     "runs": 262300,
     "costToRun": ""
@@ -3846,7 +3846,7 @@
     "modelName": "glid-3-xl",
     "description": "CompVis latent-diffusion text2im finetuned for inpainting.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/804c6fe5-d74a-4796-8835-f411b3776dae/current_0.png",
     "modelUrl": "https://replicate.com/afiaka87/glid-3-xl",
     "runs": 7800,
     "costToRun": ""
@@ -3858,7 +3858,7 @@
     "modelName": "compositional-vsual-generation-with-composable-diffusion-models-pytorch",
     "description": "Composable Diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9de5cffc-da99-43d0-9391-7ef4e9d4be1e/output.png",
     "modelUrl": "https://replicate.com/cjwbw/compositional-vsual-generation-with-composable-diffusion-models-pytorch",
     "runs": 585,
     "costToRun": ""
@@ -3870,7 +3870,7 @@
     "modelName": "micromotion-stylegan",
     "description": "Decoding Micromotion in Low-dimensional Latent Spaces from StyleGAN",
     "tags": "Image-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9e36eba2-1e6c-4f1e-88d2-e9afa6b24728/van_gouh.jpeg",
     "modelUrl": "https://replicate.com/cjwbw/micromotion-stylegan",
     "runs": 2400,
     "costToRun": ""
@@ -3882,7 +3882,7 @@
     "modelName": "clip-gen",
     "description": "Language-Free Training of a Text-to-Image Generator with CLIP",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/50aee8d2-4bda-4bac-ab67-95ebc6f0a5a1/output.png",
     "modelUrl": "https://replicate.com/cjwbw/clip-gen",
     "runs": 541,
     "costToRun": ""
@@ -3894,7 +3894,7 @@
     "modelName": "bigcolor",
     "description": "Colorization using a Generative Color Prior for Natural Images",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/66b33d3b-d0c1-41f0-9345-080422857759/output.png",
     "modelUrl": "https://replicate.com/cjwbw/bigcolor",
     "runs": 51000,
     "costToRun": ""
@@ -3918,7 +3918,7 @@
     "modelName": "vqfr",
     "description": "Blind Face Restoration with Vector-Quantized Dictionary and Parallel Decoder",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/bc7a348f-60f5-40fb-89e4-ed3dd250cb31/output_0.png",
     "modelUrl": "https://replicate.com/cjwbw/vqfr",
     "runs": 13300,
     "costToRun": ""
@@ -3930,7 +3930,7 @@
     "modelName": "diffae",
     "description": "Image Manipulation with Diffusion Autoencoders",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c4d3d37d-8545-4941-b6aa-fce61d7d0769/download.png",
     "modelUrl": "https://replicate.com/cjwbw/diffae",
     "runs": 6600,
     "costToRun": ""
@@ -3942,7 +3942,7 @@
     "modelName": "min-dalle",
     "description": "Fast, minimal port of DALL·E Mini to PyTorch",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b5ecd545-efca-46ae-8496-786ad16be61b/moai-statue-giving-a-ted-talk.jpg",
     "modelUrl": "https://replicate.com/kuprel/min-dalle",
     "runs": 491000,
     "costToRun": ""
@@ -3966,7 +3966,7 @@
     "modelName": "vqfr",
     "description": "Blind Face Restoration with Vector-Quantized Dictionary and Parallel Decoder",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b5a08f7f-6653-45a5-a7f1-ff45e7abacd2/output_0.png",
     "modelUrl": "https://replicate.com/tencentarc/vqfr",
     "runs": 17300,
     "costToRun": ""
@@ -3978,7 +3978,7 @@
     "modelName": "julius",
     "description": "Generate a collection of logos based on your text input. Use longer and more detailed inputs for better results.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a7f89728-e3ff-47b6-9ab9-2912ca756734/number14.jpg",
     "modelUrl": "https://replicate.com/ml6/julius",
     "runs": 2800,
     "costToRun": ""
@@ -3990,7 +3990,7 @@
     "modelName": "ccpl",
     "description": "Contrastive Coherence Preserving Loss for Versatile Style Transfer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4743e304-ae1b-4369-a838-a73787d4c73a/output.png",
     "modelUrl": "https://replicate.com/jarrentwu1031/ccpl",
     "runs": 1200,
     "costToRun": ""
@@ -4002,7 +4002,7 @@
     "modelName": "k-diffusion",
     "description": "CLIP Guided latent k-diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/122c091b-5a94-4702-bbc8-3bcaeaebdd08/out_0.png",
     "modelUrl": "https://replicate.com/nightmareai/k-diffusion",
     "runs": 2200,
     "costToRun": ""
@@ -4014,7 +4014,7 @@
     "modelName": "disco-diffusion",
     "description": "Generate images using a variety of techniques - Powered by Discoart",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/eb8dc56a-1e37-4e6a-8fd7-51ad12b399f5/ba70ca3b-8ed1-4ac4-a09f-3cc046dd3dea0_0.png",
     "modelUrl": "https://replicate.com/nightmareai/disco-diffusion",
     "runs": 55600,
     "costToRun": ""
@@ -4026,7 +4026,7 @@
     "modelName": "majesty-diffusion",
     "description": "Generate images from text using CLIP guided latent diffusion",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b95b22ef-54d0-4248-94ef-268635aac529/1658847957.png",
     "modelUrl": "https://replicate.com/nightmareai/majesty-diffusion",
     "runs": 5200,
     "costToRun": ""
@@ -4062,7 +4062,7 @@
     "modelName": "cartoonify",
     "description": "Cartoonifies an image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/f014fe55-f932-417b-9bff-e00545c0f2dc/result.jpg",
     "modelUrl": "https://replicate.com/sanzgiri/cartoonify",
     "runs": 1400,
     "costToRun": ""
@@ -4074,7 +4074,7 @@
     "modelName": "real-esrgan-nitroviper",
     "description": "DO NOT USE - Broken - Only Public For API Usage & Debugging",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/0105e39a-dff7-41d2-bfa7-fff483288e55/tmp2r0geap4256x256bb_out.jpg",
     "modelUrl": "https://replicate.com/nicholascelestin/real-esrgan-nitroviper",
     "runs": 4200,
     "costToRun": ""
@@ -4086,7 +4086,7 @@
     "modelName": "latent-sr",
     "description": "Upscale images with the latent diffusion superresolution model",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/62ca1b90-9ec2-4303-94f0-92206ea75459/tmpmtljfr8t.png",
     "modelUrl": "https://replicate.com/nightmareai/latent-sr",
     "runs": 25300,
     "costToRun": ""
@@ -4098,7 +4098,7 @@
     "modelName": "feed_forward_vqgan_clip",
     "description": "Feed forward VQGAN-CLIP model",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/54bbe0f6-e16d-4b6a-bd6a-1edd092e9c3d/out.png",
     "modelUrl": "https://replicate.com/mehdidc/feed_forward_vqgan_clip",
     "runs": 111500,
     "costToRun": ""
@@ -4110,7 +4110,7 @@
     "modelName": "deep-image-diffusion-prior",
     "description": "Generate an image using text by visualizing CLIP features.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/427d7301-e4d9-4893-a210-8cc91a48d188/out_00250.png",
     "modelUrl": "https://replicate.com/laion-ai/deep-image-diffusion-prior",
     "runs": 956,
     "costToRun": ""
@@ -4134,7 +4134,7 @@
     "modelName": "puck",
     "description": "Generate retro videogame art using text.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/5ef2ef46-2b65-4c38-bc68-79d620de1b82/current_5.png",
     "modelUrl": "https://replicate.com/laion-ai/puck",
     "runs": 3300,
     "costToRun": ""
@@ -4158,7 +4158,7 @@
     "modelName": "large-hole-image-inpainting",
     "description": "MAT: Mask-Aware Transformer for Large Hole Image Inpainting",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/6c3130ea-3d47-4a86-ae9a-8ede29b42c69/output.png",
     "modelUrl": "https://replicate.com/fenglinglwb/large-hole-image-inpainting",
     "runs": 6200,
     "costToRun": ""
@@ -4170,7 +4170,7 @@
     "modelName": "controllable-person-synthesis",
     "description": "Human pose manipulation for fashion",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/7fa068d4-65bc-4fbe-a070-5553a3a14ed0/result.png",
     "modelUrl": "https://replicate.com/renyurui/controllable-person-synthesis",
     "runs": 1600,
     "costToRun": ""
@@ -4182,7 +4182,7 @@
     "modelName": "srw-net",
     "description": "Semantic Room Wireframe",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/73579774-070d-4b31-9a2f-a8f41c05dea9/output.png",
     "modelUrl": "https://replicate.com/davidgillsjo/srw-net",
     "runs": 962,
     "costToRun": ""
@@ -4194,7 +4194,7 @@
     "modelName": "arf-svox2",
     "description": "Artistic Radiance Fields - Transfer the style of an image to a 3D scene (NeRF)",
     "tags": "Image-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/065ea769-0fe4-472b-961f-19e3d5a80902/941d4f18-97f8-4bdf-a0e6-bec0acd53301.png",
     "modelUrl": "https://replicate.com/nightmareai/arf-svox2",
     "runs": 4000,
     "costToRun": ""
@@ -4206,7 +4206,7 @@
     "modelName": "take-off-eyeglasses",
     "description": "Remove eyeglasses and shadows from photo",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a3e386e9-e6af-42da-b667-d7c65e55573c/output.png",
     "modelUrl": "https://replicate.com/storymy/take-off-eyeglasses",
     "runs": 969,
     "costToRun": ""
@@ -4218,7 +4218,7 @@
     "modelName": "latent-diffusion",
     "description": "High-Resolution Image Synthesis with Latent Diffusion Models",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/ff92ae5e-806b-4e39-bd7c-3a6279aec266/8de0f698-6812-4f52-bc43-b8e70262ea5a.png",
     "modelUrl": "https://replicate.com/nicholascelestin/latent-diffusion",
     "runs": 5200,
     "costToRun": ""
@@ -4230,7 +4230,7 @@
     "modelName": "anchor_net",
     "description": "Localizing Semantic Patches for Accelerating Image Classification",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/cf21baaf-55c3-49dd-a5e9-c723eaac5fd5/ILSVRC2012_val_00023440.JPEG",
     "modelUrl": "https://replicate.com/winycg/anchor_net",
     "runs": 188,
     "costToRun": ""
@@ -4242,7 +4242,7 @@
     "modelName": "real-esrgan",
     "description": "Real-ESRGAN with optional face correction and adjustable upscale",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/735eddb9-4e93-474d-9fbb-c7dfcd656301/ApplicationFrameHost_3Bs5DdjGnX.png",
     "modelUrl": "https://replicate.com/nightmareai/real-esrgan",
     "runs": 2000000,
     "costToRun": ""
@@ -4254,7 +4254,7 @@
     "modelName": "lbnet",
     "description": "Lightweight Bimodal Network for Single-Image Super-Resolution via Symmetric CNN and Recursive Transformer",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9c7e6b26-8118-42cd-9409-9507a6ffbb8f/generated.png",
     "modelUrl": "https://replicate.com/wzx0826/lbnet",
     "runs": 2100,
     "costToRun": ""
@@ -4266,7 +4266,7 @@
     "modelName": "cogview2",
     "description": "Generate vivid images for any (Chinese / English) text",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/3281b937-45ae-4ceb-a66f-a2219f71bbea/output_4.png",
     "modelUrl": "https://replicate.com/thudm/cogview2",
     "runs": 15300,
     "costToRun": ""
@@ -4278,7 +4278,7 @@
     "modelName": "ldm-autoedit",
     "description": "",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/08798785-8838-4e62-a3da-6e2ca3129333/new_york_city_completely_flooded_iter_019_batch_004_score_0.png",
     "modelUrl": "https://replicate.com/afiaka87/ldm-autoedit",
     "runs": 1400,
     "costToRun": ""
@@ -4290,7 +4290,7 @@
     "modelName": "glid-3",
     "description": "Generate images quickly with GLID-3 (non-xl)",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/f7bc3dac-83fb-4a47-b9d3-da30243252a7/00003.png",
     "modelUrl": "https://replicate.com/nicholascelestin/glid-3",
     "runs": 3800,
     "costToRun": ""
@@ -4302,7 +4302,7 @@
     "modelName": "dalle-mega",
     "description": "Made public only for API calls. Use min-dalle instead-- it's superior.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/09a937b7-5449-4e01-a894-efb47a897cb8/0fa6ef63-cf67-4ec1-a396-6f8834e06906.png",
     "modelUrl": "https://replicate.com/nicholascelestin/dalle-mega",
     "runs": 11600,
     "costToRun": ""
@@ -4314,7 +4314,7 @@
     "modelName": "dalle-mini",
     "description": "Generate images from a text prompt",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d7a2a6f2-7723-4989-a75b-d12881260a15/output_4.png",
     "modelUrl": "https://replicate.com/borisdayma/dalle-mini",
     "runs": 54300,
     "costToRun": ""
@@ -4338,7 +4338,7 @@
     "modelName": "sci",
     "description": "Low-Light Image Enhancement",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/ea9b3fed-4e18-45e7-9f51-c4bada57a519/output.png",
     "modelUrl": "https://replicate.com/vis-opt-group/sci",
     "runs": 5800,
     "costToRun": ""
@@ -4362,7 +4362,7 @@
     "modelName": "clip-caption-reward",
     "description": "Fine-grained Image Captioning with CLIP Reward",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d452ef45-ce7e-4f8d-a63f-350d624fc95a/COCO_val2014_000000462565.jpeg",
     "modelUrl": "https://replicate.com/j-min/clip-caption-reward",
     "runs": 41400,
     "costToRun": ""
@@ -4374,7 +4374,7 @@
     "modelName": "text2image-future",
     "description": "pixray text2image (future branch)",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/55ebb21e-006f-4b53-a489-1f968c7d64e6/tempfile.png",
     "modelUrl": "https://replicate.com/pixray/text2image-future",
     "runs": 23100,
     "costToRun": ""
@@ -4386,7 +4386,7 @@
     "modelName": "face-align-cog",
     "description": "face alignment using stylegan-encoding",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/27f20f9e-e16f-4b56-aa9c-a8599b44cd7b/output.png",
     "modelUrl": "https://replicate.com/cjwbw/face-align-cog",
     "runs": 1300,
     "costToRun": ""
@@ -4410,7 +4410,7 @@
     "modelName": "clipdraw",
     "description": "Generate art from text prompts. Based on kvfrans/clipdraw.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/40ec928c-6193-4d16-80d2-ffe561dbf331/out.png",
     "modelUrl": "https://replicate.com/evilstreak/clipdraw",
     "runs": 826,
     "costToRun": ""
@@ -4422,7 +4422,7 @@
     "modelName": "object-removal",
     "description": "Removes specified objects from image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/8d35f097-2c86-47ec-a403-9913cacfe4a8/output.png",
     "modelUrl": "https://replicate.com/sujaykhandekar/object-removal",
     "runs": 1800,
     "costToRun": ""
@@ -4434,7 +4434,7 @@
     "modelName": "object-removal-partial-convolutions",
     "description": "Removes specified objects from image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/521ce1af-1bcf-457e-af4f-683461a76790/Screen_Shot_2022-05-24_at_10.29.55_PM.png",
     "modelUrl": "https://replicate.com/javirk/object-removal-partial-convolutions",
     "runs": 295,
     "costToRun": ""
@@ -4446,7 +4446,7 @@
     "modelName": "text2image",
     "description": "Uses pixray to generate an image from text prompt",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4eb7ad94-3330-470e-8b3f-5b120bfce2e3/tempfile.png",
     "modelUrl": "https://replicate.com/pixray/text2image",
     "runs": 1100000,
     "costToRun": ""
@@ -4458,7 +4458,7 @@
     "modelName": "clipasso",
     "description": "Draws an abstract sketch of an object",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/198a8d75-dace-4739-af20-a465edebe932/camel.png",
     "modelUrl": "https://replicate.com/yael-vinker/clipasso",
     "runs": 5300,
     "costToRun": ""
@@ -4470,7 +4470,7 @@
     "modelName": "resnet",
     "description": "Classifies images with ResNet-50",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c2739d5f-9932-4823-8cf7-8e55cb912ab5/cat.jpg",
     "modelUrl": "https://replicate.com/bfirsh/resnet",
     "runs": 81,
     "costToRun": ""
@@ -4482,7 +4482,7 @@
     "modelName": "resnet",
     "description": "Classifies images with ResNet-50",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/64ae6640-b109-4484-9c45-2e6bae918f56/cat.jpg",
     "modelUrl": "https://replicate.com/replicate/resnet",
     "runs": 1600,
     "costToRun": ""
@@ -4494,7 +4494,7 @@
     "modelName": "thin-plate-spline-motion-model",
     "description": "Thin-Plate Spline Motion Model for Image Animation",
     "tags": "Image-to-Video, Video-to-Video",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b8efcd01-da81-42c7-8cd6-0a820084a983/source.png",
     "modelUrl": "https://replicate.com/yoyo-nb/thin-plate-spline-motion-model",
     "runs": 68100,
     "costToRun": ""
@@ -4506,7 +4506,7 @@
     "modelName": "glid-3-xl",
     "description": "A 1.4B parameter text2im model from CompVis, finetuned on CLIP text embeds and curated data.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4dc8d099-2dd4-4550-abe5-d8addf82a786/current.png",
     "modelUrl": "https://replicate.com/jack000/glid-3-xl",
     "runs": 44100,
     "costToRun": ""
@@ -4518,7 +4518,7 @@
     "modelName": "facial-expression-recognition",
     "description": "Facial Expression Recognition using Residual Masking Network",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/70224ed0-fc2a-45cb-af5a-d28a4e596523/image.jpg",
     "modelUrl": "https://replicate.com/phamquiluan/facial-expression-recognition",
     "runs": 4600,
     "costToRun": ""
@@ -4530,7 +4530,7 @@
     "modelName": "neuralneighborstyletransfer",
     "description": "Transfer the texture/style of one image onto another",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/bf295d97-4b57-4235-83d2-edb22683fd45/output.png",
     "modelUrl": "https://replicate.com/nkolkin13/neuralneighborstyletransfer",
     "runs": 5400,
     "costToRun": ""
@@ -4541,7 +4541,7 @@
     "creator": "elazarg",
     "modelName": "nakdimon",
     "description": "A simple Hebrew Diacritizer",
-    "tags": "Text-to-Image",
+    "tags": "Text-to-Text",
     "example": "",
     "modelUrl": "https://replicate.com/elazarg/nakdimon",
     "runs": 91,
@@ -4566,7 +4566,7 @@
     "modelName": "megadetector",
     "description": "Detect Animals, Vehicles and Humans in Camera Trap Imagery",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/5991a612-f0f3-43b4-ab27-79735d3dd3cc/output.jpg",
     "modelUrl": "https://replicate.com/bencevans/megadetector",
     "runs": 238,
     "costToRun": ""
@@ -4578,7 +4578,7 @@
     "modelName": "magic",
     "description": "Plugging Visual Controls in Text Generation",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/35687157-a515-449d-979e-109c2f0c6149/COCO_val2014_000000516750.jpg",
     "modelUrl": "https://replicate.com/yxuansu/magic",
     "runs": 1100,
     "costToRun": ""
@@ -4602,7 +4602,7 @@
     "modelName": "scunet",
     "description": "Practical Blind Denoising via Swin-Conv-UNet and Data Synthesis",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d5d01de0-c13d-4f28-879e-68525879ceae/output.png",
     "modelUrl": "https://replicate.com/cszn/scunet",
     "runs": 10000,
     "costToRun": ""
@@ -4626,7 +4626,7 @@
     "modelName": "nafnet",
     "description": "Nonlinear Activation Free Network for Image Restoration",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/60bdfe42-b179-40fb-81b0-fa3ec0090aea/output.png",
     "modelUrl": "https://replicate.com/megvii-research/nafnet",
     "runs": 16500,
     "costToRun": ""
@@ -4662,7 +4662,7 @@
     "modelName": "maxim",
     "description": "Multi-Axis MLP for Image Processing",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/716ffa94-41f7-46b4-a2f0-287f0e907f9c/output.png",
     "modelUrl": "https://replicate.com/google-research/maxim",
     "runs": 35100,
     "costToRun": ""
@@ -4674,7 +4674,7 @@
     "modelName": "simplify_contours",
     "description": "Detect and simplify the contours of a binary image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/3aa3f264-6539-4e18-8a55-c8b5f982327a/contour.png",
     "modelUrl": "https://replicate.com/ariel415el/simplify_contours",
     "runs": 122,
     "costToRun": ""
@@ -4686,7 +4686,7 @@
     "modelName": "refvsr-cvpr2022",
     "description": "Super-resolves an LR video frame (ultra-wide) using a reference video frame (wide-angle)",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/84eb2ac9-5919-4e36-baf3-15a124049357/inp.png",
     "modelUrl": "https://replicate.com/codeslake/refvsr-cvpr2022",
     "runs": 2600,
     "costToRun": ""
@@ -4698,7 +4698,7 @@
     "modelName": "homage1",
     "description": "Homage to the Pixel: text prompt to 6 color squares",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/e5f2c54b-3dfa-4098-9fb7-23bd7d3b2ce3/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/homage1",
     "runs": 7200,
     "costToRun": ""
@@ -4722,7 +4722,7 @@
     "modelName": "gp-unit",
     "description": "[CVPR 2022] Unsupervised Image-to-Image Translation with Generative Prior",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/8edd71dc-a8a2-44ea-be0e-9c72c5cfff04/output.png",
     "modelUrl": "https://replicate.com/williamyang1991/gp-unit",
     "runs": 629,
     "costToRun": ""
@@ -4746,7 +4746,7 @@
     "modelName": "api",
     "description": "bare pixray for API use",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/0195547c-b501-49ba-96b8-f000f957a587/tempfile.png",
     "modelUrl": "https://replicate.com/pixray/api",
     "runs": 11200,
     "costToRun": ""
@@ -4758,7 +4758,7 @@
     "modelName": "hairclip",
     "description": "Design Your Hair by Text and Reference Image",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/2c45bef1-b58b-4b00-a413-fac0072e14ca/output.png",
     "modelUrl": "https://replicate.com/wty-ustc/hairclip",
     "runs": 25700,
     "costToRun": ""
@@ -4794,7 +4794,7 @@
     "modelName": "orojar",
     "description": "Online demo for \"Orthogonal Jacobian Regularization for Unsupervised Disentanglement in Image Generation",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9deabb81-5373-424c-b214-eced2fb0d3b2/output.png",
     "modelUrl": "https://replicate.com/csyxwei/orojar",
     "runs": 753,
     "costToRun": ""
@@ -4806,7 +4806,7 @@
     "modelName": "haiku-progressive-image",
     "description": "A model for testing pydantic cog that yields images one word at a time.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a41ea2cc-ba81-4013-8faf-c0a556755ed1/haiku.png",
     "modelUrl": "https://replicate.com/zeke/haiku-progressive-image",
     "runs": 105,
     "costToRun": ""
@@ -4818,7 +4818,7 @@
     "modelName": "clipstyler",
     "description": "Image Style Transfer with Text Condition",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/59d6234b-3662-429d-93ba-637d849f1383/out.png",
     "modelUrl": "https://replicate.com/paper11667/clipstyler",
     "runs": 12700,
     "costToRun": ""
@@ -4830,7 +4830,7 @@
     "modelName": "clipdraw",
     "description": "Synthesize drawings to match a text prompt",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/0986e041-7be2-4d63-9388-dd1cc6154961/out.png",
     "modelUrl": "https://replicate.com/kvfrans/clipdraw",
     "runs": 3400,
     "costToRun": ""
@@ -4842,7 +4842,7 @@
     "modelName": "haiku-image",
     "description": "A model for testing pydantic cog that generates images.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/77db88dd-7364-4b61-aa21-e7fbfc87a34f/haiku.png",
     "modelUrl": "https://replicate.com/zeke/haiku-image",
     "runs": 310,
     "costToRun": ""
@@ -4866,7 +4866,7 @@
     "modelName": "clip-guided-diffusion",
     "description": "Clip-Guided Diffusion Model for Image Generation",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/449ab8b9-a448-4e1c-8ff3-8d2f51fb3814/out.png",
     "modelUrl": "https://replicate.com/cjwbw/clip-guided-diffusion",
     "runs": 4500,
     "costToRun": ""
@@ -4878,7 +4878,7 @@
     "modelName": "clip-guided-diffusion-pokemon",
     "description": "Generates pokemon sprites from prompt",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c3a156bb-9cb6-4877-bca5-163813fb1b91/out.png",
     "modelUrl": "https://replicate.com/cjwbw/clip-guided-diffusion-pokemon",
     "runs": 4000,
     "costToRun": ""
@@ -4890,7 +4890,7 @@
     "modelName": "laionide-v4",
     "description": "GLIDE-text2im w/ humans and experimental style prompts.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/72e54cfa-c4fc-43f6-92ba-3b06ccc22c28/sr_predictions.png",
     "modelUrl": "https://replicate.com/afiaka87/laionide-v4",
     "runs": 8900,
     "costToRun": ""
@@ -4914,7 +4914,7 @@
     "modelName": "pydantic-pixray",
     "description": "A fork of pixray/pixray for trying out Cog's new Predictor API",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/c1a698f8-7076-49c0-ad75-0a0603278b2d/tempfile.png",
     "modelUrl": "https://replicate.com/zeke/pydantic-pixray",
     "runs": 57,
     "costToRun": ""
@@ -4926,7 +4926,7 @@
     "modelName": "albef",
     "description": "Grad-CAM visualizations for Align before Fuse",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/689cc579-5421-4737-96cb-8291d9d71a75/output.png",
     "modelUrl": "https://replicate.com/salesforce/albef",
     "runs": 1400,
     "costToRun": ""
@@ -4950,7 +4950,7 @@
     "modelName": "laionide-v2",
     "description": "GLIDE from OpenAI finetuned on roughly 30M more samples. See `l...",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/bde54be2-bfa4-4513-b427-d7c9d3f130cb/upsample_predictions.png",
     "modelUrl": "https://replicate.com/laion-ai/laionide-v2",
     "runs": 3800,
     "costToRun": ""
@@ -4974,7 +4974,7 @@
     "modelName": "mask2former",
     "description": "Masked-attention Mask Transformer for Universal Image Segmentation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/45e2ed48-1803-4b58-a334-37f543072b92/out.png",
     "modelUrl": "https://replicate.com/facebookresearch/mask2former",
     "runs": 658,
     "costToRun": ""
@@ -4998,7 +4998,7 @@
     "modelName": "arithmetic",
     "description": "",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/135684b3-b268-476f-b7b5-91079781e1b3/baguette.jpg",
     "modelUrl": "https://replicate.com/yoadtew/arithmetic",
     "runs": 94,
     "costToRun": ""
@@ -5010,7 +5010,7 @@
     "modelName": "test",
     "description": "",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/9dd73204-a0b0-408a-ac82-fe685e0831c6/woman2.jpg",
     "modelUrl": "https://replicate.com/yoadtew/test",
     "runs": 147,
     "costToRun": ""
@@ -5022,7 +5022,7 @@
     "modelName": "projected_gan",
     "description": "Generate Pokemons with Projected GAN",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/b3f168b7-0a18-4eb6-95b7-a9da7f4466ae/my-file.png",
     "modelUrl": "https://replicate.com/xl-sr/projected_gan",
     "runs": 9700,
     "costToRun": ""
@@ -5034,7 +5034,7 @@
     "modelName": "stylemc",
     "description": "Text-Guided Image Generation and Manipulation",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/815d02e5-94e3-4115-b2e9-753850d8d927/out.png",
     "modelUrl": "https://replicate.com/catlab-team/stylemc",
     "runs": 824,
     "costToRun": ""
@@ -5058,7 +5058,7 @@
     "modelName": "swag",
     "description": "Supervised Weakly from hashtAGs",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/cb6264b8-c2c4-4a4d-99cd-2a4ecac00b23/dog.jpeg",
     "modelUrl": "https://replicate.com/facebookresearch/swag",
     "runs": 294,
     "costToRun": ""
@@ -5070,7 +5070,7 @@
     "modelName": "mnist-classification",
     "description": "Classify numerical digits.",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/e48d7acb-260c-4c6e-a5e5-582e4b5a3274/mnist.png",
     "modelUrl": "https://replicate.com/vganapati/mnist-classification",
     "runs": 115,
     "costToRun": ""
@@ -5094,7 +5094,7 @@
     "modelName": "pixray-text2pixel-0x42",
     "description": "Uses pixray to generate an image from text prompt",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/3f86ab3b-225c-4056-b39e-50c26ee85a71/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-text2pixel-0x42",
     "runs": 148400,
     "costToRun": ""
@@ -5106,7 +5106,7 @@
     "modelName": "fusedream",
     "description": "Training-Free Text-to-Image Generation",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/2ed67f4d-b3cf-4c96-82d4-d6caeecc884e/out.png",
     "modelUrl": "https://replicate.com/gnobitab/fusedream",
     "runs": 2400,
     "costToRun": ""
@@ -5118,7 +5118,7 @@
     "modelName": "pixray-tiler-future",
     "description": "",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/fe8fca90-dc1b-46f1-9187-22983d6062a4/tempfile.png",
     "modelUrl": "https://replicate.com/dribnet/pixray-tiler-future",
     "runs": 1700,
     "costToRun": ""
@@ -5130,7 +5130,7 @@
     "modelName": "bex-research-portfolio-code",
     "description": "",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/413f3b92-6ce9-4f8f-b648-2fa60a23f3df/tempfile.jpg",
     "modelUrl": "https://replicate.com/dribnet/bex-research-portfolio-code",
     "runs": 750,
     "costToRun": ""
@@ -5142,7 +5142,7 @@
     "modelName": "wav2clip",
     "description": "Image generation from Wav2CLIP through VQGAN-CLIP",
     "tags": "Audio-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d588eefb-c683-4756-b0c2-6d9174ebbf23/progress.png",
     "modelUrl": "https://replicate.com/hohsiangwu/wav2clip",
     "runs": 896,
     "costToRun": ""
@@ -5154,7 +5154,7 @@
     "modelName": "style-transfer-clip",
     "description": "Guide Style Transfer with CLIP loss",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/4fb41829-6d3e-4bd2-9fac-4264b53e2d0e/out.png",
     "modelUrl": "https://replicate.com/mistake0316/style-transfer-clip",
     "runs": 1300,
     "costToRun": ""
@@ -5166,7 +5166,7 @@
     "modelName": "l3das22_challenge",
     "description": "Baseline models demo of the IEEE L3DAS22 Challenge",
     "tags": "Audio-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/d1bd90de-e5ef-48b0-92cc-8338d6602768/output.png",
     "modelUrl": "https://replicate.com/l3das/l3das22_challenge",
     "runs": 228,
     "costToRun": ""
@@ -5202,7 +5202,7 @@
     "modelName": "reversiblehalftoning",
     "description": "Deep Halftoning with Reversible Binary Pattern",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/a55cbec6-04fd-4e54-8a1e-873c052c1ae5/out.png",
     "modelUrl": "https://replicate.com/menghanxia/reversiblehalftoning",
     "runs": 364,
     "costToRun": ""
@@ -5214,7 +5214,7 @@
     "modelName": "mannequin-gan-3-electric-boogaloo-2",
     "description": "Guide a StyleGAN3 trained on pictures of mannequins with CLIP.",
     "tags": "Text-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/7286415a-b861-497c-8d4e-ed6605b161b2/out.png",
     "modelUrl": "https://replicate.com/afiaka87/mannequin-gan-3-electric-boogaloo-2",
     "runs": 847,
     "costToRun": ""
@@ -5238,7 +5238,7 @@
     "modelName": "clip-age-predictor",
     "description": "Age prediction using CLIP",
     "tags": "Image-to-Text",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/8c578410-9ec6-4b20-a2ee-a625d0c652d8/Screen_Shot_2021-10-27_at_14.38.08.png",
     "modelUrl": "https://replicate.com/andreasjansson/clip-age-predictor",
     "runs": 527,
     "costToRun": ""
@@ -5250,7 +5250,7 @@
     "modelName": "spatchgan-selfie2anime",
     "description": "Selfie to anime",
     "tags": "Image-to-Image",
-    "example": "",
+    "example": "https://replicate.delivery/mgxm/607d2637-204b-4280-8678-d95c8b6f2e15/out.png",
     "modelUrl": "https://replicate.com/netease-gameai/spatchgan-selfie2anime",
     "runs": 3100,
     "costToRun": ""
