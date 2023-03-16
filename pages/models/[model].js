@@ -2,6 +2,7 @@ import { Box, Container, Heading, Text, Image, Tag } from "@chakra-ui/react";
 import data from "../data/data.json";
 import MetaTags from "../components/MetaTags";
 import PreviewImage from "../components/PreviewImage";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 export async function getStaticPaths() {
   const paths = data.map((model) => ({
@@ -31,9 +32,11 @@ export default function ModelPage({ model }) {
           <Heading as="h1" size="xl" mb="2">
             {model.modelName}
           </Heading>
+
           <Text fontSize="lg" mb="4">
             <Tag colorScheme={"teal"}>{model.tags}</Tag>
           </Text>
+
           <Text fontSize="lg" color="gray.500" mb="4">
             <a
               href={`/creators/${model.creator}`}
@@ -46,7 +49,16 @@ export default function ModelPage({ model }) {
           <Text fontSize="lg" color="gray.500" mb="4">
             {model.description}
           </Text>
-          <PreviewImage src={model.example} />
+          <Box maxW="450px" mb={5}>
+            <PreviewImage src={model.example} />
+            <Text>
+              <a href={model.modelUrl}>
+                <span style={{ textDecoration: "underline", color: "teal" }}>
+                  Try this model on Replicate <ExternalLinkIcon />{" "}
+                </span>
+              </a>
+            </Text>
+          </Box>
 
           <Text fontSize="lg" mb="4">
             Model Rank: {rank}
