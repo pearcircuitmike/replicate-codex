@@ -1,9 +1,5 @@
-import React, { useState } from "react";
-import testData from "../data/data.json";
 import {
   Box,
-  Checkbox,
-  Input,
   Table,
   TableContainer,
   Tbody,
@@ -11,160 +7,75 @@ import {
   Th,
   Thead,
   Tr,
-  Text,
   Tag,
-  HStack,
 } from "@chakra-ui/react";
-import { CalendarIcon } from "@chakra-ui/icons";
 
-export default function TableTest({ searchedVal }) {
-  const data = testData;
-
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState({ field: "", direction: "" });
-  const [selectedTags, setSelectedTags] = useState([]);
-
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  };
-
-  const handleSortChange = (field) => {
-    if (sort.field === field) {
-      setSort({
-        ...sort,
-        direction: sort.direction === "asc" ? "desc" : "asc",
-      });
-    } else {
-      setSort({ field, direction: "asc" });
-    }
-  };
-
-  const handleTagSelect = (event) => {
-    const tagName = event.target.value;
-    const checked = event.target.checked;
-    if (checked) {
-      setSelectedTags([...selectedTags, tagName]);
-    } else {
-      setSelectedTags(selectedTags.filter((tags) => tags !== tagName));
-    }
-  };
-
+export default function ModelsTable(props) {
+  const { data, searchValue, selectedTags, sorts } = props;
   const filteredData = data.filter(
     (item) =>
-      item.tags.toLowerCase().includes(filter.toLowerCase()) &&
-      (selectedTags.length === 0 || selectedTags.includes(item.tags))
+      !selectedTags ||
+      selectedTags.length === 0 ||
+      selectedTags.includes(item.tags)
   );
 
   const sortedData = filteredData.sort((a, b) => {
-    if (a[sort.field] < b[sort.field]) {
-      return sort.direction === "asc" ? -1 : 1;
-    }
-    if (a[sort.field] > b[sort.field]) {
-      return sort.direction === "asc" ? 1 : -1;
+    for (const sort of sorts ?? []) {
+      if (a[sort.column] < b[sort.column]) {
+        return sort.direction === "asc" ? -1 : 1;
+      }
+      if (a[sort.column] > b[sort.column]) {
+        return sort.direction === "asc" ? 1 : -1;
+      }
     }
     return 0;
   });
-
-  const models = Array.from(new Set(data.map((item) => item.tags)));
-
   return (
     <Box>
-      <Box mt="5px" mb="15px">
-        {models.map((tags) => (
-          <Checkbox
-            mr="20px"
-            value={tags}
-            isChecked={selectedTags.includes(tags)}
-            onChange={handleTagSelect}
-            color="gray.600"
-            key={models.tags}
-          >
-            {tags}
-          </Checkbox>
-        ))}
-      </Box>
-
       <TableContainer maxHeight={600} overflowY="auto">
         <Table size="sm">
           <Thead position="sticky" top={0} bgColor="white">
             <Tr>
-              <Th onClick={() => handleSortChange("creator")}>
-                Creator
-                {sort.field === "creator" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("modelName")}>
-                Model
-                {sort.field === "modelName" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("description")}>
-                Description
-                {sort.field === "description" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("tags")}>
-                Tags
-                {sort.field === "tags" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-
-              <Th onClick={() => handleSortChange("example")}>
-                Example
-                {sort.field === "example" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("modelUrl")}>
-                Replicate URL
-                {sort.field === "modelUrl" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("runs")}>
-                Runs
-                {sort.field === "runs" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("costToRun")}>
-                Cost
-                {sort.field === "costToRun" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
-              <Th onClick={() => handleSortChange("lastUpdated")}>
-                Last Updated
-                {sort.field === "lastUpdated" &&
-                  (sort.direction === "asc" ? "▲" : "▼")}
-              </Th>
+              <Th>Creator</Th>
+              <Th>Model Name</Th>
+              <Th>Description</Th>
+              <Th>Tags</Th>
+              <Th>Example</Th>
+              <Th>Replicate URL</Th>
+              <Th isNumeric>Runs</Th>
+              <Th isNumeric>Cost</Th>
+              <Th isNumeric>Last Updated</Th>
             </Tr>
           </Thead>
           <Tbody>
             {sortedData
               .filter(
                 (row) =>
-                  typeof searchedVal !== "undefined" &&
+                  typeof searchValue !== "undefined" &&
                   ((row.modelName &&
                     row.modelName
                       .toString()
                       .toLowerCase()
-                      .includes(searchedVal.toString().toLocaleLowerCase())) ||
+                      .includes(searchValue.toString().toLocaleLowerCase())) ||
                     (row.creator &&
                       row.creator
                         .toString()
                         .toLowerCase()
                         .includes(
-                          searchedVal.toString().toLocaleLowerCase()
+                          searchValue.toString().toLocaleLowerCase()
                         )) ||
                     (row.description &&
                       row.description
                         .toString()
                         .toLowerCase()
                         .includes(
-                          searchedVal.toString().toLocaleLowerCase()
+                          searchValue.toString().toLocaleLowerCase()
                         )) ||
                     (row.tags &&
                       row.tags
                         .toString()
                         .toLowerCase()
-                        .includes(searchedVal.toString().toLocaleLowerCase())))
+                        .includes(searchValue.toString().toLocaleLowerCase())))
               )
               .map((item) => (
                 <Tr key={item.id} style={{ verticalAlign: "top" }}>
