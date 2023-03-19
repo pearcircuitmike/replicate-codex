@@ -1,8 +1,6 @@
 import React from "react";
-
 import {
   Box,
-  Image,
   Table,
   Thead,
   Tr,
@@ -14,13 +12,52 @@ import {
 } from "@chakra-ui/react";
 import testData from "../data/data.json";
 
-function ModelLeaderboard({ searchedVal }) {
-  const models = testData;
+function getRank(modelId, data) {
+  const sortedData = [...data].sort((a, b) => b.runs - a.runs);
+  const modelIndex = sortedData.findIndex((model) => model.id === modelId);
+  return modelIndex + 1;
+}
+
+function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
+  const models = data || testData;
   const sortedModels = models.sort((a, b) => b.runs - a.runs);
 
+  const filteredModels = models
+    .filter((row) => {
+      const searchMatch =
+        typeof searchValue !== "undefined" &&
+        ((row.modelName &&
+          row.modelName
+            .toString()
+            .toLowerCase()
+            .includes(searchValue.toString().toLowerCase())) ||
+          (row.creator &&
+            row.creator
+              .toString()
+              .toLowerCase()
+              .includes(searchValue.toString().toLowerCase())) ||
+          (row.description &&
+            row.description
+              .toString()
+              .toLowerCase()
+              .includes(searchValue.toString().toLowerCase())) ||
+          (row.tags &&
+            row.tags
+              .toString()
+              .toLowerCase()
+              .includes(searchValue.toString().toLowerCase())));
+
+      const tagsMatch =
+        !selectedTags?.length ||
+        (row.tags && row.tags.some((tag) => selectedTags?.includes(tag)));
+
+      return searchMatch && tagsMatch;
+    })
+    .sort(sorts);
+
   return (
-    <Box>
-      <TableContainer maxHeight={600} overflowY="auto">
+    <Box mt={5}>
+      <TableContainer maxHeight={600} overflowY="auto" mt="50px">
         <Table variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -37,42 +74,15 @@ function ModelLeaderboard({ searchedVal }) {
             </Tr>
           </Thead>
           <Tbody>
-            {sortedModels
-              .filter(
-                (row) =>
-                  typeof searchedVal !== "undefined" &&
-                  ((row.modelName &&
-                    row.modelName
-                      .toString()
-                      .toLowerCase()
-                      .includes(searchedVal.toString().toLocaleLowerCase())) ||
-                    (row.creator &&
-                      row.creator
-                        .toString()
-                        .toLowerCase()
-                        .includes(
-                          searchedVal.toString().toLocaleLowerCase()
-                        )) ||
-                    (row.description &&
-                      row.description
-                        .toString()
-                        .toLowerCase()
-                        .includes(
-                          searchedVal.toString().toLocaleLowerCase()
-                        )) ||
-                    (row.tags &&
-                      row.tags
-                        .toString()
-                        .toLowerCase()
-                        .includes(searchedVal.toString().toLocaleLowerCase())))
-              )
-              .map((model, index) => (
+            {filteredModels.map((model, index) => {
+              const rank = getRank(model.id, models);
+              return (
                 <Tr key={model.id}>
                   <Td isNumeric>
-                    {index + 1 == "1" ? "🥇" : ""}
-                    {index + 1 == "2" ? "🥈" : ""}
-                    {index + 1 == "3" ? "🥉" : ""}
-                    {index + 1}
+                    {rank === 1 ? "🥇" : ""}
+                    {rank === 2 ? "🥈" : ""}
+                    {rank === 3 ? "🥉" : ""}
+                    {rank}
                   </Td>
 
                   <Td isNumeric>{model.runs.toLocaleString()}</Td>
@@ -135,7 +145,8 @@ function ModelLeaderboard({ searchedVal }) {
                     <Tag>{model.tags}</Tag>
                   </Td>
                 </Tr>
-              ))}
+              );
+            })}
           </Tbody>
         </Table>
       </TableContainer>

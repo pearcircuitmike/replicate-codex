@@ -1,8 +1,6 @@
 import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import styles from "@/styles/Home.module.css";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 import {
   Container,
@@ -40,6 +38,17 @@ export default function Home() {
   const [searchValue, setSearchValue] = useState("");
   const [sorts, setSorts] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const router = useRouter();
+  const { tab } = router.query;
+
+  const handleTabsChange = (index) => {
+    router.push({ pathname: "/", query: { tab: index } });
+  };
+  useEffect(() => {
+    if (tab) {
+      handleTabsChange(parseInt(tab));
+    }
+  }, [tab]);
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
@@ -114,8 +123,34 @@ export default function Home() {
               <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
             )}
           </VStack>
-          {/*  <ModelsTable data={sortedData} searchValue={searchValue} /> */}
-          <GalleryView data={sortedData} searchValue={searchValue} />
+          <Tabs index={tab ? parseInt(tab) : 0} onChange={handleTabsChange}>
+            <TabList>
+              <Tab>Models Table</Tab>
+              <Tab>Gallery View</Tab>
+              <Tab>Creators Leaderboard</Tab>
+              <Tab>Models Leaderboard</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <ModelsTable data={sortedData} searchValue={searchValue} />
+              </TabPanel>
+              <TabPanel>
+                <GalleryView data={sortedData} searchValue={searchValue} />
+              </TabPanel>
+              <TabPanel>
+                <CreatorsLeaderboard
+                  data={sortedData}
+                  searchValue={searchValue}
+                />
+              </TabPanel>
+              <TabPanel>
+                <ModelsLeaderboard
+                  data={sortedData}
+                  searchValue={searchValue}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </main>
       </Container>
     </>

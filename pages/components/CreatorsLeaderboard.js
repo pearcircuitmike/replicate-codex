@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  Image,
   Table,
   Thead,
   Tr,
@@ -9,12 +8,14 @@ import {
   Td,
   Tbody,
   TableContainer,
-  Tag,
 } from "@chakra-ui/react";
-import testData from "../data/data.json";
 
-function CreatorsLeaderboard({ searchedVal }) {
-  const creators = testData.reduce((acc, cur) => {
+function getCreatorRank(creatorName, sortedCreators) {
+  return sortedCreators.findIndex(([name]) => name === creatorName) + 1;
+}
+
+function CreatorsLeaderboard({ data, searchValue }) {
+  const creators = data.reduce((acc, cur) => {
     const creator = cur.creator;
     const runs = cur.runs;
 
@@ -35,9 +36,20 @@ function CreatorsLeaderboard({ searchedVal }) {
     ([_, a], [__, b]) => b.runs - a.runs
   );
 
+  const filteredCreators = sortedCreators.filter(([creatorName, creator]) => {
+    const searchMatch =
+      typeof searchValue === "undefined" ||
+      creatorName
+        .toString()
+        .toLowerCase()
+        .includes(searchValue.toString().toLowerCase());
+
+    return searchMatch;
+  });
+
   return (
-    <Box>
-      <TableContainer maxHeight={600} overflowY="auto">
+    <Box mt={5}>
+      <TableContainer maxHeight={600} overflowY="auto" mt="50px">
         <Table variant="simple" size="sm">
           <Thead>
             <Tr>
@@ -48,54 +60,15 @@ function CreatorsLeaderboard({ searchedVal }) {
             </Tr>
           </Thead>
           <Tbody>
-            {sortedCreators
-              .filter(
-                ([_, creator]) =>
-                  typeof searchedVal !== "undefined" &&
-                  (creator.models.some(
-                    (model) =>
-                      model.modelName &&
-                      model.modelName
-                        .toString()
-                        .toLowerCase()
-                        .includes(searchedVal.toString().toLowerCase())
-                  ) ||
-                    creator.runs
-                      .toString()
-                      .toLowerCase()
-                      .includes(searchedVal.toString().toLowerCase()) ||
-                    creator.models.some(
-                      (model) =>
-                        model.description &&
-                        model.description
-                          .toString()
-                          .toLowerCase()
-                          .includes(searchedVal.toString().toLowerCase())
-                    ) ||
-                    creator.models.some(
-                      (model) =>
-                        model.tags &&
-                        model.tags
-                          .toString()
-                          .toLowerCase()
-                          .includes(searchedVal.toString().toLowerCase())
-                    ) ||
-                    creator.models.some(
-                      (model) =>
-                        model.creator &&
-                        model.creator
-                          .toString()
-                          .toLowerCase()
-                          .includes(searchedVal.toString().toLowerCase())
-                    ))
-              )
-              .map(([creator, data], index) => (
+            {filteredCreators.map(([creator, data], index) => {
+              const rank = getCreatorRank(creator, sortedCreators);
+              return (
                 <Tr key={creator}>
                   <Td isNumeric>
-                    {index + 1 == "1" ? "🥇" : ""}
-                    {index + 1 == "2" ? "🥈" : ""}
-                    {index + 1 == "3" ? "🥉" : ""}
-                    {index + 1}
+                    {rank === 1 ? "🥇" : ""}
+                    {rank === 2 ? "🥈" : ""}
+                    {rank === 3 ? "🥉" : ""}
+                    {rank}
                   </Td>
                   <Td isNumeric>{data.runs.toLocaleString()}</Td>
                   <Td maxWidth="200px" isTruncated>
@@ -111,7 +84,8 @@ function CreatorsLeaderboard({ searchedVal }) {
                   </Td>
                   <Td isNumeric>{data.models.length}</Td>
                 </Tr>
-              ))}
+              );
+            })}
           </Tbody>
         </Table>
       </TableContainer>
