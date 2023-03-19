@@ -12,12 +12,12 @@ const ActiveTagFilters = ({ tags, onTagClose, onTagsChange }) => {
   const handleTagClose = (tag) => {
     onTagClose(tag);
     onTagsChange(
-      tags.filter((t) => t !== tag),
+      tags?.filter((t) => t !== tag),
       tag
     );
   };
 
-  if (tags.length === 0) return null;
+  if (tags?.length === 0) return null;
 
   return (
     <Flex alignItems="center" mt={2} mb={2}>
@@ -25,7 +25,7 @@ const ActiveTagFilters = ({ tags, onTagClose, onTagsChange }) => {
         Active Tag Filters:
       </Text>
       <Wrap spacing={2}>
-        {tags.map((tag) => (
+        {tags?.map((tag) => (
           <WrapItem key={tag}>
             <Button size="sm" variant="outline" onClick={() => onTagClose(tag)}>
               {tag}

@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 
 const ActiveSorts = ({ sorts, onRemoveSort }) => {
-  if (sorts.length === 0) {
+  if (sorts?.length === 0) {
     return null;
   }
 
@@ -31,7 +31,7 @@ const ActiveSorts = ({ sorts, onRemoveSort }) => {
         Active Sorts:
       </Text>
       <Wrap spacing={2}>
-        {sorts.map((sort, index) => (
+        {sorts?.map((sort, index) => (
           <WrapItem key={index}>
             <Button
               size="sm"

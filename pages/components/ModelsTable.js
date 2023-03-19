@@ -12,24 +12,26 @@ import {
 
 export default function ModelsTable(props) {
   const { data, searchValue, selectedTags, sorts } = props;
-  const filteredData = data.filter(
+
+  const filteredData = data?.filter(
     (item) =>
       !selectedTags ||
-      selectedTags.length === 0 ||
-      selectedTags.includes(item.tags)
+      selectedTags?.length === 0 ||
+      selectedTags?.includes(item.tags)
   );
 
-  const sortedData = filteredData.sort((a, b) => {
+  const sortedData = filteredData?.sort((a, b) => {
     for (const sort of sorts ?? []) {
-      if (a[sort.column] < b[sort.column]) {
+      if (sort && a[sort.column] < b[sort.column]) {
         return sort.direction === "asc" ? -1 : 1;
       }
-      if (a[sort.column] > b[sort.column]) {
+      if (sort && a[sort.column] > b[sort.column]) {
         return sort.direction === "asc" ? 1 : -1;
       }
     }
     return 0;
   });
+
   return (
     <Box mt={5}>
       <TableContainer maxHeight="600px" mt="50px" overflowY="auto">
@@ -49,7 +51,7 @@ export default function ModelsTable(props) {
           </Thead>
           <Tbody>
             {sortedData
-              .filter(
+              ?.filter(
                 (row) =>
                   typeof searchValue !== "undefined" &&
                   ((row.modelName &&

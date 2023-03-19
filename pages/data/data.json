@@ -1614,7 +1614,7 @@
     "modelName": "atmant",
     "description": "",
     "tags": "Image-to-Image",
-    "example": "replicate.com/nicosuave/atmant",
+    "example": "https://replicate.com/nicosuave/atmant",
     "modelUrl": "https://replicate.com/nicosuave/atmant",
     "runs": 227,
     "costToRun": 0.03

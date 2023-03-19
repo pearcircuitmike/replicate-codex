@@ -15,7 +15,7 @@ import {
   CloseButton,
 } from "@chakra-ui/react";
 
-const FilterTags = ({ models, selectedTags, handleTagSelect }) => {
+const FilterTags = ({ models = [], selectedTags, handleTagSelect }) => {
   const handleCheckboxChange = (value) => {
     handleTagSelect(value);
   };
