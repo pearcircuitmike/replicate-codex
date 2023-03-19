@@ -52,8 +52,8 @@ function CreatorsLeaderboard({ data, searchValue }) {
   });
 
   return (
-    <Box mt={5}>
-      <TableContainer maxHeight={600} overflowY="auto" mt="50px">
+    <Box>
+      <TableContainer maxHeight={600} overflowY="auto">
         <Table variant="simple" size="sm">
           <Thead>
             <Tr>

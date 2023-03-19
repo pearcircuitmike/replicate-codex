@@ -75,7 +75,7 @@ const SortMenu = ({ onSortChange }) => {
   return (
     <Menu>
       <MenuButton as={Button} colorScheme="teal">
-        Sort
+        Add Sort
       </MenuButton>
       <MenuList minWidth="320px">
         <MenuGroup title="Sort Options">

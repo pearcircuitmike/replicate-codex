@@ -144,7 +144,7 @@ export default function Home() {
             colorScheme="teal"
             overflowX="auto"
           >
-            <TabList>
+            <TabList mt={5}>
               <Tab>Models Table</Tab>
               <Tab>Gallery View</Tab>
               <Tab>Creators Leaderboard</Tab>

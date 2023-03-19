@@ -37,7 +37,7 @@ export default function GalleryView({
   });
 
   return (
-    <Box mt={5}>
+    <Box>
       <SimpleGrid columns={[2, null, 3]} minChildWidth="250px" gap={5}>
         {sortedData
           ?.filter(
