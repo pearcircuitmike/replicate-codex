@@ -138,7 +138,12 @@ export default function Home() {
               <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
             )}
           </VStack>
-          <Tabs index={tabIndex} onChange={handleTabsChange}>
+          <Tabs
+            index={tabIndex}
+            onChange={handleTabsChange}
+            colorScheme="teal"
+            overflowX="auto"
+          >
             <TabList>
               <Tab>Models Table</Tab>
               <Tab>Gallery View</Tab>

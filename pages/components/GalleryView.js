@@ -101,6 +101,8 @@ export default function GalleryView({
                       maxW="240px"
                       maxH="240px"
                       margin="auto"
+                      objectFit="cover"
+                      objectPosition="center"
                     />
                   </Link>
                 </Box>
