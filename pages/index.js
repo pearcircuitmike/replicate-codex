@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 
 import {
@@ -51,14 +51,17 @@ export default function Home() {
   const [selectedTags, setSelectedTags] = useState([]);
   const router = useRouter();
   const { tab } = router.query;
+  const [tabIndex, setTabIndex] = useState(0);
 
-  const handleTabsChange = (index) => {
-    router.push({ pathname: "/", query: { tab: tabNameReverseMap[index] } });
-  };
+  const handleTabsChange = useCallback((index) => {
+    const newTabName = tabNameReverseMap[index];
+    window.history.pushState({ tab: newTabName }, "", `/?tab=${newTabName}`);
+    setTabIndex(index);
+  }, []);
 
   useEffect(() => {
     if (tab) {
-      handleTabsChange(tabNameMap[tab]);
+      setTabIndex(tabNameMap[tab]);
     }
   }, [tab]);
 
@@ -135,7 +138,7 @@ export default function Home() {
               <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
             )}
           </VStack>
-          <Tabs index={tab ? tabNameMap[tab] : 0} onChange={handleTabsChange}>
+          <Tabs index={tabIndex} onChange={handleTabsChange}>
             <TabList>
               <Tab>Models Table</Tab>
               <Tab>Gallery View</Tab>
@@ -144,22 +147,30 @@ export default function Home() {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <ModelsTable data={sortedData} searchValue={searchValue} />
+                {tabIndex === 0 && (
+                  <ModelsTable data={sortedData} searchValue={searchValue} />
+                )}
               </TabPanel>
               <TabPanel>
-                <GalleryView data={sortedData} searchValue={searchValue} />
+                {tabIndex === 1 && (
+                  <GalleryView data={sortedData} searchValue={searchValue} />
+                )}
               </TabPanel>
               <TabPanel>
-                <CreatorsLeaderboard
-                  data={sortedData}
-                  searchValue={searchValue}
-                />
+                {tabIndex === 2 && (
+                  <CreatorsLeaderboard
+                    data={sortedData}
+                    searchValue={searchValue}
+                  />
+                )}
               </TabPanel>
               <TabPanel>
-                <ModelsLeaderboard
-                  data={sortedData}
-                  searchValue={searchValue}
-                />
+                {tabIndex === 3 && (
+                  <ModelsLeaderboard
+                    data={sortedData}
+                    searchValue={searchValue}
+                  />
+                )}
               </TabPanel>
             </TabPanels>
           </Tabs>

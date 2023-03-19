@@ -15,6 +15,10 @@ function getCreatorRank(creatorName, sortedCreators) {
 }
 
 function CreatorsLeaderboard({ data, searchValue }) {
+  if (!data) {
+    return null;
+  }
+
   const creators = data.reduce((acc, cur) => {
     const creator = cur.creator;
     const runs = cur.runs;
