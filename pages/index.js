@@ -34,6 +34,17 @@ import SortMenu from "./components/SortMenu";
 import ActiveTagFilters from "./components/ActiveTagFilters";
 import ActiveSorts from "./components/ActiveSorts";
 
+const tabNameMap = {
+  modelsTable: 0,
+  galleryView: 1,
+  creatorsLeaderboard: 2,
+  modelsLeaderboard: 3,
+};
+
+const tabNameReverseMap = Object.fromEntries(
+  Object.entries(tabNameMap).map(([key, value]) => [value, key])
+);
+
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
   const [sorts, setSorts] = useState([]);
@@ -42,11 +53,12 @@ export default function Home() {
   const { tab } = router.query;
 
   const handleTabsChange = (index) => {
-    router.push({ pathname: "/", query: { tab: index } });
+    router.push({ pathname: "/", query: { tab: tabNameReverseMap[index] } });
   };
+
   useEffect(() => {
     if (tab) {
-      handleTabsChange(parseInt(tab));
+      handleTabsChange(tabNameMap[tab]);
     }
   }, [tab]);
 
@@ -123,7 +135,7 @@ export default function Home() {
               <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
             )}
           </VStack>
-          <Tabs index={tab ? parseInt(tab) : 0} onChange={handleTabsChange}>
+          <Tabs index={tab ? tabNameMap[tab] : 0} onChange={handleTabsChange}>
             <TabList>
               <Tab>Models Table</Tab>
               <Tab>Gallery View</Tab>
