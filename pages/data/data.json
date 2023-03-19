@@ -3437,7 +3437,7 @@
     "creator": "deforum",
     "modelName": "deforum_stable_diffusion",
     "description": "Animating prompts with stable diffusion",
-    "tags": "Text-to-Vido",
+    "tags": "Text-to-Video",
     "example": "",
     "modelUrl": "https://replicate.com/deforum/deforum_stable_diffusion",
     "runs": 54000,

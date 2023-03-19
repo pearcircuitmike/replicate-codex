@@ -4,7 +4,24 @@ import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import { useState, useEffect } from "react";
 
-import { Container, HStack, VStack } from "@chakra-ui/react";
+import {
+  Container,
+  Heading,
+  Stack,
+  Text,
+  Box,
+  Tooltip,
+  HStack,
+  Show,
+  Button,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Input,
+  VStack,
+} from "@chakra-ui/react";
 
 import ModelsTable from "./components/ModelsTable.js";
 import ModelsLeaderboard from "./components/ModelsLeaderboard.js";
@@ -28,15 +45,8 @@ export default function Home() {
     setSearchValue(event.target.value);
   };
 
-  const handleTagSelect = (tags, removedTag) => {
-    setSelectedTags(tags);
-    if (removedTag) {
-      setTagsState((prevState) => {
-        const newState = { ...prevState };
-        newState[removedTag] = false;
-        return newState;
-      });
-    }
+  const handleTagSelect = (newSelectedTags) => {
+    setSelectedTags(newSelectedTags);
   };
   const handleTagClose = (tag) => {
     const newSelectedTags = selectedTags.filter((value) => value !== tag);
@@ -98,7 +108,6 @@ export default function Home() {
               <ActiveTagFilters
                 tags={selectedTags}
                 onTagClose={handleTagClose}
-                onTagsChange={handleTagSelect}
               />
             )}
             {sorts.length > 0 && (

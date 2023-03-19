@@ -31,8 +31,8 @@ export default function ModelsTable(props) {
     return 0;
   });
   return (
-    <Box>
-      <TableContainer maxHeight={600} overflowY="auto">
+    <Box mt={5}>
+      <TableContainer maxHeight="600px" mt="50px" overflowY="auto">
         <Table size="sm">
           <Thead position="sticky" top={0} bgColor="white">
             <Tr>
