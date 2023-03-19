@@ -79,42 +79,44 @@ const SortMenu = ({ onSortChange }) => {
       </MenuButton>
       <MenuList minWidth="320px">
         <MenuGroup title="Sort Options">
-          <VStack alignItems="start" spacing={1} m={3}>
+          <VStack alignItems="start" spacing="1px" ml={3} mr={3}>
             {sorts.map((sort, index) => (
-              <HStack key={index} spacing={2}>
-                <Select
-                  placeholder="Select column"
-                  value={sort.column}
-                  onChange={(e) =>
-                    handleSortChange(index, "column", e.target.value)
-                  }
-                >
-                  {columns.map((column) => (
-                    <option
-                      key={column.field}
-                      value={column.field}
-                      disabled={sortedColumns.includes(column.field)}
-                    >
-                      {column.name}
-                    </option>
-                  ))}
-                </Select>
-                <Select
-                  value={sort.direction}
-                  onChange={(e) =>
-                    handleSortChange(index, "direction", e.target.value)
-                  }
-                >
-                  <option value="asc">Ascending</option>
-                  <option value="desc">Descending</option>
-                </Select>
-                <IconButton
-                  aria-label="Remove sort"
-                  icon={<DeleteIcon />}
-                  size="sm"
-                  onClick={() => handleRemoveSort(index)}
-                />
-              </HStack>
+              <div key={index} style={{ marginBottom: "10px" }}>
+                <HStack spacing={2}>
+                  <Select
+                    placeholder="Select column"
+                    value={sort.column}
+                    onChange={(e) =>
+                      handleSortChange(index, "column", e.target.value)
+                    }
+                  >
+                    {columns.map((column) => (
+                      <option
+                        key={column.field}
+                        value={column.field}
+                        disabled={sortedColumns.includes(column.field)}
+                      >
+                        {column.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    value={sort.direction}
+                    onChange={(e) =>
+                      handleSortChange(index, "direction", e.target.value)
+                    }
+                  >
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </Select>
+                  <IconButton
+                    aria-label="Remove sort"
+                    icon={<DeleteIcon />}
+                    size="sm"
+                    onClick={() => handleRemoveSort(index)}
+                  />
+                </HStack>
+              </div>
             ))}
             <Button onClick={handleAddSort} size="sm" colorScheme="teal">
               Add Sort

@@ -114,7 +114,8 @@ export default function Home() {
               <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
             )}
           </VStack>
-          <ModelsTable data={sortedData} searchValue={searchValue} />
+          {/*  <ModelsTable data={sortedData} searchValue={searchValue} /> */}
+          <GalleryView data={sortedData} searchValue={searchValue} />
         </main>
       </Container>
     </>
