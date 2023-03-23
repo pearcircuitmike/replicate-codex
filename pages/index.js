@@ -53,17 +53,47 @@ export default function Home() {
   const { tab } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
 
-  const handleTabsChange = useCallback((index) => {
-    const newTabName = tabNameReverseMap[index];
-    window.history.pushState({ tab: newTabName }, "", `/?tab=${newTabName}`);
-    setTabIndex(index);
-  }, []);
+  const updateUrlParams = (tab, sorts, tags) => {
+    const params = new URLSearchParams();
+
+    if (tab) {
+      params.set("tab", tab);
+    }
+    if (sorts.length > 0) {
+      params.set("sorts", JSON.stringify(sorts));
+    }
+    if (tags.length > 0) {
+      params.set("tags", JSON.stringify(tags));
+    }
+    window.history.pushState(
+      { tab, sorts, tags },
+      "",
+      `/?${params.toString()}`
+    );
+  };
+
+  const handleTabsChange = useCallback(
+    (index) => {
+      const newTabName = tabNameReverseMap[index];
+      updateUrlParams(newTabName, sorts, selectedTags);
+      setTabIndex(index);
+    },
+    [sorts, selectedTags]
+  );
 
   useEffect(() => {
+    const { tab, sorts, tags } = router.query;
+
     if (tab) {
       setTabIndex(tabNameMap[tab]);
     }
-  }, [tab]);
+    if (sorts) {
+      setSorts(JSON.parse(sorts));
+    }
+    if (tags) {
+      setSelectedTags(JSON.parse(tags));
+    }
+  }, [router.query]);
 
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
@@ -71,14 +101,24 @@ export default function Home() {
 
   const handleTagSelect = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
+    updateUrlParams(tabNameReverseMap[tabIndex], sorts, newSelectedTags);
   };
+
   const handleTagClose = (tag) => {
     const newSelectedTags = selectedTags.filter((value) => value !== tag);
     setSelectedTags(newSelectedTags);
+    updateUrlParams(tabNameReverseMap[tabIndex], sorts, newSelectedTags);
   };
+
+  const handleSortChange = (newSorts) => {
+    setSorts(newSorts);
+    updateUrlParams(tabNameReverseMap[tabIndex], newSorts, selectedTags);
+  };
+
   const handleRemoveSort = (index) => {
     const newSorts = sorts.filter((_, i) => i !== index);
     setSorts(newSorts);
+    updateUrlParams(tabNameReverseMap[tabIndex], newSorts, selectedTags);
   };
 
   const data = testData;
@@ -124,7 +164,7 @@ export default function Home() {
                 selectedTags={selectedTags}
                 handleTagSelect={handleTagSelect}
               />
-              <SortMenu onSortChange={(newSorts) => setSorts(newSorts)} />
+              <SortMenu onSortChange={handleSortChange} />
             </HStack>
           </HStack>
           <VStack spacing={1} align="left">
