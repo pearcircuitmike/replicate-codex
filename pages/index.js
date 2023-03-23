@@ -4,14 +4,7 @@ import { useRouter } from "next/router";
 
 import {
   Container,
-  Heading,
-  Stack,
-  Text,
-  Box,
-  Tooltip,
   HStack,
-  Show,
-  Button,
   Tabs,
   TabList,
   TabPanels,
@@ -81,20 +74,6 @@ export default function Home() {
     [sorts, selectedTags]
   );
 
-  useEffect(() => {
-    const { tab, sorts, tags } = router.query;
-
-    if (tab) {
-      setTabIndex(tabNameMap[tab]);
-    }
-    if (sorts) {
-      setSorts(JSON.parse(sorts));
-    }
-    if (tags) {
-      setSelectedTags(JSON.parse(tags));
-    }
-  }, [router.query]);
-
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
   };
@@ -120,6 +99,43 @@ export default function Home() {
     setSorts(newSorts);
     updateUrlParams(tabNameReverseMap[tabIndex], newSorts, selectedTags);
   };
+  useEffect(() => {
+    const { tab, sorts, tags } = router.query;
+
+    if (tab) {
+      setTabIndex(tabNameMap[tab]);
+    }
+    if (sorts) {
+      setSorts(JSON.parse(sorts));
+    }
+    if (tags) {
+      setSelectedTags(JSON.parse(tags));
+    }
+  }, [router.query]);
+
+  useEffect(() => {
+    const handleRouteChange = (url) => {
+      const params = new URLSearchParams(url.split("?")[1]);
+      const tab = params.get("tab");
+      const sorts = params.get("sorts");
+      const tags = params.get("tags");
+
+      if (tab) {
+        setTabIndex(tabNameMap[tab]);
+      }
+      if (sorts) {
+        setSorts(JSON.parse(sorts));
+      }
+      if (tags) {
+        setSelectedTags(JSON.parse(tags));
+      }
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router]);
 
   const data = testData;
 
