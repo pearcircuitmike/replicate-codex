@@ -58,11 +58,7 @@ export default function Home() {
     if (tags.length > 0) {
       params.set("tags", JSON.stringify(tags));
     }
-    window.history.pushState(
-      { tab, sorts, tags },
-      "",
-      `/?${params.toString()}`
-    );
+    router.push(`/?${params.toString()}`);
   };
 
   const handleTabsChange = useCallback(
