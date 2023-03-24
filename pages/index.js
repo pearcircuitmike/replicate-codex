@@ -27,7 +27,7 @@ import SortMenu from "./components/SortMenu";
 import ActiveTagFilters from "./components/ActiveTagFilters";
 import ActiveSorts from "./components/ActiveSorts";
 
-import { fetchDataFromTable } from "./components/utils/supabaseClient";
+import { fetchDataFromTable } from "../utils/supabaseClient";
 
 const tabNameMap = {
   modelsTable: 0,
@@ -60,8 +60,6 @@ export default function Home() {
     // Call the getData function
     getData();
   }, []);
-
-  console.log(data);
 
   const updateUrlParams = (tab, sorts, tags) => {
     const params = new URLSearchParams();
