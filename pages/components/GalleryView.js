@@ -123,8 +123,7 @@ export default function GalleryView({
 
                 <Text fontSize="sm">Runs: {runs.toLocaleString()}</Text>
                 <Text fontSize="sm">
-                  Cost to Run: $
-                  {costToRun !== "" ? costToRun.toLocaleString() : "-"}
+                  Cost to Run: ${costToRun ? costToRun.toLocaleString() : "-"}
                 </Text>
                 <Text fontSize="sm">
                   Creator:{" "}

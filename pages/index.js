@@ -27,6 +27,8 @@ import SortMenu from "./components/SortMenu";
 import ActiveTagFilters from "./components/ActiveTagFilters";
 import ActiveSorts from "./components/ActiveSorts";
 
+import { fetchDataFromTable } from "./components/utils/supabaseClient";
+
 const tabNameMap = {
   modelsTable: 0,
   galleryView: 1,
@@ -45,6 +47,21 @@ export default function Home() {
   const router = useRouter();
   const { tab } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
+  const [data, setData] = useState([]);
+
+  // Define an effect that runs once when the component mounts
+  // and fetches the data from the table
+  useEffect(() => {
+    async function getData() {
+      const fetchedData = await fetchDataFromTable("modelsData");
+      // Update the state with the fetched data
+      setData(fetchedData);
+    }
+    // Call the getData function
+    getData();
+  }, []);
+
+  console.log(data);
 
   const updateUrlParams = (tab, sorts, tags) => {
     const params = new URLSearchParams();
@@ -132,8 +149,6 @@ export default function Home() {
       router.events.off("routeChangeComplete", handleRouteChange);
     };
   }, [router]);
-
-  const data = testData;
 
   const filteredData = data.filter(
     (item) => selectedTags.length === 0 || selectedTags.includes(item.tags)

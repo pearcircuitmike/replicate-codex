@@ -8,7 +8,7 @@ export default function MyPage() {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Query the testTable table for data
-    const { data, error } = await supabase.from("testTable").select("id");
+    const { data, error } = await supabase.from("modelsData").select("*");
 
     // Handle any errors and log the data
     if (error) {
