@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Connect to the Supabase database
-const supabaseUrl = "https://mnhpqpybfurtxpruvltx.supabase.co";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_CLIENT_API_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
