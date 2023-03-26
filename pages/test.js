@@ -14,7 +14,6 @@ export default function MyPage() {
     if (error) {
       console.error(error);
     } else {
-      console.log(data);
     }
   }
 

@@ -10,7 +10,6 @@ import {
   TableContainer,
   Tag,
 } from "@chakra-ui/react";
-import testData from "../data/data.json";
 
 function getRank(modelId, data) {
   const sortedData = [...data].sort((a, b) => b.runs - a.runs);
@@ -19,11 +18,11 @@ function getRank(modelId, data) {
 }
 
 function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
-  const models = data || testData;
-  const sortedModels = models.sort((a, b) => b.runs - a.runs);
+  const models = data;
+  const sortedModels = models?.sort((a, b) => b.runs - a.runs);
 
   const filteredModels = models
-    .filter((row) => {
+    ?.filter((row) => {
       const searchMatch =
         typeof searchValue !== "undefined" &&
         ((row.modelName &&
@@ -74,7 +73,7 @@ function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
             </Tr>
           </Thead>
           <Tbody>
-            {filteredModels.map((model, index) => {
+            {filteredModels?.map((model, index) => {
               const rank = getRank(model.id, models);
               return (
                 <Tr key={model.id}>

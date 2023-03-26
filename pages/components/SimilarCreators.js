@@ -20,7 +20,10 @@ export default function SimilarCreators({ similarCreators, data }) {
           {similarCreators &&
             similarCreators.map((creator) => {
               const creatorModels =
-                data && data.filter((item) => item.creator === creator);
+                data &&
+                data.filter(
+                  (item) => item.creator.toLowerCase() === creator.toLowerCase()
+                );
               const totalRuns = creatorModels
                 ? creatorModels.reduce((acc, curr) => acc + curr.runs, 0)
                 : 0;
@@ -47,14 +50,16 @@ export default function SimilarCreators({ similarCreators, data }) {
                   />
                   <Box p="6">
                     <Heading as="h3" size="lg" mb="2">
-                      <Link href={`/creators/${creator}`}>{creator}</Link>
+                      <Link href={`/creators/${creator.toLowerCase()}`}>
+                        {creator}
+                      </Link>
                     </Heading>
                     <Box d="flex" alignItems="baseline">
                       <Text>Runs: {totalRuns}</Text>
                       <Text> Total models: {creatorTotalModels}</Text>
                     </Box>
                     <Box>
-                      <Link href={`/creators/${creator}`}>
+                      <Link href={`/creators/${creator.toLowerCase()}`}>
                         <span
                           style={{ textDecoration: "underline", color: "teal" }}
                         >

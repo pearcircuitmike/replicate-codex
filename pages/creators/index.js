@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Container,
   Heading,
@@ -7,18 +8,15 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Image,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import Head from "next/head";
 import MetaTags from "../components/MetaTags";
-import PreviewImage from "../components/PreviewImage";
-
-import React, { useState } from "react";
-
-import testData from "../data/data.json";
+import { fetchDataFromTable } from "../../utils/supabaseClient";
 
 export const getStaticProps = async () => {
-  const data = testData;
+  const data = await fetchDataFromTable("modelsData");
 
   return {
     props: { creatorVals: data },
@@ -69,14 +67,15 @@ const Creators = ({ creatorVals }) => {
                 key={creatorVal}
               >
                 <Flex align="center" direction="column" p={4}>
-                  <Box w="150px" h="150px" objectFit="cover">
-                    <PreviewImage
-                      src={
-                        creatorVals.find((c) => c.creator === creatorVal)
-                          .example
-                      }
-                    />
-                  </Box>
+                  <Image
+                    src={
+                      creatorVals.find((c) => c.creator === creatorVal).example
+                    }
+                    alt="creator"
+                    w="150px"
+                    h="150px"
+                    objectFit="cover"
+                  />
                   <Text mt={3} fontSize="xl" fontWeight="bold">
                     <Link href={`/creators/${creatorVal}`}>{creatorVal}</Link>
                   </Text>

@@ -20,7 +20,6 @@ import MetaTags from "./components/MetaTags.js";
 import CreatorsLeaderboard from "./components/CreatorsLeaderboard.js";
 import Hero from "./components/Hero.js";
 import GalleryView from "./components/GalleryView.js";
-import testData from "./data/data.json";
 import FilterTags from "./components/FilterTags";
 import SearchField from "./components/SearchField";
 import SortMenu from "./components/SortMenu";

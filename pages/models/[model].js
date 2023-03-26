@@ -1,11 +1,15 @@
 import { Box, Container, Heading, Text, Image, Tag } from "@chakra-ui/react";
-import data from "../data/data.json";
 import MetaTags from "../components/MetaTags";
 import PreviewImage from "../components/PreviewImage";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import {
+  fetchModelDataById,
+  fetchDataFromTable,
+} from "../../utils/supabaseClient";
 
 export async function getStaticPaths() {
-  const paths = data.map((model) => ({
+  const modelsData = await fetchDataFromTable("modelsData");
+  const paths = modelsData.map((model) => ({
     params: { model: model.id.toString() },
   }));
 
@@ -13,14 +17,16 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const model = data.find((model) => model.id === parseInt(params.model));
+  const model = await fetchModelDataById(parseInt(params.model));
+  const modelsData = await fetchDataFromTable("modelsData");
 
-  return { props: { model } };
+  return { props: { model, modelsData } };
 }
 
-export default function ModelPage({ model }) {
-  const sortedData = data.sort((a, b) => b.runs - a.runs); // Sort the data by runs in descending order
+export default function ModelPage({ model, modelsData }) {
+  const sortedData = modelsData.sort((a, b) => b.runs - a.runs); // Sort the data by runs in descending order
   const rank = sortedData.findIndex((m) => m.id === model.id) + 1; // Calculate the rank of the current model
+
   return (
     <>
       <MetaTags

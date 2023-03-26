@@ -12,12 +12,12 @@ import {
   Image,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import testData from "../data/data.json";
 import Head from "next/head";
 import MetaTags from "../components/MetaTags";
+import { fetchDataFromTable } from "../../utils/supabaseClient";
 
 export const getStaticProps = async () => {
-  const data = testData;
+  const data = await fetchDataFromTable("modelsData");
 
   return {
     props: { modelVals: data },
@@ -54,8 +54,8 @@ const Models = ({ modelVals }) => {
         <Flex wrap="wrap" justify="center" mt={10}>
           {modelVals
             .filter((modelVal) =>
-              modelVal.modelName
-                .toLowerCase()
+              modelVal?.modelName
+                ?.toLowerCase()
                 .includes(stateFilter.toLowerCase())
             )
             .map((modelVal) => (

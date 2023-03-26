@@ -20,5 +20,20 @@ export async function fetchDataFromTable(tableName) {
   return data;
 }
 
+export async function fetchModelDataById(id) {
+  const { data, error } = await supabase
+    .from("modelsData")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Error fetching model data:", error);
+    return null;
+  }
+
+  return data;
+}
+
 // Export the Supabase client instance
 export default supabase;

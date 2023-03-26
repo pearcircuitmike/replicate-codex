@@ -15,7 +15,7 @@ import {
   Flex,
   ListItem,
 } from "@chakra-ui/react";
-import data from "../data/data.json";
+import { fetchDataFromTable } from "../../utils/supabaseClient";
 import Head from "next/head";
 import SimilarCreators from "../components/SimilarCreators";
 import ShareLinkButton from "../components/ShareLinkButton";
@@ -24,13 +24,10 @@ import calculateCreatorRank from "../components/utils/CreatorRank";
 import PreviewImage from "../components/PreviewImage";
 import MetaTags from "../components/MetaTags";
 
-export default function Creator({ creator }) {
-  const models = data.filter((model) => model.creator === creator);
-  const allModels = data;
-
+export default function Creator({ creator, models, allModels }) {
   const avgCost =
     models
-      .filter((model) => model.costToRun !== "") // Filters out models that have an empty string as the costToRun value
+      .filter((model) => model.costToRun !== "")
       .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
 
   const modelTypes = {};
@@ -43,10 +40,11 @@ export default function Creator({ creator }) {
   });
 
   function getSimilarCreators(creator) {
-    const creatorModels = data.filter((model) => model.creator === creator);
+    const creatorModels = models;
     const creatorTags = creatorModels.flatMap((model) => model.tags.split(","));
-    const similarCreators = data
-      .filter((item) => item.creator !== creator)
+
+    const similarCreators = allModels
+      .filter((item) => item.creator.toLowerCase() !== creator.toLowerCase())
       .filter((item) => item.tags)
       .filter((item) => {
         const itemTags = item.tags.split(",");
@@ -57,6 +55,7 @@ export default function Creator({ creator }) {
   }
 
   const similarCreators = getSimilarCreators(creator);
+  const rank = calculateCreatorRank(allModels, creator);
 
   return (
     <>
@@ -68,9 +67,9 @@ export default function Creator({ creator }) {
       <Container maxW="container.xl" py="12">
         <Heading as="h2" size="xl" mb="2">
           {creator}
-          {calculateCreatorRank(data, creator) == 1 ? " 🥇" : ""}
-          {calculateCreatorRank(data, creator) == 2 ? " 🥈" : ""}
-          {calculateCreatorRank(data, creator) == 3 ? " 🥉" : ""}
+          {rank == 1 ? " 🥇" : ""}
+          {rank == 2 ? " 🥈" : ""}
+          {rank == 3 ? " 🥉" : ""}
         </Heading>
         Rank: {calculateCreatorRank(allModels, creator)}
         <Text fontSize="lg" color="gray.500">
@@ -130,42 +129,31 @@ export default function Creator({ creator }) {
             </Box>
           ))}
         </Box>
-        <SimilarCreators similarCreators={similarCreators} data={data} />
+        <SimilarCreators similarCreators={similarCreators} data={allModels} />
       </Container>
     </>
   );
 }
 
 export async function getStaticPaths() {
+  const data = await fetchDataFromTable("modelsData");
   const creators = Array.from(new Set(data.map((model) => model.creator)));
   const paths = creators.map((creator) => ({
     params: { creator: creator.toLowerCase() },
   }));
 
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 }
 
+// Modify getStaticProps to fetch all models
 export async function getStaticProps({ params }) {
   const creator = params.creator;
+  const allModelsData = await fetchDataFromTable("modelsData");
 
-  const models = data.filter((model) => model.creator === creator);
+  const models = allModelsData.filter((model) => model.creator === creator);
 
-  const avgCost =
-    models.reduce((sum, model) => {
-      if (model.costToRun) {
-        return sum + model.costToRun;
-      }
-      return sum;
-    }, 0) / models.filter((model) => model.costToRun).length;
-
-  const modelTypes = {};
-  models.forEach((model) => {
-    if (model.tags in modelTypes) {
-      modelTypes[model.tags]++;
-    } else {
-      modelTypes[model.tags] = 1;
-    }
-  });
-
-  return { props: { creator, models, avgCost, modelTypes } };
+  return {
+    props: { creator, models, allModels: allModelsData },
+    revalidate: 60,
+  };
 }
