@@ -7,8 +7,8 @@ import {
   Text,
   Button,
   Image,
-  Link,
 } from "@chakra-ui/react";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -36,11 +36,20 @@ const Hero = () => {
           me.
         </Text>
         <HStack spacing={5}>
-          <Button colorScheme="teal" variant="solid" rounded="md" size="lg">
-            <Link href="https://notes.replicatecodex.com/#/portal/signup/free">
+          <Link
+            href="https://notes.replicatecodex.com/#/portal/signup/free"
+            passHref
+          >
+            <Button
+              colorScheme="teal"
+              variant="solid"
+              rounded="md"
+              size="lg"
+              as="a"
+            >
               👉 Get the emails
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </HStack>
         <Text fontSize="lg" textAlign="left" color="gray.500"></Text>
       </Stack>
