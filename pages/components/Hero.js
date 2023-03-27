@@ -48,7 +48,7 @@ const Hero = () => {
             rounded="md"
             color="white"
           >
-            📧 Email me about new models!
+            📧 Get emails about new models!
           </Button>
         </Link>
       </VStack>
