@@ -2,57 +2,56 @@ import * as React from "react";
 import {
   Container,
   Heading,
-  Stack,
-  HStack,
+  VStack,
   Text,
   Button,
-  Image,
+  Link as ChakraLink,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import Link from "next/link";
 
 const Hero = () => {
+  const [isMobile] = useMediaQuery("(max-width: 480px)");
+
   return (
     <Container maxWidth="800">
-      <Stack direction="column" spacing={6} alignItems="center" mt={8} mb={16}>
-        <Heading as="h1" fontSize="4xl" fontWeight="bold" textAlign="center">
-          Making Replicate models searchable
+      <VStack
+        spacing={isMobile ? 4 : 6}
+        alignItems="center"
+        mt={isMobile ? 4 : 8}
+        mb={isMobile ? 8 : 16}
+      >
+        <Heading
+          as="h1"
+          fontSize={isMobile ? "3xl" : "4xl"}
+          fontWeight="bold"
+          textAlign="center"
+        >
+          Search Replicate AI Models
         </Heading>
-        <Text fontSize="lg" textAlign="center" color="gray.500">
-          Replicate Codex is the most comprehensive resource for exploring and
-          discovering AI models available on Replicate. Search, filter, and sort
-          through a vast database of AI models. Perfect for researchers,
-          developers, and enthusiasts!
-          <br /> <br />
-          For ideas, corrections, feedback, and sponsorship,{" "}
-          <a href="https://twitter.com/mikeyoung44">
-            <span style={{ textDecoration: "underline", color: "teal" }}>
-              tweet at me
-            </span>
-          </a>
-          .
-          <br />
-          <br />
-          Subscribe for a digest of new and updated Replicate models, curated by
-          me.
+        <Text
+          fontSize={isMobile ? "md" : "lg"}
+          textAlign="center"
+          color="gray.500"
+        >
+          Search, filter, and sort AI models. Find the right one for your AI
+          project.
         </Text>
-        <HStack spacing={5}>
-          <Link
-            href="https://notes.replicatecodex.com/#/portal/signup/free"
-            passHref
+        <Link
+          href="https://notes.replicatecodex.com/#/portal/signup/free"
+          passHref
+        >
+          <Button
+            backgroundColor="yellow.500"
+            colorScheme="yellow"
+            variant="solid"
+            rounded="md"
+            color="white"
           >
-            <Button
-              colorScheme="teal"
-              variant="solid"
-              rounded="md"
-              size="lg"
-              as="a"
-            >
-              👉 Get the emails
-            </Button>
-          </Link>
-        </HStack>
-        <Text fontSize="lg" textAlign="left" color="gray.500"></Text>
-      </Stack>
+            📧 Email me about new models!
+          </Button>
+        </Link>
+      </VStack>
     </Container>
   );
 };

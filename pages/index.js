@@ -12,6 +12,7 @@ import {
   TabPanel,
   Input,
   VStack,
+  useMediaQuery,
 } from "@chakra-ui/react";
 
 import ModelsTable from "./components/ModelsTable.js";
@@ -47,6 +48,7 @@ export default function Home() {
   const { tab } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
   const [data, setData] = useState([]);
+  const [isMobile] = useMediaQuery("(max-width: 480px)");
 
   // Define an effect that runs once when the component mounts
   // and fetches the data from the table
@@ -207,15 +209,16 @@ export default function Home() {
             onChange={handleTabsChange}
             colorScheme="teal"
             overflowX="auto"
+            size={isMobile ? "sm" : "md"}
           >
-            <TabList mt={5}>
-              <Tab>Models Table</Tab>
-              <Tab>Gallery View</Tab>
-              <Tab>Creators Leaderboard</Tab>
-              <Tab>Models Leaderboard</Tab>
+            <TabList mt={isMobile ? 0 : 5}>
+              <Tab>Table</Tab>
+              <Tab>Gallery</Tab>
+              <Tab>Creators</Tab>
+              <Tab>Leaderboard</Tab>
             </TabList>
             <TabPanels>
-              <TabPanel>
+              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
                 {tabIndex === 0 && (
                   <ModelsTable data={sortedData} searchValue={searchValue} />
                 )}

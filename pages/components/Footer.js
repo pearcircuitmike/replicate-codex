@@ -1,12 +1,15 @@
 import { Container, Button } from "@chakra-ui/react";
 import { FaTwitter } from "react-icons/fa";
+import Link from "next/link";
 
 const Footer = () => {
   return (
     <Container maxW={"5xl"} mb={5} mt={5}>
-      <Button colorScheme="twitter" leftIcon={<FaTwitter />}>
-        <a href="https://twitter.com/mikeyoung44">Follow updates on Twitter</a>
-      </Button>
+      <Link href="https://twitter.com/mikeyoung44" passHref>
+        <Button colorScheme="twitter" leftIcon={<FaTwitter />}>
+          Follow updates on Twitter
+        </Button>
+      </Link>
     </Container>
   );
 };

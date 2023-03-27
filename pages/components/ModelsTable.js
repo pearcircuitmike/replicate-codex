@@ -8,10 +8,14 @@ import {
   Thead,
   Tr,
   Tag,
+  useMediaQuery,
 } from "@chakra-ui/react";
+import PreviewImage from "./PreviewImage";
 
 export default function ModelsTable(props) {
   const { data, searchValue, selectedTags, sorts } = props;
+
+  const [isMobile] = useMediaQuery("(max-width: 480px)");
 
   const filteredData = data?.filter(
     (item) =>
@@ -38,11 +42,11 @@ export default function ModelsTable(props) {
         <Table size="sm">
           <Thead position="sticky" top={0} bgColor="white">
             <Tr>
-              <Th>Creator</Th>
+              {!isMobile && <Th>Creator</Th>}
               <Th>Model Name</Th>
               <Th>Description</Th>
-              <Th>Tags</Th>
               <Th>Example</Th>
+              <Th>Tags</Th>
               <Th>Replicate URL</Th>
               <Th isNumeric>Runs</Th>
               <Th isNumeric>Cost</Th>
@@ -81,18 +85,20 @@ export default function ModelsTable(props) {
               )
               .map((item) => (
                 <Tr key={item.id} style={{ verticalAlign: "top" }}>
-                  <Td maxW="150px" isTruncated>
-                    <a
-                      href={`/creators/${item.creator}`}
-                      style={{
-                        color: "teal",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      {item.creator}
-                    </a>
-                  </Td>
-                  <Td maxWidth="200px" isTruncated>
+                  {!isMobile && (
+                    <Td maxW={isMobile ? "120px" : "180px"} isTruncated>
+                      <a
+                        href={`/creators/${item.creator}`}
+                        style={{
+                          color: "teal",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {item.creator}
+                      </a>
+                    </Td>
+                  )}
+                  <Td maxW={isMobile ? "120px" : "180px"} isTruncated>
                     <a
                       href={`/models/${item.id}`}
                       style={{
@@ -105,31 +111,19 @@ export default function ModelsTable(props) {
                   </Td>
                   <Td
                     style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                    maxW="180px"
+                    maxW={isMobile ? "120px" : "180px"}
                   >
                     {item.description}
                   </Td>
-                  <Td maxW="150px">
-                    <Tag>{item.tags}</Tag>
+                  <Td maxW="64px">
+                    <PreviewImage src={item.example} />
                   </Td>
-                  <Td>
-                    <img
-                      src={
-                        item.example !== ""
-                          ? item.example
-                          : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
-                      }
-                      alt="example"
-                      style={{
-                        width: "64px",
-                        height: "64px",
-                        objectFit: "cover",
-                      }}
-                    />
+                  <Td maxW="140px">
+                    <Tag>{item.tags}</Tag>
                   </Td>
                   <Td
                     style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                    maxW="180px"
+                    maxW={isMobile ? "120px" : "180px"}
                   >
                     <a
                       href={item.modelUrl}
