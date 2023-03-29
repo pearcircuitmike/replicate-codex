@@ -7,6 +7,7 @@ import {
   Button,
   Link as ChakraLink,
   useMediaQuery,
+  Box,
 } from "@chakra-ui/react";
 import Link from "next/link";
 
@@ -35,22 +36,20 @@ const Hero = () => {
           color="gray.500"
         >
           Search, filter, and sort AI models. Find the right one for your AI
-          project.
+          project. Subscribe for a monthly update of new models.
         </Text>
-        <Link
-          href="https://notes.replicatecodex.com/#/portal/signup/free"
-          passHref
-        >
-          <Button
-            backgroundColor="yellow.500"
-            colorScheme="yellow"
-            variant="solid"
-            rounded="md"
-            color="white"
-          >
-            📧 Get emails about new models!
-          </Button>
-        </Link>
+
+        <Box>
+          <div id="custom-substack-embed"></div>
+
+          <iframe
+            src="https://replicatecodex.substack.com/embed"
+            width="100%"
+            height="auto"
+            style={{ border: "0px solid #EEE", background: "white" }}
+            frameborder="0"
+          ></iframe>
+        </Box>
       </VStack>
     </Container>
   );
