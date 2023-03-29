@@ -1,21 +1,23 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Image,
-  Tag,
-  Link,
-} from "@chakra-ui/react";
+import { Container, Grid, VStack, GridItem } from "@chakra-ui/react";
+import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../components/MetaTags";
 import PreviewImage from "../components/PreviewImage";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   fetchModelDataById,
   fetchDataFromTable,
 } from "../../utils/supabaseClient";
-import ModelDescription from "../components/ModelDescription";
-import SimilarModels from "../components/SimilarModels";
+
+import SimilarModelsTable from "../components/SimilarModelsTable";
+import CreatorModelsTable from "../components/CreatorModelsTable";
+import ModelDetailsTable from "../components/ModelDetailsTable";
+import ModelOverview from "../components/ModelOverview";
+import ModelPricingSummary from "../components/ModelPricingSummary";
+
+import calculateCreatorRank from "../../utils/calculateCreatorRank";
+import calculateModelRank from "../../utils/calculateModelRank";
+
+import { findSimilarModels } from "../../utils/findSimilarModels";
+import { findCreatorModels } from "../../utils/findCreatorModels";
 
 export async function getStaticPaths() {
   const modelsData = await fetchDataFromTable("modelsData");
@@ -30,15 +32,23 @@ export async function getStaticProps({ params }) {
   const model = await fetchModelDataById(parseInt(params.model));
   const modelsData = await fetchDataFromTable("modelsData");
 
-  return { props: { model, modelsData } };
+  // Calculate model rank and creator rank
+  const modelRank = calculateModelRank(modelsData, model.id);
+  const creatorRank = calculateCreatorRank(modelsData, model.creator);
+
+  // Add ranks to the model object
+  const modelWithRanks = {
+    ...model,
+    modelRank,
+    creatorRank,
+  };
+
+  return { props: { model: modelWithRanks, modelsData } };
 }
 
 export default function ModelPage({ model, modelsData }) {
-  const sortedData = modelsData.sort((a, b) => b.runs - a.runs);
-  const rank = sortedData.findIndex((m) => m.id === model.id) + 1;
-
-  const avgCompletionTimeMinutes =
-    model.avgCompletionTime && model.avgCompletionTime / 60;
+  const similarModels = findSimilarModels(model, modelsData);
+  const creatorModels = findCreatorModels(model, modelsData);
 
   return (
     <>
@@ -47,64 +57,22 @@ export default function ModelPage({ model, modelsData }) {
         description={`Details about the ${model.modelName} model by ${model.creator}`}
       />
       <Container maxW="container.xl" py="12">
-        <Box>
-          <Heading as="h1" size="xl" mb="2">
-            {model.modelName}
-          </Heading>
-          <Text fontSize="lg" mb="4">
-            <Tag colorScheme={"teal"}>{model.tags}</Tag>
-          </Text>
-          <Text fontSize="lg" color="gray.500" mb="4">
-            <Link
-              href={`/creators/${model.creator}`}
-              textDecoration="underline"
-              color="teal"
-            >
-              {model.creator}
-            </Link>
-          </Text>
-          <Text fontSize="lg" color="gray.500" mb="4">
-            {model.description}
-          </Text>
-          <Box maxW="450px" mb={5}>
-            <PreviewImage src={model.example} />
-            <Text>
-              <Link
-                href={model.modelUrl}
-                textDecoration="underline"
-                color="teal"
-              >
-                Try this model on Replicate <ExternalLinkIcon />
-              </Link>
-            </Text>
-          </Box>
-          <Text fontSize="lg" mb="4">
-            Model Rank: {rank}
-            {rank === 1 ? " 🥇" : ""}
-            {rank === 2 ? " 🥈" : ""}
-            {rank === 3 ? " 🥉" : ""}
-          </Text>
-          <Text fontSize="lg" mb="4">
-            Cost/run: ${model.costToRun}
-          </Text>
-          <Text fontSize="lg" mb="4">
-            Runs: {model.runs.toLocaleString()}
-          </Text>
-          <Text fontSize="lg" mb="4">
-            {model.predictionHardware
-              ? `Prediction Hardware: ${model.predictionHardware}`
-              : ""}
-          </Text>
-          <Text fontSize="lg" mb="4">
-            {avgCompletionTimeMinutes
-              ? `Avg Completion Time: ${avgCompletionTimeMinutes.toFixed(
-                  2
-                )} minutes`
-              : ""}
-          </Text>
-        </Box>{" "}
-        <ModelDescription model={model} rank={rank} />
-        <SimilarModels currentModel={model} modelsData={modelsData} />
+        <Grid
+          templateColumns={{ base: "1fr", md: "1fr 2fr" }}
+          gap={{ base: 6, md: 10 }}
+        >
+          <GridItem>
+            <VStack spacing={6} alignItems="start">
+              <ModelOverview model={model} />
+              <ModelPricingSummary model={model} />
+              <CreatorModelsTable creatorModels={creatorModels} />
+              <SimilarModelsTable similarModels={similarModels} />
+            </VStack>
+          </GridItem>
+          <GridItem>
+            <ModelDetailsTable model={model} />
+          </GridItem>
+        </Grid>
       </Container>
     </>
   );
