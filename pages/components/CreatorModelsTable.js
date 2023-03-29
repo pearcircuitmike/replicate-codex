@@ -12,53 +12,63 @@ import {
   Icon,
   Heading,
   TableContainer,
+  VStack,
 } from "@chakra-ui/react";
-import { User } from "@chakra-ui/icons";
+
+import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { AiOutlineUser } from "react-icons/ai";
 
 const CreatorModelsTable = ({ creatorModels }) => {
+  const maxToShow = 5;
+  const displayedModels = creatorModels?.slice(0, maxToShow);
+
   return (
-    <>
-      <Box>
-        <HStack>
-          <Icon as={User} />
-          <Heading as="h2" size="md">
-            Creator's Models
-          </Heading>
-        </HStack>
-        <TableContainer mt={5} mb={5}>
-          <Table variant="striped" size="sm">
-            <Thead>
-              <Tr>
-                <Th>Model</Th>
+    <VStack spacing={4} alignItems="start">
+      <HStack>
+        <Heading as="h2" size="md">
+          <Icon as={AiOutlineUser} boxSize={4} /> Creator Models
+        </Heading>
+      </HStack>
 
-                <Th>Cost</Th>
-                <Th>Runs</Th>
+      <Table variant="striped" size="sm" border="1px" borderColor="gray.200">
+        <Thead>
+          <Tr>
+            <Th isTruncated maxWidth="50%">
+              Model
+            </Th>
+            <Th>Cost</Th>
+            <Th>Runs</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {displayedModels?.length ? (
+            displayedModels?.map((model) => (
+              <Tr key={model.id}>
+                <Td>
+                  <Link href={`/models/${model.id}`}>{model.modelName}</Link>
+                </Td>
+
+                <Td isTruncated>${model.costToRun ? model.costToRun : "?"}</Td>
+                <Td isTruncated>{model.runs.toLocaleString()}</Td>
               </Tr>
-            </Thead>
-            <Tbody>
-              {creatorModels?.length ? (
-                creatorModels?.map((model) => (
-                  <Tr key={model.id}>
-                    <Td>
-                      <Link href={`/models/${model.id}`}>
-                        {model.modelName}
-                      </Link>
-                    </Td>
-
-                    <Td>${model.costToRun ? model.costToRun : "?"}</Td>
-                    <Td>{model.runs.toLocaleString()}</Td>
-                  </Tr>
-                ))
-              ) : (
-                <Tr>
-                  <Td colSpan="4">No other models by this creator</Td>
-                </Tr>
-              )}
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </>
+            ))
+          ) : (
+            <Tr>
+              <Td colSpan="4">No other models by this creator</Td>
+            </Tr>
+          )}
+        </Tbody>
+      </Table>
+      {creatorModels?.length > maxToShow && (
+        <Link
+          href={`/creators/${creatorModels[0]?.creator}`}
+          textDecoration="underline"
+          color="blue.500"
+        >
+          View more
+        </Link>
+      )}
+    </VStack>
   );
 };
 

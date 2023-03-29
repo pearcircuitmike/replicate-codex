@@ -13,7 +13,7 @@ import {
   Heading,
   TableContainer,
 } from "@chakra-ui/react";
-import { AiFillDollarCircle } from "react-icons/ai";
+import { AiFillBulb } from "react-icons/ai";
 
 const SimilarModelsTable = ({ similarModels }) => {
   return (
@@ -21,11 +21,16 @@ const SimilarModelsTable = ({ similarModels }) => {
       <Box>
         <HStack>
           <Heading as="h2" size="md">
-            <Icon as={AiFillDollarCircle} boxSize={4} /> Similar Models
+            <Icon as={AiFillBulb} boxSize={4} /> Similar Models
           </Heading>
         </HStack>
         <TableContainer my={5}>
-          <Table variant="striped" size="sm">
+          <Table
+            variant="striped"
+            size="sm"
+            border="1px"
+            borderColor="gray.200"
+          >
             <Thead>
               <Tr>
                 <Th>Model</Th>
@@ -36,7 +41,7 @@ const SimilarModelsTable = ({ similarModels }) => {
                 similarModels?.map((model) => (
                   <Tr key={model.id}>
                     <Td>
-                      <Link href={`/models/${model.id}`}>
+                      <Link href={`/models/${model.id}`} color="blue.500">
                         {model.modelName}
                       </Link>
                     </Td>

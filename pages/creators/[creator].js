@@ -20,7 +20,7 @@ import Head from "next/head";
 import SimilarCreators from "../components/SimilarCreators";
 import ShareLinkButton from "../components/ShareLinkButton";
 import ShareTweetButton from "../components/ShareTweetButton";
-import calculateCreatorRank from "../../utils/CreatorRank";
+import calculateCreatorRank from "../../utils/calculateCreatorRank";
 import PreviewImage from "../components/PreviewImage";
 import MetaTags from "../components/MetaTags";
 

@@ -6,19 +6,19 @@ const ModelOverview = ({ model }) => {
     <Box>
       <VStack alignItems="left" spacing={2}>
         <Heading as="h2" size="lg">
-          {model.modelName}
+          {model?.modelName}
         </Heading>
         <Text>
-          <Link href={`/creators/${model.creator}`} color="teal">
-            {model.creator}
+          <Link href={`/creators/${model?.creator}`} color="blue.500">
+            {model?.creator}
           </Link>
         </Text>
         <Box>
-          <PreviewImage src={model.example} />
+          <PreviewImage src={model?.example} />
         </Box>
-        <Text color="gray.700">{model.description}</Text>
+        <Text color="gray.700">{model?.description}</Text>
         <Box>
-          <Tag>{model.tags}</Tag>
+          <Tag colorScheme="teal">{model?.tags}</Tag>
         </Box>
       </VStack>
     </Box>

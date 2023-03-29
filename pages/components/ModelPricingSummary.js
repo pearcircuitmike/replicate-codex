@@ -11,36 +11,30 @@ import {
 import { AiFillDollarCircle } from "react-icons/ai";
 
 const ModelPricingSummary = ({ model }) => {
-  const avgCompletionTimeMinutes =
-    model.avgCompletionTime && model.avgCompletionTime / 60;
-
   return (
     <Box>
       <Heading as="h2" size="md">
-        <Icon as={AiFillDollarCircle} boxSize={4} />
-        Pricing
+        <Icon as={AiFillDollarCircle} boxSize={4} /> Pricing
       </Heading>
-      <HStack spacing={4} shouldWrapChildren="true" my={5}>
+      <HStack spacing={4} shouldWrapChildren="true" my={5} overflow="hidden">
         <Stat size="md">
           <StatLabel>Cost per run</StatLabel>
           <StatNumber>
-            {model.costToRun ? `$${model.costToRun}` : "$-"}
+            {model?.costToRun ? `$${model?.costToRun}` : "$-"}
           </StatNumber>
           <StatHelpText>USD</StatHelpText>
         </Stat>
         <Stat size="md">
           <StatLabel>Avg run time</StatLabel>
           <StatNumber>
-            {avgCompletionTimeMinutes
-              ? avgCompletionTimeMinutes?.toFixed(2)
-              : "-"}
+            {model?.avgCompletionTime ? model?.avgCompletionTime : "-"}
           </StatNumber>
-          <StatHelpText>Minutes</StatHelpText>
+          <StatHelpText>Seconds</StatHelpText>
         </Stat>
         <Stat size="md">
           <StatLabel>Hardware</StatLabel>
           <StatNumber>
-            {model.predictionHardware ? model.predictionHardware : "-"}
+            {model?.predictionHardware ? model?.predictionHardware : "-"}
           </StatNumber>
           <StatHelpText>Prediction</StatHelpText>
         </Stat>

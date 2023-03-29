@@ -7,7 +7,6 @@ import {
   Th,
   Thead,
   Tr,
-  Link,
   HStack,
   Icon,
   VStack,
@@ -15,18 +14,18 @@ import {
   TableContainer,
   Heading,
   Tag,
+  Link,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { GiTrophyBronze, GiTrophySilver, GiTrophyGold } from "react-icons/gi";
 
 const ModelDetailsTable = ({ model }) => {
   const trophyIcon = (rank) => {
     if (rank === 1) {
-      return <Icon as={GiTrophyGold} />;
+      return " 🥇";
     } else if (rank === 2) {
-      return <Icon as={GiTrophySilver} />;
+      return " 🥈";
     } else if (rank === 3) {
-      return <Icon as={GiTrophyBronze} />;
+      return " 🥉";
     } else {
       return null;
     }
@@ -37,6 +36,7 @@ const ModelDetailsTable = ({ model }) => {
       <Heading as="h3" size="sm">
         Overview
       </Heading>
+      <Text>Summary of this model and related resources.</Text>
       <Table
         size="sm"
         variant="simple"
@@ -82,41 +82,33 @@ const ModelDetailsTable = ({ model }) => {
           <Tr>
             <Td>Tags</Td>
             <Td>
-              <Tag>{model?.tags}</Tag>
+              <Tag colorScheme="teal">{model?.tags}</Tag>
             </Td>
           </Tr>
           <Tr>
             <Td>Demo Link</Td>
             <Td>
-              {model?.demoUrl ? (
-                <Link
-                  href={model?.demoUrl}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
-                </Link>
-              ) : (
-                "No demo link provided"
-              )}
+              <Link
+                href={`https://replicate.com/${model?.creator}/${model?.modelName}/examples`}
+                isExternal
+                color="blue.500"
+                textDecoration="underline"
+              >
+                View on Replicate <ExternalLinkIcon mx="2px" />
+              </Link>
             </Td>
           </Tr>
           <Tr>
             <Td>API Spec</Td>
             <Td>
-              {model?.apiSpecUrl ? (
-                <Link
-                  href={model?.apiSpecUrl}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
-                </Link>
-              ) : (
-                "No API spec link provided"
-              )}
+              <Link
+                href={`https://replicate.com/${model?.creator}/${model?.modelName}/api`}
+                isExternal
+                color="blue.500"
+                textDecoration="underline"
+              >
+                View on Replicate <ExternalLinkIcon mx="2px" />
+              </Link>
             </Td>
           </Tr>
           <Tr>
@@ -156,43 +148,39 @@ const ModelDetailsTable = ({ model }) => {
           <Tr>
             <Td>Examples</Td>
             <Td>
-              {model?.examplesUrl ? (
-                <Link
-                  href={model.examples}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
-                </Link>
-              ) : (
-                "No examples link provided"
-              )}
+              <Link
+                href={`https://replicate.com/${model?.creator}/${model?.modelName}/examples`}
+                isExternal
+                color="blue.500"
+                textDecoration="underline"
+              >
+                View on Replicate <ExternalLinkIcon mx="2px" />
+              </Link>
             </Td>
           </Tr>
           <Tr>
             <Td>Versions</Td>
             <Td>
-              {model?.versionsUrl ? (
-                <Link
-                  href={model.versionsUrl}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
-                </Link>
-              ) : (
-                "No versions link provided"
-              )}
+              <Link
+                href={`https://replicate.com/${model?.creator}/${model?.modelName}/versions`}
+                isExternal
+                color="blue.500"
+                textDecoration="underline"
+              >
+                View on Replicate <ExternalLinkIcon mx="2px" />
+              </Link>
             </Td>
           </Tr>
         </Tbody>
       </Table>
 
       <Heading as="h3" size="sm">
-        Popularity
+        <Link href="/?tab=modelsLeaderboard">Popularity</Link>
       </Heading>
+      <Text>
+        How popular is this model, by number of runs? How popular is the
+        creator, by the sum of all their runs?
+      </Text>
       <Table
         size="sm"
         variant="simple"
@@ -233,6 +221,10 @@ const ModelDetailsTable = ({ model }) => {
       <Heading as="h3" size="sm">
         Cost
       </Heading>
+      <Text>
+        How much does it cost to run this model? How long, on average, does it
+        take to complete a run?
+      </Text>
       <Table
         size="sm"
         variant="simple"
@@ -263,7 +255,7 @@ const ModelDetailsTable = ({ model }) => {
             <Td>Average Completion Time</Td>
             <Td>
               {model?.avgCompletionTime
-                ? `${(model?.avgCompletionTime / 60).toFixed(2)} minutes`
+                ? `${model?.avgCompletionTime} seconds`
                 : "-"}
             </Td>
           </Tr>
