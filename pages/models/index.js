@@ -81,7 +81,7 @@ const Models = ({ modelVals, totalCount }) => {
             variant="outline"
             value={stateFilter}
             onChange={handleSearch}
-            placeholder="Search by model name, creator, tag, or description"
+            placeholder="Search by model name"
           />
         </InputGroup>
       </Container>
