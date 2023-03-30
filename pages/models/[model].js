@@ -1,4 +1,4 @@
-import { Container, Grid, VStack, GridItem } from "@chakra-ui/react";
+import { Container, Grid, VStack, GridItem, Box } from "@chakra-ui/react";
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../components/MetaTags";
 import PreviewImage from "../components/PreviewImage";
@@ -12,6 +12,7 @@ import CreatorModelsTable from "../components/CreatorModelsTable";
 import ModelDetailsTable from "../components/ModelDetailsTable";
 import ModelOverview from "../components/ModelOverview";
 import ModelPricingSummary from "../components/ModelPricingSummary";
+import RunsHistoryChart from "../components/RunsHistoryChart";
 
 import calculateCreatorRank from "../../utils/calculateCreatorRank";
 import calculateModelRank from "../../utils/calculateModelRank";
@@ -56,24 +57,27 @@ export default function ModelPage({ model, modelsData }) {
         title={`AI model details - ${model.modelName}`}
         description={`Details about the ${model.modelName} model by ${model.creator}`}
       />
-      <Container maxW="container.xl" py="12">
-        <Grid
-          templateColumns={{ base: "1fr", md: "1fr 2fr" }}
-          gap={{ base: 6, md: 10 }}
-        >
-          <GridItem>
-            <VStack spacing={6} alignItems="start">
-              <ModelOverview model={model} />
-              <ModelPricingSummary model={model} />
-              <CreatorModelsTable creatorModels={creatorModels} />
-              <SimilarModelsTable similarModels={similarModels} />
-            </VStack>
-          </GridItem>
-          <GridItem>
-            <ModelDetailsTable model={model} />
-          </GridItem>
-        </Grid>
-      </Container>
+      <Box overflowX="hidden">
+        <Container maxW="container.xl" py="12">
+          <Grid
+            templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+            gap={{ base: 6, md: 10 }}
+          >
+            <GridItem>
+              <VStack spacing={6} alignItems="start">
+                <ModelOverview model={model} />
+                <ModelPricingSummary model={model} />
+                <CreatorModelsTable creatorModels={creatorModels} />
+                <SimilarModelsTable similarModels={similarModels} />
+              </VStack>
+            </GridItem>
+            <GridItem>
+              <ModelDetailsTable model={model} />
+              <RunsHistoryChart modelId={model.id} />
+            </GridItem>
+          </Grid>
+        </Container>
+      </Box>
     </>
   );
 }

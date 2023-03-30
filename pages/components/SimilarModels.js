@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
+
 export default function SimilarModels({ currentModel, modelsData }) {
   const similarModels = modelsData
     ?.filter(

@@ -47,7 +47,6 @@ const Hero = () => {
             width="100%"
             height="auto"
             style={{ border: "0px solid #EEE", background: "white" }}
-            frameborder="0"
           ></iframe>
         </Box>
       </VStack>
