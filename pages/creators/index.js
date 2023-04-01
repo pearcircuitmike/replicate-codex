@@ -15,6 +15,7 @@ import Head from "next/head";
 import MetaTags from "../components/MetaTags";
 import { fetchDataFromTable } from "../../utils/supabaseClient";
 
+
 export const getStaticProps = async () => {
   const data = await fetchDataFromTable("modelsData");
 

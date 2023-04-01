@@ -111,7 +111,7 @@ function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
                   <Td>
                     <img
                       src={
-                        model.example !== ""
+                        model.example
                           ? model.example
                           : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
                       }

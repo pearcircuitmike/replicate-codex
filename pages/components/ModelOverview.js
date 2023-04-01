@@ -15,7 +15,13 @@ const ModelOverview = ({ model }) => {
             </Link>
           </Text>
           <Box>
-            <PreviewImage src={model?.example} />
+            <PreviewImage
+              src={
+                model.example != ""
+                  ? model.example
+                  : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
+              }
+            />
           </Box>
           <Text color="gray.700">{model?.description}</Text>
           <Box>

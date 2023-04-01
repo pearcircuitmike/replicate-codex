@@ -116,7 +116,7 @@ export default function ModelsTable(props) {
                     {item.description}
                   </Td>
                   <Td maxW="64px">
-                    <PreviewImage src={item.example} />
+                    <PreviewImage src={item.example ? item.example : ""} />
                   </Td>
                   <Td maxW="140px">
                     <Tag>{item.tags}</Tag>
