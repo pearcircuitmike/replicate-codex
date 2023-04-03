@@ -3,9 +3,7 @@ import { Box, Button, HStack } from "@chakra-ui/react";
 
 const Pagination = ({ totalCount, pageSize, currentPage, onPageChange }) => {
   const pageCount = Math.ceil(totalCount / pageSize);
-  console.log(totalCount);
-  console.log(pageSize); // 20
-  console.log(pageCount); //NaN
+
   const handlePrevPage = () => {
     if (currentPage > 1) onPageChange(currentPage - 1);
   };

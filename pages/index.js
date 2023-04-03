@@ -10,7 +10,6 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  Input,
   VStack,
   useMediaQuery,
 } from "@chakra-ui/react";
@@ -44,21 +43,18 @@ export default function Home() {
   const [searchValue, setSearchValue] = useState("");
   const [sorts, setSorts] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const { tab } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
   const [data, setData] = useState([]);
   const [isMobile] = useMediaQuery("(max-width: 480px)");
 
-  // Define an effect that runs once when the component mounts
-  // and fetches the data from the table
   useEffect(() => {
     async function getData() {
       const fetchedData = await fetchDataFromTable("modelsData");
-      // Update the state with the fetched data
       setData(fetchedData);
     }
-    // Call the getData function
     getData();
   }, []);
 
@@ -111,6 +107,7 @@ export default function Home() {
     setSorts(newSorts);
     updateUrlParams(tabNameReverseMap[tabIndex], newSorts, selectedTags);
   };
+
   useEffect(() => {
     const { tab, sorts, tags } = router.query;
 
@@ -149,21 +146,7 @@ export default function Home() {
     };
   }, [router]);
 
-  const filteredData = data.filter(
-    (item) => selectedTags.length === 0 || selectedTags.includes(item.tags)
-  );
-
-  const sortedData = filteredData.sort((a, b) => {
-    for (const sort of sorts) {
-      if (a[sort.column] < b[sort.column]) {
-        return sort.direction === "asc" ? -1 : 1;
-      }
-      if (a[sort.column] > b[sort.column]) {
-        return sort.direction === "asc" ? 1 : -1;
-      }
-    }
-    return 0;
-  });
+  // ... (previous functions)
 
   const models = Array.from(new Set(data.map((item) => item.tags)));
 
@@ -215,35 +198,37 @@ export default function Home() {
               <Tab>Table</Tab>
               <Tab>Gallery</Tab>
               <Tab>Creators</Tab>
-              <Tab>Leaderboard</Tab>
+              {/*    <Tab>Leaderboard</Tab> */}
             </TabList>
             <TabPanels>
               <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
                 {tabIndex === 0 && (
-                  <ModelsTable data={sortedData} searchValue={searchValue} />
+                  <ModelsTable
+                    data={data}
+                    searchValue={searchValue}
+                    sorts={sorts}
+                    selectedTags={selectedTags}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                  />
                 )}
               </TabPanel>
-              <TabPanel>
+              <TabPanel pl={0} pr={0}>
                 {tabIndex === 1 && (
-                  <GalleryView data={sortedData} searchValue={searchValue} />
-                )}
-              </TabPanel>
-              <TabPanel>
-                {tabIndex === 2 && (
-                  <CreatorsLeaderboard
-                    data={sortedData}
+                  <GalleryView
+                    data={data}
                     searchValue={searchValue}
+                    sorts={sorts}
+                    selectedTags={selectedTags}
                   />
                 )}
               </TabPanel>
-              <TabPanel>
-                {tabIndex === 3 && (
-                  <ModelsLeaderboard
-                    data={sortedData}
-                    searchValue={searchValue}
-                  />
-                )}
+              <TabPanel pl={0} pr={0}>
+                {tabIndex === 2 && <CreatorsLeaderboard data={data} />}
               </TabPanel>
+              {/*   <TabPanel pl={0} pr={0}>
+                {tabIndex === 3 && <ModelsLeaderboard data={data} />}
+              </TabPanel>*/}
             </TabPanels>
           </Tabs>
         </main>

@@ -51,5 +51,52 @@ export async function fetchRunsHistoryByModelId(modelId) {
   return data;
 }
 
+export async function fetchFilteredData({
+  tableName,
+  tags = [],
+  searchValue = "",
+  sorts = [],
+  pageSize = 10,
+  currentPage = 1,
+}) {
+  let query = supabase.from(tableName).select("*", { count: "exact" });
+
+  if (tags.length > 0) {
+    query = query.or(tags.map((tag) => `tags.contains.${tag}`).join(","));
+  }
+
+  if (searchValue) {
+    query = query.ilike("name", `%${searchValue}%`);
+  }
+
+  sorts.forEach(({ field, direction }) => {
+    query = query.order(field, { ascending: direction === "asc" });
+  });
+
+  const { count } = await query;
+
+  const offset = (currentPage - 1) * pageSize;
+  query = query.range(offset, offset + pageSize - 1);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    return { data: null, totalCount: 0 };
+  }
+
+  return { data, totalCount: count };
+}
+export async function fetchAllTags() {
+  const { data, error } = await supabase.from("modelsData").select("tags");
+
+  if (error) {
+    console.error("Error fetching all tags:", error);
+    return [];
+  }
+
+  const allTags = data.flatMap((item) => item.tags);
+  return Array.from(new Set(allTags));
+}
 // Export the Supabase client instance
 export default supabase;
