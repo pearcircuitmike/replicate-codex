@@ -10,6 +10,7 @@ import {
   Tr,
   Tag,
   useMediaQuery,
+  Skeleton,
 } from "@chakra-ui/react";
 import PreviewImage from "./PreviewImage";
 
@@ -86,15 +87,17 @@ export default function ModelsTable(props) {
               <Tr key={item.id} style={{ verticalAlign: "top" }}>
                 {!isMobile && (
                   <Td maxW={isMobile ? "120px" : "180px"} isTruncated>
-                    <a
-                      href={`/creators/${item.creator}`}
-                      style={{
-                        color: "teal",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      {item.creator}
-                    </a>
+                    <Skeleton isLoaded={item}>
+                      <a
+                        href={`/creators/${item.creator}`}
+                        style={{
+                          color: "teal",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {item.creator}
+                      </a>
+                    </Skeleton>
                   </Td>
                 )}
                 <Td maxW={isMobile ? "120px" : "180px"} isTruncated>
