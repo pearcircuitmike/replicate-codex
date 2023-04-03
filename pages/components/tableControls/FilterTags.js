@@ -4,15 +4,10 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
-  Flex,
-  Text,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Wrap,
-  WrapItem,
-  CloseButton,
 } from "@chakra-ui/react";
 
 const FilterTags = ({ models = [], selectedTags, handleTagSelect }) => {

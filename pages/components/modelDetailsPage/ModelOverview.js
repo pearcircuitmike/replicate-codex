@@ -1,5 +1,5 @@
 import { Box, Heading, Text, Link, Tag, VStack } from "@chakra-ui/react";
-import PreviewImage from "./PreviewImage";
+import PreviewImage from "../PreviewImage";
 
 const ModelOverview = ({ model }) => {
   return (

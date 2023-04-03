@@ -7,12 +7,12 @@ import {
   fetchDataFromTable,
 } from "../../utils/supabaseClient";
 
-import SimilarModelsTable from "../components/SimilarModelsTable";
-import CreatorModelsTable from "../components/CreatorModelsTable";
-import ModelDetailsTable from "../components/ModelDetailsTable";
-import ModelOverview from "../components/ModelOverview";
+import SimilarModelsTable from "../components/modelDetailsPage/SimilarModelsTable";
+import CreatorModelsTable from "../components/modelDetailsPage/CreatorModelsTable";
+import ModelDetailsTable from "../components/modelDetailsPage/ModelDetailsTable";
+import ModelOverview from "../components/modelDetailsPage/ModelOverview";
 import ModelPricingSummary from "../components/ModelPricingSummary";
-import RunsHistoryChart from "../components/RunsHistoryChart";
+import RunsHistoryChart from "../components/modelDetailsPage/RunsHistoryChart";
 
 import calculateCreatorRank from "../../utils/calculateCreatorRank";
 import calculateModelRank from "../../utils/calculateModelRank";

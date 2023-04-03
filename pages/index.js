@@ -20,11 +20,11 @@ import MetaTags from "./components/MetaTags.js";
 import CreatorsLeaderboard from "./components/CreatorsLeaderboard.js";
 import Hero from "./components/Hero.js";
 import GalleryView from "./components/GalleryView.js";
-import FilterTags from "./components/FilterTags";
-import SearchField from "./components/SearchField";
-import SortMenu from "./components/SortMenu";
-import ActiveTagFilters from "./components/ActiveTagFilters";
-import ActiveSorts from "./components/ActiveSorts";
+import FilterTags from "./components/tableControls/FilterTags";
+import SearchField from "./components/tableControls/SearchField";
+import SortMenu from "./components/tableControls/SortMenu";
+import ActiveTagFilters from "./components/tableControls/ActiveTagFilters";
+import ActiveSorts from "./components/tableControls/ActiveSorts";
 
 import { fetchDataFromTable } from "../utils/supabaseClient";
 
