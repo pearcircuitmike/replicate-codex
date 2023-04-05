@@ -7,27 +7,59 @@ import {
   Box,
   Input,
   InputGroup,
-  InputRightElement,
-  Image,
+  Center,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import Head from "next/head";
 import MetaTags from "../components/MetaTags";
-import { fetchDataFromTable } from "../../utils/supabaseClient";
+import CreatorCard from "../components/CreatorCard";
+import Pagination from "../components/Pagination";
+import { fetchCreators } from "../../utils/fetchCreators";
 
+const pageSize = 12;
 
-export const getStaticProps = async () => {
-  const data = await fetchDataFromTable("modelsData");
+export async function getStaticProps() {
+  const { data, totalCount } = await fetchCreators({
+    viewName: "unique_creators_with_runs",
+    pageSize,
+    currentPage: 1,
+    searchValue: "",
+  });
 
   return {
-    props: { creatorVals: data },
+    props: { creatorVals: data, totalCount: totalCount || 0 },
+    revalidate: 60,
   };
-};
+}
 
-const Creators = ({ creatorVals }) => {
+const Creators = ({ creatorVals, totalCount }) => {
   const [stateFilter, setStateFilter] = useState("");
-  const handleSearch = (event) => setStateFilter(event.target.value);
-  const uniqueCreators = [...new Set(creatorVals.map((item) => item.creator))];
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handleSearch = async (event) => {
+    setStateFilter(event.target.value);
+    setCurrentPage(1);
+    const { data, totalCount } = await fetchCreators({
+      viewName: "unique_creators_with_runs",
+      pageSize,
+      currentPage: 1,
+      searchValue: event.target.value,
+    });
+    setCreatorVals(data);
+    setTotalCount(totalCount || 1);
+  };
+
+  const [totalCreators, setTotalCount] = useState(totalCount);
+  const [creators, setCreatorVals] = useState(creatorVals);
+
+  const handlePageChange = async (page) => {
+    setCurrentPage(page);
+    const { data } = await fetchCreators({
+      viewName: "unique_creators_with_runs",
+      pageSize,
+      currentPage: page,
+      searchValue: stateFilter,
+    });
+    setCreatorVals(data);
+  };
 
   return (
     <>
@@ -48,43 +80,27 @@ const Creators = ({ creatorVals }) => {
             onChange={handleSearch}
             placeholder="Search by creator name"
           />
-          <InputRightElement mr={3}></InputRightElement>
         </InputGroup>
+      </Container>
 
+      <Container maxW="8xl">
         <Flex wrap="wrap" justify="center" mt={10}>
-          {uniqueCreators
-            .filter((creatorVal) =>
-              creatorVal.toLowerCase().includes(stateFilter.toLowerCase())
-            )
-            .map((creatorVal) => (
-              <Box
-                m={3}
-                p={3}
-                w="280px"
-                h="280px"
-                borderRadius="md"
-                shadow="xl"
-                bg="white"
-                key={creatorVal}
-              >
-                <Flex align="center" direction="column" p={4}>
-                  <Image
-                    src={
-                      creatorVals.find((c) => c.creator === creatorVal).example
-                    }
-                    alt="creator"
-                    w="150px"
-                    h="150px"
-                    objectFit="cover"
-                  />
-                  <Text mt={3} fontSize="xl" fontWeight="bold">
-                    <Link href={`/creators/${creatorVal}`}>{creatorVal}</Link>
-                  </Text>
-                </Flex>
-              </Box>
-            ))}
+          {creators.map((creator, index) => (
+            <Box m={3} w="280px" key={index}>
+              <CreatorCard creator={creator} />
+            </Box>
+          ))}
         </Flex>
       </Container>
+
+      <Center my={5}>
+        <Pagination
+          currentPage={currentPage}
+          totalCount={totalCount}
+          onPageChange={handlePageChange}
+          pageSize={pageSize}
+        />
+      </Center>
     </>
   );
 };
