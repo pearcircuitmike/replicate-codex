@@ -31,6 +31,12 @@ export default function App({ Component, pageProps }) {
         `}
           </Script>*/}
 
+          <Script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4489327921275613"
+            crossOrigin="anonymous"
+          ></Script>
+
           <Component {...pageProps} />
         </Layout>
       </ChakraProvider>
