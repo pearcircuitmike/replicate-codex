@@ -8,8 +8,8 @@ import {
   Link as ChakraLink,
   useMediaQuery,
   Box,
+  Link,
 } from "@chakra-ui/react";
-import Link from "next/link";
 
 const Hero = () => {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
@@ -37,6 +37,19 @@ const Hero = () => {
         >
           Search, filter, and sort AI models. Find the right one for your AI
           project. Subscribe for a monthly update of new models.
+        </Text>
+        <Text fontSize={isMobile ? "md" : "lg"} textAlign="center">
+          <b>
+            Show off your company to 5,000+ AI founders and devs - sponsor the
+            site. You ad here for $49!{" "}
+            <Link
+              href="https://notes.replicatecodex.com/sponsor-the-site/"
+              color="blue.500"
+              textDecoration="underline"
+            >
+              Details
+            </Link>
+          </b>
         </Text>
 
         <Box>
