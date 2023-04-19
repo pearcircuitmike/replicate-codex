@@ -146,8 +146,6 @@ export default function Home() {
     };
   }, [router]);
 
-  // ... (previous functions)
-
   const models = Array.from(new Set(data.map((item) => item.tags)));
 
   return (

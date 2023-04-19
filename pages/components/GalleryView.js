@@ -56,7 +56,7 @@ export default function GalleryView({
                     .includes(searchValue.toString().toLocaleLowerCase())))
           )
           .map((model) => (
-            <ModelCard key={model.id} model={model} />
+            <ModelCard key={model.id} model={model} allModels={data} />
           ))}
       </SimpleGrid>
     </Box>

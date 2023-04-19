@@ -12,8 +12,8 @@ import {
 import Link from "next/link";
 import calculateModelRank from "../../utils/calculateModelRank";
 
-const ModelCard = ({ model }) => {
-  const rank = calculateModelRank(model);
+const ModelCard = ({ model, allModels }) => {
+  const rank = calculateModelRank(allModels, model?.id);
   const formatRuns = (runs) => {
     if (runs >= 1000000) return `${(runs / 1000000).toFixed(1)}M`;
     if (runs >= 1000) return `${(runs / 1000).toFixed(1)}K`;

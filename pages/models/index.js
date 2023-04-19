@@ -90,7 +90,7 @@ const Models = ({ modelVals, totalCount }) => {
         <Flex wrap="wrap" justify="center" mt={10}>
           {models.map((modelVal) => (
             <Box m={3} w="280px" key={modelVal.id}>
-              <ModelCard model={modelVal} />
+              <ModelCard model={modelVal} allModels={modelVals} />
             </Box>
           ))}
         </Flex>
