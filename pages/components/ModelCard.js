@@ -102,7 +102,9 @@ const ModelCard = ({ model, allModels }) => {
             <Text fontSize="sm">
               Cost: {model.costToRun ? `$${model.costToRun}` : "$-"}
             </Text>
-            <Text fontSize="sm">Hardware: {model.hardware || "N/A"}</Text>
+            <Text fontSize="sm">
+              Hardware: {model.predictionHardware || "N/A"}
+            </Text>
           </Box>
         </HStack>
         <Link href={`/models/${model?.id}`} passHref>

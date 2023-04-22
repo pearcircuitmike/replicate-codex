@@ -233,7 +233,7 @@ export default function Home() {
                 />
               </TabPanel>
               <TabPanel pl={0} pr={0}>
-                <CreatorsLeaderboard data={data} />
+                <CreatorsLeaderboard searchValue={searchValue} />
               </TabPanel>
               {/*   <TabPanel pl={0} pr={0}>
                 {tabIndex === 3 && <ModelsLeaderboard data={data} />}

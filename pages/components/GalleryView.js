@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import ModelCard from "./ModelCard";
 import Pagination from "./Pagination";
+import { fetchAllDataFromTable } from "../../utils/supabaseClient"; // Import fetchAllDataFromTable
 
 export default function GalleryView({
   fetchFilteredData,
@@ -13,6 +14,7 @@ export default function GalleryView({
 }) {
   const [totalCount, setTotalCount] = useState(0);
   const [filteredData, setFilteredData] = useState([]);
+  const [allModels, setAllModels] = useState([]); // State to store allModels
 
   useEffect(() => {
     async function fetchData() {
@@ -26,6 +28,10 @@ export default function GalleryView({
       });
       setFilteredData(data);
       setTotalCount(totalCount || 0);
+
+      // Fetch all models data
+      const allData = await fetchAllDataFromTable("modelsData");
+      setAllModels(allData);
     }
     fetchData();
   }, [fetchFilteredData, searchValue, selectedTags, sorts, currentPage]);
@@ -39,7 +45,7 @@ export default function GalleryView({
     <Box>
       <SimpleGrid columns={[2, null, 3]} minChildWidth="250px" gap={5}>
         {filteredData.map((model) => (
-          <ModelCard key={model.id} model={model} />
+          <ModelCard key={model.id} model={model} allModels={allModels} /> // Pass allModels to ModelCard
         ))}
       </SimpleGrid>
       <Pagination

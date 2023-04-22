@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -9,47 +9,33 @@ import {
   Tbody,
   TableContainer,
 } from "@chakra-ui/react";
+import { fetchCreators } from "../../utils/fetchCreators";
+import Pagination from "./Pagination";
 
-function getCreatorRank(creatorName, sortedCreators) {
-  return sortedCreators.findIndex(([name]) => name === creatorName) + 1;
-}
+function CreatorsLeaderboard({ searchValue }) {
+  const [creatorsData, setCreatorsData] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10; // Number of creators to display per page
 
-function CreatorsLeaderboard({ data, searchValue }) {
-  if (!data) {
-    return null;
-  }
-
-  const creators = data.reduce((acc, cur) => {
-    const creator = cur.creator;
-    const runs = cur.runs;
-
-    if (!acc[creator]) {
-      acc[creator] = {
-        runs: runs,
-        models: [cur],
-      };
-    } else {
-      acc[creator].runs += runs;
-      acc[creator].models.push(cur);
+  useEffect(() => {
+    async function fetchData() {
+      const { data, totalCount } = await fetchCreators({
+        viewName: "unique_creators_with_runs", // Update this to match your view name
+        pageSize,
+        currentPage,
+        searchValue,
+      });
+      setCreatorsData(data);
+      setTotalCount(totalCount);
     }
+    fetchData();
+  }, [searchValue, currentPage]);
 
-    return acc;
-  }, {});
-
-  const sortedCreators = Object.entries(creators).sort(
-    ([_, a], [__, b]) => b.runs - a.runs
-  );
-
-  const filteredCreators = sortedCreators.filter(([creatorName, creator]) => {
-    const searchMatch =
-      typeof searchValue === "undefined" ||
-      creatorName
-        .toString()
-        .toLowerCase()
-        .includes(searchValue.toString().toLowerCase());
-
-    return searchMatch;
-  });
+  // set current page to 1 when a value changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchValue]);
 
   return (
     <Box>
@@ -57,42 +43,43 @@ function CreatorsLeaderboard({ data, searchValue }) {
         <Table variant="simple" size="sm">
           <Thead>
             <Tr>
-              <Th>Creator Rank</Th>
+              <Th>Rank</Th>
               <Th>Total Runs</Th>
               <Th>Creator</Th>
-              <Th>Total Models</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {filteredCreators.map(([creator, data], index) => {
-              const rank = getCreatorRank(creator, sortedCreators);
-              return (
-                <Tr key={creator}>
-                  <Td isNumeric>
-                    {rank === 1 ? "🥇" : ""}
-                    {rank === 2 ? "🥈" : ""}
-                    {rank === 3 ? "🥉" : ""}
-                    {rank}
-                  </Td>
-                  <Td isNumeric>{data.runs.toLocaleString()}</Td>
-                  <Td maxWidth="200px" isTruncated>
-                    <a
-                      href={`/creators/${creator}`}
-                      style={{
-                        color: "teal",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      {creator}
-                    </a>
-                  </Td>
-                  <Td isNumeric>{data.models.length}</Td>
-                </Tr>
-              );
-            })}
+            {creatorsData.map((creatorData) => (
+              <Tr key={creatorData.creator}>
+                <Td isNumeric>
+                  {creatorData.rank === 1 ? "🥇" : ""}
+                  {creatorData.rank === 2 ? "🥈" : ""}
+                  {creatorData.rank === 3 ? "🥉" : ""}
+                  {creatorData.rank}
+                </Td>
+                <Td isNumeric>{creatorData.total_runs.toLocaleString()}</Td>
+                <Td maxWidth="200px" isTruncated>
+                  <a
+                    href={`/creators/${creatorData.creator}`}
+                    style={{
+                      color: "teal",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    {creatorData.creator}
+                  </a>
+                </Td>
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       </TableContainer>
+      <Pagination
+        totalCount={totalCount}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </Box>
   );
 }
