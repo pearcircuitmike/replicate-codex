@@ -22,7 +22,7 @@ export async function fetchDataFromTable({
 
   if (searchValue) {
     query = query.or(
-      `modelName.ilike.%${searchValue}%,creator.ilike.%${searchValue}%`
+      `modelName.ilike.%${searchValue}%,creator.ilike.%${searchValue}%,description.ilike.%${searchValue}%`
     );
   }
 

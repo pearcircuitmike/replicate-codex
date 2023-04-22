@@ -77,7 +77,8 @@ export default function Home() {
     if (tags.length > 0) {
       params.set("tags", JSON.stringify(tags));
     }
-    router.push(`/?${params.toString()}`);
+    // Use replace with shallow option set to true
+    router.replace(`/?${params.toString()}`, undefined, { shallow: true });
   };
 
   const handleTabsChange = useCallback(
