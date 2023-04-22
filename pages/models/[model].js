@@ -4,7 +4,7 @@ import MetaTags from "../components/MetaTags";
 import PreviewImage from "../components/PreviewImage";
 import {
   fetchModelDataById,
-  fetchDataFromTable,
+  fetchAllDataFromTable,
 } from "../../utils/supabaseClient";
 
 import SimilarModelsTable from "../components/modelDetailsPage/SimilarModelsTable";
@@ -21,7 +21,7 @@ import { findSimilarModels } from "../../utils/findSimilarModels";
 import { findCreatorModels } from "../../utils/findCreatorModels";
 
 export async function getStaticPaths() {
-  const modelsData = await fetchDataFromTable("modelsData");
+  const modelsData = await fetchAllDataFromTable("modelsData");
   const paths = modelsData.map((model) => ({
     params: { model: model.id.toString() },
   }));
@@ -31,7 +31,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const model = await fetchModelDataById(parseInt(params.model));
-  const modelsData = await fetchDataFromTable("modelsData");
+  const modelsData = await fetchAllDataFromTable("modelsData");
 
   // Calculate model rank and creator rank
   const modelRank = calculateModelRank(modelsData, model.id);

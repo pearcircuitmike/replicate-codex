@@ -52,11 +52,18 @@ export default function Home() {
 
   useEffect(() => {
     async function getData() {
-      const fetchedData = await fetchDataFromTable("modelsData");
-      setData(fetchedData);
+      const { data, count } = await fetchDataFromTable({
+        tableName: "modelsData",
+        tags: selectedTags,
+        searchValue,
+        sorts,
+        pageSize: 10,
+        currentPage: 1,
+      });
+      setData(data);
     }
     getData();
-  }, []);
+  }, [searchValue, selectedTags, sorts]);
 
   const updateUrlParams = (tab, sorts, tags) => {
     const params = new URLSearchParams();
@@ -202,10 +209,10 @@ export default function Home() {
               <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
                 {tabIndex === 0 && (
                   <ModelsTable
-                    data={data}
+                    fetchFilteredData={fetchDataFromTable}
+                    selectedTags={selectedTags}
                     searchValue={searchValue}
                     sorts={sorts}
-                    selectedTags={selectedTags}
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
                   />

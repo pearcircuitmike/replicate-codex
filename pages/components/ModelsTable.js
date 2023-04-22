@@ -12,58 +12,46 @@ import {
   useMediaQuery,
   Skeleton,
 } from "@chakra-ui/react";
+import Pagination from "./Pagination";
+
 import PreviewImage from "./PreviewImage";
 
 export default function ModelsTable(props) {
-  const { data, searchValue, selectedTags, sorts } = props;
+  const {
+    fetchFilteredData,
+    currentPage,
+    setCurrentPage,
+    searchValue,
+    selectedTags,
+    sorts,
+  } = props;
 
   const [isMobile] = useMediaQuery("(max-width: 480px)");
+  const [totalCount, setTotalCount] = useState(0);
 
   const [filteredData, setFilteredData] = useState([]);
 
   useEffect(() => {
-    const newFilteredData = data?.filter((item) => {
-      const hasTag =
-        !selectedTags ||
-        selectedTags?.length === 0 ||
-        selectedTags?.some((tag) => item.tags.includes(tag));
+    async function fetchData() {
+      // Destructure both data and totalCount from the result
+      const { data, totalCount } = await fetchFilteredData({
+        tableName: "modelsData",
+        tags: selectedTags,
+        searchValue,
+        sorts,
+        pageSize: 10,
+        currentPage,
+      });
+      setFilteredData(data);
+      setTotalCount(totalCount || 0); // Use totalCount or default to 0 if undefined
+    }
+    fetchData();
+  }, [fetchFilteredData, searchValue, selectedTags, sorts, currentPage]);
 
-      const hasSearchValue =
-        typeof searchValue !== "undefined" &&
-        (item.modelName
-          ?.toString()
-          .toLowerCase()
-          .includes(searchValue.toString().toLocaleLowerCase()) ||
-          item.creator
-            ?.toString()
-            .toLowerCase()
-            .includes(searchValue.toString().toLocaleLowerCase()) ||
-          item.description
-            ?.toString()
-            .toLowerCase()
-            .includes(searchValue.toString().toLocaleLowerCase()) ||
-          item.tags
-            ?.toString()
-            .toLowerCase()
-            .includes(searchValue.toString().toLocaleLowerCase()));
-
-      return hasTag && hasSearchValue;
-    });
-
-    const newSortedData = newFilteredData?.sort((a, b) => {
-      for (const sort of sorts ?? []) {
-        if (sort && a[sort.column] < b[sort.column]) {
-          return sort.direction === "asc" ? -1 : 1;
-        }
-        if (sort && a[sort.column] > b[sort.column]) {
-          return sort.direction === "asc" ? 1 : -1;
-        }
-      }
-      return 0;
-    });
-
-    setFilteredData(newSortedData);
-  }, [data, searchValue, selectedTags, sorts]);
+  // set current page to 1 when a value changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedTags, sorts, searchValue]);
 
   return (
     <Box>
@@ -145,6 +133,12 @@ export default function ModelsTable(props) {
           </Tbody>
         </Table>
       </TableContainer>
+      <Pagination
+        totalCount={totalCount}
+        pageSize={10}
+        currentPage={currentPage}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </Box>
   );
 }

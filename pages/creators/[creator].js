@@ -15,7 +15,7 @@ import {
   Flex,
   ListItem,
 } from "@chakra-ui/react";
-import { fetchDataFromTable } from "../../utils/supabaseClient";
+import { fetchAllDataFromTable } from "../../utils/supabaseClient";
 import Head from "next/head";
 import SimilarCreators from "../components/SimilarCreators";
 import ShareLinkButton from "../components/ShareLinkButton";
@@ -136,7 +136,7 @@ export default function Creator({ creator, models, allModels }) {
 }
 
 export async function getStaticPaths() {
-  const data = await fetchDataFromTable("modelsData");
+  const data = await fetchAllDataFromTable("modelsData");
   const creators = Array.from(new Set(data.map((model) => model.creator)));
   const paths = creators.map((creator) => ({
     params: { creator: creator.toLowerCase() },
@@ -148,7 +148,7 @@ export async function getStaticPaths() {
 // Modify getStaticProps to fetch all models
 export async function getStaticProps({ params }) {
   const creator = params.creator;
-  const allModelsData = await fetchDataFromTable("modelsData");
+  const allModelsData = await fetchAllDataFromTable("modelsData");
 
   const models = allModelsData.filter((model) => model.creator === creator);
 

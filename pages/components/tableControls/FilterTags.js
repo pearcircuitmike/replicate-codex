@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -9,8 +9,20 @@ import {
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
+import { fetchAllTags } from "../../../utils/supabaseClient";
 
-const FilterTags = ({ models = [], selectedTags, handleTagSelect }) => {
+const FilterTags = ({ selectedTags, handleTagSelect }) => {
+  const [allTags, setAllTags] = useState([]);
+
+  useEffect(() => {
+    async function fetchTags() {
+      const tags = await fetchAllTags();
+      setAllTags(tags);
+    }
+
+    fetchTags();
+  }, []);
+
   const handleCheckboxChange = (value) => {
     handleTagSelect(value);
   };
@@ -27,7 +39,7 @@ const FilterTags = ({ models = [], selectedTags, handleTagSelect }) => {
         </MenuButton>
         <MenuList minWidth="240px" maxHeight="200px" overflowY="auto">
           <CheckboxGroup value={selectedTags} onChange={handleCheckboxChange}>
-            {models.map((tag) => (
+            {allTags.map((tag) => (
               <MenuItem key={tag}>
                 <Checkbox
                   mr="20px"

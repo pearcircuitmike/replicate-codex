@@ -6,18 +6,62 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_CLIENT_API_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Utility function to fetch data from a specific table
-export async function fetchDataFromTable(tableName) {
-  // Query the specified table for data
-  const { data, error } = await supabase.from(tableName).select("*");
+export async function fetchDataFromTable({
+  tableName,
+  tags = [],
+  searchValue = "",
+  sorts = [],
+  pageSize = 10,
+  currentPage = 1,
+}) {
+  let query = supabase.from(tableName).select("*", { count: "exact" });
 
-  // Handle any errors
-  if (error) {
-    console.error(error);
-    return null;
+  if (tags.length > 0) {
+    query = query.or(tags.map((tag) => `tags.ilike.%${tag}%`).join(","));
   }
 
-  // Return the data
-  return data;
+  if (searchValue) {
+    query = query.or(
+      `modelName.ilike.%${searchValue}%,creator.ilike.%${searchValue}%`
+    );
+  }
+
+  sorts.forEach(({ column, direction }) => {
+    query = query.order(column, { ascending: direction === "asc" });
+  });
+
+  const offset = (currentPage - 1) * pageSize;
+  query = query.range(offset, offset + pageSize - 1);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error(error);
+    return { data: [], totalCount: 0 };
+  }
+
+  // Ensure that data is an array
+  const dataArray = Array.isArray(data) ? data : [data].filter(Boolean);
+  // Ensure that totalCount is a number
+  const totalCountNumber = typeof count === "number" ? count : 0;
+
+  return { data: dataArray, totalCount: totalCountNumber };
+}
+
+export async function fetchAllDataFromTable(tableName) {
+  // Fetch all data from the specified table
+  const { data, error } = await supabase.from(tableName).select("*");
+
+  // Handle errors
+  if (error) {
+    console.error(`Error fetching all data from table "${tableName}":`, error);
+    return [];
+  }
+
+  // Ensure that data is an array
+  const dataArray = Array.isArray(data) ? data : [data].filter(Boolean);
+
+  return dataArray;
 }
 
 export async function fetchModelDataById(id) {
@@ -87,6 +131,7 @@ export async function fetchFilteredData({
 
   return { data, totalCount: count };
 }
+
 export async function fetchAllTags() {
   const { data, error } = await supabase.from("modelsData").select("tags");
 
@@ -98,5 +143,6 @@ export async function fetchAllTags() {
   const allTags = data.flatMap((item) => item.tags);
   return Array.from(new Set(allTags));
 }
+
 // Export the Supabase client instance
 export default supabase;
