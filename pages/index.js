@@ -40,25 +40,6 @@ const tabNameReverseMap = Object.fromEntries(
   Object.entries(tabNameMap).map(([key, value]) => [value, key])
 );
 
-// Use getServerSideProps to fetch data on the server side
-export async function getServerSideProps() {
-  const { data, count } = await fetchDataFromTable({
-    tableName: "modelsData",
-    tags: [],
-    searchValue: "",
-    sorts: [],
-    pageSize: 10,
-    currentPage: 1,
-  });
-
-  // Return initialData as a prop
-  return {
-    props: {
-      initialData: data,
-    },
-  };
-}
-
 export default function Home({ initialData }) {
   const [searchValue, setSearchValue] = useState("");
   const [sorts, setSorts] = useState([]);
@@ -263,4 +244,23 @@ export default function Home({ initialData }) {
       </Container>
     </>
   );
+}
+
+// Use getServerSideProps to fetch data on the server side
+export async function getServerSideProps() {
+  const { data, count } = await fetchDataFromTable({
+    tableName: "modelsData",
+    tags: [],
+    searchValue: "",
+    sorts: [],
+    pageSize: 10,
+    currentPage: 1,
+  });
+
+  // Return initialData as a prop
+  return {
+    props: {
+      initialData: data,
+    },
+  };
 }
