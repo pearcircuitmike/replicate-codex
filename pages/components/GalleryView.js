@@ -1,64 +1,53 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import ModelCard from "./ModelCard";
+import Pagination from "./Pagination";
 
 export default function GalleryView({
-  data,
+  fetchFilteredData,
+  currentPage,
+  setCurrentPage,
   searchValue,
   selectedTags,
   sorts,
 }) {
-  const filteredData = data?.filter(
-    (item) =>
-      !selectedTags ||
-      selectedTags?.length === 0 ||
-      selectedTags?.includes(item.tags)
-  );
+  const [totalCount, setTotalCount] = useState(0);
+  const [filteredData, setFilteredData] = useState([]);
 
-  const sortedData = filteredData?.sort((a, b) => {
-    for (const sort of sorts ?? []) {
-      if (sort && a[sort.column] < b[sort.column]) {
-        return sort.direction === "asc" ? -1 : 1;
-      }
-      if (sort && a[sort.column] > b[sort.column]) {
-        return sort.direction === "asc" ? 1 : -1;
-      }
+  useEffect(() => {
+    async function fetchData() {
+      const { data, totalCount } = await fetchFilteredData({
+        tableName: "modelsData",
+        tags: selectedTags,
+        searchValue,
+        sorts,
+        pageSize: 10,
+        currentPage,
+      });
+      setFilteredData(data);
+      setTotalCount(totalCount || 0);
     }
-    return 0;
-  });
+    fetchData();
+  }, [fetchFilteredData, searchValue, selectedTags, sorts, currentPage]);
+
+  // Set current page to 1 when a value changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedTags, sorts, searchValue]);
 
   return (
     <Box>
       <SimpleGrid columns={[2, null, 3]} minChildWidth="250px" gap={5}>
-        {sortedData
-          ?.filter(
-            (row) =>
-              typeof searchValue !== "undefined" &&
-              ((row.modelName &&
-                row.modelName
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchValue.toString().toLocaleLowerCase())) ||
-                (row.creator &&
-                  row.creator
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchValue.toString().toLocaleLowerCase())) ||
-                (row.description &&
-                  row.description
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchValue.toString().toLocaleLowerCase())) ||
-                (row.tags &&
-                  row.tags
-                    .toString()
-                    .toLowerCase()
-                    .includes(searchValue.toString().toLocaleLowerCase())))
-          )
-          .map((model) => (
-            <ModelCard key={model.id} model={model} allModels={data} />
-          ))}
+        {filteredData.map((model) => (
+          <ModelCard key={model.id} model={model} />
+        ))}
       </SimpleGrid>
+      <Pagination
+        totalCount={totalCount}
+        pageSize={10}
+        currentPage={currentPage}
+        onPageChange={(page) => setCurrentPage(page)}
+      />
     </Box>
   );
 }

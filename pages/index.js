@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
+import { useRef } from "react"; // Import useRef
 
 import {
   Container,
@@ -50,6 +51,8 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [isMobile] = useMediaQuery("(max-width: 480px)");
 
+  const scrollRef = useRef(null); // Create a ref to store the scroll position
+
   useEffect(() => {
     async function getData() {
       const { data, count } = await fetchDataFromTable({
@@ -64,7 +67,6 @@ export default function Home() {
     }
     getData();
   }, [searchValue, selectedTags, sorts]);
-
   const updateUrlParams = (tab, sorts, tags) => {
     const params = new URLSearchParams();
 
@@ -77,8 +79,11 @@ export default function Home() {
     if (tags.length > 0) {
       params.set("tags", JSON.stringify(tags));
     }
-    // Use replace with shallow option set to true
-    router.replace(`/?${params.toString()}`, undefined, { shallow: true });
+    // Use replace with shallow option set to true and scroll option set to false
+    router.replace(`/?${params.toString()}`, undefined, {
+      shallow: true,
+      scroll: false,
+    });
   };
 
   const handleTabsChange = useCallback(
@@ -208,29 +213,27 @@ export default function Home() {
             </TabList>
             <TabPanels>
               <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
-                {tabIndex === 0 && (
-                  <ModelsTable
-                    fetchFilteredData={fetchDataFromTable}
-                    selectedTags={selectedTags}
-                    searchValue={searchValue}
-                    sorts={sorts}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                  />
-                )}
+                <ModelsTable
+                  fetchFilteredData={fetchDataFromTable}
+                  selectedTags={selectedTags}
+                  searchValue={searchValue}
+                  sorts={sorts}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
               </TabPanel>
               <TabPanel pl={0} pr={0}>
-                {tabIndex === 1 && (
-                  <GalleryView
-                    data={data}
-                    searchValue={searchValue}
-                    sorts={sorts}
-                    selectedTags={selectedTags}
-                  />
-                )}
+                <GalleryView
+                  fetchFilteredData={fetchDataFromTable}
+                  selectedTags={selectedTags}
+                  searchValue={searchValue}
+                  sorts={sorts}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
               </TabPanel>
               <TabPanel pl={0} pr={0}>
-                {tabIndex === 2 && <CreatorsLeaderboard data={data} />}
+                <CreatorsLeaderboard data={data} />
               </TabPanel>
               {/*   <TabPanel pl={0} pr={0}>
                 {tabIndex === 3 && <ModelsLeaderboard data={data} />}

@@ -14,7 +14,7 @@ const Pagination = ({ totalCount, pageSize, currentPage, onPageChange }) => {
 
   return (
     <Box>
-      <HStack>
+      <HStack mt={5}>
         <Button
           onClick={handlePrevPage}
           isDisabled={currentPage === 1}
