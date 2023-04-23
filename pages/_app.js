@@ -18,8 +18,7 @@ export default function App({ Component, pageProps }) {
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', ${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS});
-        `}
+          gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');`}
           </Script>
           {/*   <Script id="microsoft-clarity">
             {`
