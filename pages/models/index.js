@@ -48,8 +48,6 @@ const Models = ({ modelVals, totalCount }) => {
     setTotalCount(totalCount || 1);
   };
 
-  console.log(totalCount);
-
   const [totalModels, setTotalCount] = useState(totalCount);
   const [models, setModelVals] = useState(modelVals);
 

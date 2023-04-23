@@ -28,8 +28,6 @@ const RunsHistoryChart = ({ modelId }) => {
     const prepareChartData = async () => {
       const runsHistory = await fetchRunsHistoryByModelId(modelId);
 
-      console.log("Runs history:", runsHistory);
-
       if (!runsHistory || runsHistory.length === 0) {
         console.warn("No runs history data available");
         return;
