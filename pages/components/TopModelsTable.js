@@ -1,5 +1,15 @@
 import React from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Link,
+  Box,
+  TableContainer,
+} from "@chakra-ui/react";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
 
 function formatNumber(number) {
@@ -33,33 +43,52 @@ const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
         onTagClose={onTagClose}
         onTagsChange={onTagsChange}
       />
-      <Table variant="simple" size="md">
-        <Thead>
-          <Tr>
-            <Th>Rank</Th>
-            <Th>Name</Th>
-            <Th>Runs</Th>
-            <Th>Creator</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {models.map((model, index) => (
-            <Tr key={model.id}>
-              <Td>
-                {medalEmoji(index + 1)}
-                {index + 1}
-              </Td>
-              <Td>
-                <Link to={`/models/${model.id}`}>{model.modelName}</Link>
-              </Td>
-              <Td>{formatNumber(model.runs)}</Td>
-              <Td>
-                <Link to={`/creators/${model.creator}`}>{model.creator}</Link>
-              </Td>
+      <TableContainer>
+        <Table variant="simple" size="sm">
+          <Thead>
+            <Tr>
+              <Th>Rank</Th>
+              <Th>Name</Th>
+              <Th>Runs</Th>
+              <Th>Creator</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {models?.map((model, index) => (
+              <Tr key={model.id}>
+                <Td>
+                  {medalEmoji(index + 1)}
+                  {index + 1}
+                </Td>
+                <Td isTruncated maxW="150px">
+                  <a
+                    href={`/models/${model.id}`}
+                    style={{
+                      color: "teal",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    {model.creator}
+                    {model.modelName}
+                  </a>
+                </Td>
+                <Td>{formatNumber(model.runs)}</Td>
+                <Td>
+                  <a
+                    href={`/creators/${model.creator}`}
+                    style={{
+                      color: "teal",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    {model.creator}
+                  </a>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
     </>
   );
 };

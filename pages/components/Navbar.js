@@ -41,6 +41,9 @@ const Navbar = () => {
               <Link href="/models" aria-label="Models" m={5} w="100%">
                 Models
               </Link>
+              <Link href="/trending" aria-label="trending" m={5} w="100%">
+                🔥 Trending
+              </Link>
               <Link
                 href="https://notes.replicatecodex.com"
                 aria-label="notes"
@@ -105,6 +108,9 @@ const Navbar = () => {
             </Link>
             <Link href="/models" aria-label="models" m={"10px"} w="100%">
               <span onClick={() => changeDisplay("none")}>Models </span>
+            </Link>
+            <Link href="/trending" aria-label="trending" m={"10px"} w="100%">
+              <span onClick={() => changeDisplay("none")}>🔥 Trending </span>
             </Link>
 
             <Link

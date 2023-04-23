@@ -1,34 +1,58 @@
-import { useEffect, useRef, useState } from "react";
-import { fetchRunsHistoryByModelId } from "../../utils/supabaseClient";
+import React, { useEffect, useState } from "react";
+import { Line } from "react-chartjs-2";
 import {
-  Chart,
-  LineController,
-  LineElement,
-  PointElement,
+  Chart as ChartJS,
   LinearScale,
+  LineElement, // Import LineElement
+  PointElement,
+  Tooltip,
+  Legend,
   TimeScale,
 } from "chart.js";
-import "chartjs-adapter-date-fns"; // Import the date-fns adapter
-import { Heading, Text, Box } from "@chakra-ui/react";
 
-// Register required controllers, elements, and scales
-Chart.register(
-  LineController,
+import { fetchRunsHistoryByModelId } from "../../utils/supabaseClient";
+import { fetchModelDataById } from "../../utils/supabaseClient";
+import { Heading, Text, Box, useTheme, useToken } from "@chakra-ui/react";
+import "chartjs-adapter-date-fns";
+
+// Register the required plugins
+ChartJS.register(
+  LinearScale,
   LineElement,
   PointElement,
-  LinearScale,
+  Tooltip,
+  Legend,
   TimeScale
 );
 
 const TrendingModelsChart = ({ modelIds }) => {
-  const chartRef = useRef(null);
-  const chartInstanceRef = useRef(null);
   const [chartData, setChartData] = useState(null);
+  const theme = useTheme();
+
+  // Define Chakra UI preset theme colors
+  const colors = [
+    "red.500",
+    "yellow.500",
+    "green.500",
+    "blue.500",
+    "cyan.500",
+    "teal.500",
+    "purple.500",
+    "pink.500",
+    "orange.500",
+    "indigo.500",
+  ];
+  // Use the useToken hook to access the color values from the theme
+  const presetColors = useToken("colors", colors);
+  // Shuffle the presetColors array to randomize the color order
+  // presetColors.sort(() => Math.random() - 0.5);
 
   useEffect(() => {
     const prepareChartData = async () => {
       const datasets = await Promise.all(
-        modelIds.map(async (modelId) => {
+        modelIds?.map(async (modelId, index) => {
+          const modelData = await fetchModelDataById(modelId);
+
           const runsHistory = await fetchRunsHistoryByModelId(modelId);
 
           if (!runsHistory || runsHistory.length === 0) {
@@ -43,16 +67,20 @@ const TrendingModelsChart = ({ modelIds }) => {
             y: entry.runs,
           }));
 
+          // Use a color from the shuffled array, ensuring it's unique
+          const color = presetColors[index]; // Assign a unique color from the shuffled array
+
+          // Use the modelName property instead of modelId for the label
+          const modelName = modelData?.modelName || `Model ${modelId}`;
+
           return {
             modelId,
-            label: `Model ${modelId}`,
+            label: ` ${modelName}`,
             data,
-            backgroundColor: "rgba(75, 192, 192, 0.2)",
-            borderColor: `#${Math.floor(Math.random() * 16777215).toString(
-              16
-            )}`,
-            borderWidth: 1,
-            pointRadius: 2,
+            backgroundColor: color,
+            borderColor: color,
+            borderWidth: 2,
+            pointRadius: 3,
           };
         })
       );
@@ -65,53 +93,28 @@ const TrendingModelsChart = ({ modelIds }) => {
     prepareChartData();
   }, [modelIds]);
 
-  useEffect(() => {
-    if (!chartRef.current || !chartData) {
-      return;
-    }
-
-    const chartOptions = {
-      scales: {
-        x: {
-          type: "time",
-          adapters: {
-            date: "date-fns",
-          },
-          time: {
-            unit: "day",
-          },
-        },
-        y: {
-          beginAtZero: true,
+  const chartOptions = {
+    scales: {
+      x: {
+        type: "time",
+        time: {
+          unit: "day",
         },
       },
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: "top", // Change the position of the legend as needed
-        },
+      y: {
+        beginAtZero: true,
       },
-    };
+    },
+    responsive: true,
+    maintainAspectRatio: false,
 
-    if (chartInstanceRef.current) {
-      chartInstanceRef.current.destroy();
-    }
-
-    chartInstanceRef.current = new Chart(chartRef.current, {
-      type: "line",
-      data: chartData,
-      options: chartOptions,
-    });
-
-    return () => {
-      // Clean up the chart instance on component unmount
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [chartData]);
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+    },
+  };
 
   return (
     <>
@@ -123,8 +126,8 @@ const TrendingModelsChart = ({ modelIds }) => {
           This chart displays the number of runs over time for the top 10
           trending models.
         </Text>
-        <Box p={5} maxH="250px">
-          <canvas ref={chartRef} style={{ width: "100%", height: "200px" }} />
+        <Box p={5} minH="400px">
+          {chartData && <Line data={chartData} options={chartOptions} />}
         </Box>
       </Box>
     </>
