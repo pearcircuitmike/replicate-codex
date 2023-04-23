@@ -1,7 +1,17 @@
-import { Container, Grid, VStack, GridItem, Box } from "@chakra-ui/react";
+import {
+  Container,
+  Grid,
+  VStack,
+  GridItem,
+  Box,
+  Text,
+  Heading,
+} from "@chakra-ui/react";
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../components/MetaTags";
 import PreviewImage from "../components/PreviewImage";
+import NewsletterSubscription from "../components/NewsletterSubscription";
+
 import {
   fetchModelDataById,
   fetchAllDataFromTable,
@@ -72,6 +82,8 @@ export default function ModelPage({ model, modelsData }) {
               </VStack>
             </GridItem>
             <GridItem>
+              <NewsletterSubscription />
+
               <ModelDetailsTable model={model} />
               <RunsHistoryChart modelId={model.id} />
             </GridItem>
