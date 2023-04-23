@@ -68,7 +68,6 @@ const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
                       textDecoration: "underline",
                     }}
                   >
-                    {model.creator}
                     {model.modelName}
                   </a>
                 </Td>
