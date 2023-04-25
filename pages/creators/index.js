@@ -12,7 +12,7 @@ import {
 import MetaTags from "../../components/MetaTags";
 import CreatorCard from "../../components/CreatorCard";
 import Pagination from "../../components/Pagination";
-import { fetchCreators } from "../../utils/fetchCreators";
+import { fetchCreators } from "../../utils/fetchCreatorsPaginated";
 
 const pageSize = 12;
 

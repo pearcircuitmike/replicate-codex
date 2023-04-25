@@ -17,7 +17,9 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import TrendingModelsChart from "../components/TrendingModelsChart";
 import TopModelsTable from "../components/TopModelsTable";
 import MetaTags from "../components/MetaTags";
-import { fetchAllTags, fetchModelDataById } from "../utils/supabaseClient";
+import { fetchModelDataById } from "../utils/supabaseClient";
+import { fetchAllTags } from "../utils/tags.js";
+
 import { fetchTopModelIds } from "@/utils/fetchTopModelIds";
 
 export default function Trending() {

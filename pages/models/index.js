@@ -13,12 +13,12 @@ import Head from "next/head";
 import MetaTags from "../../components/MetaTags";
 import ModelCard from "../../components/ModelCard";
 import Pagination from "../../components/Pagination";
-import { fetchDataWithPagination } from "../../utils/fetchModels";
+import { fetchModelsPaginated } from "../../utils/fetchModelsPaginated";
 
 const pageSize = 12;
 
 export async function getStaticProps() {
-  const { data, totalCount } = await fetchDataWithPagination({
+  const { data, totalCount } = await fetchModelsPaginated({
     tableName: "modelsData",
     pageSize,
     currentPage: 1,
@@ -38,7 +38,7 @@ const Models = ({ modelVals, totalCount }) => {
   const handleSearch = async (event) => {
     setStateFilter(event.target.value);
     setCurrentPage(1);
-    const { data, totalCount } = await fetchDataWithPagination({
+    const { data, totalCount } = await fetchModelsPaginated({
       tableName: "modelsData",
       pageSize,
       currentPage: 1,
@@ -53,7 +53,7 @@ const Models = ({ modelVals, totalCount }) => {
 
   const handlePageChange = async (page) => {
     setCurrentPage(page);
-    const { data } = await fetchDataWithPagination({
+    const { data } = await fetchModelsPaginated({
       tableName: "modelsData",
       pageSize,
       currentPage: page,

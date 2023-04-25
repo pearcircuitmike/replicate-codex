@@ -9,7 +9,7 @@ import {
   Tbody,
   TableContainer,
 } from "@chakra-ui/react";
-import { fetchCreators } from "../utils/fetchCreators";
+import { fetchCreators } from "../utils/fetchCreatorsPaginated";
 import Pagination from "./Pagination";
 
 function CreatorsLeaderboard({ searchValue }) {

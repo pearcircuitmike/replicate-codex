@@ -132,17 +132,5 @@ export async function fetchFilteredData({
   return { data, totalCount: count };
 }
 
-export async function fetchAllTags() {
-  const { data, error } = await supabase.from("modelsData").select("tags");
-
-  if (error) {
-    console.error("Error fetching all tags:", error);
-    return [];
-  }
-
-  const allTags = data.flatMap((item) => item.tags);
-  return Array.from(new Set(allTags));
-}
-
 // Export the Supabase client instance
 export default supabase;

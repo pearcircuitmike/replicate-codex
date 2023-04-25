@@ -1,7 +1,7 @@
 // utils/fetchModels.js
 import supabase from "./supabaseClient";
 
-export async function fetchDataWithPagination({
+export async function fetchModelsPaginated({
   tableName,
   pageSize,
   currentPage,

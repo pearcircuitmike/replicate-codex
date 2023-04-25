@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { fetchRunsHistoryByModelId } from "../../utils/supabaseClient";
+import { fetchRunsHistoryByModelId } from "../../utils/runsHistory.js";
 import {
   Chart,
   LineController,
