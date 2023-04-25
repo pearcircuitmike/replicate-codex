@@ -15,7 +15,7 @@ import NewsletterSubscription from "../../components/NewsletterSubscription";
 import {
   fetchModelDataById,
   fetchAllDataFromTable,
-} from "../../utils/supabaseClient";
+} from "../../utils/modelsData.js";
 
 import SimilarModelsTable from "../../components/modelDetailsPage/SimilarModelsTable";
 import CreatorModelsTable from "../../components/modelDetailsPage/CreatorModelsTable";

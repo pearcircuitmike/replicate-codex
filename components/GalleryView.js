@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import ModelCard from "./ModelCard";
 import Pagination from "./Pagination";
-import { fetchAllDataFromTable } from "../utils/supabaseClient"; // Import fetchAllDataFromTable
+import { fetchAllDataFromTable } from "../utils/modelsData.js"; // Import fetchAllDataFromTable
 
 export default function GalleryView({
   fetchFilteredData,

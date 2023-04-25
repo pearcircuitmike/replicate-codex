@@ -17,7 +17,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import TrendingModelsChart from "../components/TrendingModelsChart";
 import TopModelsTable from "../components/TopModelsTable";
 import MetaTags from "../components/MetaTags";
-import { fetchModelDataById } from "../utils/supabaseClient";
+import { fetchModelDataById } from "../utils/modelsData.js";
 import { fetchAllTags } from "../utils/tags.js";
 
 import { fetchTopModelIds } from "@/utils/fetchTopModelIds";

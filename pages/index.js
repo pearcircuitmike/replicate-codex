@@ -26,7 +26,7 @@ import SortMenu from "../components/tableControls/SortMenu.js";
 import ActiveTagFilters from "../components/tableControls/ActiveTagFilters.js";
 import ActiveSorts from "../components/tableControls/ActiveSorts.js";
 
-import { fetchDataFromTable } from "../utils/supabaseClient";
+import { fetchDataFromTable } from "../utils/modelsData.js";
 
 const tabNameMap = {
   modelsTable: 0,

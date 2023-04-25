@@ -15,7 +15,7 @@ import {
   Flex,
   ListItem,
 } from "@chakra-ui/react";
-import { fetchAllDataFromTable } from "../../utils/supabaseClient";
+import { fetchAllDataFromTable } from "../../utils/modelsData.js";
 import Head from "next/head";
 import SimilarCreators from "../../components/SimilarCreators";
 import ShareLinkButton from "../../components/ShareLinkButton";
