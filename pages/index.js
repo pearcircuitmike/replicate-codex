@@ -15,17 +15,16 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 
-import ModelsTable from "./components/ModelsTable.js";
-import ModelsLeaderboard from "./components/ModelsLeaderboard.js";
-import MetaTags from "./components/MetaTags.js";
-import CreatorsLeaderboard from "./components/CreatorsLeaderboard.js";
-import Hero from "./components/Hero.js";
-import GalleryView from "./components/GalleryView.js";
-import FilterTags from "./components/tableControls/FilterTags";
-import SearchField from "./components/tableControls/SearchField";
-import SortMenu from "./components/tableControls/SortMenu";
-import ActiveTagFilters from "./components/tableControls/ActiveTagFilters";
-import ActiveSorts from "./components/tableControls/ActiveSorts";
+import ModelsTable from "../components/ModelsTable.js";
+import MetaTags from "../components/MetaTags.js";
+import CreatorsLeaderboard from "../components/CreatorsLeaderboard.js";
+import Hero from "../components/Hero.js";
+import GalleryView from "../components/GalleryView.js";
+import FilterTags from "../components/tableControls/FilterTags.js";
+import SearchField from "../components/tableControls/SearchField.js";
+import SortMenu from "../components/tableControls/SortMenu.js";
+import ActiveTagFilters from "../components/tableControls/ActiveTagFilters.js";
+import ActiveSorts from "../components/tableControls/ActiveSorts.js";
 
 import { fetchDataFromTable } from "../utils/supabaseClient";
 
@@ -33,7 +32,6 @@ const tabNameMap = {
   modelsTable: 0,
   galleryView: 1,
   creatorsLeaderboard: 2,
-  modelsLeaderboard: 3,
 };
 
 const tabNameReverseMap = Object.fromEntries(
@@ -235,9 +233,6 @@ export default function Home() {
               <TabPanel pl={0} pr={0}>
                 <CreatorsLeaderboard searchValue={searchValue} />
               </TabPanel>
-              {/*   <TabPanel pl={0} pr={0}>
-                {tabIndex === 3 && <ModelsLeaderboard data={data} />}
-              </TabPanel>*/}
             </TabPanels>
           </Tabs>
         </main>

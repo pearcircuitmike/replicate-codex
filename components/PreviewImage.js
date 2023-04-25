@@ -25,6 +25,9 @@ const PreviewImage = ({ src }) => {
         src={inView && !displayFallback ? src : undefined}
         alt="AI model preview image"
         fallbackSrc={displayFallback ? fallbackUrl : undefined}
+        objectFit="contain" // Add this line to maintain aspect ratio
+        width="100%" // Add this line to set width
+        height="100%" // Add this line to set height
       />
     </Skeleton>
   );

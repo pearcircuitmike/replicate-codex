@@ -17,12 +17,12 @@ import {
 } from "@chakra-ui/react";
 import { fetchAllDataFromTable } from "../../utils/supabaseClient";
 import Head from "next/head";
-import SimilarCreators from "../components/SimilarCreators";
-import ShareLinkButton from "../components/ShareLinkButton";
-import ShareTweetButton from "../components/ShareTweetButton";
+import SimilarCreators from "../../components/SimilarCreators";
+import ShareLinkButton from "../../components/ShareLinkButton";
+import ShareTweetButton from "../../components/ShareTweetButton";
 import calculateCreatorRank from "../../utils/calculateCreatorRank";
-import PreviewImage from "../components/PreviewImage";
-import MetaTags from "../components/MetaTags";
+import PreviewImage from "../../components/PreviewImage";
+import MetaTags from "../../components/MetaTags";
 
 export default function Creator({ creator, models, allModels }) {
   const avgCost =

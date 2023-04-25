@@ -9,9 +9,9 @@ import {
   InputGroup,
   Center,
 } from "@chakra-ui/react";
-import MetaTags from "../components/MetaTags";
-import CreatorCard from "../components/CreatorCard";
-import Pagination from "../components/Pagination";
+import MetaTags from "../../components/MetaTags";
+import CreatorCard from "../../components/CreatorCard";
+import Pagination from "../../components/Pagination";
 import { fetchCreators } from "../../utils/fetchCreators";
 
 const pageSize = 12;

@@ -10,9 +10,9 @@ import {
   Center,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import MetaTags from "../components/MetaTags";
-import ModelCard from "../components/ModelCard";
-import Pagination from "../components/Pagination";
+import MetaTags from "../../components/MetaTags";
+import ModelCard from "../../components/ModelCard";
+import Pagination from "../../components/Pagination";
 import { fetchDataWithPagination } from "../../utils/fetchModels";
 
 const pageSize = 12;

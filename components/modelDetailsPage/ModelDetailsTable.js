@@ -172,7 +172,7 @@ const ModelDetailsTable = ({ model }) => {
         </Table>
 
         <Heading as="h3" size="sm">
-          <Link href="/?tab=modelsLeaderboard">Popularity</Link>
+          Popularity
         </Heading>
         <Text>
           How popular is this model, by number of runs? How popular is the

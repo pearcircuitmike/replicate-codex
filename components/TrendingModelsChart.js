@@ -10,8 +10,8 @@ import {
   TimeScale,
 } from "chart.js";
 
-import { fetchRunsHistoryByModelId } from "../../utils/supabaseClient";
-import { fetchModelDataById } from "../../utils/supabaseClient";
+import { fetchRunsHistoryByModelId } from "../utils/supabaseClient";
+import { fetchModelDataById } from "../utils/supabaseClient";
 import { Heading, Text, Box, useTheme, useToken } from "@chakra-ui/react";
 import "chartjs-adapter-date-fns";
 

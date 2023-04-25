@@ -10,7 +10,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import calculateModelRank from "../../utils/calculateModelRank";
+import calculateModelRank from "../utils/calculateModelRank";
 
 const ModelCard = ({ model, allModels }) => {
   const rank = calculateModelRank(allModels, model?.id);

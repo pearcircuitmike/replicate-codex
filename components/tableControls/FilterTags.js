@@ -9,7 +9,7 @@ import {
   MenuItem,
   MenuList,
 } from "@chakra-ui/react";
-import { fetchAllTags } from "../../../utils/supabaseClient";
+import { fetchAllTags } from "../../utils/supabaseClient";
 
 const FilterTags = ({ selectedTags, handleTagSelect }) => {
   const [allTags, setAllTags] = useState([]);

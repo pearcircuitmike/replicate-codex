@@ -8,21 +8,21 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
-import MetaTags from "../components/MetaTags";
-import PreviewImage from "../components/PreviewImage";
-import NewsletterSubscription from "../components/NewsletterSubscription";
+import MetaTags from "../../components/MetaTags";
+import PreviewImage from "../../components/PreviewImage";
+import NewsletterSubscription from "../../components/NewsletterSubscription";
 
 import {
   fetchModelDataById,
   fetchAllDataFromTable,
 } from "../../utils/supabaseClient";
 
-import SimilarModelsTable from "../components/modelDetailsPage/SimilarModelsTable";
-import CreatorModelsTable from "../components/modelDetailsPage/CreatorModelsTable";
-import ModelDetailsTable from "../components/modelDetailsPage/ModelDetailsTable";
-import ModelOverview from "../components/modelDetailsPage/ModelOverview";
-import ModelPricingSummary from "../components/ModelPricingSummary";
-import RunsHistoryChart from "../components/modelDetailsPage/RunsHistoryChart";
+import SimilarModelsTable from "../../components/modelDetailsPage/SimilarModelsTable";
+import CreatorModelsTable from "../../components/modelDetailsPage/CreatorModelsTable";
+import ModelDetailsTable from "../../components/modelDetailsPage/ModelDetailsTable";
+import ModelOverview from "../../components/modelDetailsPage/ModelOverview";
+import ModelPricingSummary from "../../components/ModelPricingSummary";
+import RunsHistoryChart from "../../components/modelDetailsPage/RunsHistoryChart";
 
 import calculateCreatorRank from "../../utils/calculateCreatorRank";
 import calculateModelRank from "../../utils/calculateModelRank";
