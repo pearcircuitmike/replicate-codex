@@ -58,7 +58,7 @@ export default function TableRow({ item, isHeader = false }) {
         {item?.description}
       </Td>
       <Td width="64px">
-        <Box width="64px" height="64px">
+        <Box width="64px" height="64px" overflow="hidden">
           <PreviewImage src={item?.example ? item.example : ""} />
         </Box>
       </Td>

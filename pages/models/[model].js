@@ -27,8 +27,8 @@ import RunsHistoryChart from "../../components/modelDetailsPage/RunsHistoryChart
 import calculateCreatorRank from "../../utils/calculateCreatorRank";
 import calculateModelRank from "../../utils/calculateModelRank";
 
-import { findSimilarModels } from "../../utils/findSimilarModels";
-import { findCreatorModels } from "../../utils/findCreatorModels";
+import { findSimilarModels } from "../../utils/modelsData";
+import { findCreatorModels } from "../../utils/modelsData";
 
 export async function getStaticPaths() {
   const modelsData = await fetchAllDataFromTable("modelsData");
