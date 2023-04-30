@@ -136,7 +136,7 @@ export default function Creator({ creator, models, allModels }) {
 }
 
 export async function getStaticPaths() {
-  const data = await fetchAllDataFromTable("modelsData");
+  const data = await fetchAllDataFromTable("replicateModelsData");
   const creators = Array.from(new Set(data.map((model) => model.creator)));
   const paths = creators.map((creator) => ({
     params: { creator: creator.toLowerCase() },
@@ -148,7 +148,7 @@ export async function getStaticPaths() {
 // Modify getStaticProps to fetch all models
 export async function getStaticProps({ params }) {
   const creator = params.creator;
-  const allModelsData = await fetchAllDataFromTable("modelsData");
+  const allModelsData = await fetchAllDataFromTable("replicateModelsData");
 
   const models = allModelsData.filter((model) => model.creator === creator);
 

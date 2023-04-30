@@ -1,7 +1,7 @@
 import supabase from "./supabaseClient";
 
-export async function fetchAllTags() {
-  const { data, error } = await supabase.from("modelsData").select("tags");
+export async function fetchAllTags(tableName) {
+  const { data, error } = await supabase.from(tableName).select("tags");
 
   if (error) {
     console.error("Error fetching all tags:", error);

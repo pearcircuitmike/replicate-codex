@@ -16,7 +16,7 @@ const FilterTags = ({ selectedTags, handleTagSelect }) => {
 
   useEffect(() => {
     async function fetchTags() {
-      const tags = await fetchAllTags();
+      const tags = await fetchAllTags("replicateModelsData");
       setAllTags(tags);
     }
 

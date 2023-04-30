@@ -19,7 +19,7 @@ const pageSize = 12;
 
 export async function getStaticProps() {
   const { data, totalCount } = await fetchModelsPaginated({
-    tableName: "modelsData",
+    tableName: "replicateModelsData",
     pageSize,
     currentPage: 1,
     searchValue: "",
@@ -39,7 +39,7 @@ const Models = ({ modelVals, totalCount }) => {
     setStateFilter(event.target.value);
     setCurrentPage(1);
     const { data, totalCount } = await fetchModelsPaginated({
-      tableName: "modelsData",
+      tableName: "replicateModelsData",
       pageSize,
       currentPage: 1,
       searchValue: event.target.value,
@@ -54,7 +54,7 @@ const Models = ({ modelVals, totalCount }) => {
   const handlePageChange = async (page) => {
     setCurrentPage(page);
     const { data } = await fetchModelsPaginated({
-      tableName: "modelsData",
+      tableName: "replicateModelsData",
       pageSize,
       currentPage: page,
       searchValue: stateFilter,

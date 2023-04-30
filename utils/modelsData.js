@@ -59,9 +59,9 @@ export async function fetchAllDataFromTable(tableName) {
   return dataArray;
 }
 
-export async function fetchModelDataById(id) {
+export async function fetchModelDataById(id, tableName) {
   const { data, error } = await supabase
-    .from("modelsData")
+    .from(tableName)
     .select("*")
     .eq("id", id)
     .single();

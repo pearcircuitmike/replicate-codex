@@ -19,7 +19,7 @@ export default function GalleryView({
   useEffect(() => {
     async function fetchData() {
       const { data, totalCount } = await fetchFilteredData({
-        tableName: "modelsData",
+        tableName: "replicateModelsData",
         tags: selectedTags,
         searchValue,
         sorts,
@@ -30,7 +30,7 @@ export default function GalleryView({
       setTotalCount(totalCount || 0);
 
       // Fetch all models data
-      const allData = await fetchAllDataFromTable("modelsData");
+      const allData = await fetchAllDataFromTable("replicateModelsData");
       setAllModels(allData);
     }
     fetchData();

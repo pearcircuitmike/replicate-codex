@@ -31,7 +31,8 @@ import { findSimilarModels } from "../../utils/modelsData";
 import { findCreatorModels } from "../../utils/modelsData";
 
 export async function getStaticPaths() {
-  const modelsData = await fetchAllDataFromTable("modelsData");
+  const modelsData = await fetchAllDataFromTable("replicateModelsData");
+
   const paths = modelsData.map((model) => ({
     params: { model: model.id.toString() },
   }));
@@ -40,8 +41,11 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const model = await fetchModelDataById(parseInt(params.model));
-  const modelsData = await fetchAllDataFromTable("modelsData");
+  const model = await fetchModelDataById(
+    parseInt(params.model),
+    "replicateModelsData"
+  );
+  const modelsData = await fetchAllDataFromTable("replicateModelsData");
 
   // Calculate model rank and creator rank
   const modelRank = calculateModelRank(modelsData, model.id);

@@ -54,7 +54,7 @@ export default function Home() {
   useEffect(() => {
     async function getData() {
       const { data, count } = await fetchDataFromTable({
-        tableName: "modelsData",
+        tableName: "replicateModelsData",
         tags: selectedTags,
         searchValue,
         sorts,

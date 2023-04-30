@@ -51,9 +51,15 @@ const TrendingModelsChart = ({ modelIds }) => {
     const prepareChartData = async () => {
       const datasets = await Promise.all(
         modelIds?.map(async (modelId, index) => {
-          const modelData = await fetchModelDataById(modelId);
+          const modelData = await fetchModelDataById(
+            modelId,
+            "replicateModelsData"
+          );
 
-          const runsHistory = await fetchRunsHistoryByModelId(modelId);
+          const runsHistory = await fetchRunsHistoryByModelId(
+            modelId,
+            "replicateModelsData"
+          );
 
           if (!runsHistory || runsHistory.length === 0) {
             console.warn(

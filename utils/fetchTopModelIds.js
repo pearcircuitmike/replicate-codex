@@ -3,7 +3,7 @@ import supabase from "./supabaseClient";
 export async function fetchTopModelIds(limit, selectedTags) {
   try {
     let query = supabase
-      .from("modelsData")
+      .from("replicateModelsData")
       .select("id")
       .order("runs", { ascending: false })
       .limit(limit);

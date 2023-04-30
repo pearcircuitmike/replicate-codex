@@ -30,7 +30,7 @@ export default function Trending() {
 
   useEffect(() => {
     async function fetchTags() {
-      const tags = await fetchAllTags();
+      const tags = await fetchAllTags("replicateModelsData");
       setAllTags(tags);
     }
     fetchTags();
@@ -39,7 +39,9 @@ export default function Trending() {
   useEffect(() => {
     async function fetchData() {
       const topModelIds = await fetchTopModelIds(10, selectedTags);
-      const modelDataPromises = topModelIds.map((id) => fetchModelDataById(id));
+      const modelDataPromises = topModelIds.map((id) =>
+        fetchModelDataById(id, "replicateModelsData")
+      );
       const topModels = await Promise.all(modelDataPromises);
       setModels(topModels);
     }

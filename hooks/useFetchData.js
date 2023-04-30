@@ -15,7 +15,7 @@ const useFetchData = (
     async function fetchData() {
       // Destructure both data and totalCount from the result
       const { data, totalCount } = await fetchFilteredData({
-        tableName: "modelsData",
+        tableName: "replicateModelsData",
         tags: selectedTags,
         searchValue,
         sorts,
