@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 const useFetchData = (
   fetchFilteredData,
+  tableName,
   searchValue,
   selectedTags,
   sorts,
@@ -15,7 +16,7 @@ const useFetchData = (
     async function fetchData() {
       // Destructure both data and totalCount from the result
       const { data, totalCount } = await fetchFilteredData({
-        tableName: "replicateModelsData",
+        tableName, // Pass the tableName argument here
         tags: selectedTags,
         searchValue,
         sorts,
@@ -26,7 +27,14 @@ const useFetchData = (
       setTotalCount(totalCount || 0); // Use totalCount or default to 0 if undefined
     }
     fetchData();
-  }, [fetchFilteredData, searchValue, selectedTags, sorts, currentPage]);
+  }, [
+    fetchFilteredData,
+    tableName,
+    searchValue,
+    selectedTags,
+    sorts,
+    currentPage,
+  ]);
 
   // Set current page to 1 when a value changes
   useEffect(() => {

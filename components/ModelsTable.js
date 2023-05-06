@@ -12,10 +12,13 @@ export default function ModelsTable(props) {
     searchValue,
     selectedTags,
     sorts,
+    tableName, // Add tableName prop here
   } = props;
 
+  // Pass tableName to useFetchData
   const { filteredData, totalCount } = useFetchData(
     fetchFilteredData,
+    tableName,
     searchValue,
     selectedTags,
     sorts,

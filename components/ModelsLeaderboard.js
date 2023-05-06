@@ -99,7 +99,7 @@ function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
 
                   <Td maxWidth="200px" isTruncated>
                     <a
-                      href={`/models/${model.id}`}
+                      href={`/models/${model?.platform}/${model?.id}`}
                       style={{
                         color: "teal",
                         textDecoration: "underline",

@@ -44,7 +44,7 @@ export default function TableRow({ item, isHeader = false }) {
       )}
       <Td maxW={isMobile ? "120px" : "180px"} isTruncated>
         <Link
-          href={`/models/${item?.id}`}
+          href={`/models/${item?.platform}/${item?.id}`}
           color="teal"
           textDecoration="underline"
         >
@@ -65,7 +65,7 @@ export default function TableRow({ item, isHeader = false }) {
       <Td maxW="180px">
         <Tag>{item?.tags}</Tag>
       </Td>
-      <Td isNumeric>{item?.runs.toLocaleString()}</Td>
+      <Td isNumeric>{item?.runs?.toLocaleString()}</Td>
       <Td isNumeric>${item?.costToRun ? item.costToRun : "-"}</Td>
     </>
   );

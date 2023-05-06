@@ -52,7 +52,7 @@ const ModelCard = ({ model, allModels }) => {
         justifyContent="space-between"
       >
         <Box>
-          <Link href={`/models/${model?.id}`} passHref>
+          <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
             <Box cursor="pointer">
               <Box
                 bgImage={`url(${
@@ -107,7 +107,7 @@ const ModelCard = ({ model, allModels }) => {
             </Text>
           </Box>
         </HStack>
-        <Link href={`/models/${model?.id}`} passHref>
+        <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
           <Button size="sm" colorScheme="blue" alignSelf="flex-start">
             View model details
           </Button>

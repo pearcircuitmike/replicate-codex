@@ -45,11 +45,13 @@ const CreatorModelsTable = ({ creatorModels }) => {
             displayedModels?.map((model) => (
               <Tr key={model.id}>
                 <Td>
-                  <Link href={`/models/${model.id}`}>{model.modelName}</Link>
+                  <Link href={`/models/${model?.platform}/${model?.id}`}>
+                    {model.modelName}
+                  </Link>
                 </Td>
 
                 <Td isTruncated>${model.costToRun ? model.costToRun : "?"}</Td>
-                <Td isTruncated>{model.runs.toLocaleString()}</Td>
+                <Td isTruncated>{model.runs?.toLocaleString()}</Td>
               </Tr>
             ))
           ) : (

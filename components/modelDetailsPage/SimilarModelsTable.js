@@ -41,7 +41,10 @@ const SimilarModelsTable = ({ similarModels }) => {
                 similarModels?.map((model) => (
                   <Tr key={model.id}>
                     <Td>
-                      <Link href={`/models/${model.id}`} color="blue.500">
+                      <Link
+                        href={`/models/${model?.platform}/${model?.id}`}
+                        color="blue.500"
+                      >
                         {model.modelName}
                       </Link>
                     </Td>

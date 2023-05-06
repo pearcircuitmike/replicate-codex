@@ -83,15 +83,18 @@ const ModelDetailsTable = ({ model }) => {
               </Td>
             </Tr>
             <Tr>
-              <Td>Demo Link</Td>
+              <Td>Model Link</Td>
               <Td>
                 <Link
-                  href={`https://replicate.com/${model?.creator}/${model?.modelName}/examples`}
+                  href={model.modelUrl}
                   isExternal
                   color="blue.500"
                   textDecoration="underline"
                 >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
+                  View on{" "}
+                  {model.platform.charAt(0).toUpperCase() +
+                    model.platform.slice(1)}{" "}
+                  <ExternalLinkIcon mx="2px" />
                 </Link>
               </Td>
             </Tr>
@@ -99,12 +102,15 @@ const ModelDetailsTable = ({ model }) => {
               <Td>API Spec</Td>
               <Td>
                 <Link
-                  href={`https://replicate.com/${model?.creator}/${model?.modelName}/api`}
+                  href={model.modelUrl}
                   isExternal
                   color="blue.500"
                   textDecoration="underline"
                 >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
+                  View on{" "}
+                  {model.platform.charAt(0).toUpperCase() +
+                    model.platform.slice(1)}{" "}
+                  <ExternalLinkIcon mx="2px" />
                 </Link>
               </Td>
             </Tr>
@@ -142,32 +148,6 @@ const ModelDetailsTable = ({ model }) => {
                 )}
               </Td>
             </Tr>
-            <Tr>
-              <Td>Examples</Td>
-              <Td>
-                <Link
-                  href={`https://replicate.com/${model?.creator}/${model?.modelName}/examples`}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
-                </Link>
-              </Td>
-            </Tr>
-            <Tr>
-              <Td>Versions</Td>
-              <Td>
-                <Link
-                  href={`https://replicate.com/${model?.creator}/${model?.modelName}/versions`}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on Replicate <ExternalLinkIcon mx="2px" />
-                </Link>
-              </Td>
-            </Tr>
           </Tbody>
         </Table>
 
@@ -192,7 +172,7 @@ const ModelDetailsTable = ({ model }) => {
           <Tbody>
             <Tr>
               <Td>Runs</Td>
-              <Td>{model?.runs ? model?.runs?.toLocaleString() : 0}</Td>
+              <Td>{model?.runs ? model?.runs?.toLocaleString() : "-"}</Td>
             </Tr>
             <Tr>
               <Td>Model Rank</Td>

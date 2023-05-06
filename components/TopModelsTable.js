@@ -62,7 +62,7 @@ const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
                 </Td>
                 <Td isTruncated maxW="150px">
                   <a
-                    href={`/models/${model.id}`}
+                    href={`/models/${model?.platform}/${model?.id}`}
                     style={{
                       color: "teal",
                       textDecoration: "underline",

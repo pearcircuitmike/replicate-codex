@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
-
 export default function SimilarModels({ currentModel, modelsData }) {
   const similarModels = modelsData
     ?.filter(
@@ -62,7 +61,7 @@ export default function SimilarModels({ currentModel, modelsData }) {
                   <Flex justifyContent="space-between">
                     <Text>
                       <Link
-                        href={`/models/${model.id}`}
+                        href={`/models/${model?.platform}/${model?.id}`}
                         textDecoration="underline"
                         color="teal"
                       >

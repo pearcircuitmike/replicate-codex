@@ -29,9 +29,8 @@ import ActiveSorts from "../components/tableControls/ActiveSorts.js";
 import { fetchDataFromTable } from "../utils/modelsData.js";
 
 const tabNameMap = {
-  modelsTable: 0,
-  galleryView: 1,
-  creatorsLeaderboard: 2,
+  replicateModelsTable: 0,
+  cerebriumModelsTable: 1,
 };
 
 const tabNameReverseMap = Object.fromEntries(
@@ -51,20 +50,6 @@ export default function Home() {
 
   const scrollRef = useRef(null); // Create a ref to store the scroll position
 
-  useEffect(() => {
-    async function getData() {
-      const { data, count } = await fetchDataFromTable({
-        tableName: "replicateModelsData",
-        tags: selectedTags,
-        searchValue,
-        sorts,
-        pageSize: 10,
-        currentPage: 1,
-      });
-      setData(data);
-    }
-    getData();
-  }, [searchValue, selectedTags, sorts]);
   const updateUrlParams = (tab, sorts, tags) => {
     const params = new URLSearchParams();
 
@@ -204,15 +189,14 @@ export default function Home() {
             size={isMobile ? "sm" : "md"}
           >
             <TabList mt={isMobile ? 0 : 5}>
-              <Tab>Table</Tab>
-              <Tab>Gallery</Tab>
-              <Tab>Creators</Tab>
-              {/*    <Tab>Leaderboard</Tab> */}
+              <Tab>Replicate</Tab>
+              <Tab>Cerebrium</Tab>
             </TabList>
             <TabPanels>
               <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
                 <ModelsTable
                   fetchFilteredData={fetchDataFromTable}
+                  tableName={"replicateModelsData"}
                   selectedTags={selectedTags}
                   searchValue={searchValue}
                   sorts={sorts}
@@ -220,18 +204,16 @@ export default function Home() {
                   setCurrentPage={setCurrentPage}
                 />
               </TabPanel>
-              <TabPanel pl={0} pr={0}>
-                <GalleryView
+              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
+                <ModelsTable
                   fetchFilteredData={fetchDataFromTable}
+                  tableName={"cerebriumModelsData"}
                   selectedTags={selectedTags}
                   searchValue={searchValue}
                   sorts={sorts}
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
                 />
-              </TabPanel>
-              <TabPanel pl={0} pr={0}>
-                <CreatorsLeaderboard searchValue={searchValue} />
               </TabPanel>
             </TabPanels>
           </Tabs>

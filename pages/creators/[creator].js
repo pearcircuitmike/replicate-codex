@@ -104,7 +104,7 @@ export default function Creator({ creator, models, allModels }) {
               width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
               p="4"
             >
-              <Link href={`/models/${model.id}`}>
+              <Link href={`/models/${model?.platform}/${model?.id}`}>
                 <PreviewImage src={model.example} />
               </Link>
 
