@@ -28,7 +28,7 @@ const Hero = () => {
           fontWeight="bold"
           textAlign="center"
         >
-          Search Replicate AI Models
+          Search AI Models
         </Heading>
         <Text
           fontSize={isMobile ? "md" : "lg"}
