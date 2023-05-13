@@ -10,7 +10,6 @@ import {
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../../../components/MetaTags";
 import PreviewImage from "../../../components/PreviewImage";
-import NewsletterSubscription from "../../../components/NewsletterSubscription";
 
 import {
   fetchModelDataById,
@@ -84,8 +83,6 @@ export default function ModelPage({ model, modelsData }) {
               </VStack>
             </GridItem>
             <GridItem>
-              <NewsletterSubscription />
-
               <ModelDetailsTable model={model} />
               <RunsHistoryChart modelId={model.id} />
             </GridItem>
