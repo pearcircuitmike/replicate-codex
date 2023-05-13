@@ -40,10 +40,9 @@ const Hero = () => {
         </Text>
         <Text fontSize={isMobile ? "md" : "lg"} textAlign="center">
           <b>
-            Show off your company to 5,000+ AI founders and devs - sponsor the
-            site. Your ad here for $49!{" "}
+            Turn 5,000+ AI founders and devs into customers - advertise with us:{" "}
             <Link
-              href="https://notes.replicatecodex.com/sponsor-the-site/"
+              href="https://www.passionfroot.me/replicate-codex"
               color="blue.500"
               textDecoration="underline"
             >
