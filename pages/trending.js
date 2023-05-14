@@ -88,7 +88,7 @@ export default function Trending() {
   return (
     <>
       <MetaTags
-        title="Trending Models | AImodels.fyi"
+        title="Trending Models | AIModels.fyi"
         description="Discover the top trending AI models in the world."
       />
       <Container maxW="4xl">

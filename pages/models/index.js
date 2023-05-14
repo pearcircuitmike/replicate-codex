@@ -65,7 +65,7 @@ const Models = ({ modelVals, totalCount }) => {
   return (
     <>
       <MetaTags
-        title={"AImodels.fyi | All Models"}
+        title={"AIModels.fyi | All Models"}
         description={"List of all AI models."}
       />
       <Container maxW="5xl">

@@ -147,7 +147,7 @@ export default function Home() {
   return (
     <>
       <MetaTags
-        title={"AImodels.fyi - AI model details"}
+        title={"AIModels.fyi - AI model details"}
         description={
           "Discover AI models to play and build with on platforms like Replicate, Cerebrium, HuggingFace, and more."
         }

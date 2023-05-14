@@ -25,7 +25,7 @@ const Navbar = () => {
           {/*LOGO*/}
           <Heading fontSize="2xl">
             <Link href="/" aria-label="Home" my={5} w="100%">
-              <div>🤖 AImodels.fyi</div>
+              <div>🤖 AIModels.fyi</div>
             </Link>
           </Heading>
         </Flex>
@@ -86,7 +86,7 @@ const Navbar = () => {
               <Heading fontSize="2xl">
                 <Link href="/" aria-label="Home" my={5} w="100%">
                   <span onClick={() => changeDisplay("none")}>
-                    🤖 AImodels.fyi
+                    🤖 AIModels.fyi
                   </span>
                 </Link>
               </Heading>
