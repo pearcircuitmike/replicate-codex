@@ -45,7 +45,7 @@ const Navbar = () => {
                 🔥 Trending
               </Link>
               <Link
-                href="https://notes.replicatecodex.com"
+                href="https://notes.aimodels.fyi"
                 aria-label="notes"
                 m={5}
                 w="100%"
@@ -114,7 +114,7 @@ const Navbar = () => {
             </Link>
 
             <Link
-              href="https://notes.replicatecodex.com"
+              href="https://notes.aimodels.fyi"
               aria-label="notes"
               m={"10px"}
               w="100%"
