@@ -64,8 +64,8 @@ const Creators = ({ creatorVals, totalCount }) => {
   return (
     <>
       <MetaTags
-        title={"Replicate Codex | All Creators"}
-        description={"Search AI model creators on the Replicate platform."}
+        title={"AImodels.fyi | All Creators"}
+        description={"Search AI model creators."}
       />
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>

@@ -65,8 +65,8 @@ const Models = ({ modelVals, totalCount }) => {
   return (
     <>
       <MetaTags
-        title={"Replicate Codex | All Models"}
-        description={"List of all AI models on the Replicate platform."}
+        title={"AImodels.fyi | All Models"}
+        description={"List of all AI models."}
       />
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>

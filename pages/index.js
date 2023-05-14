@@ -147,9 +147,9 @@ export default function Home() {
   return (
     <>
       <MetaTags
-        title={"Replicate Codex - AI model details"}
+        title={"AImodels.fyi - AI model details"}
         description={
-          "Replicate lets you easily deploy machine learning models. Replicate Codex helps you discover AI models to play and build with on Replicate."
+          "Discover AI models to play and build with on platforms like Replicate, Cerebrium, HuggingFace, and more."
         }
       />
 
