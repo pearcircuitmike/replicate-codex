@@ -80,7 +80,7 @@ export default function SimilarModels({ currentModel, modelsData }) {
                     color="teal"
                     mt={2}
                   >
-                    Try on Replicate <ExternalLinkIcon />
+                    Try on Platform <ExternalLinkIcon />
                   </Link>
                 </Box>
               </Box>

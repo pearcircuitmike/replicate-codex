@@ -67,7 +67,7 @@ function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
               <Th>Example</Th>
               <Th>Cost to Run</Th>
               <Th>Description</Th>
-              <Th>Replicate URL</Th>
+              <Th>URL</Th>
               <Th>Last Updated</Th>
               <Th>Tags</Th>
             </Tr>

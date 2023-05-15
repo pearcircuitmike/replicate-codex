@@ -16,7 +16,7 @@ const NewsletterSubscription = () => {
           <div id="custom-substack-embed"></div>
 
           <iframe
-            src="https://replicatecodex.substack.com/embed"
+            src="https://aimodels.substack.com/embed"
             width="100%"
             height="auto"
             border="0px solid #EEE"
