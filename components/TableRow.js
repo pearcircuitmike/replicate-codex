@@ -33,7 +33,7 @@ export default function TableRow({ item, isHeader = false }) {
         <Td maxW={isMobile ? "120px" : "180px"} isTruncated>
           <Skeleton isLoaded={item}>
             <Link
-              href={`/creators/${item?.creator}`}
+              href={`/creators/${item?.platform}/${item?.creator}`}
               color="teal"
               textDecoration="underline"
             >

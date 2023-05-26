@@ -56,7 +56,7 @@ const ModelDetailsTable = ({ model }) => {
               <Td>Creator</Td>
               <Td>
                 <Link
-                  href={`/creators/${model?.creator}`}
+                  href={`/creators/${model?.platform}/${model?.creator}`}
                   color="blue.500"
                   textDecoration="underline"
                 >

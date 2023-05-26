@@ -75,10 +75,12 @@ const ModelCard = ({ model, allModels }) => {
             <Avatar
               src={`https://github.com/${model.creator}.png`}
               size="sm"
-              onClick={() => window.open(`/creators/${model.creator}`)}
+              onClick={() =>
+                window.open(`/creators/${model.platform}/${model.creator}`)
+              }
               cursor="pointer"
             />
-            <Link href={`/creators/${model.creator}`}>
+            <Link href={`/creators/${model.platform}/${model.creator}`}>
               <Text textDecoration="underline" color="blue.500">
                 {model.creator}
               </Text>

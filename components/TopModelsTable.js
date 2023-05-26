@@ -74,7 +74,7 @@ const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
                 <Td>{formatNumber(model.runs)}</Td>
                 <Td>
                   <a
-                    href={`/creators/${model.creator}`}
+                    href={`/creators/${model.platform}/${model.creator}`}
                     style={{
                       color: "teal",
                       textDecoration: "underline",

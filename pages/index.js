@@ -191,6 +191,7 @@ export default function Home() {
             <TabList mt={isMobile ? 0 : 5}>
               <Tab>Replicate</Tab>
               <Tab>Cerebrium</Tab>
+              <Tab>DeepInfra</Tab>
             </TabList>
             <TabPanels>
               <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
@@ -208,6 +209,17 @@ export default function Home() {
                 <ModelsTable
                   fetchFilteredData={fetchDataFromTable}
                   tableName={"cerebriumModelsData"}
+                  selectedTags={selectedTags}
+                  searchValue={searchValue}
+                  sorts={sorts}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+              </TabPanel>
+              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
+                <ModelsTable
+                  fetchFilteredData={fetchDataFromTable}
+                  tableName={"deepInfraModelsData"}
                   selectedTags={selectedTags}
                   searchValue={searchValue}
                   sorts={sorts}

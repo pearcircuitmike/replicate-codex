@@ -74,7 +74,10 @@ const CreatorCard = ({ creator }) => {
           </Text>
         </Box>
         <Flex justifyContent="center" mt={3}>
-          <Link href={`/creators/${creator.creator}`} passHref>
+          <Link
+            href={`/creators/${creator.platform}/${creator.creator}`}
+            passHref
+          >
             <Button size="sm" colorScheme="blue">
               View profile
             </Button>

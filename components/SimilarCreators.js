@@ -50,7 +50,11 @@ export default function SimilarCreators({ similarCreators, data }) {
                   />
                   <Box p="6">
                     <Heading as="h3" size="lg" mb="2">
-                      <Link href={`/creators/${creator.toLowerCase()}`}>
+                      <Link
+                        href={`/creators/${
+                          data.platform
+                        }/${creator.toLowerCase()}`}
+                      >
                         {creator}
                       </Link>
                     </Heading>
@@ -59,7 +63,11 @@ export default function SimilarCreators({ similarCreators, data }) {
                       <Text> Total models: {creatorTotalModels}</Text>
                     </Box>
                     <Box>
-                      <Link href={`/creators/${creator.toLowerCase()}`}>
+                      <Link
+                        href={`/creators/${
+                          data.platform
+                        }/${creator.toLowerCase()}`}
+                      >
                         <span
                           style={{ textDecoration: "underline", color: "teal" }}
                         >

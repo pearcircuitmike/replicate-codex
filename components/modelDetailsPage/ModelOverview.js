@@ -10,7 +10,10 @@ const ModelOverview = ({ model }) => {
             {model?.modelName}
           </Heading>
           <Text>
-            <Link href={`/creators/${model?.creator}`} color="blue.500">
+            <Link
+              href={`/creators/${model?.platform}/${model?.creator}`}
+              color="blue.500"
+            >
               {model?.creator}
             </Link>
           </Text>

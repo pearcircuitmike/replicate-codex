@@ -60,7 +60,7 @@ function CreatorsLeaderboard({ searchValue }) {
                 <Td isNumeric>{creatorData.total_runs.toLocaleString()}</Td>
                 <Td maxWidth="200px" isTruncated>
                   <a
-                    href={`/creators/${creatorData.creator}`}
+                    href={`/creators/${creatorData.platform}/${creatorData.creator}`}
                     style={{
                       color: "teal",
                       textDecoration: "underline",

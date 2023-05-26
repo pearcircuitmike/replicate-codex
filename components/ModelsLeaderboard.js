@@ -87,7 +87,7 @@ function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
                   <Td isNumeric>{model.runs.toLocaleString()}</Td>
                   <Td maxWidth="200px" isTruncated>
                     <a
-                      href={`/creators/${model.creator}`}
+                      href={`/creators/${model.platform}/${model.creator}`}
                       style={{
                         color: "teal",
                         textDecoration: "underline",

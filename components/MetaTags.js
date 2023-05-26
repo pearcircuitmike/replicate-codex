@@ -12,14 +12,17 @@ export default function MetaTags({ title, description }) {
       <meta property="og:description" content={description} />
 
       <meta property="og:url" content="https://aimodels.fyi" />
-      <meta property="og:image" content="https://aimodels.fyi/socialImg.png" />
+      <meta
+        property="og:image"
+        content="https://og-examples.vercel.sh/api/static"
+      />
       <meta property="og:type" content="website" />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta property="twitter:description" content={description} />
       <meta
         property="twitter:image"
-        content="https://aimodels.fyi/socialImg.png"
+        content="https://og-examples.vercel.sh/api/static"
       />
 
       <link rel="icon" href="/favicon.ico" />
