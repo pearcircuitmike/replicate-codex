@@ -80,8 +80,8 @@ export default async function handler(request) {
           }
           alt="Model Image"
           style={{
-            width: "300px",
-            height: "300px",
+            width: "200px",
+            height: "200px",
             borderRadius: "50%",
             objectFit: "cover",
           }}
@@ -96,7 +96,7 @@ export default async function handler(request) {
         >
           <h1
             style={{
-              fontSize: "32px",
+              fontSize: "70px",
               fontWeight: "bold",
               marginBottom: "8px",
             }}
@@ -105,15 +105,15 @@ export default async function handler(request) {
             <span style={{ fontFamily: "LatoBold" }}> {modelName}</span>
           </h1>
 
-          <p style={{ fontSize: "20px", marginBottom: "32px" }}>
+          <p style={{ fontSize: "35px", marginBottom: "25px" }}>
             {description}
           </p>
           <div
             style={{
               display: "flex",
               justifyContent: "center",
-              fontSize: "20",
-              maxWidth: "800px",
+              fontSize: "30",
+              maxWidth: "1000px",
             }}
           >
             <table>
@@ -146,7 +146,7 @@ export default async function handler(request) {
                         margin: "auto",
                       }}
                     >
-                      {costToRun}
+                      ${costToRun}
                     </span>
                   </td>
                   <td
@@ -188,7 +188,8 @@ export default async function handler(request) {
             style={{
               display: "flex",
               justifyContent: "center",
-              maxWidth: "800px",
+              maxWidth: "1000px",
+              fontSize: "20",
             }}
           >
             <table>
@@ -262,16 +263,6 @@ export default async function handler(request) {
               </tbody>
             </table>
           </div>
-
-          <p
-            style={{
-              fontSize: "20px",
-              fontFamily: "LatoRegular",
-              marginTop: "32px",
-            }}
-          >
-            Powered by AIModels.fyi
-          </p>
         </div>
       </div>
     ),

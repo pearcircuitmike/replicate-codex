@@ -3,6 +3,7 @@ import Head from "next/head";
 export default function MetaTags({
   title,
   description,
+  ogModelDescription,
   creator,
   modelName,
   ogImgUrl,
@@ -16,6 +17,7 @@ export default function MetaTags({
     creator,
     modelName,
     description,
+    ogModelDescription,
     ogImgUrl,
     platform,
     tags,
