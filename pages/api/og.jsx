@@ -26,7 +26,7 @@ export default async function handler(request) {
   const creator = searchParams.get("creator");
   const modelName = searchParams.get("modelName");
   const description = searchParams.get("description");
-  const ogImgUrl = searchParams.get("ogImgUrl");
+  const ogImgUrl = decodeURIComponent(searchParams.get("ogImgUrl"));
 
   const platform = searchParams.get("platform");
   const tags = searchParams.get("tags");
