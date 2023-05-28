@@ -89,9 +89,6 @@ export default async function handler(request) {
             textAlign: "center",
           }}
         >
-          {tags && (
-            <p style={{ fontSize: "20px", marginBottom: "16px" }}>{tags}</p>
-          )}
           <h1
             style={{
               fontSize: "32px",
