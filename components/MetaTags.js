@@ -1,6 +1,31 @@
 import Head from "next/head";
 
-export default function MetaTags({ title, description }) {
+export default function MetaTags({
+  title,
+  description,
+  creator,
+  modelName,
+  ogImgUrl,
+  platform,
+  tags,
+  costToRun,
+  avgCompletionTime,
+  predictionHardware,
+}) {
+  const params = new URLSearchParams({
+    creator,
+    modelName,
+    description,
+    ogImgUrl,
+    platform,
+    tags,
+    costToRun,
+    avgCompletionTime,
+    predictionHardware,
+  });
+
+  const ogImageUrl = `https://aimodels.fyi/api/static?${params.toString()}`;
+
   return (
     <Head>
       <meta httpEquiv="content-language" content="en-us" />
@@ -12,18 +37,12 @@ export default function MetaTags({ title, description }) {
       <meta property="og:description" content={description} />
 
       <meta property="og:url" content="https://aimodels.fyi" />
-      <meta
-        property="og:image"
-        content="https://og-examples.vercel.sh/api/static?imageUrl=https://aimodels.fyi/socialImg.png"
-      />
+      <meta property="og:image" content={ogImageUrl} />
       <meta property="og:type" content="website" />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta property="twitter:description" content={description} />
-      <meta
-        property="twitter:image"
-        content="https://og-examples.vercel.sh/api/static"
-      />
+      <meta property="twitter:image" content={ogImageUrl} />
 
       <link rel="icon" href="/favicon.ico" />
     </Head>
