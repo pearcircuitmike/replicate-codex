@@ -31,6 +31,8 @@ export default async function handler(request) {
   const creator = searchParams.get("creator");
   const modelName = searchParams.get("modelName");
   const description = searchParams.get("description");
+  const ogModelDescription = searchParams.get("ogModelDescription");
+
   const ogImgUrl = decodeURIComponent(searchParams.get("ogImgUrl"));
 
   const platform = searchParams.get("platform");
@@ -108,7 +110,7 @@ export default async function handler(request) {
           <p
             style={{ fontSize: "35px", marginBottom: "25px", color: "#718096" }}
           >
-            {description}
+            {ogModelDescription}
           </p>
           <div
             style={{
@@ -148,7 +150,7 @@ export default async function handler(request) {
                         margin: "auto",
                       }}
                     >
-                      ${costToRun}
+                      ${costToRun ? costToRun : "?"}
                     </span>
                   </td>
                   <td
@@ -163,7 +165,7 @@ export default async function handler(request) {
                         margin: "auto",
                       }}
                     >
-                      {avgCompletionTime}
+                      {avgCompletionTime ? avgCompletionTime : "?"}
                     </span>
                   </td>
                   <td
@@ -178,7 +180,7 @@ export default async function handler(request) {
                         margin: "auto",
                       }}
                     >
-                      {predictionHardware}
+                      {predictionHardware ? predictionHardware : "N/A"}
                     </span>
                   </td>
                 </tr>
