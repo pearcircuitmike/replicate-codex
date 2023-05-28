@@ -65,9 +65,9 @@ export default async function handler(request) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: "40px",
+          paddingTop: "20px",
           paddingBottom: "20px",
-          borderBottom: "15px",
+          borderBottom: "25px",
           borderColor: "#5a91a0",
           fontFamily: "LatoRegular",
           backgroundColor: "white",
@@ -80,9 +80,9 @@ export default async function handler(request) {
           }
           alt="Model Image"
           style={{
-            width: "200px",
-            height: "200px",
-            borderRadius: "50%",
+            width: "250px",
+            height: "250px",
+            borderRadius: "5%",
             objectFit: "cover",
           }}
         />
@@ -105,7 +105,9 @@ export default async function handler(request) {
             <span style={{ fontFamily: "LatoBold" }}> {modelName}</span>
           </h1>
 
-          <p style={{ fontSize: "35px", marginBottom: "25px" }}>
+          <p
+            style={{ fontSize: "35px", marginBottom: "25px", color: "#718096" }}
+          >
             {description}
           </p>
           <div
@@ -190,6 +192,7 @@ export default async function handler(request) {
               justifyContent: "center",
               maxWidth: "1000px",
               fontSize: "20",
+              color: "#718096",
             }}
           >
             <table>
@@ -205,7 +208,6 @@ export default async function handler(request) {
                     <span
                       style={{
                         margin: "auto",
-                        fontFamily: "LatoLight",
                       }}
                     >
                       Platform
@@ -221,7 +223,6 @@ export default async function handler(request) {
                     <span
                       style={{
                         margin: "auto",
-                        fontFamily: "LatoLight",
                       }}
                     >
                       Cost To Run
@@ -237,7 +238,6 @@ export default async function handler(request) {
                     <span
                       style={{
                         margin: "auto",
-                        fontFamily: "LatoLight",
                       }}
                     >
                       Avg Completion Time
@@ -253,7 +253,6 @@ export default async function handler(request) {
                     <span
                       style={{
                         margin: "auto",
-                        fontFamily: "LatoLight",
                       }}
                     >
                       Prediction Hardware
