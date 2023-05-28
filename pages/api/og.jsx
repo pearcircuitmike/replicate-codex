@@ -126,7 +126,13 @@ export default async function handler(request) {
                       width: "25%",
                     }}
                   >
-                    {toTitleCase(platform)}
+                    <span
+                      style={{
+                        margin: "auto",
+                      }}
+                    >
+                      {toTitleCase(platform)}
+                    </span>
                   </td>
                   <td
                     style={{
@@ -264,7 +270,7 @@ export default async function handler(request) {
               marginTop: "32px",
             }}
           >
-            Click to view more on AIModels.fyi
+            Powered by AIModels.fyi
           </p>
         </div>
       </div>
