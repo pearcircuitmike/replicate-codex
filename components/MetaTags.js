@@ -24,7 +24,7 @@ export default function MetaTags({
     predictionHardware,
   });
 
-  const ogImageUrl = `https://aimodels.fyi/api/static?${params.toString()}`;
+  const ogImageUrl = `https://aimodels.fyi/api/og?${params.toString()}`;
 
   return (
     <Head>
