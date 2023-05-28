@@ -21,6 +21,11 @@ export default async function handler(request) {
   const fontRegularData = await fontRegular;
   const fontBoldData = await fontBold;
   const fontLightData = await fontLight;
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
 
   const { searchParams } = request.nextUrl;
   const creator = searchParams.get("creator");
@@ -121,13 +126,7 @@ export default async function handler(request) {
                       width: "25%",
                     }}
                   >
-                    <span
-                      style={{
-                        margin: "auto",
-                      }}
-                    >
-                      {platform}
-                    </span>
+                    {toTitleCase(platform)}
                   </td>
                   <td
                     style={{
