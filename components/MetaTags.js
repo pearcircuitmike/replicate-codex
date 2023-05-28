@@ -14,7 +14,7 @@ export default function MetaTags({ title, description }) {
       <meta property="og:url" content="https://aimodels.fyi" />
       <meta
         property="og:image"
-        content="https://og-examples.vercel.sh/api/static"
+        content="https://og-examples.vercel.sh/api/static?imageUrl=https://aimodels.fyi/socialImg.png"
       />
       <meta property="og:type" content="website" />
 

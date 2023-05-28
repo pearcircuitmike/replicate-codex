@@ -69,6 +69,14 @@ export default function ModelPage({ model, modelsData }) {
       <MetaTags
         title={`AI model details - ${model.modelName}`}
         description={`Details about the ${model.modelName} model by ${model.creator}`}
+        creator={model.creator}
+        modelName={model.modelName}
+        ogImgUrl={model.example} // assuming 'ogImgUrl' is a property on the model object
+        platform={model.platform} // assuming 'platform' is a property on the model object
+        tags={model.tags} // assuming 'tags' is a property on the model object
+        costToRun={model.costToRun} // assuming 'costToRun' is a property on the model object
+        avgCompletionTime={model.avgCompletionTime} // assuming 'avgCompletionTime' is a property on the model object
+        predictionHardware={model.predictionHardware} // assuming 'predictionHardware' is a property on the model object
       />
       <Box overflowX="hidden">
         <Container maxW="container.xl" py="12">
