@@ -41,9 +41,9 @@ export default async function handler(request) {
   const avgCompletionTime = searchParams.get("avgCompletionTime");
   const predictionHardware = searchParams.get("predictionHardware");
 
-  let maxLineLength = 69; // Set the maximum length to fit your design.
+  const maxLineLength = 69; // Set the maximum length to fit your design.
 
-  let truncatedDescription = ogModelDescription;
+  const truncatedDescription = ogModelDescription;
 
   if (ogModelDescription.length > maxLineLength) {
     truncatedDescription =
