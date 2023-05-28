@@ -41,6 +41,15 @@ export default async function handler(request) {
   const avgCompletionTime = searchParams.get("avgCompletionTime");
   const predictionHardware = searchParams.get("predictionHardware");
 
+  let maxLineLength = 69; // Set the maximum length to fit your design.
+
+  let truncatedDescription = ogModelDescription;
+
+  if (ogModelDescription.length > maxLineLength) {
+    truncatedDescription =
+      ogModelDescription.substring(0, maxLineLength - 3) + "...";
+  }
+
   if (!creator || !modelName || !description) {
     return new ImageResponse(
       (
@@ -110,7 +119,7 @@ export default async function handler(request) {
           <p
             style={{ fontSize: "35px", marginBottom: "25px", color: "#718096" }}
           >
-            {ogModelDescription}
+            {truncatedDescription}
           </p>
           <div
             style={{
