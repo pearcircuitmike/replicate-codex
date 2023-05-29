@@ -1,17 +1,17 @@
 import Head from "next/head";
 
 export default function MetaTags({
-  title,
-  description,
-  ogModelDescription,
-  creator,
-  modelName,
-  ogImgUrl,
-  platform,
-  tags,
-  costToRun,
-  avgCompletionTime,
-  predictionHardware,
+  title = "AI Models", // default title
+  description = "Explore the world of AI Models.", // default description
+  ogModelDescription = "",
+  creator = "",
+  modelName = "",
+  ogImgUrl = "https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg", // default image url
+  platform = "",
+  tags = "",
+  costToRun = "",
+  avgCompletionTime = "",
+  predictionHardware = "",
 }) {
   const params = new URLSearchParams({
     creator,

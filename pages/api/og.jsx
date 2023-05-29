@@ -51,9 +51,12 @@ export default async function handler(request) {
   }
 
   if (
-    creator != undefined &&
-    modelName != undefined &&
-    description != undefined
+    creator &&
+    creator !== "" &&
+    modelName &&
+    modelName !== "" &&
+    description &&
+    description !== ""
   ) {
     return new ImageResponse(
       (
