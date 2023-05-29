@@ -45,7 +45,7 @@ export default async function handler(request) {
 
   let truncatedDescription = ogModelDescription;
 
-  if (ogModelDescription.length > maxLineLength) {
+  if (ogModelDescription?.length > maxLineLength) {
     truncatedDescription =
       ogModelDescription.substring(0, maxLineLength - 3) + "...";
   }
@@ -53,11 +53,10 @@ export default async function handler(request) {
   if (!creator || !modelName || !description) {
     return new ImageResponse(
       (
-        <>
-          Visit with parameters:
-          ?creator=John&modelName=MyModel&description=This is my
-          model&ogImgUrl=https://example.com/image.png
-        </>
+        <img
+          src="https://aimodels.fyi/socialImg.png"
+          alt="social og img fallback"
+        />
       ),
       {
         width: 1200,
