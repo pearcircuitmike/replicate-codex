@@ -155,7 +155,10 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        ${costToRun ? costToRun : "?"}
+                        $
+                        {costToRun != null && costToRun.length > 0
+                          ? costToRun
+                          : "?"}
                       </span>
                     </td>
                     <td
@@ -170,7 +173,11 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        {avgCompletionTime ? avgCompletionTime : "?"}s
+                        {avgCompletionTime != null &&
+                        avgCompletionTime.length > 0
+                          ? avgCompletionTime
+                          : "?"}
+                        s
                       </span>
                     </td>
                     <td
@@ -185,7 +192,10 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        {predictionHardware ? predictionHardware : "N/A"}
+                        {predictionHardware != null &&
+                        predictionHardware.length > 0
+                          ? predictionHardware
+                          : "N/A"}
                       </span>
                     </td>
                   </tr>
