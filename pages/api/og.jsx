@@ -170,7 +170,7 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        {avgCompletionTime ? avgCompletionTime : "?"}
+                        {avgCompletionTime ? avgCompletionTime : "?"}s
                       </span>
                     </td>
                     <td
