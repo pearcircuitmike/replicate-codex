@@ -26,6 +26,9 @@ export default async function handler(request) {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
   };
+  function nonEmptyString(str) {
+    return str != null && str.trim().length > 0;
+  }
 
   const { searchParams } = request.nextUrl;
   const creator = searchParams.get("creator");
@@ -51,12 +54,9 @@ export default async function handler(request) {
   }
 
   if (
-    creator &&
-    creator !== "" &&
-    modelName &&
-    modelName !== "" &&
-    description &&
-    description !== ""
+    nonEmptyString(creator) &&
+    nonEmptyString(modelName) &&
+    nonEmptyString(description)
   ) {
     return new ImageResponse(
       (
@@ -155,10 +155,7 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        $
-                        {costToRun != null && costToRun.length > 0
-                          ? costToRun
-                          : "?"}
+                        ${nonEmptyString(costToRun) ? costToRun : "?"}
                       </span>
                     </td>
                     <td
@@ -173,8 +170,7 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        {avgCompletionTime != null &&
-                        avgCompletionTime.length > 0
+                        {nonEmptyString(avgCompletionTime)
                           ? avgCompletionTime
                           : "?"}
                         s
@@ -192,8 +188,7 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        {predictionHardware != null &&
-                        predictionHardware.length > 0
+                        {nonEmptyString(predictionHardware)
                           ? predictionHardware
                           : "N/A"}
                       </span>
