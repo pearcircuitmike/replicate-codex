@@ -155,7 +155,7 @@ export default async function handler(request) {
                           margin: "auto",
                         }}
                       >
-                        ${nonEmptyString(costToRun) ? costToRun : "?"}
+                        {nonEmptyString(costToRun) ? "$" + costToRun : "-"}
                       </span>
                     </td>
                     <td
@@ -171,9 +171,8 @@ export default async function handler(request) {
                         }}
                       >
                         {nonEmptyString(avgCompletionTime)
-                          ? avgCompletionTime
-                          : "?"}
-                        s
+                          ? avgCompletionTime + "s"
+                          : "-"}
                       </span>
                     </td>
                     <td
