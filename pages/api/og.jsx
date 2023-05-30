@@ -27,7 +27,7 @@ export default async function handler(request) {
     });
   };
   function nonEmptyString(str) {
-    return str != null && str.trim().length > 0;
+    return str != null && str !== "null" && str.trim().length > 0;
   }
 
   const { searchParams } = request.nextUrl;
