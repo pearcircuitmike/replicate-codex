@@ -31,6 +31,7 @@ import { fetchDataFromTable } from "../utils/modelsData.js";
 const tabNameMap = {
   replicateModelsTable: 0,
   cerebriumModelsTable: 1,
+  deepInfraModelsTable: 2,
 };
 
 const tabNameReverseMap = Object.fromEntries(

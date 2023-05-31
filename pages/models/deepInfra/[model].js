@@ -32,7 +32,6 @@ import { findCreatorModels } from "../../../utils/modelsData";
 export async function getStaticPaths() {
   const modelsData = await fetchAllDataFromTable("deepInfraModelsData");
 
-  console.log(modelsData);
   const paths = modelsData.map((model) => ({
     params: { model: model.id.toString() },
   }));
