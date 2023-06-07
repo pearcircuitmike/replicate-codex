@@ -63,7 +63,7 @@ const CreatorModelsTable = ({ creatorModels }) => {
       </Table>
       {creatorModels?.length > maxToShow && (
         <Link
-          href={`/${creatorModels[0]?.platform}/${creatorModels[0]?.creator}`}
+          href={`/creators/${creatorModels[0]?.platform}/${creatorModels[0]?.creator}`}
           textDecoration="underline"
           color="blue.500"
         >
