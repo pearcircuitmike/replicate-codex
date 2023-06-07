@@ -30,18 +30,27 @@ import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 
 export async function getStaticPaths() {
-  const modelsData = await fetchAllDataFromTable("cerebriumModelsData");
+  const platforms = ["replicate", "cerebrium", "deepInfra"];
+  const paths = [];
 
-  const paths = modelsData.map((model) => ({
-    params: { model: model.id.toString() },
-  }));
+  for (const platform of platforms) {
+    const modelsData = await fetchAllDataFromTable(`${platform}ModelsData`);
+    for (const model of modelsData) {
+      paths.push({
+        params: { model: model.id.toString(), platform },
+      });
+    }
+  }
 
   return { paths, fallback: false };
 }
 
 export async function getStaticProps({ params }) {
-  const model = await fetchModelDataById(params.model, "cerebriumModelsData");
-  const modelsData = await fetchAllDataFromTable("cerebriumModelsData");
+  const model = await fetchModelDataById(params.model, params.platform);
+
+  const modelsData = await fetchAllDataFromTable(
+    `${params.platform}ModelsData`
+  );
 
   // Calculate model rank and creator rank
   const modelRank = calculateModelRank(modelsData, model.id);
@@ -66,15 +75,6 @@ export default function ModelPage({ model, modelsData }) {
       <MetaTags
         title={`AI model details - ${model.modelName}`}
         description={`Details about the ${model.modelName} model by ${model.creator}`}
-        ogModelDescription={model.description}
-        creator={model.creator}
-        modelName={model.modelName}
-        ogImgUrl={model.example} // assuming 'ogImgUrl' is a property on the model object
-        platform={model.platform} // assuming 'platform' is a property on the model object
-        tags={model.tags} // assuming 'tags' is a property on the model object
-        costToRun={model.costToRun} // assuming 'costToRun' is a property on the model object
-        avgCompletionTime={model.avgCompletionTime} // assuming 'avgCompletionTime' is a property on the model object
-        predictionHardware={model.predictionHardware} // assuming 'predictionHardware' is a property on the model object
       />
       <Box overflowX="hidden">
         <Container maxW="container.xl" py="12">

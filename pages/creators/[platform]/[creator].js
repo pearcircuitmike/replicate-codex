@@ -11,9 +11,6 @@ import {
   Td,
   Image,
   Link,
-  List,
-  Flex,
-  ListItem,
 } from "@chakra-ui/react";
 import { fetchAllDataFromTable } from "../../../utils/modelsData.js";
 import Head from "next/head";
@@ -24,7 +21,37 @@ import calculateCreatorRank from "../../../utils/calculateCreatorRank";
 import PreviewImage from "../../../components/PreviewImage";
 import MetaTags from "../../../components/MetaTags";
 
-export default function Creator({ creator, models, allModels }) {
+export async function getStaticPaths() {
+  const platforms = ["replicate", "cerebrium", "deepInfra"];
+  const paths = [];
+
+  for (const platform of platforms) {
+    const modelsData = await fetchAllDataFromTable(`${platform}ModelsData`);
+    const creators = Array.from(
+      new Set(modelsData.map((model) => model.creator))
+    );
+
+    for (const creator of creators) {
+      paths.push({ params: { creator: creator.toLowerCase(), platform } });
+    }
+  }
+
+  return { paths, fallback: "blocking" };
+}
+
+export async function getStaticProps({ params }) {
+  const { creator, platform } = params;
+  const allModelsData = await fetchAllDataFromTable(`${platform}ModelsData`);
+
+  const models = allModelsData.filter((model) => model.creator === creator);
+
+  return {
+    props: { creator, models, allModels: allModelsData },
+    revalidate: 60,
+  };
+}
+
+export default function Creator({ creator, models, allModels, platform }) {
   const avgCost =
     models
       .filter((model) => model.costToRun !== "")
@@ -61,7 +88,7 @@ export default function Creator({ creator, models, allModels }) {
     <>
       <MetaTags
         title={`AI model creator details for ${creator}`}
-        description={`Details about DeepInfra and their pre-built AI models`}
+        description={`Details about ${creator}'s account on Replicate and their AI models`}
       />
 
       <Container maxW="container.xl" py="12">
@@ -104,7 +131,7 @@ export default function Creator({ creator, models, allModels }) {
               width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
               p="4"
             >
-              <Link href={`/models/${model?.platform}/${model?.id}`}>
+              <Link href={`/models/${platform}/${model.id}`}>
                 <PreviewImage src={model.example} />
               </Link>
 
@@ -121,7 +148,7 @@ export default function Creator({ creator, models, allModels }) {
                 Cost/run: ${model.costToRun}
               </Text>
               <Text fontSize="lg" mb="4">
-                Runs: {model.runs.toLocaleString()}
+                Runs: {model.runs?.toLocaleString()}
               </Text>
               <Text fontSize="lg" color="gray.500" mb="4">
                 Last Updated: {model.lastUpdated}
@@ -133,27 +160,4 @@ export default function Creator({ creator, models, allModels }) {
       </Container>
     </>
   );
-}
-
-export async function getStaticPaths() {
-  const data = await fetchAllDataFromTable("replicateModelsData");
-  const creators = Array.from(new Set(data.map((model) => model.creator)));
-  const paths = creators.map((creator) => ({
-    params: { creator: creator.toLowerCase() },
-  }));
-
-  return { paths, fallback: "blocking" };
-}
-
-// Modify getStaticProps to fetch all models
-export async function getStaticProps({ params }) {
-  const creator = params.creator;
-  const allModelsData = await fetchAllDataFromTable("replicateModelsData");
-
-  const models = allModelsData.filter((model) => model.creator === creator);
-
-  return {
-    props: { creator, models, allModels: allModelsData },
-    revalidate: 60,
-  };
 }

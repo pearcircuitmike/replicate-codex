@@ -59,19 +59,38 @@ export async function fetchAllDataFromTable(tableName) {
   return dataArray;
 }
 
-export async function fetchModelDataById(id, tableName) {
-  const { data, error } = await supabase
-    .from(tableName)
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error) {
-    console.error("Error fetching model data:", error);
-    return null;
+// in your modelsData.js
+export async function fetchModelDataById(id, platform) {
+  let table = "";
+  switch (platform) {
+    case "cerebrium":
+      table = "cerebriumModelsData";
+      break;
+    case "deepInfra":
+      table = "deepInfraModelsData";
+      break;
+    case "replicate":
+    default:
+      table = "replicateModelsData";
+      break;
   }
 
-  return data;
+  try {
+    let { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    console.error(`Error fetching model data: ${err.message}`);
+    return null;
+  }
 }
 
 export async function fetchFilteredData({
