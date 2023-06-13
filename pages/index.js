@@ -33,6 +33,7 @@ const tabNameMap = {
   replicateModelsTable: 0,
   cerebriumModelsTable: 1,
   deepInfraModelsTable: 2,
+  huggingFaceModelsTable: 3,
 };
 
 const tabNameReverseMap = Object.fromEntries(
@@ -194,6 +195,7 @@ export default function Home() {
               <Tab>Replicate</Tab>
               <Tab>Cerebrium</Tab>
               <Tab>DeepInfra</Tab>
+              <Tab>HuggingFace</Tab>
             </TabList>
             <TabPanels>
               <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
@@ -222,6 +224,17 @@ export default function Home() {
                 <ModelsTable
                   fetchFilteredData={fetchDataFromTable}
                   tableName={"deepInfraModelsData"}
+                  selectedTags={selectedTags}
+                  searchValue={searchValue}
+                  sorts={sorts}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+              </TabPanel>
+              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
+                <ModelsTable
+                  fetchFilteredData={fetchDataFromTable}
+                  tableName={"huggingFaceModelsData"}
                   selectedTags={selectedTags}
                   searchValue={searchValue}
                   sorts={sorts}

@@ -63,6 +63,9 @@ export async function fetchAllDataFromTable(tableName) {
 export async function fetchModelDataById(id, platform) {
   let table = "";
   switch (platform) {
+    case "huggingFace":
+      table = "huggingFaceModelsData";
+      break;
     case "cerebrium":
       table = "cerebriumModelsData";
       break;
@@ -131,14 +134,16 @@ export async function fetchFilteredData({
 }
 
 export const findSimilarModels = (model, modelsData, maxResults = 5) => {
-  const modelTags = model.tags.split(",").map((tag) => tag.trim());
+  const modelTags = model.tags
+    ? model.tags.split(",").map((tag) => tag.trim())
+    : [];
 
   return modelsData
     .filter((otherModel) => {
       if (otherModel.id === model.id) return false;
       const otherModelTags = otherModel.tags
-        .split(",")
-        .map((tag) => tag.trim());
+        ? otherModel.tags.split(",").map((tag) => tag.trim())
+        : [];
       return otherModelTags.some((tag) => modelTags.includes(tag));
     })
     .slice(0, maxResults);

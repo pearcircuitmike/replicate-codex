@@ -13,6 +13,7 @@ import {
   Link,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import truncateWithReadMore from "@/utils/truncateWithReadMore";
 
 const ModelDetailsTable = ({ model }) => {
   const trophyIcon = (rank) => {
@@ -26,6 +27,12 @@ const ModelDetailsTable = ({ model }) => {
       return null;
     }
   };
+
+  const truncatedDescription = truncateWithReadMore(
+    model?.description,
+    275,
+    false
+  );
 
   return (
     <Box>
@@ -72,7 +79,7 @@ const ModelDetailsTable = ({ model }) => {
               <Td>Description</Td>
               <Td>
                 {model?.description
-                  ? model?.description
+                  ? truncatedDescription
                   : "No description provided"}
               </Td>
             </Tr>

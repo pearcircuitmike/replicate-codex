@@ -22,7 +22,7 @@ import PreviewImage from "../../../components/PreviewImage";
 import MetaTags from "../../../components/MetaTags";
 
 export async function getStaticPaths() {
-  const platforms = ["replicate", "cerebrium", "deepInfra"];
+  const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
   const paths = [];
 
   for (const platform of platforms) {
@@ -59,16 +59,22 @@ export default function Creator({ creator, models, allModels, platform }) {
 
   const modelTypes = {};
   models.forEach((model) => {
-    if (model.tags in modelTypes) {
-      modelTypes[model.tags]++;
+    const tags = model.tags ? model.tags : "";
+    if (tags in modelTypes) {
+      modelTypes[tags]++;
     } else {
-      modelTypes[model.tags] = 1;
+      modelTypes[tags] = 1;
     }
   });
-
   function getSimilarCreators(creator) {
     const creatorModels = models;
-    const creatorTags = creatorModels.flatMap((model) => model.tags.split(","));
+    const creatorTags = creatorModels.flatMap((model) => {
+      if (model.tags) {
+        return model.tags.split(",");
+      } else {
+        return [];
+      }
+    });
 
     const similarCreators = allModels
       .filter((item) => item.creator.toLowerCase() !== creator.toLowerCase())

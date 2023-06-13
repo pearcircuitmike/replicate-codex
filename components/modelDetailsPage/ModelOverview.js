@@ -1,7 +1,14 @@
 import { Box, Heading, Text, Link, Tag, VStack } from "@chakra-ui/react";
 import PreviewImage from "../PreviewImage";
+import truncateWithReadMore from "@/utils/truncateWithReadMore";
 
 const ModelOverview = ({ model }) => {
+  const truncatedDescription = truncateWithReadMore(
+    model?.description,
+    275,
+    true
+  );
+
   return (
     <>
       <Box>
@@ -26,7 +33,7 @@ const ModelOverview = ({ model }) => {
               }
             />
           </Box>
-          <Text color="gray.700">{model?.description}</Text>
+          <Text color="gray.700">{truncatedDescription}</Text>
           <Box>
             <Tag colorScheme="teal">{model?.tags}</Tag>
           </Box>

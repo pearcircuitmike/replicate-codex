@@ -30,7 +30,7 @@ import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 
 export async function getStaticPaths() {
-  const platforms = ["replicate", "cerebrium", "deepInfra"];
+  const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
   const paths = [];
 
   for (const platform of platforms) {
