@@ -8,6 +8,21 @@ const nextConfig = {
         destination: "/models/replicate/:id",
         permanent: true,
       },
+      {
+        source: "/models/:id(\\d{2})",
+        destination: "/models/replicate/:id",
+        permanent: true,
+      },
+      {
+        source: "/models/:id(\\d{1})",
+        destination: "/models/replicate/:id",
+        permanent: true,
+      },
+      {
+        source: "/creators/:id",
+        destination: "/creators/replicate/:id",
+        permanent: true,
+      },
     ];
   },
 };
