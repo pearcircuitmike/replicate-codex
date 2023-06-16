@@ -35,6 +35,14 @@ const Navbar = () => {
 
           <Flex display={["none", "none", "flex", "flex"]}>
             <HStack spacing={10}>
+              <Link
+                href="https://www.passionfroot.me/replicate-codex"
+                aria-label="advertise"
+                m={5}
+                w="100%"
+              >
+                Advertise
+              </Link>
               <Link href="/creators" aria-label="Creators" m={5} w="100%">
                 Creators
               </Link>
@@ -120,6 +128,14 @@ const Navbar = () => {
               w="100%"
             >
               <span onClick={() => changeDisplay("none")}>Notes</span>
+            </Link>
+            <Link
+              href="https://www.passionfroot.me/replicate-codex"
+              aria-label="advertise"
+              m={"10px"}
+              w="100%"
+            >
+              <span onClick={() => changeDisplay("none")}>Advertise</span>
             </Link>
           </Flex>
         </Flex>
