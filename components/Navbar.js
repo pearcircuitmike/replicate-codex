@@ -15,12 +15,7 @@ const Navbar = () => {
 
   return (
     <nav>
-      <Flex
-        p={5}
-        borderBottom={1}
-        borderStyle={"solid"}
-        borderColor={"gray.200"}
-      >
+      <Flex p={5}>
         <Flex top="1rem" right="1rem" align="center">
           {/*LOGO*/}
           <Heading fontSize="2xl">

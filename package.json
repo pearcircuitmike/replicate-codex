@@ -18,6 +18,7 @@
     "@vercel/og": "^0.5.6",
     "chart.js": "^4.2.1",
     "chartjs-adapter-date-fns": "^3.0.0",
+    "crisp-sdk-web": "^1.0.19",
     "date-fns": "^2.29.3",
     "eslint": "8.35.0",
     "eslint-config-next": "13.2.3",

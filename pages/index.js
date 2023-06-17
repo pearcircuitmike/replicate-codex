@@ -1,18 +1,13 @@
 import Head from "next/head";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { useRef } from "react"; // Import useRef
-
+import { useRef } from "react";
 import {
   Container,
   HStack,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
   VStack,
   useMediaQuery,
+  Skeleton,
 } from "@chakra-ui/react";
 
 import ModelsTable from "../components/ModelsTable.js";
@@ -27,18 +22,6 @@ import ActiveTagFilters from "../components/tableControls/ActiveTagFilters.js";
 import ActiveSorts from "../components/tableControls/ActiveSorts.js";
 
 import { fetchDataFromTable } from "../utils/modelsData.js";
-//test
-
-const tabNameMap = {
-  replicateModelsTable: 0,
-  cerebriumModelsTable: 1,
-  deepInfraModelsTable: 2,
-  huggingFaceModelsTable: 3,
-};
-
-const tabNameReverseMap = Object.fromEntries(
-  Object.entries(tabNameMap).map(([key, value]) => [value, key])
-);
 
 export default function Home() {
   const [searchValue, setSearchValue] = useState("");
@@ -46,12 +29,12 @@ export default function Home() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
-  const { tab } = router.query;
   const [tabIndex, setTabIndex] = useState(0);
   const [data, setData] = useState([]);
   const [isMobile] = useMediaQuery("(max-width: 480px)");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const scrollRef = useRef(null); // Create a ref to store the scroll position
+  const scrollRef = useRef(null);
 
   const updateUrlParams = (tab, sorts, tags) => {
     const params = new URLSearchParams();
@@ -65,7 +48,7 @@ export default function Home() {
     if (tags.length > 0) {
       params.set("tags", JSON.stringify(tags));
     }
-    // Use replace with shallow option set to true and scroll option set to false
+
     router.replace(`/?${params.toString()}`, undefined, {
       shallow: true,
       scroll: false,
@@ -145,7 +128,56 @@ export default function Home() {
     };
   }, [router]);
 
-  const models = Array.from(new Set(data.map((item) => item.tags)));
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+
+      try {
+        // Fetch data from the table
+        const tableData = await fetchDataFromTable();
+
+        setData(tableData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedTags, searchValue, sorts, currentPage]);
+
+  const models = Array.from(
+    new Set(Array.isArray(data) ? data.map((item) => item.tags) : [])
+  );
+
+  if (isLoading) {
+    return (
+      <>
+        <MetaTags
+          title={"AIModels.fyi - AI model details"}
+          description={
+            "Discover AI models to play and build with on platforms like Replicate, Cerebrium, HuggingFace, and more."
+          }
+        />
+
+        <Container maxW="8xl">
+          <main>
+            <Skeleton height="80px" mb={5} />
+            <HStack justifyContent="space-between" mb={5}>
+              <Skeleton width="150px" height="40px" />
+              <Skeleton width="150px" height="40px" />
+            </HStack>
+            <VStack spacing={1} align="left">
+              <Skeleton width="150px" height="30px" />
+              <Skeleton width="150px" height="30px" />
+            </VStack>
+            <Skeleton height="500px" my={5} />
+          </main>
+        </Container>
+      </>
+    );
+  }
 
   return (
     <>
@@ -184,66 +216,16 @@ export default function Home() {
               <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
             )}
           </VStack>
-          <Tabs
-            index={tabIndex}
-            onChange={handleTabsChange}
-            colorScheme="teal"
-            overflowX="auto"
-            size={isMobile ? "sm" : "md"}
-          >
-            <TabList mt={isMobile ? 0 : 5}>
-              <Tab>Replicate</Tab>
-              <Tab>Cerebrium</Tab>
-              <Tab>DeepInfra</Tab>
-              <Tab>HuggingFace</Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
-                <ModelsTable
-                  fetchFilteredData={fetchDataFromTable}
-                  tableName={"replicateModelsData"}
-                  selectedTags={selectedTags}
-                  searchValue={searchValue}
-                  sorts={sorts}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                />
-              </TabPanel>
-              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
-                <ModelsTable
-                  fetchFilteredData={fetchDataFromTable}
-                  tableName={"cerebriumModelsData"}
-                  selectedTags={selectedTags}
-                  searchValue={searchValue}
-                  sorts={sorts}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                />
-              </TabPanel>
-              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
-                <ModelsTable
-                  fetchFilteredData={fetchDataFromTable}
-                  tableName={"deepInfraModelsData"}
-                  selectedTags={selectedTags}
-                  searchValue={searchValue}
-                  sorts={sorts}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                />
-              </TabPanel>
-              <TabPanel pl={0} pr={0} size={isMobile ? "sm" : "md"}>
-                <ModelsTable
-                  fetchFilteredData={fetchDataFromTable}
-                  tableName={"huggingFaceModelsData"}
-                  selectedTags={selectedTags}
-                  searchValue={searchValue}
-                  sorts={sorts}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                />
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
+
+          <ModelsTable
+            fetchFilteredData={fetchDataFromTable}
+            tableName={"combinedModelsData"}
+            selectedTags={selectedTags}
+            searchValue={searchValue}
+            sorts={sorts}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </main>
       </Container>
     </>

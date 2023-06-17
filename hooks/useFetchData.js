@@ -7,7 +7,9 @@ const useFetchData = (
   selectedTags,
   sorts,
   currentPage,
-  setCurrentPage
+  setCurrentPage,
+  platform,
+  selectedRows
 ) => {
   const [totalCount, setTotalCount] = useState(0);
   const [filteredData, setFilteredData] = useState([]);
@@ -22,6 +24,7 @@ const useFetchData = (
         sorts,
         pageSize: 10,
         currentPage,
+        ids: selectedRows, // Pass selectedRows here
       });
       setFilteredData(data);
       setTotalCount(totalCount || 0); // Use totalCount or default to 0 if undefined
@@ -34,9 +37,9 @@ const useFetchData = (
     selectedTags,
     sorts,
     currentPage,
+    selectedRows, // Include selectedRows as a dependency
   ]);
 
-  // Set current page to 1 when a value changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedTags, sorts, searchValue]);

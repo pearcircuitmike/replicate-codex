@@ -7,12 +7,18 @@ import {
   Skeleton,
   Link,
   Box,
+  Checkbox,
 } from "@chakra-ui/react";
 import PreviewImage from "./PreviewImage";
 import truncateWithReadMore from "@/utils/truncateWithReadMore";
 
 export default function TableRow({ item, isHeader = false }) {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
 
   if (isHeader) {
     return (
@@ -22,6 +28,7 @@ export default function TableRow({ item, isHeader = false }) {
         <Th>Description</Th>
         <Th>Example</Th>
         <Th>Tags</Th>
+        <Th>Platform</Th>
         <Th isNumeric>Runs</Th>
         <Th isNumeric>Cost</Th>
       </>
@@ -72,6 +79,7 @@ export default function TableRow({ item, isHeader = false }) {
       <Td maxW="180px">
         <Tag>{item?.tags}</Tag>
       </Td>
+      <Td maxW="180px">{toTitleCase(item?.platform)}</Td>
       <Td isNumeric>{item?.runs?.toLocaleString()}</Td>
       <Td isNumeric>${item?.costToRun ? item.costToRun : "-"}</Td>
     </>

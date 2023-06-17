@@ -2,8 +2,14 @@ import "../styles/globals.css";
 import Layout from "../components/Layout";
 import Script from "next/script";
 import { ChakraProvider } from "@chakra-ui/react";
+import { useEffect } from "react";
+import { Crisp } from "crisp-sdk-web";
 
 export default function App({ Component, pageProps }) {
+  useEffect(() => {
+    Crisp.configure("854812c2-86af-48d6-9e51-a52c31640751");
+  }, []);
+
   return (
     <>
       <ChakraProvider>
@@ -30,6 +36,14 @@ export default function App({ Component, pageProps }) {
 
         `}
           </Script>
+          <Script
+            id="crisp"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `window.$crisp=[];window.CRISP_WEBSITE_ID="854812c2-86af-48d6-9e51-a52c31640751";
+              (function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`,
+            }}
+          />
 
           <Script
             async

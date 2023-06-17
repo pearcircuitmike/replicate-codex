@@ -1,15 +1,18 @@
 import supabase from "./supabaseClient";
 
 // Utility function to fetch data from a specific table
+
 export async function fetchDataFromTable({
-  tableName,
+  platform = null,
   tags = [],
   searchValue = "",
   sorts = [],
   pageSize = 10,
   currentPage = 1,
-}) {
-  let query = supabase.from(tableName).select("*", { count: "exact" });
+} = {}) {
+  let query = supabase
+    .from("combinedModelsData") // Always fetch from the combinedModelsData view
+    .select("*", { count: "exact" });
 
   if (tags.length > 0) {
     query = query.or(tags.map((tag) => `tags.ilike.%${tag}%`).join(","));
@@ -27,6 +30,10 @@ export async function fetchDataFromTable({
 
   const offset = (currentPage - 1) * pageSize;
   query = query.range(offset, offset + pageSize - 1);
+
+  if (platform !== null) {
+    query = query.eq("platform", platform); // Add platform filter
+  }
 
   const { data, error, count } = await query;
 
@@ -60,26 +67,31 @@ export async function fetchAllDataFromTable(tableName) {
 }
 
 // in your modelsData.js
-export async function fetchModelDataById(id, platform) {
+export async function fetchModelDataById(id, platform = null) {
   let table = "";
-  switch (platform) {
-    case "huggingFace":
-      table = "huggingFaceModelsData";
-      break;
-    case "cerebrium":
-      table = "cerebriumModelsData";
-      break;
-    case "deepInfra":
-      table = "deepInfraModelsData";
-      break;
-    case "replicate":
-    default:
-      table = "replicateModelsData";
-      break;
+
+  if (platform) {
+    switch (platform) {
+      case "huggingFace":
+        table = "huggingFaceModelsData";
+        break;
+      case "cerebrium":
+        table = "cerebriumModelsData";
+        break;
+      case "deepInfra":
+        table = "deepInfraModelsData";
+        break;
+      case "replicate":
+      default:
+        table = "replicateModelsData";
+        break;
+    }
+  } else {
+    table = "combinedModelsData";
   }
 
   try {
-    let { data, error } = await supabase
+    const { data, error } = await supabase
       .from(table)
       .select("*")
       .eq("id", id)
@@ -95,7 +107,6 @@ export async function fetchModelDataById(id, platform) {
     return null;
   }
 }
-
 export async function fetchFilteredData({
   tableName,
   tags = [],
@@ -103,6 +114,7 @@ export async function fetchFilteredData({
   sorts = [],
   pageSize = 10,
   currentPage = 1,
+  ids = null,
 }) {
   let query = supabase.from(tableName).select("*", { count: "exact" });
 
@@ -118,10 +130,18 @@ export async function fetchFilteredData({
     query = query.order(field, { ascending: direction === "asc" });
   });
 
+  // if ids are provided, filter only those rows
+  if (ids && ids.length > 0) {
+    query = query.in("id", ids);
+  }
+
   const { count } = await query;
 
   const offset = (currentPage - 1) * pageSize;
-  query = query.range(offset, offset + pageSize - 1);
+  // if ids are not provided, use pagination
+  if (!ids) {
+    query = query.range(offset, offset + pageSize - 1);
+  }
 
   const { data, error } = await query;
 
@@ -130,7 +150,8 @@ export async function fetchFilteredData({
     return { data: null, totalCount: 0 };
   }
 
-  return { data, totalCount: count };
+  // if ids are provided, totalCount should be the length of ids
+  return { data, totalCount: ids ? ids.length : count };
 }
 
 export const findSimilarModels = (model, modelsData, maxResults = 5) => {

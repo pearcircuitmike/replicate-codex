@@ -12,7 +12,7 @@ export default function ModelsTable(props) {
     searchValue,
     selectedTags,
     sorts,
-    tableName, // Add tableName prop here
+    tableName,
   } = props;
 
   // Pass tableName to useFetchData
@@ -27,7 +27,7 @@ export default function ModelsTable(props) {
   );
 
   return (
-    <Box>
+    <Box mt={5}>
       <TableContainer maxHeight="600px" overflowY="auto">
         <Table size="sm">
           <Thead position="sticky" top={0} bgColor="white">
