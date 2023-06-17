@@ -2,13 +2,7 @@ import Head from "next/head";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
-import {
-  Container,
-  HStack,
-  VStack,
-  useMediaQuery,
-  Skeleton,
-} from "@chakra-ui/react";
+import { Container, HStack, VStack, useMediaQuery } from "@chakra-ui/react";
 
 import ModelsTable from "../components/ModelsTable.js";
 import MetaTags from "../components/MetaTags.js";
@@ -150,34 +144,6 @@ export default function Home() {
   const models = Array.from(
     new Set(Array.isArray(data) ? data.map((item) => item.tags) : [])
   );
-
-  if (isLoading) {
-    return (
-      <>
-        <MetaTags
-          title={"AIModels.fyi - AI model details"}
-          description={
-            "Discover AI models to play and build with on platforms like Replicate, Cerebrium, HuggingFace, and more."
-          }
-        />
-
-        <Container maxW="8xl">
-          <main>
-            <Skeleton height="80px" mb={5} />
-            <HStack justifyContent="space-between" mb={5}>
-              <Skeleton width="150px" height="40px" />
-              <Skeleton width="150px" height="40px" />
-            </HStack>
-            <VStack spacing={1} align="left">
-              <Skeleton width="150px" height="30px" />
-              <Skeleton width="150px" height="30px" />
-            </VStack>
-            <Skeleton height="500px" my={5} />
-          </main>
-        </Container>
-      </>
-    );
-  }
 
   return (
     <>
