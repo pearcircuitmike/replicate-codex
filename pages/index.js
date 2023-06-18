@@ -49,47 +49,31 @@ export default function Home() {
     });
   };
 
-  const handleTabsChange = useCallback(
-    (index) => {
-      const newTabName = tabNameReverseMap[index];
-      updateUrlParams(newTabName, sorts, selectedTags);
-      setTabIndex(index);
-    },
-    [sorts, selectedTags]
-  );
-
   const handleSearchChange = (event) => {
     setSearchValue(event.target.value);
   };
 
   const handleTagSelect = (newSelectedTags) => {
     setSelectedTags(newSelectedTags);
-    updateUrlParams(tabNameReverseMap[tabIndex], sorts, newSelectedTags);
   };
 
   const handleTagClose = (tag) => {
     const newSelectedTags = selectedTags.filter((value) => value !== tag);
     setSelectedTags(newSelectedTags);
-    updateUrlParams(tabNameReverseMap[tabIndex], sorts, newSelectedTags);
   };
 
   const handleSortChange = (newSorts) => {
     setSorts(newSorts);
-    updateUrlParams(tabNameReverseMap[tabIndex], newSorts, selectedTags);
   };
 
   const handleRemoveSort = (index) => {
     const newSorts = sorts.filter((_, i) => i !== index);
     setSorts(newSorts);
-    updateUrlParams(tabNameReverseMap[tabIndex], newSorts, selectedTags);
   };
 
   useEffect(() => {
     const { tab, sorts, tags } = router.query;
 
-    if (tab) {
-      setTabIndex(tabNameMap[tab]);
-    }
     if (sorts) {
       setSorts(JSON.parse(sorts));
     }
@@ -101,13 +85,9 @@ export default function Home() {
   useEffect(() => {
     const handleRouteChange = (url) => {
       const params = new URLSearchParams(url.split("?")[1]);
-      const tab = params.get("tab");
       const sorts = params.get("sorts");
       const tags = params.get("tags");
 
-      if (tab) {
-        setTabIndex(tabNameMap[tab]);
-      }
       if (sorts) {
         setSorts(JSON.parse(sorts));
       }
