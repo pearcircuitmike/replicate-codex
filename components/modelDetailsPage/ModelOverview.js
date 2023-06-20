@@ -1,6 +1,6 @@
 import { Box, Heading, Text, Link, Tag, VStack } from "@chakra-ui/react";
-import PreviewImage from "../PreviewImage";
 import truncateWithReadMore from "@/utils/truncateWithReadMore";
+import PreviewImage from "../PreviewImage";
 
 const ModelOverview = ({ model }) => {
   const truncatedDescription = truncateWithReadMore(
@@ -24,15 +24,7 @@ const ModelOverview = ({ model }) => {
               {model?.creator}
             </Link>
           </Text>
-          <Box>
-            <PreviewImage
-              src={
-                model?.example != ""
-                  ? model?.example
-                  : "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
-              }
-            />
-          </Box>
+          <PreviewImage src={model?.example} />
           <Text color="gray.700">{truncatedDescription}</Text>
           <Box>
             <Tag colorScheme="teal">{model?.tags}</Tag>

@@ -28,103 +28,6 @@ export default function Home() {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
   const [isLoading, setIsLoading] = useState(true);
 
-  const scrollRef = useRef(null);
-
-  const updateUrlParams = (tab, sorts, tags) => {
-    const params = new URLSearchParams();
-
-    if (tab) {
-      params.set("tab", tab);
-    }
-    if (sorts.length > 0) {
-      params.set("sorts", JSON.stringify(sorts));
-    }
-    if (tags.length > 0) {
-      params.set("tags", JSON.stringify(tags));
-    }
-
-    router.replace(`/?${params.toString()}`, undefined, {
-      shallow: true,
-      scroll: false,
-    });
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchValue(event.target.value);
-  };
-
-  const handleTagSelect = (newSelectedTags) => {
-    setSelectedTags(newSelectedTags);
-  };
-
-  const handleTagClose = (tag) => {
-    const newSelectedTags = selectedTags.filter((value) => value !== tag);
-    setSelectedTags(newSelectedTags);
-  };
-
-  const handleSortChange = (newSorts) => {
-    setSorts(newSorts);
-  };
-
-  const handleRemoveSort = (index) => {
-    const newSorts = sorts.filter((_, i) => i !== index);
-    setSorts(newSorts);
-  };
-
-  useEffect(() => {
-    const { tab, sorts, tags } = router.query;
-
-    if (sorts) {
-      setSorts(JSON.parse(sorts));
-    }
-    if (tags) {
-      setSelectedTags(JSON.parse(tags));
-    }
-  }, [router.query]);
-
-  useEffect(() => {
-    const handleRouteChange = (url) => {
-      const params = new URLSearchParams(url.split("?")[1]);
-      const sorts = params.get("sorts");
-      const tags = params.get("tags");
-
-      if (sorts) {
-        setSorts(JSON.parse(sorts));
-      }
-      if (tags) {
-        setSelectedTags(JSON.parse(tags));
-      }
-    };
-
-    router.events.on("routeChangeComplete", handleRouteChange);
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-
-      try {
-        // Fetch data from the table
-        const tableData = await fetchDataFromTable();
-
-        setData(tableData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedTags, searchValue, sorts, currentPage]);
-
-  const models = Array.from(
-    new Set(Array.isArray(data) ? data.map((item) => item.tags) : [])
-  );
-
   return (
     <>
       <MetaTags
@@ -137,31 +40,6 @@ export default function Home() {
       <Container maxW="8xl">
         <main>
           <Hero />
-          <HStack justifyContent="space-between" mb={5}>
-            <SearchField
-              searchValue={searchValue}
-              handleSearchChange={handleSearchChange}
-            />
-            <HStack>
-              <FilterTags
-                models={models}
-                selectedTags={selectedTags}
-                handleTagSelect={handleTagSelect}
-              />
-              <SortMenu onSortChange={handleSortChange} />
-            </HStack>
-          </HStack>
-          <VStack spacing={1} align="left">
-            {selectedTags.length > 0 && (
-              <ActiveTagFilters
-                tags={selectedTags}
-                onTagClose={handleTagClose}
-              />
-            )}
-            {sorts.length > 0 && (
-              <ActiveSorts sorts={sorts} onRemoveSort={handleRemoveSort} />
-            )}
-          </VStack>
 
           <ModelsTable
             fetchFilteredData={fetchDataFromTable}

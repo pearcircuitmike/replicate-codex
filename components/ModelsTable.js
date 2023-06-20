@@ -1,55 +1,477 @@
-import React from "react";
-import { Box, Table, TableContainer, Tbody, Thead, Tr } from "@chakra-ui/react";
-import useFetchData from "../hooks/useFetchData";
-import Pagination from "./Pagination";
-import TableRow from "./TableRow";
+import React, { useEffect, useState, useCallback } from "react";
 
-export default function ModelsTable(props) {
-  const {
-    fetchFilteredData,
-    currentPage,
-    setCurrentPage,
-    searchValue,
-    selectedTags,
-    sorts,
-    tableName,
-  } = props;
+import styles from "../styles/table/tableStyles.module.css";
+import PreviewImage from "./PreviewImage";
+import SortableTableHeader from "./SortableTableHeader";
 
-  // Pass tableName to useFetchData
-  const { filteredData, totalCount } = useFetchData(
-    fetchFilteredData,
-    tableName,
-    searchValue,
-    selectedTags,
-    sorts,
-    currentPage,
-    setCurrentPage
+import {
+  Table,
+  Skeleton,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  useMediaQuery,
+  Td,
+  Input,
+  Button,
+  Text,
+  Checkbox,
+  TableContainer,
+  Box,
+  Tag,
+  Link,
+  Stack,
+  Select,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from "@chakra-ui/react";
+
+import supabase from "../utils/supabaseClient";
+import Pagination from "./Pagination.js";
+import ActiveTagFilters from "./tableControls/ActiveTagFilters";
+
+const ModelsTable = ({ pageSize = 10 }) => {
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [compareMode, setCompareMode] = useState(false);
+  const [activeFilters, setActiveFilters] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [isMobile] = useMediaQuery("(max-width: 480px)");
+  const [allTags, setAllTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
+  const fetchTags = useCallback(async () => {
+    const { data: tagData } = await supabase
+      .from("combinedModelsData")
+      .select("tags");
+
+    let tags = [];
+    tagData.forEach((item) => {
+      if (item.tags) {
+        const itemTags = item.tags.split(",");
+        tags = [...tags, ...itemTags];
+      }
+    });
+    const uniqueTags = [...new Set(tags)]; // Remove duplicates from array
+    setAllTags(uniqueTags);
+  }, []);
+
+  useEffect(() => {
+    fetchTags();
+  }, [fetchTags]);
+
+  const fetchData = useCallback(
+    async (ids = null) => {
+      let query = supabase
+        .from("combinedModelsData")
+        .select(
+          "modelName, id, description, creator, platform, example, tags, modelUrl, runs, costToRun",
+          {
+            count: "exact",
+          }
+        ); // get the total count of rows
+
+      // If ids are provided, fetch only these ids
+      if (ids) {
+        query = query.in("id", ids);
+      } else {
+        // Apply filters
+        if (activeFilters.length > 0) {
+          const tagFilters = activeFilters
+            .map((tag) => `tags.ilike.%${tag}%`)
+            .join(",");
+          query = query.or(tagFilters);
+        }
+
+        // Apply search
+        if (searchQuery) {
+          query = query.or(
+            `modelName.ilike.%${searchQuery}%,creator.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+          );
+        }
+
+        // If a sort column is specified, sort the data
+        if (sortColumn) {
+          query = query.order(sortColumn, {
+            ascending: sortOrder === "asc",
+            nullFirst: true,
+          });
+        }
+      }
+
+      const { count, data: fullData } = await query;
+
+      // Paginate the data
+      const data = ids
+        ? fullData
+        : fullData.slice((page - 1) * pageSize, page * pageSize);
+
+      setData(data);
+      setTotalCount(count); // set the total count
+    },
+    [page, pageSize, searchQuery, activeFilters, sortColumn, sortOrder]
   );
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
+
+  const handleSort = (column) => {
+    // If the user clicks on the column that is currently sorted,
+    // toggle the sort order. Otherwise, start sorting by the new column in ascending order.
+    const newSortOrder =
+      sortColumn === column ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
+    setSortColumn(column);
+    setSortOrder(newSortOrder);
+  };
+
+  // Add onClick event to tag to filter by that tag
+  const handleTagClick = (tag) => {
+    if (activeFilters.includes(tag)) {
+      setActiveFilters(activeFilters.filter((activeTag) => activeTag !== tag));
+    } else {
+      setActiveFilters([...activeFilters, tag]);
+    }
+    setPage(1);
+  };
+
+  // Add function to clear all active filters
+  const handleClearFilters = () => {
+    setActiveFilters([]);
+  };
+
+  const handleCheckboxChange = (id) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    } else {
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
+  const handleCompare = () => {
+    fetchData(selectedIds);
+    setCompareMode(true);
+    setPage(1);
+  };
+
+  const handleClearCompare = () => {
+    setSelectedIds([]);
+    setCompareMode(false);
+    fetchData();
+    setPage(1);
+  };
+
   return (
-    <Box mt={5}>
-      <TableContainer maxHeight="600px" overflowY="auto">
-        <Table size="sm">
-          <Thead position="sticky" top={0} bgColor="white">
+    <>
+      <Box my={5}>
+        <Input
+          type="text"
+          placeholder="Search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </Box>
+
+      <Stack
+        direction={{ base: "column", sm: "row" }} // stack vertically on mobile, horizontally otherwise
+        spacing={3} // replace ml={3} with spacing={3} to apply to all children
+        align="center" // to align the buttons in center
+      >
+        {!compareMode && selectedIds.length == 0 && (
+          <Button isDisabled>No comparison selected</Button>
+        )}
+
+        {!compareMode && selectedIds.length > 0 && (
+          <Button onClick={handleCompare} colorScheme="blue">
+            Compare {selectedIds.length} models
+          </Button>
+        )}
+        {compareMode && (
+          <Button onClick={handleClearCompare} colorScheme="red">
+            Clear Comparison
+          </Button>
+        )}
+
+        {activeFilters.length == 0 && (
+          <Button isDisabled>No tag selected</Button>
+        )}
+        {activeFilters.length > 0 && (
+          <Button onClick={handleClearFilters} colorScheme="red">
+            Clear {activeFilters.length} tag filter(s)
+          </Button>
+        )}
+        <Menu closeOnSelect={false}>
+          <MenuButton as={Button} colorScheme="blue">
+            Select tag(s)
+          </MenuButton>
+          <MenuList
+            minWidth="240px"
+            maxHeight="400px"
+            overflowY="auto"
+            zIndex={9999}
+          >
+            {allTags.map((tag) => (
+              <MenuItem key={tag}>
+                <Checkbox
+                  isChecked={activeFilters.includes(tag)}
+                  onChange={() => handleTagClick(tag)}
+                >
+                  {tag}
+                </Checkbox>
+              </MenuItem>
+            ))}
+          </MenuList>
+        </Menu>
+      </Stack>
+
+      <TableContainer overflowY="auto" my={5}>
+        <Table
+          style={{ tableLayout: "fixed" }}
+          className={styles.paginatedTable}
+          size="md"
+        >
+          <Thead
+            position="sticky"
+            top={0}
+            bgColor="gray.300"
+            zIndex={999}
+            overflowY="none"
+          >
             <Tr>
-              <TableRow isHeader={true} />
+              <Th width="2ch" borderRadius="5px 0px">
+                {selectedIds.length > 0 ? (
+                  <Checkbox isIndeterminate onChange={handleClearCompare} />
+                ) : (
+                  <Checkbox isDisabled defaultChecked isReadOnly />
+                )}
+              </Th>
+              {!isMobile && (
+                <SortableTableHeader
+                  column="creator"
+                  displayName="Creator"
+                  width="140px"
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+              )}
+              <SortableTableHeader
+                column="modelName"
+                displayName="Model"
+                width={isMobile ? "110px" : "180px"}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+              <SortableTableHeader
+                column="description"
+                displayName="Description"
+                width={isMobile ? "120px" : "180px"}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+              <SortableTableHeader
+                column="example"
+                displayName="Example"
+                width="200px"
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+              {!isMobile && (
+                <SortableTableHeader
+                  column="platform"
+                  displayName="Platform"
+                  width={isMobile ? "100px" : "180px"}
+                  sortColumn={sortColumn}
+                  sortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+              )}
+              <SortableTableHeader
+                column="tags"
+                displayName="Tags"
+                width={isMobile ? "240px" : "280px"}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+                isTruncated
+              />
+              <SortableTableHeader
+                column="runs"
+                displayName="Runs"
+                isNumeric="true"
+                width={isMobile ? "100px" : "100px"}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+              />
+              <SortableTableHeader
+                column="costToRun"
+                displayName="Avg Run Cost"
+                width={isMobile ? "200px" : "220px"}
+                sortColumn={sortColumn}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+                isNumeric="true"
+              />
             </Tr>
           </Thead>
           <Tbody>
-            {filteredData?.map((item) => (
-              <Tr key={item.id} style={{ verticalAlign: "top" }}>
-                <TableRow item={item} />
-              </Tr>
-            ))}
+            {data.length > 0
+              ? data.map((item) => (
+                  <Tr key={item.id}>
+                    <Td>
+                      <Checkbox
+                        onChange={() => handleCheckboxChange(item.id)}
+                        isChecked={selectedIds.includes(item.id)}
+                      />
+                    </Td>
+
+                    {!isMobile && (
+                      <Td
+                        maxW={isMobile ? "120px" : "100px"}
+                        style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                        isTruncated
+                      >
+                        <Text noOfLines={1}>
+                          <Link
+                            href={`/creators/${item?.platform}/${item?.creator}`}
+                            color="teal"
+                            textDecoration="underline"
+                          >
+                            {item?.creator}
+                          </Link>
+                        </Text>
+                      </Td>
+                    )}
+                    <Td
+                      style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                      maxW={isMobile ? "110px" : "180px"}
+                      isTruncated
+                    >
+                      <Text noOfLines={1}>
+                        <Link
+                          href={`/models/${item?.platform}/${item?.id}`}
+                          color="teal"
+                          textDecoration="underline"
+                        >
+                          {item?.modelName}
+                        </Link>
+                      </Text>
+                    </Td>
+                    <Td
+                      style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                      maxW={isMobile ? "110px" : "180px"}
+                      isTruncated
+                    >
+                      <Text noOfLines={3}>{item?.description}</Text>
+                    </Td>
+                    <Td width="160px">
+                      <Box width="160px" height="90px" overflow="hidden">
+                        <Link
+                          href={`/models/${item?.platform}/${item?.id}`}
+                          color="teal"
+                          textDecoration="underline"
+                        >
+                          <PreviewImage
+                            src={item?.example ? item.example : ""}
+                          />
+                        </Link>
+                      </Box>
+                    </Td>
+                    {!isMobile && <Td>{toTitleCase(item.platform)}</Td>}
+                    <Td
+                      maxW={isMobile ? "200px" : "200px"}
+                      style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                    >
+                      {item?.tags?.split(",").map((tag) => (
+                        <Text
+                          key={tag}
+                          as="span"
+                          onClick={() => handleTagClick(tag)}
+                          noOfLines={1}
+                        >
+                          <Tag
+                            _hover={{
+                              cursor: "pointer",
+                              backgroundColor: "gray.300",
+                            }}
+                            _active={{
+                              backgroundColor: "gray.400",
+                            }}
+                          >
+                            {tag}
+                          </Tag>
+                        </Text>
+                      ))}
+                    </Td>
+                    <Td maxW={isMobile ? "100px" : "120px"} isNumeric>
+                      {item.runs ? item.runs.toLocaleString() : "-"}
+                    </Td>
+                    <Td maxW={isMobile ? "200px" : "220px"} isNumeric>
+                      ${item.costToRun ? item.costToRun : " -"}
+                    </Td>
+                  </Tr>
+                ))
+              : // Display 10 Skeleton rows while loading data
+                [...Array(10)].map((_, i) => (
+                  <Tr key={i}>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="64px" width="64px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                    <Td>
+                      <Skeleton height="20px" />
+                    </Td>
+                  </Tr>
+                ))}
           </Tbody>
         </Table>
       </TableContainer>
       <Pagination
         totalCount={totalCount}
-        pageSize={10}
-        currentPage={currentPage}
-        onPageChange={(page) => setCurrentPage(page)}
+        pageSize={pageSize}
+        currentPage={page}
+        onPageChange={(newPage) => setPage(newPage)}
       />
-    </Box>
+    </>
   );
-}
+};
+
+export default ModelsTable;

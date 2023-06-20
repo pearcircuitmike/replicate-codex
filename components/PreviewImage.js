@@ -1,34 +1,66 @@
-import React from "react";
-import { Image, Skeleton } from "@chakra-ui/react";
-import { useInView } from "react-intersection-observer";
+import React, { useState, useEffect } from "react";
+import { Box, Image as ChakraImage, Skeleton } from "@chakra-ui/react";
+
+const gradients = [
+  "linear(to-r, gray.300, pink.500)",
+  "linear(to-r, #7928CA, #FF0080)",
+  "linear(to-r, gray.300, yellow.400, pink.200)",
+  "linear(red.100 0%, orange.100 25%, yellow.100 50%)",
+];
 
 const PreviewImage = ({ src }) => {
-  const fallbackUrl =
-    "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png";
+  console.log("Rendering PreviewImage with src:", src);
 
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [bgGradient, setBgGradient] = useState("");
+  const [hasError, setHasError] = useState(false);
 
-  const displayFallback = !src || src === "";
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * gradients.length);
+    setBgGradient(gradients[randomIndex]);
+
+    if (src && src.trim() !== "") {
+      const img = new window.Image();
+      img.src = src;
+
+      img.onload = () => {
+        setHasLoaded(true);
+      };
+
+      img.onerror = () => {
+        setHasError(true);
+        console.error(`Error loading image: ${src}`);
+      };
+    }
+  }, [src]);
+
+  const displayFallback = !src || src.trim() === "" || hasError;
 
   return (
     <Skeleton
-      isLoaded={inView}
+      isLoaded={hasLoaded || displayFallback}
       startColor="gray.300"
       endColor="gray.500"
       mb="8"
+      width="100%"
+      height="100%"
     >
-      <Image
-        ref={ref}
-        src={inView && !displayFallback ? src : undefined}
-        alt="AI model preview image"
-        fallbackSrc={displayFallback ? fallbackUrl : undefined}
-        objectFit="contain" // Add this line to maintain aspect ratio
-        width="100%" // Add this line to set width
-        height="100%" // Add this line to set height
-      />
+      <Box
+        as="span"
+        display={hasLoaded || displayFallback ? "inline-block" : "none"}
+        width="100%"
+        height="100%"
+        bgGradient={displayFallback ? bgGradient : "none"}
+      >
+        {!displayFallback && (
+          <ChakraImage
+            src={src}
+            alt="AI model preview image"
+            objectFit="cover"
+            boxSize="100%"
+          />
+        )}
+      </Box>
     </Skeleton>
   );
 };

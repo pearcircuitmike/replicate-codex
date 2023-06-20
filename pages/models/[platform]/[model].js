@@ -92,7 +92,6 @@ export default function ModelPage({ model, modelsData }) {
             </GridItem>
             <GridItem>
               <ModelDetailsTable model={model} />
-              <RunsHistoryChart modelId={model.id} />
             </GridItem>
           </Grid>
         </Container>
