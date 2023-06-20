@@ -120,6 +120,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
         : fullData.slice((page - 1) * pageSize, page * pageSize);
 
       setData(data);
+      console.log(data);
       setTotalCount(count); // set the total count
     },
     [page, pageSize, searchQuery, activeFilters, sortColumn, sortOrder]
