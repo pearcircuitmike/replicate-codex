@@ -137,9 +137,11 @@ export default function Creator({ creator, models, allModels, platform }) {
               width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
               p="4"
             >
-              <Link href={`/models/${model.platform}/${model.id}`}>
-                <PreviewImage src={model.example} />
-              </Link>
+              <Box>
+                <Link href={`/models/${model.platform}/${model.id}`}>
+                  <PreviewImage src={model.example} />
+                </Link>
+              </Box>
 
               <Heading as="h3" size="lg" mb="2">
                 {model.modelName}

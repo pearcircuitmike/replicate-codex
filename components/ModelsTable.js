@@ -426,7 +426,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
                       ))}
                     </Td>
                     <Td maxW={isMobile ? "100px" : "120px"} isNumeric>
-                      {item.runs ? item.runs.toLocaleString() : "-"}
+                      {item.runs !== null ? item.runs.toLocaleString() : "-"}
                     </Td>
                     <Td maxW={isMobile ? "200px" : "220px"} isNumeric>
                       ${item.costToRun ? item.costToRun : " -"}
