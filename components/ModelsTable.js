@@ -34,6 +34,7 @@ import Pagination from "./Pagination.js";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
 
 const ModelsTable = ({ pageSize = 10 }) => {
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,6 +52,12 @@ const ModelsTable = ({ pageSize = 10 }) => {
     return str.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
+  };
+
+  const formatRuns = (runs) => {
+    if (runs >= 1000000) return `${(runs / 1000000).toFixed(1)}M`;
+    if (runs >= 1000) return `${(runs / 1000).toFixed(1)}K`;
+    return runs;
   };
 
   const fetchTags = useCallback(async () => {
@@ -75,6 +82,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
 
   const fetchData = useCallback(
     async (ids = null) => {
+      setLoading(true);
       let query = supabase
         .from("combinedModelsData")
         .select(
@@ -122,6 +130,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
       setData(data);
       console.log(data);
       setTotalCount(count); // set the total count
+      setLoading(false);
     },
     [page, pageSize, searchQuery, activeFilters, sortColumn, sortOrder]
   );
@@ -242,11 +251,12 @@ const ModelsTable = ({ pageSize = 10 }) => {
         </Menu>
       </Stack>
 
-      <TableContainer overflowY="auto" my={5}>
+      <TableContainer overflowY="auto" my={5} borderRadius="5px">
         <Table
           style={{ tableLayout: "fixed" }}
           className={styles.paginatedTable}
           size="md"
+          borderRadius="5px"
         >
           <Thead
             position="sticky"
@@ -256,7 +266,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
             overflowY="none"
           >
             <Tr>
-              <Th width="2ch" borderRadius="5px 0px">
+              <Th width="2ch">
                 {selectedIds.length > 0 ? (
                   <Checkbox isIndeterminate onChange={handleClearCompare} />
                 ) : (
@@ -310,7 +320,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
               <SortableTableHeader
                 column="tags"
                 displayName="Tags"
-                width={isMobile ? "240px" : "280px"}
+                width={isMobile ? "200px" : "200px"}
                 sortColumn={sortColumn}
                 sortOrder={sortOrder}
                 onSort={handleSort}
@@ -327,8 +337,8 @@ const ModelsTable = ({ pageSize = 10 }) => {
               />
               <SortableTableHeader
                 column="costToRun"
-                displayName="Avg Run Cost"
-                width={isMobile ? "200px" : "220px"}
+                displayName="$/Run"
+                width={isMobile ? "100px" : "120px"}
                 sortColumn={sortColumn}
                 sortOrder={sortOrder}
                 onSort={handleSort}
@@ -337,131 +347,149 @@ const ModelsTable = ({ pageSize = 10 }) => {
             </Tr>
           </Thead>
           <Tbody>
-            {data.length > 0
-              ? data.map((item) => (
-                  <Tr key={item.id}>
-                    <Td>
-                      <Checkbox
-                        onChange={() => handleCheckboxChange(item.id)}
-                        isChecked={selectedIds.includes(item.id)}
-                      />
-                    </Td>
+            {data.length > 0 ? (
+              data.map((item) => (
+                <Tr key={item.id}>
+                  <Td>
+                    <Checkbox
+                      onChange={() => handleCheckboxChange(item.id)}
+                      isChecked={selectedIds.includes(item.id)}
+                    />
+                  </Td>
 
-                    {!isMobile && (
-                      <Td
-                        maxW={isMobile ? "120px" : "100px"}
-                        style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                        isTruncated
-                      >
-                        <Text noOfLines={1}>
-                          <Link
-                            href={`/creators/${item?.platform}/${item?.creator}`}
-                            color="teal"
-                            textDecoration="underline"
-                          >
-                            {item?.creator}
-                          </Link>
-                        </Text>
-                      </Td>
-                    )}
+                  {!isMobile && (
                     <Td
+                      maxW={isMobile ? "120px" : "100px"}
                       style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                      maxW={isMobile ? "110px" : "180px"}
                       isTruncated
                     >
                       <Text noOfLines={1}>
                         <Link
-                          href={`/models/${item?.platform}/${item?.id}`}
+                          href={`/creators/${item?.platform}/${item?.creator}`}
                           color="teal"
                           textDecoration="underline"
                         >
-                          {item?.modelName}
+                          {item?.creator}
                         </Link>
                       </Text>
                     </Td>
-                    <Td
-                      style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                      maxW={isMobile ? "110px" : "180px"}
-                      isTruncated
-                    >
-                      <Text noOfLines={3}>{item?.description}</Text>
-                    </Td>
-                    <Td width="160px">
-                      <Box width="160px" height="90px" overflow="hidden">
-                        <Link
-                          href={`/models/${item?.platform}/${item?.id}`}
-                          color="teal"
-                          textDecoration="underline"
+                  )}
+                  <Td
+                    style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                    maxW={isMobile ? "110px" : "180px"}
+                    isTruncated
+                  >
+                    <Text noOfLines={1}>
+                      <Link
+                        href={`/models/${item?.platform}/${item?.id}`}
+                        color="teal"
+                        textDecoration="underline"
+                      >
+                        {item?.modelName}
+                      </Link>
+                    </Text>
+                  </Td>
+                  <Td
+                    style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                    maxW={isMobile ? "110px" : "180px"}
+                    isTruncated
+                  >
+                    <Text noOfLines={3}>{item?.description}</Text>
+                  </Td>
+                  <Td width="160px">
+                    <Box width="160px" height="90px" overflow="hidden">
+                      <Link
+                        href={`/models/${item?.platform}/${item?.id}`}
+                        color="teal"
+                        textDecoration="underline"
+                      >
+                        <PreviewImage src={item?.example ? item.example : ""} />
+                      </Link>
+                    </Box>
+                  </Td>
+                  {!isMobile && <Td>{toTitleCase(item.platform)}</Td>}
+                  <Td
+                    maxW={isMobile ? "120px" : "120px"}
+                    style={{
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    {item?.tags?.split(",").map((tag) => (
+                      <Text
+                        key={tag}
+                        as="span"
+                        onClick={() => handleTagClick(tag)}
+                      >
+                        <Tag
+                          _hover={{
+                            cursor: "pointer",
+                            backgroundColor: "gray.300",
+                          }}
+                          _active={{
+                            backgroundColor: "gray.400",
+                          }}
                         >
-                          <PreviewImage
-                            src={item?.example ? item.example : ""}
-                          />
-                        </Link>
-                      </Box>
-                    </Td>
-                    {!isMobile && <Td>{toTitleCase(item.platform)}</Td>}
-                    <Td
-                      maxW={isMobile ? "200px" : "200px"}
-                      style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                    >
-                      {item?.tags?.split(",").map((tag) => (
-                        <Text
-                          key={tag}
-                          as="span"
-                          onClick={() => handleTagClick(tag)}
-                          noOfLines={1}
-                        >
-                          <Tag
-                            _hover={{
-                              cursor: "pointer",
-                              backgroundColor: "gray.300",
-                            }}
-                            _active={{
-                              backgroundColor: "gray.400",
+                          <span
+                            maxW={isMobile ? "140px" : "140px"}
+                            style={{
+                              wordWrap: "break-word",
+                              whiteSpace: "nowrap",
+                              textOverflow: "ellipsis",
+                              overflow: "hidden",
                             }}
                           >
                             {tag}
-                          </Tag>
-                        </Text>
-                      ))}
-                    </Td>
-                    <Td maxW={isMobile ? "100px" : "120px"} isNumeric>
-                      {item.runs !== null ? item.runs.toLocaleString() : "-"}
-                    </Td>
-                    <Td maxW={isMobile ? "200px" : "220px"} isNumeric>
-                      ${item.costToRun ? item.costToRun : " -"}
-                    </Td>
-                  </Tr>
-                ))
-              : // Display 10 Skeleton rows while loading data
-                [...Array(10)].map((_, i) => (
-                  <Tr key={i}>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="64px" width="64px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                    <Td>
-                      <Skeleton height="20px" />
-                    </Td>
-                  </Tr>
-                ))}
+                          </span>
+                        </Tag>
+                      </Text>
+                    ))}
+                  </Td>
+                  <Td maxW={isMobile ? "100px" : "120px"} isNumeric>
+                    {item.runs !== null ? formatRuns(item.runs) : "-"}
+                  </Td>
+                  <Td maxW={isMobile ? "200px" : "220px"} isNumeric>
+                    ${item.costToRun ? item.costToRun : " -"}
+                  </Td>
+                </Tr>
+              ))
+            ) : loading ? (
+              [...Array(10)].map((_, i) => (
+                <Tr key={i}>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="64px" width="64px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                  <Td>
+                    <Skeleton height="20px" />
+                  </Td>
+                </Tr>
+              ))
+            ) : (
+              <Tr>
+                <Td colSpan={isMobile ? 1 : 9} height="200px">
+                  <Text textAlign="center" color="gray.500">
+                    No models found - try changing your search!
+                  </Text>
+                </Td>
+              </Tr>
+            )}
           </Tbody>
         </Table>
       </TableContainer>

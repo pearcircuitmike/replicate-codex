@@ -9,7 +9,6 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../../../components/MetaTags";
-import PreviewImage from "../../../components/PreviewImage";
 
 import {
   fetchModelDataById,

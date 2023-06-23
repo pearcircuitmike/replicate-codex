@@ -24,7 +24,9 @@ const ModelOverview = ({ model }) => {
               {model?.creator}
             </Link>
           </Text>
-          <PreviewImage src={model?.example} />
+          <Box>
+            <PreviewImage src={model?.example} />
+          </Box>
           <Text color="gray.700">{truncatedDescription}</Text>
           <Box>
             <Tag colorScheme="teal">{model?.tags}</Tag>

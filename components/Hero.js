@@ -9,6 +9,7 @@ import {
   useMediaQuery,
   Box,
   Link,
+  Image,
 } from "@chakra-ui/react";
 
 const Hero = () => {
@@ -22,6 +23,10 @@ const Hero = () => {
         mt={isMobile ? 4 : 8}
         mb={isMobile ? 8 : 16}
       >
+        <Link href="https://labelstud.io/?utm_source=newsletter&utm_medium=email&utm_campaign=aimodelsfyi&utm_id=newsletterads">
+          <Image src="/heartex.png" />
+        </Link>
+
         <Heading
           as="h1"
           fontSize={isMobile ? "3xl" : "4xl"}
