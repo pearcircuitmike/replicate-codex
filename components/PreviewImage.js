@@ -9,8 +9,6 @@ const gradients = [
 ];
 
 const PreviewImage = ({ src }) => {
-  console.log("Rendering PreviewImage with src:", src);
-
   const [hasLoaded, setHasLoaded] = useState(false);
   const [bgGradient, setBgGradient] = useState("");
   const [hasError, setHasError] = useState(false);
