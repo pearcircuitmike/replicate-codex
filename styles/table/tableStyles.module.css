@@ -8,6 +8,10 @@
   background: #cbd5e0;
 }
 
+.paginatedTable th{
+  
+}
+
 .paginatedTable tr:hover {
   background: #f7fafc;
 }
