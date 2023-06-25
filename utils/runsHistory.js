@@ -4,7 +4,7 @@ export async function fetchRunsHistoryByModelId(modelId) {
   const { data, error } = await supabase
     .from("runsHistory")
     .select("*")
-    .eq("model_id", modelId)
+    .eq("modelId", modelId)
     .order("timestamp", { ascending: true });
 
   if (error) {
