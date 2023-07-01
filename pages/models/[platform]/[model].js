@@ -20,7 +20,7 @@ import SimilarModelsTable from "../../../components/modelDetailsPage/SimilarMode
 import CreatorModelsTable from "../../../components/modelDetailsPage/CreatorModelsTable";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
-import ModelPricingSummary from "../../../components/ModelPricingSummary";
+import ModelPricingSummary from "../../../components/modelDetailsPage/ModelPricingSummary";
 import RunsHistoryChart from "../../../components/modelDetailsPage/RunsHistoryChart";
 
 import calculateCreatorRank from "../../../utils/calculateCreatorRank";
