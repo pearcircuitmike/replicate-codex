@@ -11,14 +11,11 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import calculateModelRank from "../utils/calculateModelRank";
+import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 const ModelCard = ({ model, allModels }) => {
   const rank = calculateModelRank(allModels, model?.id);
-  const formatRuns = (runs) => {
-    if (runs >= 1000000) return `${(runs / 1000000).toFixed(1)}M`;
-    if (runs >= 1000) return `${(runs / 1000).toFixed(1)}K`;
-    return runs;
-  };
+
   if (!model) {
     return (
       <Box
@@ -97,7 +94,7 @@ const ModelCard = ({ model, allModels }) => {
         </Box>
         <HStack justify="space-between" mb={3}>
           <Box>
-            <Text fontSize="sm">Runs: {formatRuns(model.runs)}</Text>
+            <Text fontSize="sm">Runs: {formatLargeNumber(model.runs)}</Text>
             <Text fontSize="sm">Rank: {rank}</Text>
           </Box>
           <Box>

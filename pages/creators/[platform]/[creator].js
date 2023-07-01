@@ -20,6 +20,7 @@ import ShareTweetButton from "../../../components/ShareTweetButton";
 import calculateCreatorRank from "../../../utils/calculateCreatorRank";
 import PreviewImage from "../../../components/PreviewImage";
 import MetaTags from "../../../components/MetaTags";
+import { formatLargeNumber } from "@/utils/formatLargeNumber.js";
 
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
@@ -110,7 +111,9 @@ export default function Creator({ creator, models, allModels, platform }) {
         </Text>
         <Text fontSize="lg" color="gray.500" mb="8">
           Number of Runs:{" "}
-          {models.reduce((sum, model) => sum + model.runs, 0).toLocaleString()}
+          {formatLargeNumber(
+            models.reduce((sum, model) => sum + model.runs, 0)
+          )}
         </Text>
         <Table>
           <Thead>

@@ -11,16 +11,7 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
-
-function formatNumber(number) {
-  if (number >= 1000000) {
-    return (number / 1000000).toFixed(1) + "M";
-  } else if (number >= 1000) {
-    return (number / 1000).toFixed(1) + "K";
-  } else {
-    return number.toString();
-  }
-}
+import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 const medalEmoji = (rank) => {
   switch (rank) {
@@ -71,7 +62,7 @@ const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
                     {model.modelName}
                   </a>
                 </Td>
-                <Td>{formatNumber(model.runs)}</Td>
+                <Td>{formatLargeNumber(model.runs)}</Td>
                 <Td>
                   <a
                     href={`/creators/${model.platform}/${model.creator}`}

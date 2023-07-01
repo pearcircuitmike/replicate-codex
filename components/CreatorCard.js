@@ -1,14 +1,9 @@
 import React from "react";
 import { Box, Heading, Text, Avatar, Button, Flex } from "@chakra-ui/react";
 import Link from "next/link";
+import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 const CreatorCard = ({ creator }) => {
-  const formatRuns = (runs) => {
-    if (runs >= 1000000) return `${(runs / 1000000).toFixed(1)}M`;
-    if (runs >= 1000) return `${(runs / 1000).toFixed(1)}K`;
-    return runs;
-  };
-
   const getMedalEmoji = (rank) => {
     switch (rank) {
       case 1:
@@ -67,7 +62,7 @@ const CreatorCard = ({ creator }) => {
             {creator.creator} {medalEmoji}
           </Heading>
           <Text fontSize="sm" color="gray.500">
-            Total Runs: {formatRuns(creator.total_runs)}
+            Total Runs: {formatLargeNumber(creator.total_runs)}
           </Text>
           <Text fontSize="sm" color="gray.500">
             Rank: {creator.rank}

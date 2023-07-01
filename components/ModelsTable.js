@@ -32,6 +32,7 @@ import {
 import supabase from "../utils/supabaseClient";
 import Pagination from "./Pagination.js";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
+import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 const ModelsTable = ({ pageSize = 8 }) => {
   const [loading, setLoading] = useState(true);
@@ -52,12 +53,6 @@ const ModelsTable = ({ pageSize = 8 }) => {
     return str?.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
-  };
-
-  const formatRuns = (runs) => {
-    if (runs >= 1000000) return `${(runs / 1000000).toFixed(1)}M`;
-    if (runs >= 1000) return `${(runs / 1000).toFixed(1)}K`;
-    return runs;
   };
 
   const fetchTags = useCallback(async () => {
@@ -444,7 +439,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
                     ))}
                   </Td>
                   <Td maxW={isMobile ? "100px" : "120px"} isNumeric>
-                    {item.runs !== null ? formatRuns(item.runs) : "-"}
+                    {item.runs !== null ? formatLargeNumber(item.runs) : "-"}
                   </Td>
                   <Td maxW={isMobile ? "200px" : "220px"} isNumeric>
                     ${item.costToRun ? item.costToRun : " -"}
