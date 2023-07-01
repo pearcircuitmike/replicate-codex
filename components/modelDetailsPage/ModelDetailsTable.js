@@ -14,20 +14,9 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import truncateWithReadMore from "@/utils/truncateWithReadMore";
+import { getMedalEmoji } from "@/utils/getMedalEmoji";
 
 const ModelDetailsTable = ({ model }) => {
-  const trophyIcon = (rank) => {
-    if (rank === 1) {
-      return " 🥇";
-    } else if (rank === 2) {
-      return " 🥈";
-    } else if (rank === 3) {
-      return " 🥉";
-    } else {
-      return null;
-    }
-  };
-
   const truncatedDescription = truncateWithReadMore(
     model.description,
     75,
@@ -184,13 +173,13 @@ const ModelDetailsTable = ({ model }) => {
             <Tr>
               <Td>Model Rank</Td>
               <Td>
-                {model?.modelRank} {trophyIcon(model?.modelRank)}
+                {model?.modelRank} {getMedalEmoji(model?.modelRank)}
               </Td>
             </Tr>
             <Tr>
               <Td>Creator Rank</Td>
               <Td>
-                {model?.creatorRank} {trophyIcon(model?.creatorRank)}
+                {model?.creatorRank} {getMedalEmoji(model?.creatorRank)}
               </Td>
             </Tr>
           </Tbody>

@@ -9,6 +9,7 @@ import MetaTags from "../../../components/MetaTags";
 import ModelCard from "../../../components/ModelCard";
 import { formatLargeNumber } from "@/utils/formatLargeNumber.js";
 import { toTitleCase } from "@/utils/toTitleCase.js";
+import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
 
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
@@ -80,9 +81,7 @@ export default function Creator({ creator, models, allModels, platform }) {
       <Container maxW="container.xl" py="12">
         <Heading as="h1" size="xl" mb="2">
           {toTitleCase(creator)}
-          {rank == 1 ? " 🥇" : ""}
-          {rank == 2 ? " 🥈" : ""}
-          {rank == 3 ? " 🥉" : ""}
+          {getMedalEmoji(rank)}
         </Heading>
         Rank: {calculateCreatorRank(allModels, creator)}
         <Text fontSize="lg" color="gray.500">

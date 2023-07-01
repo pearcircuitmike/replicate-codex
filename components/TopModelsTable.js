@@ -12,19 +12,7 @@ import {
 } from "@chakra-ui/react";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
-
-const medalEmoji = (rank) => {
-  switch (rank) {
-    case 1:
-      return "🥇";
-    case 2:
-      return "🥈";
-    case 3:
-      return "🥉";
-    default:
-      return "";
-  }
-};
+import { getMedalEmoji } from "@/utils/getMedalEmoji";
 
 const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
   return (
@@ -48,7 +36,7 @@ const TopModelsTable = ({ models, selectedTags, onTagClose, onTagsChange }) => {
             {models?.map((model, index) => (
               <Tr key={model.id}>
                 <Td>
-                  {medalEmoji(index + 1)}
+                  {getMedalEmoji(index + 1)}
                   {index + 1}
                 </Td>
                 <Td isTruncated maxW="150px">

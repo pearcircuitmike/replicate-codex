@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { fetchCreators } from "../utils/fetchCreatorsPaginated";
 import Pagination from "./Pagination";
+import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
 
 function CreatorsLeaderboard({ searchValue }) {
   const [creatorsData, setCreatorsData] = useState([]);
@@ -52,9 +53,7 @@ function CreatorsLeaderboard({ searchValue }) {
             {creatorsData.map((creatorData) => (
               <Tr key={creatorData.creator}>
                 <Td isNumeric>
-                  {creatorData.rank === 1 ? "🥇" : ""}
-                  {creatorData.rank === 2 ? "🥈" : ""}
-                  {creatorData.rank === 3 ? "🥉" : ""}
+                  {getMedalEmoji({creatorData.rank})}
                   {creatorData.rank}
                 </Td>
                 <Td isNumeric>{creatorData.total_runs.toLocaleString()}</Td>

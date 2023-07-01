@@ -10,6 +10,7 @@ import {
   TableContainer,
   Tag,
 } from "@chakra-ui/react";
+import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
 
 function getRank(modelId, data) {
   const sortedData = [...data].sort((a, b) => b.runs - a.runs);
@@ -78,9 +79,7 @@ function ModelLeaderboard({ data, searchValue, selectedTags, sorts }) {
               return (
                 <Tr key={model.id}>
                   <Td isNumeric>
-                    {rank === 1 ? "🥇" : ""}
-                    {rank === 2 ? "🥈" : ""}
-                    {rank === 3 ? "🥉" : ""}
+                    {getMedalEmoji(rank)}
                     {rank}
                   </Td>
 

@@ -2,21 +2,9 @@ import React from "react";
 import { Box, Heading, Text, Avatar, Button, Flex } from "@chakra-ui/react";
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
 
 const CreatorCard = ({ creator }) => {
-  const getMedalEmoji = (rank) => {
-    switch (rank) {
-      case 1:
-        return "🥇";
-      case 2:
-        return "🥈";
-      case 3:
-        return "🥉";
-      default:
-        return "";
-    }
-  };
-
   if (!creator) {
     return (
       <Box
@@ -36,9 +24,6 @@ const CreatorCard = ({ creator }) => {
       </Box>
     );
   } else {
-    const rank = creator.rank;
-    const medalEmoji = getMedalEmoji(rank);
-
     return (
       <Box
         borderWidth="1px"
@@ -59,7 +44,7 @@ const CreatorCard = ({ creator }) => {
             mb={3}
           />
           <Heading as="h2" size="md" isTruncated mb={2}>
-            {creator.creator} {medalEmoji}
+            {creator.creator} {getMedalEmoji(creator.rank)}
           </Heading>
           <Text fontSize="sm" color="gray.500">
             Total Runs:{" "}
