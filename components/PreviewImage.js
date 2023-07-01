@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Box, Image as ChakraImage, Skeleton } from "@chakra-ui/react";
 
 const gradients = [
-  "linear(to-r, gray.300, pink.500)",
-  "linear(to-r, #7928CA, #FF0080)",
-  "linear(to-r, gray.300, yellow.400, pink.200)",
-  "linear(red.100 0%, orange.100 25%, yellow.100 50%)",
+  "linear(to-r, gray.400, gray.500)",
+  "linear(to-r, blue.400, blue.500)",
+  "linear(to-r, teal.400, teal.500)",
 ];
 
 const PreviewImage = ({ src }) => {
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [bgGradient, setBgGradient] = useState("");
   const [hasError, setHasError] = useState(false);
 
@@ -22,44 +21,56 @@ const PreviewImage = ({ src }) => {
       img.src = src;
 
       img.onload = () => {
-        setHasLoaded(true);
+        setIsLoading(false);
       };
 
       img.onerror = () => {
         setHasError(true);
         console.error(`Error loading image: ${src}`);
       };
+    } else {
+      setIsLoading(false);
     }
-  }, []);
+  }, [src]);
 
   const displayFallback = !src || src.trim() === "" || hasError;
 
   return (
-    <Skeleton
-      isLoaded={hasLoaded || displayFallback}
-      startColor="gray.300"
-      endColor="gray.500"
-      mb="8"
-      width="100%"
-      height="100%"
-    >
-      <Box
-        as="span"
-        display={hasLoaded || displayFallback ? "inline-block" : "none"}
-        width="100%"
-        height="100%"
-        bgGradient={displayFallback ? bgGradient : "none"}
-      >
-        {!displayFallback && (
+    <>
+      {displayFallback ? (
+        <Box
+          bgGradient={bgGradient}
+          width="100%"
+          height="100%"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          fontSize="xl"
+          fontWeight="bold"
+          color="white"
+          minH="350px"
+          textAlign="center"
+        >
+          No Preview
+        </Box>
+      ) : (
+        <Skeleton
+          isLoaded={!isLoading}
+          startColor="gray.300"
+          endColor="gray.500"
+          mb="8"
+          width="100%"
+          height="100%"
+        >
           <ChakraImage
             src={src}
             alt="AI model preview image"
             objectFit="cover"
             boxSize="100%"
           />
-        )}
-      </Box>
-    </Skeleton>
+        </Skeleton>
+      )}
+    </>
   );
 };
 
