@@ -29,9 +29,9 @@ const ModelDetailsTable = ({ model }) => {
   };
 
   const truncatedDescription = truncateWithReadMore(
-    model?.description,
-    275,
-    false
+    model.description,
+    75,
+    true
   );
 
   return (
@@ -78,7 +78,7 @@ const ModelDetailsTable = ({ model }) => {
             <Tr>
               <Td>Description</Td>
               <Td>
-                {model?.description
+                {model.description
                   ? truncatedDescription
                   : "No description provided"}
               </Td>

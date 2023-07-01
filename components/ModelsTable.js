@@ -33,7 +33,7 @@ import supabase from "../utils/supabaseClient";
 import Pagination from "./Pagination.js";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
 
-const ModelsTable = ({ pageSize = 10 }) => {
+const ModelsTable = ({ pageSize = 8 }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
@@ -146,7 +146,7 @@ const ModelsTable = ({ pageSize = 10 }) => {
     // If the user clicks on the column that is currently sorted,
     // toggle the sort order. Otherwise, start sorting by the new column in ascending order.
     const newSortOrder =
-      sortColumn === column ? (sortOrder === "asc" ? "desc" : "asc") : "asc";
+      sortColumn === column ? (sortOrder === "asc" ? "desc" : "asc") : "desc";
     setSortColumn(column);
     setSortOrder(newSortOrder);
   };
@@ -460,14 +460,16 @@ const ModelsTable = ({ pageSize = 10 }) => {
                   <Td>
                     <Skeleton height="20px" />
                   </Td>
+
                   <Td>
-                    <Skeleton height="64px" width="64px" />
+                    <Skeleton height="20px" />
                   </Td>
+
                   <Td>
                     <Skeleton height="20px" />
                   </Td>
                   <Td>
-                    <Skeleton height="20px" />
+                    <Skeleton height="64px" width="160px" />
                   </Td>
                   <Td>
                     <Skeleton height="20px" />

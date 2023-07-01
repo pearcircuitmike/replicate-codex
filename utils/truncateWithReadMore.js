@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import { chakra } from "@chakra-ui/react";
+import truncate from "html-truncate";
 
 const truncateWithReadMore = (content, length, hasReadMore) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  if (!content || content.length <= length) {
-    return content;
-  }
+  // If content is not provided, default to an empty string.
+  const validContent = content || "";
 
-  const truncatedContent = isExpanded
-    ? content
-    : content.slice(0, length) + "...";
+  const fullContent = (
+    <div dangerouslySetInnerHTML={{ __html: validContent }} />
+  );
+  const truncatedContent = (
+    <div dangerouslySetInnerHTML={{ __html: truncate(validContent, length) }} />
+  );
+
+  const contentToShow = isExpanded ? fullContent : truncatedContent;
 
   const handleReadMore = () => {
     setIsExpanded(true);
@@ -18,7 +23,7 @@ const truncateWithReadMore = (content, length, hasReadMore) => {
 
   return (
     <>
-      {truncatedContent}
+      {contentToShow}
       {hasReadMore && !isExpanded && (
         <>
           {" "}

@@ -30,7 +30,7 @@ const PreviewImage = ({ src }) => {
         console.error(`Error loading image: ${src}`);
       };
     }
-  }, [src]);
+  }, []);
 
   const displayFallback = !src || src.trim() === "" || hasError;
 

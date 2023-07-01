@@ -1,39 +1,38 @@
-import { Box, Heading, Text, Link, Tag, VStack } from "@chakra-ui/react";
-import truncateWithReadMore from "@/utils/truncateWithReadMore";
+import parse, { domToReact } from "html-react-parser";
+import {
+  Box,
+  Heading,
+  Text,
+  Link,
+  Tag,
+  VStack,
+  List,
+  ListItem,
+  Code,
+  chakra,
+} from "@chakra-ui/react";
 import PreviewImage from "../PreviewImage";
 
 const ModelOverview = ({ model }) => {
-  const truncatedDescription = truncateWithReadMore(
-    model?.description,
-    275,
-    true
-  );
-
   return (
-    <>
-      <Box>
-        <VStack alignItems="left" spacing={2}>
-          <Heading as="h2" size="lg">
-            {model?.modelName}
-          </Heading>
-          <Text>
-            <Link
-              href={`/creators/${model?.platform}/${model?.creator}`}
-              color="blue.500"
-            >
-              {model?.creator}
-            </Link>
-          </Text>
-          <Box>
-            <PreviewImage src={model?.example} />
-          </Box>
-          <Text color="gray.700">{truncatedDescription}</Text>
-          <Box>
-            <Tag colorScheme="teal">{model?.tags}</Tag>
-          </Box>
-        </VStack>
-      </Box>
-    </>
+    <Box>
+      <VStack alignItems="left" spacing={2}>
+        <Heading as="h1">{model?.modelName}</Heading>
+        <Text>
+          <Link
+            href={`/creators/${model?.platform}/${model?.creator}`}
+            color="blue.500"
+          >
+            {model?.creator}
+          </Link>
+        </Text>
+        <PreviewImage src={model?.example} />
+        <Box> {model?.description}</Box>
+        <Box>
+          <Tag colorScheme="teal">{model?.tags}</Tag>
+        </Box>
+      </VStack>
+    </Box>
   );
 };
 

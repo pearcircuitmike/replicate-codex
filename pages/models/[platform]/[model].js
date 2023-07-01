@@ -7,6 +7,7 @@ import {
   Text,
   Heading,
 } from "@chakra-ui/react";
+
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../../../components/MetaTags";
 
