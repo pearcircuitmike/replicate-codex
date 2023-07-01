@@ -6,6 +6,7 @@ import {
   IconButton,
   Spacer,
   Image,
+  VStack,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useState } from "react";
@@ -105,33 +106,36 @@ const Navbar = () => {
               ></IconButton>
             </Flex>
           </HStack>
-          <Flex flexDir="column" align="center">
-            <Link href="/creators" aria-label="creators" m={"10px"} w="100%">
-              <span onClick={() => changeDisplay("none")}>Creators</span>
-            </Link>
-            <Link href="/models" aria-label="models" m={"10px"} w="100%">
-              <span onClick={() => changeDisplay("none")}>Models </span>
-            </Link>
-            <Link href="/trending" aria-label="trending" m={"10px"} w="100%">
-              <span onClick={() => changeDisplay("none")}>🔥 Trending </span>
-            </Link>
 
-            <Link
-              href="https://notes.aimodels.fyi"
-              aria-label="notes"
-              m={"10px"}
-              w="100%"
-            >
-              <span onClick={() => changeDisplay("none")}>Notes</span>
-            </Link>
-            <Link
-              href="https://www.passionfroot.me/replicate-codex"
-              aria-label="advertise"
-              m={"10px"}
-              w="100%"
-            >
-              <span onClick={() => changeDisplay("none")}>Advertise</span>
-            </Link>
+          <Flex flexDir="column" align="center">
+            <VStack spacing={3} m={5} fontSize="xl">
+              <Link href="/creators" aria-label="creators" m={"10px"} w="100%">
+                <span onClick={() => changeDisplay("none")}>Creators</span>
+              </Link>
+              <Link href="/models" aria-label="models" m={"10px"} w="100%">
+                <span onClick={() => changeDisplay("none")}>Models </span>
+              </Link>
+              <Link href="/trending" aria-label="trending" m={"10px"} w="100%">
+                <span onClick={() => changeDisplay("none")}>Trending </span>
+              </Link>
+
+              <Link
+                href="https://notes.aimodels.fyi"
+                aria-label="notes"
+                m={"10px"}
+                w="100%"
+              >
+                <span onClick={() => changeDisplay("none")}>Notes</span>
+              </Link>
+              <Link
+                href="https://www.passionfroot.me/replicate-codex"
+                aria-label="advertise"
+                m={"10px"}
+                w="100%"
+              >
+                <span onClick={() => changeDisplay("none")}>Advertise</span>
+              </Link>
+            </VStack>
           </Flex>
         </Flex>
       </Flex>
