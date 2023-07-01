@@ -83,9 +83,9 @@ const ModelCard = ({ model, allModels }) => {
               </Text>
             </Link>
           </HStack>
-          {model?.tags.split(",")?.map((tag, index) => (
+          {model?.tags?.split(",")?.map((tag, index) => (
             <Tag key={index} mr={1} mb={1}>
-              {tag.trim()}
+              {tag?.trim()}
             </Tag>
           ))}
           <Text fontSize="sm" noOfLines={3} mb={3}>
