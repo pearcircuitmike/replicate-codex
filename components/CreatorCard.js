@@ -62,7 +62,8 @@ const CreatorCard = ({ creator }) => {
             {creator.creator} {medalEmoji}
           </Heading>
           <Text fontSize="sm" color="gray.500">
-            Total Runs: {formatLargeNumber(creator.total_runs)}
+            Total Runs:{" "}
+            {formatLargeNumber(creator.total_runs ? creator.total_runs : 0)}
           </Text>
           <Text fontSize="sm" color="gray.500">
             Rank: {creator.rank}

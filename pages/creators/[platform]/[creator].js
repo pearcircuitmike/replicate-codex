@@ -1,26 +1,14 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Badge,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Td,
-  Image,
-  Link,
-} from "@chakra-ui/react";
+import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import { fetchAllDataFromTable } from "../../../utils/modelsData.js";
 import Head from "next/head";
 import SimilarCreators from "../../../components/SimilarCreators";
 import ShareLinkButton from "../../../components/ShareLinkButton";
 import ShareTweetButton from "../../../components/ShareTweetButton";
 import calculateCreatorRank from "../../../utils/calculateCreatorRank";
-import PreviewImage from "../../../components/PreviewImage";
 import MetaTags from "../../../components/MetaTags";
+import ModelCard from "../../../components/ModelCard";
 import { formatLargeNumber } from "@/utils/formatLargeNumber.js";
+import { toTitleCase } from "@/utils/toTitleCase.js";
 
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
@@ -58,15 +46,6 @@ export default function Creator({ creator, models, allModels, platform }) {
       .filter((model) => model.costToRun !== "")
       .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
 
-  const modelTypes = {};
-  models.forEach((model) => {
-    const tags = model.tags ? model.tags : "";
-    if (tags in modelTypes) {
-      modelTypes[tags]++;
-    } else {
-      modelTypes[tags] = 1;
-    }
-  });
   function getSimilarCreators(creator) {
     const creatorModels = models;
     const creatorTags = creatorModels.flatMap((model) => {
@@ -99,8 +78,8 @@ export default function Creator({ creator, models, allModels, platform }) {
       />
 
       <Container maxW="container.xl" py="12">
-        <Heading as="h2" size="xl" mb="2">
-          {creator}
+        <Heading as="h1" size="xl" mb="2">
+          {toTitleCase(creator)}
           {rank == 1 ? " 🥇" : ""}
           {rank == 2 ? " 🥈" : ""}
           {rank == 3 ? " 🥉" : ""}
@@ -112,62 +91,31 @@ export default function Creator({ creator, models, allModels, platform }) {
         <Text fontSize="lg" color="gray.500" mb="8">
           Number of Runs:{" "}
           {formatLargeNumber(
-            models.reduce((sum, model) => sum + model.runs, 0)
+            models.reduce((sum, model) => sum + model.runs, 0).toLocaleString()
           )}
         </Text>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>Model Type</Th>
-              <Th>Count</Th>
-            </Tr>
-          </Thead>
-          <tbody>
-            {Object.entries(modelTypes).map(([tag, count]) => (
-              <Tr key={tag}>
-                <Td>{tag}</Td>
-                <Td>{count}</Td>
-              </Tr>
-            ))}
-          </tbody>
-        </Table>
-        <ShareLinkButton />
-        <ShareTweetButton />
-        <Box mt="12" display="flex" flexWrap="wrap">
+        <Heading as="h2" size="lg" mt={2}>
+          Models by this creator
+        </Heading>
+        <Box my={2} display="flex" flexWrap="wrap">
           {models.map((model) => (
             <Box
               key={model.id}
               width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
               p="4"
             >
-              <Box>
-                <Link href={`/models/${model.platform}/${model.id}`}>
-                  <PreviewImage src={model.example} />
-                </Link>
-              </Box>
-
-              <Heading as="h3" size="lg" mb="2">
-                {model.modelName}
-              </Heading>
-              <Text fontSize="lg" color="gray.500" mb="4">
-                {model.description}
-              </Text>
-              <Badge colorScheme="teal" mb="4">
-                {model.tags}
-              </Badge>
-              <Text fontSize="lg" mb="4">
-                Cost/run: ${model.costToRun}
-              </Text>
-              <Text fontSize="lg" mb="4">
-                Runs: {model.runs?.toLocaleString()}
-              </Text>
-              <Text fontSize="lg" color="gray.500" mb="4">
-                Last Updated: {model.lastUpdated}
-              </Text>
+              <ModelCard model={model} allModels={allModels} />{" "}
             </Box>
           ))}
         </Box>
-        <SimilarCreators similarCreators={similarCreators} data={allModels} />
+        <Heading as="h2" size="lg" mt={2}>
+          Similar creators
+        </Heading>
+        <SimilarCreators
+          similarCreators={similarCreators}
+          data={allModels}
+          mt={1}
+        />
       </Container>
     </>
   );

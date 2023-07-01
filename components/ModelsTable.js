@@ -32,6 +32,7 @@ import {
 import supabase from "../utils/supabaseClient";
 import Pagination from "./Pagination.js";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
+import { toTitleCase } from "@/utils/toTitleCase";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 const ModelsTable = ({ pageSize = 8 }) => {
@@ -48,12 +49,6 @@ const ModelsTable = ({ pageSize = 8 }) => {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
   const [allTags, setAllTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
-
-  const toTitleCase = (str) => {
-    return str?.replace(/\w\S*/g, (txt) => {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-  };
 
   const fetchTags = useCallback(async () => {
     const { data: tagData } = await supabase
