@@ -53,12 +53,12 @@ const TrendingModelsChart = ({ modelIds }) => {
         modelIds?.map(async (modelId, index) => {
           const modelData = await fetchModelDataById(
             modelId,
-            "replicateModelsData"
+            "combinedModelsData"
           );
 
           const runsHistory = await fetchRunsHistoryByModelId(
             modelId,
-            "replicateModelsData"
+            "combinedModelsData"
           );
 
           if (!runsHistory || runsHistory.length === 0) {
