@@ -21,23 +21,45 @@ const truncateWithReadMore = (content, length, hasReadMore) => {
     setIsExpanded(true);
   };
 
-  return (
-    <>
-      {contentToShow}
-      {hasReadMore && !isExpanded && (
-        <>
-          {" "}
-          <chakra.span
-            cursor="pointer"
-            color="teal.600"
-            onClick={handleReadMore}
-          >
-            Read more »
-          </chakra.span>
-        </>
-      )}
-    </>
-  );
+  const handleReadLess = () => {
+    setIsExpanded(false);
+  };
+
+  // Render truncated content and read more button if the content is longer than the character limit
+  if (validContent.length > length) {
+    return (
+      <>
+        {contentToShow}
+        {!isExpanded && (
+          <>
+            {" "}
+            <chakra.span
+              cursor="pointer"
+              color="teal.600"
+              onClick={handleReadMore}
+            >
+              Read more »
+            </chakra.span>
+          </>
+        )}
+        {isExpanded && (
+          <>
+            {" "}
+            <chakra.span
+              cursor="pointer"
+              color="teal.600"
+              onClick={handleReadLess}
+            >
+              Read less «
+            </chakra.span>
+          </>
+        )}
+      </>
+    );
+  }
+
+  // Render the full content if it is not longer than the character limit
+  return <>{contentToShow}</>;
 };
 
 export default truncateWithReadMore;
