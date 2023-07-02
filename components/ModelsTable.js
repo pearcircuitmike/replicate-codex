@@ -182,7 +182,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
       <Box my={5}>
         <Input
           type="text"
-          placeholder="Search"
+          placeholder="Search by model (Ex: stable diffusion) or use case (Ex: upscaler)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
