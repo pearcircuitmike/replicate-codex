@@ -48,9 +48,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const model = await fetchModelDataById(params.model, params.platform);
 
-  const modelsData = await fetchAllDataFromTable(
-    `${params.platform}ModelsData`
-  );
+  const modelsData = await fetchAllDataFromTable(`combinedModelsData`);
 
   // Calculate model rank and creator rank
   const modelRank = calculateModelRank(modelsData, model.id);

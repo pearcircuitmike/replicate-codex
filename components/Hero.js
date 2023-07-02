@@ -51,7 +51,10 @@ const Hero = () => {
             src="https://aimodels.substack.com/embed"
             width="100%"
             height="auto"
-            style={{ border: "0px solid #EEE", background: "white" }}
+            style={{
+              border: "0px solid #EEE",
+              background: "white",
+            }}
           ></iframe>
         </Box>
       </VStack>
