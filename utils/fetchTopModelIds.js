@@ -26,7 +26,6 @@ export async function fetchTopModelIds(
     }
 
     const { data, error } = await query;
-    console.log(data);
 
     if (error) {
       console.error("Error fetching top model ids:", error);
