@@ -96,8 +96,10 @@ const ModelsTable = ({ pageSize = 8 }) => {
 
         // Apply search
         if (searchQuery) {
+          const searchQueryWithDashes = searchQuery.replace(/\s/g, "-");
           query = query.or(
-            `modelName.ilike.%${searchQuery}%,creator.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+            `modelName.ilike.%${searchQuery}%,creator.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,` +
+              `modelName.ilike.%${searchQueryWithDashes}%,creator.ilike.%${searchQueryWithDashes}%,description.ilike.%${searchQueryWithDashes}%`
           );
         }
 
@@ -105,7 +107,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
         if (sortColumn) {
           query = query.order(sortColumn, {
             ascending: sortOrder === "asc",
-            nullFirst: true,
+            nullsFirst: false,
           });
         }
       }
