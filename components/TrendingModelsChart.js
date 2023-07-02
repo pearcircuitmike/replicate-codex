@@ -51,15 +51,9 @@ const TrendingModelsChart = ({ modelIds }) => {
     const prepareChartData = async () => {
       const datasets = await Promise.all(
         modelIds?.map(async (modelId, index) => {
-          const modelData = await fetchModelDataById(
-            modelId,
-            "combinedModelsData"
-          );
+          const modelData = await fetchModelDataById(modelId);
 
-          const runsHistory = await fetchRunsHistoryByModelId(
-            modelId,
-            "combinedModelsData"
-          );
+          const runsHistory = await fetchRunsHistoryByModelId(modelId);
 
           if (!runsHistory || runsHistory.length === 0) {
             console.warn(
