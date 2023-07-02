@@ -49,6 +49,15 @@ const Navbar = () => {
                 🔥 Trending
               </Link>
               <Link
+                href="https://aimodels.discourse.group/"
+                aria-label="forum"
+                m={5}
+                w="100%"
+              >
+                Forum
+              </Link>
+
+              <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="notes"
                 m={5}
@@ -127,6 +136,15 @@ const Navbar = () => {
               >
                 <span onClick={() => changeDisplay("none")}>Notes</span>
               </Link>
+              <Link
+                href="https://aimodels.discourse.group/"
+                aria-label="forum"
+                m={"10px"}
+                w="100%"
+              >
+                <span onClick={() => changeDisplay("none")}>Forum </span>
+              </Link>
+
               <Link
                 href="https://www.passionfroot.me/replicate-codex"
                 aria-label="advertise"
