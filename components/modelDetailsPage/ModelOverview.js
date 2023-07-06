@@ -17,7 +17,9 @@ const ModelOverview = ({ model }) => {
   return (
     <Box>
       <VStack alignItems="left" spacing={2}>
-        <Heading as="h1">{model?.modelName}</Heading>
+        <Heading as="h1" size="2xl">
+          {model?.modelName}
+        </Heading>
         <Text>
           <Link
             href={`/creators/${model?.platform}/${model?.creator}`}

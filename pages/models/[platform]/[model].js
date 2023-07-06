@@ -1,4 +1,6 @@
+import { useState } from "react";
 import {
+  Select,
   Container,
   Grid,
   VStack,
@@ -7,27 +9,23 @@ import {
   Text,
   Heading,
 } from "@chakra-ui/react";
-
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../../../components/MetaTags";
-
 import {
   fetchModelDataById,
   fetchAllDataFromTable,
 } from "../../../utils/modelsData.js";
-
 import SimilarModelsTable from "../../../components/modelDetailsPage/SimilarModelsTable";
 import CreatorModelsTable from "../../../components/modelDetailsPage/CreatorModelsTable";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import ModelPricingSummary from "../../../components/modelDetailsPage/ModelPricingSummary";
 import RunsHistoryChart from "../../../components/modelDetailsPage/RunsHistoryChart";
-
 import calculateCreatorRank from "../../../utils/calculateCreatorRank";
 import calculateModelRank from "../../../utils/calculateModelRank";
-
 import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
+import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";
 
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
@@ -65,8 +63,15 @@ export async function getStaticProps({ params }) {
 }
 
 export default function ModelPage({ model, modelsData }) {
+  const [selectedSource, setSelectedSource] = useState(
+    model.demoSources ? model.demoSources[0] : ""
+  );
   const similarModels = findSimilarModels(model, modelsData);
   const creatorModels = findCreatorModels(model, modelsData);
+
+  const handleSourceChange = (event) => {
+    setSelectedSource(event.target.value);
+  };
 
   return (
     <>
@@ -74,6 +79,7 @@ export default function ModelPage({ model, modelsData }) {
         title={`AI model details - ${model.modelName}`}
         description={`Details about the ${model.modelName} model by ${model.creator}`}
       />
+
       <Box overflowX="hidden">
         <Container maxW="container.xl" py="12">
           <Grid
@@ -89,7 +95,31 @@ export default function ModelPage({ model, modelsData }) {
               </VStack>
             </GridItem>
             <GridItem>
-              <ModelDetailsTable model={model} />
+              <VStack spacing={6} alignItems="start">
+                <Heading as="h2" size="lg">
+                  Try it!
+                </Heading>
+                {model.demoSources?.length > 0 ? (
+                  <>
+                    <Select onChange={handleSourceChange}>
+                      {model.demoSources.map((source, index) => (
+                        <option key={index} value={source}>
+                          {source}
+                        </option>
+                      ))}
+                    </Select>
+                    <GradioEmbed
+                      src={`https://${selectedSource?.replace(
+                        /\//g,
+                        "-"
+                      )}.hf.space`}
+                    />
+                  </>
+                ) : (
+                  <Text mt={2}>No demo available</Text>
+                )}
+                <ModelDetailsTable model={model} />
+              </VStack>
             </GridItem>
           </Grid>
         </Container>

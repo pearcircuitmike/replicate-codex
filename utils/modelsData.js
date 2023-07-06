@@ -93,7 +93,9 @@ export async function fetchModelDataById(id, platform = null) {
   try {
     const { data, error } = await supabase
       .from(table)
-      .select("*")
+      .select(
+        "id, lastUpdated, creator, modelName, description, tags, example, modelUrl, runs, costToRun, githubUrl, licenseUrl, paperUrl, predictionHardware, avgCompletionTime, platform, demoSources"
+      )
       .eq("id", id)
       .single();
 
