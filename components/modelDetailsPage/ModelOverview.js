@@ -17,7 +17,7 @@ const ModelOverview = ({ model }) => {
   return (
     <Box>
       <VStack alignItems="left" spacing={2}>
-        <Heading as="h1" size="2xl">
+        <Heading as="h1" size="2xl" style={{ wordBreak: "break-all" }}>
           {model?.modelName}
         </Heading>
         <Text>
@@ -28,7 +28,7 @@ const ModelOverview = ({ model }) => {
             {model?.creator}
           </Link>
         </Text>
-        <PreviewImage src={model?.example} />
+        <PreviewImage width={"100%"} src={model?.example} />
         <Box> {model?.description}</Box>
         <Box>
           <Tag colorScheme="teal">{model?.tags}</Tag>

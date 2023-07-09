@@ -76,7 +76,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
       let query = supabase
         .from("combinedModelsData")
         .select(
-          "modelName, id, description, creator, platform, example, tags, modelUrl, runs, costToRun",
+          "modelName, id, description, creator, platform, example, tags, runs, costToRun",
           {
             count: "exact",
           }
