@@ -98,7 +98,8 @@ const ModelsTable = ({ pageSize = 8 }) => {
         if (searchQuery) {
           const searchQueryWithDashes = searchQuery.replace(/\s/g, "-");
           query = query.or(
-            `modelName.ilike.%${searchQuery}%,creator.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+            `description.ilike.%${searchQuery}%,` +
+              `modelName.ilike.%${searchQueryWithDashes}%,creator.like.%${searchQueryWithDashes}%`
           );
         }
 
