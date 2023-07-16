@@ -29,7 +29,12 @@ const ModelOverview = ({ model }) => {
           </Link>
         </Text>
         <PreviewImage width={"100%"} src={model?.example} />
-        <Box> {model?.description}</Box>
+        <Box>
+          {" "}
+          {model?.generatedSummary
+            ? model?.generatedSummary
+            : model.description}
+        </Box>
         <Box>
           <Tag colorScheme="teal">{model?.tags}</Tag>
         </Box>

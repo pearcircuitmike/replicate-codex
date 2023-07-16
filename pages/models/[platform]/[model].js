@@ -8,6 +8,7 @@ import {
   Box,
   Text,
   Heading,
+  Link,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../../../components/MetaTags";
@@ -99,6 +100,20 @@ export default function ModelPage({ model, modelsData }) {
                 <Heading as="h2" size="lg">
                   Try it!
                 </Heading>
+                <Text>
+                  You can use this area to play around with demo applications
+                  that incorporate the {model.modelName} model. These demos are
+                  maintained and hosted externally by third-party creators. If
+                  you see an error,{" "}
+                  <Link
+                    href={`https://twitter.com/mikeyoung44`}
+                    color="teal"
+                    textDecoration="underline"
+                  >
+                    message me on Twitter
+                  </Link>
+                  .
+                </Text>
                 {model.demoSources?.length > 0 ? (
                   <>
                     <Select onChange={handleSourceChange}>
@@ -116,7 +131,9 @@ export default function ModelPage({ model, modelsData }) {
                     />
                   </>
                 ) : (
-                  <Text mt={2}>No demo available</Text>
+                  <Text mt={2}>
+                    Currently, there are no demos available for this model.
+                  </Text>
                 )}
                 <ModelDetailsTable model={model} />
               </VStack>
