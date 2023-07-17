@@ -109,6 +109,11 @@ const ModelsTable = ({ pageSize = 8 }) => {
             ascending: sortOrder === "asc",
             nullsFirst: false,
           });
+        } else if (sortColumn === null) {
+          query = query.order("runs", {
+            ascending: false,
+            nullsFirst: false,
+          });
         }
       }
 
