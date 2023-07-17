@@ -96,11 +96,11 @@ const ModelsTable = ({ pageSize = 8 }) => {
 
         // Apply search
         if (searchQuery) {
-          const searchQueryWithDashes = searchQuery.replace(/\s/g, "-");
-          query = query.or(
-            `description.ilike.%${searchQuery}%,` +
-              `modelName.ilike.%${searchQueryWithDashes}%,creator.like.%${searchQueryWithDashes}%`
-          );
+          const formattedSearchQuery = searchQuery
+            .split(/\s+/) // split by whitespace
+            .map((word) => `'${word}'`) // wrap each word with quotes
+            .join(" & "); // join words with '&'
+          query = query.filter("searchText", "fts", formattedSearchQuery);
         }
 
         // If a sort column is specified, sort the data
@@ -112,7 +112,8 @@ const ModelsTable = ({ pageSize = 8 }) => {
         }
       }
 
-      const { count, data: fullData } = await query;
+      const { count, data: fullData, error } = await query;
+      if (error) throw error;
 
       // Paginate the data
       const data = ids
