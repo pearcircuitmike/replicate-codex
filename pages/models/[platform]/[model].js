@@ -78,7 +78,7 @@ export default function ModelPage({ model, modelsData }) {
     <>
       <MetaTags
         title={`AI model details - ${model.modelName}`}
-        description={`Details about the ${model.modelName} model by ${model.creator}`}
+        description={`Details about the ${model.modelName} ${model.tags} model by ${model.creator}`}
       />
 
       <Box overflowX="hidden">
