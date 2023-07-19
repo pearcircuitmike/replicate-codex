@@ -52,7 +52,9 @@ export async function fetchDataFromTable({
 
 export async function fetchAllDataFromTable(tableName) {
   // Fetch all data from the specified table
-  const { data, error } = await supabase.from(tableName).select("*");
+  const { data, error } = await supabase
+    .from(tableName)
+    .select("id, creator, modelName, runs, tags, costToRun, platform");
 
   // Handle errors
   if (error) {
