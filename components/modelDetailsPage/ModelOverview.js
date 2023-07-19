@@ -34,6 +34,15 @@ const ModelOverview = ({ model }) => {
           {model?.generatedSummary
             ? model?.generatedSummary
             : model.description}
+          <br />
+          {model.generatedUseCase && (
+            <>
+              <Heading as="h2" size="md" mt={"1em"}>
+                Use cases
+              </Heading>
+              <Text>{model.generatedUseCase}</Text>
+            </>
+          )}
         </Box>
         <Box>
           <Tag colorScheme="teal">{model?.tags}</Tag>
