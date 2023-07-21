@@ -23,7 +23,6 @@ import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import ModelPricingSummary from "../../../components/modelDetailsPage/ModelPricingSummary";
 import RunsHistoryChart from "../../../components/modelDetailsPage/RunsHistoryChart";
 import calculateCreatorRank from "../../../utils/calculateCreatorRank";
-import calculateModelRank from "../../../utils/calculateModelRank";
 import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";
@@ -45,18 +44,16 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const model = await fetchModelDataById(params.model, params.platform);
+  const model = await fetchModelDataById(params.model);
 
   const modelsData = await fetchAllDataFromTable(`combinedModelsData`);
 
   // Calculate model rank and creator rank
-  const modelRank = calculateModelRank(modelsData, model.id);
-  const creatorRank = calculateCreatorRank(modelsData, model.creator);
+  const creatorRank = await calculateCreatorRank(modelsData, model.creator);
 
   // Add ranks to the model object
   const modelWithRanks = {
     ...model,
-    modelRank,
     creatorRank,
   };
 
