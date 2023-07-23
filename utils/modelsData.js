@@ -158,21 +158,25 @@ export async function fetchFilteredData({
   return { data, totalCount: ids ? ids.length : count };
 }
 
-export const findSimilarModels = (model, modelsData, maxResults = 5) => {
-  const modelTags = model.tags
-    ? model.tags.split(",").map((tag) => tag.trim())
-    : [];
+export async function findSimilarModels(model, maxResults = 5) {
+  const modelTags = model.tags;
 
-  return modelsData
-    .filter((otherModel) => {
-      if (otherModel.id === model.id) return false;
-      const otherModelTags = otherModel.tags
-        ? otherModel.tags.split(",").map((tag) => tag.trim())
-        : [];
-      return otherModelTags.some((tag) => modelTags.includes(tag));
-    })
-    .slice(0, maxResults);
-};
+  const { data, error } = await supabase
+    .from("combinedModelsData")
+    .select("id, modelName, creator, runs, platform, costToRun, description")
+    .ilike("tags", `%${modelTags}%`)
+    .neq("id", model.id)
+    .order("runs", { ascending: false })
+    .limit(maxResults);
+
+  if (error) {
+    console.error(`Error fetching similar models: ${error}`);
+    return [];
+  }
+  const similarModels = Array.isArray(data) ? data : [data].filter(Boolean);
+
+  return similarModels;
+}
 
 export const findCreatorModels = (model, modelsData) => {
   return modelsData.filter(

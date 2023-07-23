@@ -42,7 +42,6 @@ export async function getStaticProps({ params }) {
 }
 
 export default function Creator({ creator, models, allModels, platform }) {
-  console.log(allModels);
   const avgCost =
     models
       .filter((model) => model.costToRun !== "")

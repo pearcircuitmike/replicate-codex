@@ -51,20 +51,22 @@ export async function getStaticProps({ params }) {
   // Calculate model rank and creator rank
   const creatorRank = await calculateCreatorRank(modelsData, model.creator);
 
+  // Find similar models
+  const similarModels = await findSimilarModels(model);
+
   // Add ranks to the model object
   const modelWithRanks = {
     ...model,
     creatorRank,
   };
 
-  return { props: { model: modelWithRanks, modelsData } };
+  return { props: { model: modelWithRanks, modelsData, similarModels } };
 }
 
-export default function ModelPage({ model, modelsData }) {
+export default function ModelPage({ model, modelsData, similarModels }) {
   const [selectedSource, setSelectedSource] = useState(
     model.demoSources ? model.demoSources[0] : ""
   );
-  const similarModels = findSimilarModels(model, modelsData);
   const creatorModels = findCreatorModels(model, modelsData);
 
   const handleSourceChange = (event) => {
