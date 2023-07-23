@@ -20,7 +20,7 @@ import { AiOutlineUser } from "react-icons/ai";
 
 const CreatorModelsTable = ({ creatorModels }) => {
   const maxToShow = 5;
-  const displayedModels = creatorModels?.slice(0, maxToShow);
+  const displayedModels = creatorModels;
 
   return (
     <VStack spacing={4} alignItems="start">
@@ -45,7 +45,11 @@ const CreatorModelsTable = ({ creatorModels }) => {
             displayedModels?.map((model) => (
               <Tr key={model.id}>
                 <Td>
-                  <Link href={`/models/${model?.platform}/${model?.id}`}>
+                  <Link
+                    href={`/models/${model?.platform}/${model?.id}`}
+                    textDecoration="underline"
+                    color="blue.500"
+                  >
                     {model.modelName}
                   </Link>
                 </Td>

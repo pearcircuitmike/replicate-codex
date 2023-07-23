@@ -178,9 +178,27 @@ export async function findSimilarModels(model, maxResults = 5) {
   return similarModels;
 }
 
-export const findCreatorModels = (model, modelsData) => {
-  return modelsData.filter(
-    (otherModel) =>
-      otherModel.creator === model.creator && otherModel.id !== model.id
-  );
+export const findCreatorModels = async (model, maxResults = null) => {
+  let query = supabase
+    .from("combinedModelsData")
+    .select("id, modelName, creator, runs, costToRun, description")
+    .eq("creator", model.creator)
+    .eq("platform", model.platform)
+    .neq("id", model.id);
+
+  if (maxResults !== null) {
+    query = query.limit(maxResults);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(`Error fetching creator's other models: ${error}`);
+    return [];
+  }
+
+  // Ensure that data is an array
+  const creatorModels = Array.isArray(data) ? data : [data].filter(Boolean);
+
+  return creatorModels;
 };

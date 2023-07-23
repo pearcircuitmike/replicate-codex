@@ -10,7 +10,6 @@ import {
   Heading,
   Link,
 } from "@chakra-ui/react";
-import { ExternalLinkIcon, DollarSign, User, Robot } from "@chakra-ui/icons";
 import MetaTags from "../../../components/MetaTags";
 import {
   fetchModelDataById,
@@ -39,35 +38,32 @@ export async function getStaticPaths() {
       });
     }
   }
-
   return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {
   const model = await fetchModelDataById(params.model);
 
-  const modelsData = await fetchAllDataFromTable(`combinedModelsData`);
-
   // Calculate model rank and creator rank
-  const creatorRank = await calculateCreatorRank(modelsData, model.creator);
-
-  // Find similar models
+  const creatorRank = await calculateCreatorRank([], model.creator); // TO BE FIXED
   const similarModels = await findSimilarModels(model);
+  const creatorModels = await findCreatorModels(model, 5);
 
-  // Add ranks to the model object
+  // Add ranks to the model object ... TO BE FIXED
   const modelWithRanks = {
     ...model,
     creatorRank,
   };
 
-  return { props: { model: modelWithRanks, modelsData, similarModels } };
+  return {
+    props: { model: modelWithRanks, similarModels, creatorModels },
+  };
 }
 
-export default function ModelPage({ model, modelsData, similarModels }) {
+export default function ModelPage({ model, similarModels, creatorModels }) {
   const [selectedSource, setSelectedSource] = useState(
     model.demoSources ? model.demoSources[0] : ""
   );
-  const creatorModels = findCreatorModels(model, modelsData);
 
   const handleSourceChange = (event) => {
     setSelectedSource(event.target.value);
@@ -106,7 +102,7 @@ export default function ModelPage({ model, modelsData, similarModels }) {
                   you see an error,{" "}
                   <Link
                     href={`https://twitter.com/mikeyoung44`}
-                    color="teal"
+                    color="teal.500"
                     textDecoration="underline"
                   >
                     message me on Twitter
