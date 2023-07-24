@@ -6,10 +6,12 @@ export async function fetchCreators({
   pageSize,
   currentPage,
   searchValue,
+  creatorName = null,
+  platform = null,
 }) {
   let query = supabase
     .from(viewName)
-    .select("creator, example, total_runs, id, rank, platform", {
+    .select("creator, example, total_runs, id, creatorRank, platform", {
       count: "exact",
     });
 
@@ -17,8 +19,16 @@ export async function fetchCreators({
     query = query.ilike("creator", `%${searchValue}%`);
   }
 
+  if (creatorName) {
+    query = query.eq("creator", creatorName);
+  }
+
+  if (platform) {
+    query = query.eq("platform", platform);
+  }
+
   const { data, error, count } = await query
-    .order("rank", { ascending: true })
+    .order("creatorRank", { ascending: true })
     .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
 
   if (error) {

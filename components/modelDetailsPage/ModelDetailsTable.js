@@ -16,7 +16,7 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import truncateWithReadMore from "@/utils/truncateWithReadMore";
 import { getMedalEmoji } from "@/utils/getMedalEmoji";
 
-const ModelDetailsTable = ({ model }) => {
+const ModelDetailsTable = ({ model, creator }) => {
   const truncatedDescription = truncateWithReadMore(
     model.description,
     75,
@@ -179,7 +179,7 @@ const ModelDetailsTable = ({ model }) => {
             <Tr>
               <Td>Creator Rank</Td>
               <Td>
-                {model?.creatorRank} {getMedalEmoji(model?.creatorRank)}
+                {creator?.creatorRank} {getMedalEmoji(creator?.creatorRank)}
               </Td>
             </Tr>
           </Tbody>

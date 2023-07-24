@@ -44,14 +44,14 @@ const CreatorCard = ({ creator }) => {
             mb={3}
           />
           <Heading as="h2" size="md" isTruncated mb={2}>
-            {creator.creator} {getMedalEmoji(creator.rank)}
+            {creator.creator} {getMedalEmoji(creator.creatorRank)}
           </Heading>
           <Text fontSize="sm" color="gray.500">
             Total Runs:{" "}
             {formatLargeNumber(creator.total_runs ? creator.total_runs : 0)}
           </Text>
           <Text fontSize="sm" color="gray.500">
-            Rank: {creator.rank}
+            Rank: {creator.creatorRank}
           </Text>
         </Box>
         <Flex justifyContent="center" mt={3}>

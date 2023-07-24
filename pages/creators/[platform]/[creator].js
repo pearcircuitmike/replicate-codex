@@ -1,75 +1,79 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/react";
-import { fetchAllDataFromTable } from "../../../utils/modelsData.js";
+import { useEffect, useState } from "react";
 import Head from "next/head";
-import SimilarCreators from "../../../components/SimilarCreators";
-import ShareLinkButton from "../../../components/ShareLinkButton";
-import ShareTweetButton from "../../../components/ShareTweetButton";
-import calculateCreatorRank from "../../../utils/calculateCreatorRank";
+
 import MetaTags from "../../../components/MetaTags";
 import ModelCard from "../../../components/ModelCard";
 import { formatLargeNumber } from "@/utils/formatLargeNumber.js";
 import { toTitleCase } from "@/utils/toTitleCase.js";
 import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
+import { fetchModelsPaginated } from "../../../utils/fetchModelsPaginated";
+import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
 
 export async function getStaticPaths() {
-  const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
-  const paths = [];
+  const creatorsData = await fetchCreators({
+    viewName: "unique_creators_with_runs",
+    pageSize: 1000, // only first 1k
+    currentPage: 1,
+    searchValue: "", // this can be an empty string since we want all creators
+  });
 
-  for (const platform of platforms) {
-    const modelsData = await fetchAllDataFromTable(`${platform}ModelsData`);
-    const creators = Array.from(
-      new Set(modelsData.map((model) => model.creator))
-    );
-
-    for (const creator of creators) {
-      paths.push({ params: { creator: creator.toLowerCase(), platform } });
-    }
-  }
+  const paths = creatorsData.data.map(({ creator, platform }) => ({
+    params: { creator: creator.toLowerCase(), platform },
+  }));
 
   return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {
   const { creator, platform } = params;
-  const allModelsData = await fetchAllDataFromTable(`${platform}ModelsData`);
 
-  const models = allModelsData.filter((model) => model.creator === creator);
+  const modelsResponse = await fetchModelsPaginated({
+    tableName: `combinedModelsData`,
+    pageSize: 10, // Limiting the number of models fetched
+    currentPage: 1,
+    creator: creator,
+    platform: platform,
+  });
 
-  return {
-    props: { creator, models, allModels: allModelsData },
-    revalidate: 60,
-  };
-}
-
-export default function Creator({ creator, models, allModels, platform }) {
+  const models = modelsResponse.data;
+  // Calculate average model cost
   const avgCost =
     models
       .filter((model) => model.costToRun !== "")
       .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
 
-  function getSimilarCreators(creator) {
-    const creatorModels = models;
-    const creatorTags = creatorModels.flatMap((model) => {
-      if (model.tags) {
-        return model.tags.split(",");
-      } else {
-        return [];
-      }
-    });
+  return {
+    props: { creator, models, avgCost, platform },
+    revalidate: 60,
+  };
+}
 
-    const similarCreators = allModels
-      .filter((item) => item.creator.toLowerCase() !== creator.toLowerCase())
-      .filter((item) => item.tags)
-      .filter((item) => {
-        const itemTags = item.tags.split(",");
-        return itemTags.some((tag) => creatorTags.includes(tag));
-      })
-      .map((item) => item.creator);
-    return [...new Set(similarCreators)];
-  }
+export default function Creator({ creator, models, platform }) {
+  const [creatorData, setCreatorData] = useState(null);
 
-  const similarCreators = getSimilarCreators(creator);
-  const rank = calculateCreatorRank(allModels, creator);
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      const response = await fetchCreators({
+        viewName: "unique_creators_with_runs",
+        pageSize: 1,
+        currentPage: 1,
+        creatorName: creator,
+        platform: platform,
+      });
+
+      const fetchedCreatorData =
+        response.data.length > 0 ? response.data[0] : null;
+      setCreatorData(fetchedCreatorData);
+    };
+
+    fetchCreatorData();
+  }, [creator, platform]);
+
+  const avgCost =
+    models
+      .filter((model) => model.costToRun !== "")
+      .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
 
   return (
     <>
@@ -81,9 +85,9 @@ export default function Creator({ creator, models, allModels, platform }) {
       <Container maxW="container.xl" py="12">
         <Heading as="h1" size="xl" mb="2">
           {toTitleCase(creator)}
-          {getMedalEmoji(rank)}
+          {getMedalEmoji(creatorData?.creatorRank)}
         </Heading>
-        Rank: {calculateCreatorRank(allModels, creator)}
+        Rank: {creatorData?.creatorRank.toLocaleString()}
         <Text fontSize="lg" color="gray.500">
           Average Model Cost: ${avgCost.toFixed(4)}
         </Text>
@@ -103,18 +107,13 @@ export default function Creator({ creator, models, allModels, platform }) {
               width={{ base: "100%", sm: "50%", md: "33%", lg: "25%" }}
               p="4"
             >
-              <ModelCard model={model} allModels={allModels} />{" "}
+              <ModelCard model={model} />
             </Box>
           ))}
         </Box>
         <Heading as="h2" size="lg" mt={2}>
           Similar creators
         </Heading>
-        <SimilarCreators
-          similarCreators={similarCreators}
-          data={allModels}
-          mt={1}
-        />
       </Container>
     </>
   );

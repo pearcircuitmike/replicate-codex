@@ -12,9 +12,7 @@ import {
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
-const ModelCard = ({ model, allModels }) => {
-  const rank = model.modelRank;
-
+const ModelCard = ({ model }) => {
   if (!model) {
     return (
       <Box
@@ -94,7 +92,7 @@ const ModelCard = ({ model, allModels }) => {
         <HStack justify="space-between" mb={3}>
           <Box>
             <Text fontSize="sm">Runs: {formatLargeNumber(model.runs)}</Text>
-            <Text fontSize="sm">Rank: {rank}</Text>
+            <Text fontSize="sm">Rank: {model.modelRank.toLocaleString()}</Text>
           </Box>
           <Box>
             <Text fontSize="sm">

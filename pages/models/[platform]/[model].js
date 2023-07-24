@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Select,
   Container,
@@ -15,13 +15,13 @@ import {
   fetchModelDataById,
   fetchAllDataFromTable,
 } from "../../../utils/modelsData.js";
+import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
 import SimilarModelsTable from "../../../components/modelDetailsPage/SimilarModelsTable";
 import CreatorModelsTable from "../../../components/modelDetailsPage/CreatorModelsTable";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import ModelPricingSummary from "../../../components/modelDetailsPage/ModelPricingSummary";
 import RunsHistoryChart from "../../../components/modelDetailsPage/RunsHistoryChart";
-import calculateCreatorRank from "../../../utils/calculateCreatorRank";
 import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";
@@ -43,20 +43,11 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const model = await fetchModelDataById(params.model);
-
-  // Calculate model rank and creator rank
-  const creatorRank = await calculateCreatorRank([], model.creator); // TO BE FIXED
   const similarModels = await findSimilarModels(model);
   const creatorModels = await findCreatorModels(model, 5);
 
-  // Add ranks to the model object ... TO BE FIXED
-  const modelWithRanks = {
-    ...model,
-    creatorRank,
-  };
-
   return {
-    props: { model: modelWithRanks, similarModels, creatorModels },
+    props: { model, similarModels, creatorModels },
   };
 }
 
@@ -64,6 +55,25 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
   const [selectedSource, setSelectedSource] = useState(
     model.demoSources ? model.demoSources[0] : ""
   );
+  const [creatorData, setCreatorData] = useState(null);
+
+  useEffect(() => {
+    const fetchCreatorData = async () => {
+      const creatorObject = await fetchCreators({
+        viewName: "unique_creators_with_runs",
+        pageSize: 1,
+        currentPage: 1,
+        creatorName: model.creator,
+        platform: model.platform,
+      });
+
+      const fetchedCreatorData =
+        creatorObject.data.length > 0 ? creatorObject.data[0] : null;
+      setCreatorData(fetchedCreatorData);
+    };
+
+    fetchCreatorData();
+  }, [model.creator, model.platform]);
 
   const handleSourceChange = (event) => {
     setSelectedSource(event.target.value);
@@ -75,7 +85,6 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
         title={`AI model details - ${model.modelName}`}
         description={`Details about the ${model.modelName} ${model.tags} model by ${model.creator}`}
       />
-
       <Box overflowX="hidden">
         <Container maxW="container.xl" py="12">
           <Grid
@@ -130,7 +139,7 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
                     Currently, there are no demos available for this model.
                   </Text>
                 )}
-                <ModelDetailsTable model={model} />
+                <ModelDetailsTable model={model} creator={creatorData} />
               </VStack>
             </GridItem>
           </Grid>

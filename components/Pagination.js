@@ -23,7 +23,7 @@ const Pagination = ({ totalCount, pageSize, currentPage, onPageChange }) => {
           Previous
         </Button>
         <Box>
-          Page {currentPage} of {pageCount}
+          Page {currentPage.toLocaleString()} of {pageCount.toLocaleString()}
         </Box>
         <Button
           onClick={handleNextPage}

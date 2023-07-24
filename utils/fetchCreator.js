@@ -3,7 +3,7 @@ import supabase from "./supabaseClient";
 export async function fetchCreator({ viewName, creatorName }) {
   let query = supabase
     .from(viewName)
-    .select("creator, example, total_runs, id, rank, platform")
+    .select("creator, example, total_runs, id, rank, platform, creatorRank")
     .eq("creator", creatorName);
 
   const { data, error } = await query;
