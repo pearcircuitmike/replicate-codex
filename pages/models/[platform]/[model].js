@@ -83,10 +83,16 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
   return (
     <>
       <MetaTags
-        title={`AI model details - ${kebabToTitleCase(model.modelName)}`}
-        description={`Details about the ${kebabToTitleCase(model.modelName)} ${
+        title={`${kebabToTitleCase(model.modelName)} | ${kebabToTitleCase(
+          model.creator
+        )} | AI model details`}
+        description={`Guide to running ${kebabToTitleCase(
+          model.modelName
+        )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
+          model.platform
+        )}. Overview, ${
           model.tags
-        } model by ${kebabToTitleCase(model.creator)}`}
+        } alternatives, schema, use cases, limitations, cost.`}
       />
       <Box overflowX="hidden">
         <Container maxW="container.xl" py="12">
