@@ -54,7 +54,8 @@ export async function fetchAllDataFromTable(tableName) {
   // Fetch all data from the specified table
   const { data, error } = await supabase
     .from(tableName)
-    .select("id, creator, modelName, runs, tags, costToRun, platform");
+    .select("id, creator, modelName, runs, tags, costToRun, platform")
+    .order("runs", { ascending: false });
 
   // Handle errors
   if (error) {
