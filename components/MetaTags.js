@@ -30,7 +30,7 @@ export default function MetaTags({
 
   return (
     <Head>
-      <meta httpEquiv="content-language" content="en-us" />
+      <meta httpEquiv="content-language" content="en" />
 
       <title>{title}</title>
       <meta name="description" content={description} />
