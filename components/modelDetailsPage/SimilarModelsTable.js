@@ -14,6 +14,7 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import { AiFillBulb } from "react-icons/ai";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 const SimilarModelsTable = ({ similarModels }) => {
   return (
@@ -45,7 +46,7 @@ const SimilarModelsTable = ({ similarModels }) => {
                         href={`/models/${model?.platform}/${model?.id}`}
                         color="blue.500"
                       >
-                        {model.modelName}
+                        {kebabToTitleCase(model.modelName)}
                       </Link>
                     </Td>
                   </Tr>

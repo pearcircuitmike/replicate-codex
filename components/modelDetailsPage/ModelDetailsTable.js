@@ -15,6 +15,7 @@ import {
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import truncateWithReadMore from "@/utils/truncateWithReadMore";
 import { getMedalEmoji } from "@/utils/getMedalEmoji";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 const ModelDetailsTable = ({ model, creator }) => {
   const truncatedDescription = truncateWithReadMore(
@@ -62,7 +63,7 @@ const ModelDetailsTable = ({ model, creator }) => {
             </Tr>
             <Tr>
               <Td>Model Name</Td>
-              <Td>{model?.modelName}</Td>
+              <Td>{kebabToTitleCase(model?.modelName)}</Td>
             </Tr>
             <Tr>
               <Td>Description</Td>

@@ -12,13 +12,14 @@ import {
   chakra,
 } from "@chakra-ui/react";
 import PreviewImage from "../PreviewImage";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 const ModelOverview = ({ model }) => {
   return (
     <Box>
       <VStack alignItems="left" spacing={2}>
         <Heading as="h1" size="2xl" style={{ wordBreak: "break-all" }}>
-          {model?.modelName}
+          {kebabToTitleCase(model?.modelName)}
         </Heading>
         <Text>
           <Link

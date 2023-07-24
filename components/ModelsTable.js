@@ -34,6 +34,7 @@ import Pagination from "./Pagination.js";
 import ActiveTagFilters from "./tableControls/ActiveTagFilters";
 import { toTitleCase } from "@/utils/toTitleCase";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 const ModelsTable = ({ pageSize = 8 }) => {
   const [loading, setLoading] = useState(true);
@@ -76,7 +77,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
       let query = supabase
         .from("combinedModelsData")
         .select(
-          "modelName, id, description, creator, platform, example, tags, runs, costToRun",
+          "modelName, id, description, creator, generatedSummary, platform, example, tags, runs, costToRun",
           {
             count: "exact",
           }
@@ -366,7 +367,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
                           color="teal"
                           textDecoration="underline"
                         >
-                          {item?.creator}
+                          {kebabToTitleCase(item?.creator)}
                         </Link>
                       </Text>
                     </Td>
@@ -382,7 +383,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
                         color="teal"
                         textDecoration="underline"
                       >
-                        {item?.modelName}
+                        {kebabToTitleCase(item?.modelName)}
                       </Link>
                     </Text>
                   </Td>

@@ -25,6 +25,7 @@ import RunsHistoryChart from "../../../components/modelDetailsPage/RunsHistoryCh
 import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
@@ -82,8 +83,10 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
   return (
     <>
       <MetaTags
-        title={`AI model details - ${model.modelName}`}
-        description={`Details about the ${model.modelName} ${model.tags} model by ${model.creator}`}
+        title={`AI model details - ${kebabToTitleCase(model.modelName)}`}
+        description={`Details about the ${kebabToTitleCase(model.modelName)} ${
+          model.tags
+        } model by ${kebabToTitleCase(model.creator)}`}
       />
       <Box overflowX="hidden">
         <Container maxW="container.xl" py="12">
@@ -106,9 +109,9 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
                 </Heading>
                 <Text>
                   You can use this area to play around with demo applications
-                  that incorporate the {model.modelName} model. These demos are
-                  maintained and hosted externally by third-party creators. If
-                  you see an error,{" "}
+                  that incorporate the {kebabToTitleCase(model.modelName)}{" "}
+                  model. These demos are maintained and hosted externally by
+                  third-party creators. If you see an error,{" "}
                   <Link
                     href={`https://twitter.com/mikeyoung44`}
                     color="teal.500"

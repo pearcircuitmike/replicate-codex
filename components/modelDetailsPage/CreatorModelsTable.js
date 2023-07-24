@@ -17,6 +17,7 @@ import {
 
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { AiOutlineUser } from "react-icons/ai";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 const CreatorModelsTable = ({ creatorModels }) => {
   const maxToShow = 5;
@@ -50,7 +51,7 @@ const CreatorModelsTable = ({ creatorModels }) => {
                     textDecoration="underline"
                     color="blue.500"
                   >
-                    {model.modelName}
+                    {kebabToTitleCase(model.modelName)}
                   </Link>
                 </Td>
 

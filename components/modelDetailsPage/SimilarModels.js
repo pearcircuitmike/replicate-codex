@@ -9,6 +9,7 @@ import {
   Grid,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 export default function SimilarModels({ currentModel, modelsData }) {
   const similarModels = modelsData
@@ -53,7 +54,7 @@ export default function SimilarModels({ currentModel, modelsData }) {
               >
                 <Image
                   src={model.example}
-                  alt={`${model.modelName} example`}
+                  alt={`${kebabToTitleCase(model.modelName)} example`}
                   width="100%"
                   height="auto"
                 />
@@ -65,7 +66,7 @@ export default function SimilarModels({ currentModel, modelsData }) {
                         textDecoration="underline"
                         color="teal"
                       >
-                        {model.modelName}
+                        {kebabToTitleCase(model.modelName)}
                       </Link>
                     </Text>
                   </Flex>
