@@ -44,9 +44,9 @@ export default function Home() {
   return (
     <>
       <MetaTags
-        title={"AIModels.fyi - AI model details"}
+        title={"AIModels.fyi - Find the best AI model for your startup"}
         description={
-          "Discover AI models to play and build with on platforms like Replicate, Cerebrium, HuggingFace, and more."
+          "Free, no account needed. Describe your product and get the best AI model. Compares 250,000 AI models from Replicate, HuggingFace, and more."
         }
       />
 
