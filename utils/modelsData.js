@@ -50,12 +50,18 @@ export async function fetchDataFromTable({
   return { data: dataArray, totalCount: totalCountNumber };
 }
 
-export async function fetchAllDataFromTable(tableName) {
-  // Fetch all data from the specified table
+export async function fetchAllDataFromTable({
+  tableName,
+  pageSize = 1000,
+  currentPage = 1,
+}) {
+  const offset = (currentPage - 1) * pageSize;
+
   const { data, error } = await supabase
     .from(tableName)
     .select("id, creator, modelName, runs, tags, costToRun, platform")
-    .order("runs", { ascending: false });
+    .order("runs", { ascending: false })
+    .range(offset, offset + pageSize - 1); // Using range method for pagination
 
   // Handle errors
   if (error) {

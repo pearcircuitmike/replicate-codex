@@ -30,15 +30,36 @@ import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
   const paths = [];
+  const pageSize = 1000; // Number of records to fetch per page
+  const limit = 15000; // Maximum number of records to fetch
 
   for (const platform of platforms) {
-    const modelsData = await fetchAllDataFromTable(`${platform}ModelsData`);
-    for (const model of modelsData) {
-      paths.push({
-        params: { model: model.id.toString(), platform },
+    let currentPage = 1;
+    let totalFetched = 0;
+
+    while (totalFetched < limit) {
+      const modelsData = await fetchAllDataFromTable({
+        tableName: `${platform}ModelsData`,
+        pageSize,
+        currentPage,
       });
+
+      for (const model of modelsData) {
+        paths.push({
+          params: { model: model.id.toString(), platform },
+        });
+      }
+
+      totalFetched += modelsData.length;
+
+      if (modelsData.length < pageSize || totalFetched >= limit) {
+        break; // Stop fetching if there are no more records or if the limit is reached
+      }
+
+      currentPage += 1;
     }
   }
+
   return { paths, fallback: "blocking" };
 }
 
