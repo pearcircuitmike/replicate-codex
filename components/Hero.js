@@ -37,7 +37,8 @@ const Hero = () => {
           color="gray.500"
         >
           Search, filter, and sort AI models. Find the right one for your AI
-          project. Subscribe for a weekly digest of new models and resources.
+          project. Subscribe for a free weekly digest of new models and
+          resources.
         </Text>
 
         <Box>
