@@ -92,7 +92,9 @@ const ModelCard = ({ model }) => {
         <HStack justify="space-between" mb={3}>
           <Box>
             <Text fontSize="sm">Runs: {formatLargeNumber(model.runs)}</Text>
-            <Text fontSize="sm">Rank: {model.modelRank.toLocaleString()}</Text>
+            <Text fontSize="sm">
+              Rank: {model?.modelRank?.toLocaleString()}
+            </Text>
           </Box>
           <Box>
             <Text fontSize="sm">
