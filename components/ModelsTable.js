@@ -249,7 +249,7 @@ const ModelsTable = ({ pageSize = 8 }) => {
         </Menu>
       </Stack>
 
-      <TableContainer overflowY="auto" my={5} borderRadius="5px">
+      <TableContainer overflowY="auto" height="900px" my={5} borderRadius="5px">
         <Table
           style={{ tableLayout: "fixed" }}
           className={styles.paginatedTable}

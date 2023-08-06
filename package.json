@@ -42,6 +42,7 @@
     "react-window": "^1.8.8",
     "sanitize-html": "^2.11.0",
     "seedrandom": "^3.0.5",
+    "synonyms": "^1.0.1",
     "xss": "^1.0.14"
   }
 }
