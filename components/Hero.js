@@ -29,19 +29,17 @@ const Hero = () => {
           fontWeight="bold"
           textAlign="center"
         >
-          Find the best AI model for your startup
+          A free tool to find the best AI model for your startup
         </Heading>
         <Text
           fontSize={isMobile ? "md" : "lg"}
           textAlign="center"
           color="gray.500"
         >
-          Search, filter, and sort AI models. Find the right one for your AI
-          project. Subscribe for a free weekly digest of new models and
-          resources.
+          Describe your problem and get an AI model that can solve it.
         </Text>
 
-        <Box>
+        {/* <Box>
           <div id="custom-substack-embed"></div>
 
           <iframe
@@ -53,7 +51,7 @@ const Hero = () => {
               background: "white",
             }}
           ></iframe>
-        </Box>
+        </Box>*/}
       </VStack>
     </Container>
   );

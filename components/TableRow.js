@@ -10,7 +10,7 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import PreviewImage from "./PreviewImage";
-import truncateWithReadMore from "@/utils/truncateWithReadMore";
+import TruncateWithReadMore from "@/components/TruncateWithReadMore";
 
 export default function TableRow({ item, isHeader = false }) {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
@@ -34,12 +34,6 @@ export default function TableRow({ item, isHeader = false }) {
       </>
     );
   }
-
-  const truncatedDescription = truncateWithReadMore(
-    item?.description,
-    75,
-    false
-  );
 
   return (
     <>
@@ -69,7 +63,11 @@ export default function TableRow({ item, isHeader = false }) {
         style={{ whiteSpace: "normal", wordWrap: "break-word" }}
         maxW={isMobile ? "120px" : "180px"}
       >
-        {truncatedDescription}
+        <TruncateWithReadMore
+          content={item.description}
+          length={75}
+          hasReadMore={true}
+        />
       </Td>
       <Td width="64px">
         <Box width="64px" height="64px" overflow="hidden">

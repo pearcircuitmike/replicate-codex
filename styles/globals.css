@@ -14,3 +14,23 @@ th:last-child,
 td:last-child {
   border-right: none;
 }
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.blinking-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  background-color: black;
+  animation: blink 1s step-end infinite;
+}

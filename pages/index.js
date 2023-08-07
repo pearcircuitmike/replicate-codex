@@ -6,6 +6,7 @@ import ModelsTable from "../components/ModelsTable.js";
 import MetaTags from "../components/MetaTags.js";
 import Hero from "../components/Hero.js";
 import ModelOfTheDay from "../components/ModelOfTheDay"; // Import the ModelOfTheDay component
+import ModelMatchmaker from "@/components/ModelMatchmaker.js";
 
 import { fetchDataFromTable } from "../utils/modelsData.js";
 
@@ -54,7 +55,9 @@ export default function Home() {
         <main>
           <Hero />
 
-          <ModelsTable
+          <ModelMatchmaker />
+
+          {/* <ModelsTable
             fetchFilteredData={fetchDataFromTable}
             tableName={"combinedModelsData"}
             selectedTags={selectedTags}
@@ -62,7 +65,7 @@ export default function Home() {
             sorts={sorts}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-          />
+          />*/}
         </main>
       </Container>
     </>

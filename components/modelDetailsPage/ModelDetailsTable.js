@@ -13,17 +13,13 @@ import {
   Link,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import truncateWithReadMore from "@/utils/truncateWithReadMore";
+
+import TruncateWithReadMore from "@/components/TruncateWithReadMore";
+
 import { getMedalEmoji } from "@/utils/getMedalEmoji";
 import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 
 const ModelDetailsTable = ({ model, creator }) => {
-  const truncatedDescription = truncateWithReadMore(
-    model.description,
-    75,
-    true
-  );
-
   return (
     <Box>
       <VStack spacing={5} alignItems="start">
@@ -68,9 +64,15 @@ const ModelDetailsTable = ({ model, creator }) => {
             <Tr>
               <Td>Description</Td>
               <Td>
-                {model.description
-                  ? truncatedDescription
-                  : "No description provided"}
+                <TruncateWithReadMore
+                  content={
+                    model.description
+                      ? model.description
+                      : "No description available"
+                  }
+                  length={75}
+                  hasReadMore={true}
+                />
               </Td>
             </Tr>
             <Tr>
