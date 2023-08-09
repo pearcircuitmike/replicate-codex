@@ -39,7 +39,7 @@ const Hero = () => {
           Describe your problem and get an AI model that can solve it.
         </Text>
 
-        {/* <Box>
+        <Box>
           <div id="custom-substack-embed"></div>
 
           <iframe
@@ -51,7 +51,7 @@ const Hero = () => {
               background: "white",
             }}
           ></iframe>
-        </Box>*/}
+        </Box>
       </VStack>
     </Container>
   );
