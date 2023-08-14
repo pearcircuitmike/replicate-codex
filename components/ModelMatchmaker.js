@@ -34,12 +34,20 @@ const openAi = new OpenAIApi(
   new Configuration({ apiKey: process.env.NEXT_PUBLIC_OPENAI_CLIENT_KEY })
 );
 
-const ModelMatchmaker = () => {
+const ModelMatchmaker = ({ initialQuery }) => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null); // Initial state is null
+  const [data, setData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const queryFromURL = router.query.query;
 
+  useEffect(() => {
+    if (queryFromURL) {
+      const decodedQuery = decodeURIComponent(queryFromURL);
+      setSearchQuery(decodedQuery); // update the searchQuery state
+      fetchData(decodedQuery);
+    }
+  }, [queryFromURL]);
   const fetchData = async (query) => {
     setLoading(true);
 
@@ -89,8 +97,12 @@ const ModelMatchmaker = () => {
   };
 
   const handleSearch = () => {
-    updateURL(searchQuery);
-    fetchData(searchQuery); // Use the current state value
+    let queryToUse = searchQuery.trim();
+    if (queryToUse === "") {
+      queryToUse = "Show me some random AI models";
+      setSearchQuery(queryToUse);
+    }
+    router.push(`/results?query=${encodeURIComponent(queryToUse)}`);
   };
 
   const handleKeyPress = (event) => {
@@ -99,15 +111,6 @@ const ModelMatchmaker = () => {
       handleSearch();
     }
   };
-
-  useEffect(() => {
-    const { query: urlQuery } = router.query;
-
-    if (urlQuery) {
-      setSearchQuery(urlQuery);
-      fetchData(urlQuery); // Pass the URL query directly
-    }
-  }, [router.query]);
 
   const getMatchScoreColor = (score) => {
     if (score <= 0.5) {
@@ -121,35 +124,26 @@ const ModelMatchmaker = () => {
 
   return (
     <>
-      <Container maxW="50%">
-        <Box my={5} textAlign="center">
-          <Textarea
-            mt={4}
-            placeholder="e.g., I need a model that can help upscale my images without losing clarity..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          <Button
-            mt={3}
-            onClick={handleSearch}
-            colorScheme="blue"
-            isDisabled={loading}
-          >
-            {loading ? "Checking 240,381 models..." : "Find my match"}
-          </Button>
-        </Box>
-      </Container>
+      <Textarea
+        fullWidth
+        placeholder="e.g., I need a model that can help upscale my images without losing clarity..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyPress={handleKeyPress}
+        width="100%"
+        margin="auto"
+      />
+      <Button
+        mt={3}
+        onClick={handleSearch}
+        colorScheme="blue"
+        isDisabled={loading}
+      >
+        {loading ? "Checking 240,381 models..." : "Find my AI model"}
+      </Button>
 
       {data === null ? (
-        <Box mt={5} textAlign="center" color="gray.500">
-          {/* <Text>You haven't searched yet! Try some of these examples:</Text>
-          <br />
-          <Text>"Remove the background from an image."</Text>
-          <Text>"What is the best model to restore old photos?"</Text>
-          <Text>"I need to increase the resolution of a picture."</Text>
-          <Text>"Top models to transcribe speech into text."</Text>  */}
-        </Box>
+        <Box mt={5} textAlign="center" color="gray.500"></Box>
       ) : loading ? (
         <Box textAlign="center">
           <Spinner size="lg" />
@@ -296,11 +290,11 @@ const ModelMatchmaker = () => {
                   <Td>
                     <Box width="80%">
                       <Progress
-                        colorScheme={getMatchScoreColor(item.match_score)}
-                        value={(item.match_score * 100).toFixed(0)}
+                        colorScheme={getMatchScoreColor(item?.match_score)}
+                        value={(item?.match_score * 100)?.toFixed(0)}
                       />
                     </Box>
-                    <Text>{item.match_score.toFixed(2)}</Text>
+                    <Text>{item?.match_score?.toFixed(2)}</Text>
                   </Td>
                   <Td>
                     <Box>

@@ -12,7 +12,7 @@ export async function fetchModelsPaginated({
   let query = supabase
     .from(tableName)
     .select(
-      "id, lastUpdated, creator, modelName, description, tags, example, runs, costToRun, githubUrl, licenseUrl, paperUrl, predictionHardware, avgCompletionTime, platform, modelUrl, demoSources, generatedSummary, generatedUseCase, modelRank",
+      "id, lastUpdated, creator, modelName, description, tags, example, runs, costToRun, githubUrl, licenseUrl, paperUrl, predictionHardware, avgCompletionTime, platform, modelUrl, demoSources, generatedSummary, generatedUseCase ",
       { count: "exact" }
     );
 

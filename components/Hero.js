@@ -4,56 +4,100 @@ import {
   Heading,
   VStack,
   Text,
-  Button,
-  Link as ChakraLink,
   useMediaQuery,
   Box,
   Link,
   Image,
+  Grid,
+  Textarea,
+  Flex,
 } from "@chakra-ui/react";
 
 const Hero = () => {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
 
   return (
-    <Container maxWidth="800">
-      <VStack
-        spacing={isMobile ? 4 : 6}
-        alignItems="center"
-        mt={isMobile ? 4 : 8}
-        mb={isMobile ? 8 : 16}
-      >
-        <Heading
-          as="h1"
-          fontSize={isMobile ? "3xl" : "4xl"}
-          fontWeight="bold"
-          textAlign="center"
-        >
-          A free tool to find the best AI model for your startup
-        </Heading>
-        <Text
-          fontSize={isMobile ? "md" : "lg"}
-          textAlign="center"
-          color="gray.500"
-        >
-          Describe your problem and get an AI model that can solve it.
-        </Text>
+    <>
+      <Grid templateColumns={["1fr", "1fr 1fr"]} gap={6} mt={8} mb={16}>
+        {/* Left Column */}
+        <VStack align="start" spacing={4}>
+          <Heading
+            as="h1"
+            fontSize={isMobile ? "3xl" : "4xl"}
+            fontWeight="bold"
+          >
+            Describe your problem. Get an AI that can solve it.
+          </Heading>
+          <Textarea placeholder="Describe your problem here..."></Textarea>
+          <Text color="gray.500">Or try these popular searches:</Text>
+          <VStack align="start" spacing={2}>
+            <Link color="blue.500" textDecoration="underline">
+              Turn my profile picture into a Studio Ghibli illustration
+            </Link>
+            <Link color="blue.500" textDecoration="underline">
+              AI 3D model generators
+            </Link>
+            <Link color="blue.500" textDecoration="underline">
+              Text-to-speech for a virtual assistant chatbot
+            </Link>
+            <Link color="blue.500" textDecoration="underline">
+              Best AI for logo design
+            </Link>
+          </VStack>
+          <Box>
+            <Flex wrap="wrap" alignItems="center">
+              <Text display="inline-block">As seen on:</Text>
+              {[
+                "aiInPlainEnglishLogo",
+                "hackerNoonLogo",
+                "betterProgrammingLogo",
+                "dZoneLogo",
+                "devToLogo",
+              ].map((logo) => (
+                <Box height="2em" mx={2}>
+                  <Image
+                    src={`/img/logos/media/${logo}.webp`}
+                    alt={logo}
+                    height="1.5em"
+                    objectFit="contain"
+                  />
+                </Box>
+              ))}
+            </Flex>
+          </Box>
+        </VStack>
 
-        <Box>
-          <div id="custom-substack-embed"></div>
-
-          <iframe
-            src="https://aimodels.substack.com/embed"
+        {/* Right Column */}
+        <VStack align="start" spacing={6}>
+          <Image
+            src="/img/test.svg"
+            alt="Test SVG"
             width="100%"
-            height="auto"
-            style={{
-              border: "0px solid #EEE",
-              background: "white",
-            }}
-          ></iframe>
-        </Box>
-      </VStack>
-    </Container>
+            objectFit="contain"
+          />
+          <Heading as="h2" fontSize="lg">
+            Search 240,800+ models from 7,560+ creators on all major platforms
+          </Heading>
+          <Flex wrap="wrap" alignItems="center">
+            {[
+              "cerebriumLogo",
+              "deepInfraLogo",
+              "replicateLogo",
+              "huggingFaceLogo",
+            ].map((logo) => (
+              <Box height="50px" margin={2}>
+                <Image
+                  src={`/img/logos/platforms/${logo}.webp`}
+                  alt={logo}
+                  height="1.5em"
+                  objectFit="contain"
+                />
+              </Box>
+            ))}
+          </Flex>
+        </VStack>
+      </Grid>
+    </>
   );
 };
 
