@@ -5,26 +5,22 @@ import {
   Heading,
   Text,
   Avatar,
-  Tag,
-  Button,
+  Link as ChakraLink,
   HStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import { toTitleCase } from "@/utils/toTitleCase";
 
 const ModelCard = ({ model }) => {
   if (!model) {
     return (
       <Box
-        borderWidth="1px"
-        borderRadius="lg"
-        overflow="hidden"
         w="100%"
-        boxShadow="base"
+        h="100%"
         p={4}
-        height="100%"
+        bgColor="gray.100"
         display="flex"
-        flexDirection="column"
         justifyContent="center"
         alignItems="center"
       >
@@ -34,82 +30,92 @@ const ModelCard = ({ model }) => {
   } else {
     return (
       <Box
+        w="100%"
+        h="100%"
         borderWidth="1px"
         borderRadius="lg"
-        overflow="hidden"
-        w="100%"
         boxShadow="base"
-        p={4}
-        height="100%"
+        bgColor="gray.100"
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
       >
-        <Box>
-          <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
-            <Box cursor="pointer">
-              <Box
-                bgImage={`url(${
-                  model.example ||
-                  "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
-                })`}
-                bgPosition="center"
-                bgSize="cover"
-                bgRepeat="no-repeat"
-                width="100%"
-                height="200px"
-                mb={3}
-              ></Box>
-            </Box>
-          </Link>
-          <Heading as="h2" size="md" isTruncated mb={2}>
+        <Box
+          bgImage={`url(${
+            model.example ||
+            "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
+          })`}
+          bgPosition="center"
+          bgSize="cover"
+          bgRepeat="no-repeat"
+          width="100%"
+          height="200px"
+          mb="10px"
+        ></Box>
+        <Box p="15px">
+          <Heading
+            as="h3"
+            size="md"
+            noOfLines={2}
+            mb={2}
+            style={{ whiteSpace: "normal", wordWrap: "break-word" }}
+          >
             {model.modelName}
           </Heading>
-          <HStack spacing={2} mb={2}>
+
+          <Flex mb="10px" alignItems="center">
             <Avatar
               src={`https://github.com/${model.creator}.png`}
-              size="sm"
+              size="xs"
               onClick={() =>
                 window.open(`/creators/${model.platform}/${model.creator}`)
               }
               cursor="pointer"
             />
             <Link href={`/creators/${model.platform}/${model.creator}`}>
-              <Text textDecoration="underline" color="blue.500">
+              <ChakraLink
+                ml={2}
+                color="blue.500"
+                textDecoration="underline"
+                fontSize="sm"
+              >
                 {model.creator}
-              </Text>
+              </ChakraLink>
             </Link>
-          </HStack>
-          {model?.tags?.split(",")?.map((tag, index) => (
-            <Tag key={index} mr={1} mb={1}>
-              {tag?.trim()}
-            </Tag>
-          ))}
-          <Text fontSize="sm" noOfLines={3} mb={3}>
+          </Flex>
+
+          <Text fontSize="sm" noOfLines={4}>
             {model?.description || "No description provided."}
           </Text>
+          <Text>
+            <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
+              <ChakraLink
+                fontSize="sm"
+                color="blue.500"
+                textDecoration="underline"
+              >
+                Read more
+              </ChakraLink>
+            </Link>
+          </Text>
         </Box>
-        <HStack justify="space-between" mb={3}>
-          <Box>
-            <Text fontSize="sm">Runs: {formatLargeNumber(model.runs)}</Text>
-            <Text fontSize="sm">
-              Rank: {model?.modelRank?.toLocaleString()}
-            </Text>
-          </Box>
-          <Box>
-            <Text fontSize="sm">
-              Cost: {model.costToRun ? `$${model.costToRun}` : "$-"}
-            </Text>
-            <Text fontSize="sm">
-              Hardware: {model.predictionHardware || "N/A"}
-            </Text>
-          </Box>
+
+        <HStack
+          justify="space-between"
+          mt="auto"
+          mb="10px"
+          spacing={6}
+          pl="15px"
+          pr="15px"
+        >
+          <Text fontSize="sm">
+            {model.costToRun ? `$${model.costToRun}/run` : "$-/run"}
+          </Text>
+          <Text fontSize="sm">{formatLargeNumber(model.downloads)}</Text>
+          <Text fontSize="sm" textAlign="right">
+            {toTitleCase(model.platform)}
+          </Text>
         </HStack>
-        <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
-          <Button size="sm" colorScheme="blue" alignSelf="flex-start">
-            View model details
-          </Button>
-        </Link>
       </Box>
     );
   }
