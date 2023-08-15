@@ -166,7 +166,7 @@ export async function fetchFilteredData({
 }
 
 export async function findSimilarModels(model, maxResults = 5) {
-  const modelTags = model.tags;
+  const modelTags = model.tags ? model.tags : "untagged";
 
   const { data, error } = await supabase
     .from("combinedModelsData")
