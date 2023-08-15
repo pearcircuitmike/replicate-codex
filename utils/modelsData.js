@@ -103,7 +103,7 @@ export async function fetchModelDataById(id, platform = null) {
     const { data, error } = await supabase
       .from(table)
       .select(
-        "id, lastUpdated, generatedSummary, generatedUseCase, creator, modelName, description, tags, example, modelUrl, runs, costToRun, githubUrl, licenseUrl, paperUrl, predictionHardware, avgCompletionTime, platform, demoSources"
+        "id, lastUpdated, modelRank, generatedSummary, generatedUseCase, creator, modelName, description, tags, example, modelUrl, runs, costToRun, githubUrl, licenseUrl, paperUrl, predictionHardware, avgCompletionTime, platform, demoSources"
       )
       .eq("id", id)
       .single();
@@ -166,7 +166,7 @@ export async function fetchFilteredData({
 }
 
 export async function findSimilarModels(model, maxResults = 5) {
-  const modelTags = model.tags ? model.tags : "untagged";
+  const modelTags = model.tags;
 
   const { data, error } = await supabase
     .from("combinedModelsData")
