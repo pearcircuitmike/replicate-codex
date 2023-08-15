@@ -18,8 +18,8 @@ const Hero = () => {
 
   return (
     <>
-      <Grid templateColumns={["1fr", "1fr 1fr"]} gap={6} mt={8} mb={16}>
-        {/* Left Column */}
+      {/*  <Grid templateColumns={["1fr", "1fr 1fr"]} gap={6} mt={8} mb={16}>
+
         <VStack align="start" spacing={4}>
           <Heading
             as="h1"
@@ -67,7 +67,7 @@ const Hero = () => {
           </Box>
         </VStack>
 
-        {/* Right Column */}
+
         <VStack align="start" spacing={6}>
           <Image
             src="/img/test.svg"
@@ -96,7 +96,7 @@ const Hero = () => {
             ))}
           </Flex>
         </VStack>
-      </Grid>
+      </Grid>*/}
     </>
   );
 };

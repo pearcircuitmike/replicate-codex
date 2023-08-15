@@ -21,7 +21,6 @@ import { ArrowForwardIcon } from "@chakra-ui/icons";
 
 import ModelsTable from "../components/ModelsTable.js";
 import MetaTags from "../components/MetaTags.js";
-import Hero from "../components/Hero.js";
 import ModelOfTheDay from "../components/ModelOfTheDay"; // Import the ModelOfTheDay component
 import ModelMatchmaker from "@/components/ModelMatchmaker.js";
 
