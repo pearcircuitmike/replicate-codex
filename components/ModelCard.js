@@ -7,10 +7,14 @@ import {
   Avatar,
   Link as ChakraLink,
   HStack,
+  Tooltip,
 } from "@chakra-ui/react";
+import { DownloadIcon, RepeatIcon } from "@chakra-ui/icons";
+
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import { toTitleCase } from "@/utils/toTitleCase";
+import PreviewImage from "./PreviewImage"; // Ensure to import the PreviewImage component
 
 const ModelCard = ({ model }) => {
   if (!model) {
@@ -35,23 +39,23 @@ const ModelCard = ({ model }) => {
         borderWidth="1px"
         borderRadius="lg"
         boxShadow="base"
-        bgColor="gray.100"
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
+        rounded="md"
+        bg="white"
+        overflow="hidden"
       >
-        <Box
-          bgImage={`url(${
-            model.example ||
-            "https://upload.wikimedia.org/wikipedia/commons/d/dc/No_Preview_image_2.png"
-          })`}
-          bgPosition="center"
-          bgSize="cover"
-          bgRepeat="no-repeat"
-          width="100%"
-          height="200px"
-          mb="10px"
-        ></Box>
+        <Link href={`/models/${model.platform}/${model.id}`}>
+          <Box maxH="250px" overflow="hidden">
+            <PreviewImage
+              src={model.example}
+              id={model.id}
+              modelName={model.modelName}
+            />
+          </Box>
+        </Link>
+
         <Box p="15px">
           <Heading
             as="h3"
@@ -73,19 +77,23 @@ const ModelCard = ({ model }) => {
               cursor="pointer"
             />
             <Link href={`/creators/${model.platform}/${model.creator}`}>
-              <ChakraLink
-                ml={2}
-                color="blue.500"
-                textDecoration="underline"
-                fontSize="sm"
-              >
-                {model.creator}
-              </ChakraLink>
+              <Tooltip label="Creator or maintainer">
+                <ChakraLink
+                  ml={2}
+                  color="blue.500"
+                  textDecoration="underline"
+                  fontSize="sm"
+                >
+                  {model.creator}
+                </ChakraLink>
+              </Tooltip>
             </Link>
           </Flex>
 
           <Text fontSize="sm" noOfLines={4}>
-            {model?.description || "No description provided."}
+            {model?.generatedSummary || model?.description
+              ? model?.generatedSummary || model?.description
+              : "No description available."}
           </Text>
           <Text>
             <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
@@ -104,17 +112,36 @@ const ModelCard = ({ model }) => {
           justify="space-between"
           mt="auto"
           mb="10px"
-          spacing={6}
+          spacing={5}
           pl="15px"
           pr="15px"
         >
-          <Text fontSize="sm">
-            {model.costToRun ? `$${model.costToRun}/run` : "$-/run"}
-          </Text>
-          <Text fontSize="sm">{formatLargeNumber(model.downloads)}</Text>
-          <Text fontSize="sm" textAlign="right">
-            {toTitleCase(model.platform)}
-          </Text>
+          <Tooltip label="Cost per run, on average">
+            <Text fontSize="sm">
+              {model.costToRun
+                ? `$${model.costToRun.toFixed(3)}/run`
+                : "$-/run"}
+            </Text>
+          </Tooltip>
+          <Tooltip
+            label={model.platform === "replicate" ? "Runs" : "Downloads"}
+          >
+            <Text fontSize="sm">
+              {model.platform === "replicate" && (
+                <RepeatIcon boxSize=".8em" mr=".2em" />
+              )}
+              {model.platform !== "replicate" && (
+                <DownloadIcon boxSize=".9em" mr=".2em" />
+              )}
+
+              {formatLargeNumber(model.runs)}
+            </Text>
+          </Tooltip>
+          <Tooltip label="Platform">
+            <Text fontSize="sm" textAlign="right">
+              {toTitleCase(model.platform)}
+            </Text>
+          </Tooltip>
         </HStack>
       </Box>
     );

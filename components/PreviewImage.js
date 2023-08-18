@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Box, Image as ChakraImage, Skeleton } from "@chakra-ui/react";
+import {
+  Box,
+  Image as ChakraImage,
+  Skeleton,
+  Text,
+  Heading,
+} from "@chakra-ui/react";
 
-const gradients = [
-  "linear(to-r, gray.400, gray.500)",
-  "linear(to-r, blue.400, blue.500)",
-  "linear(to-r, teal.400, teal.500)",
-];
-
-const PreviewImage = ({ src }) => {
+const PreviewImage = ({ src, id, modelName }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [bgGradient, setBgGradient] = useState("");
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * gradients.length);
-    setBgGradient(gradients[randomIndex]);
-
     if (src && src.trim() !== "") {
       const img = new window.Image();
       img.src = src;
@@ -30,6 +26,7 @@ const PreviewImage = ({ src }) => {
       };
     } else {
       setIsLoading(false);
+      setHasError(true);
     }
   }, [src]);
 
@@ -39,19 +36,28 @@ const PreviewImage = ({ src }) => {
     <>
       {displayFallback ? (
         <Box
-          bgGradient={bgGradient}
+          bgImage={`url(https://picsum.photos/seed/${id}/500/500?blur=10)`}
+          bgPosition="center"
+          bgSize="cover"
+          bgRepeat="no-repeat"
           width="100%"
           height="100%"
           display="flex"
           justifyContent="center"
           alignItems="center"
           fontSize="xl"
-          fontWeight="bold"
           color="white"
-          minH="350px"
+          minH="250px"
           textAlign="center"
         >
-          No Preview
+          <Text
+            fontSize="xl"
+            color="white"
+            textAlign="center"
+            textShadow="2px 2px 4px rgba(0,0,0,0.5)"
+          >
+            {modelName ? modelName : "No preview available"}
+          </Text>
         </Box>
       ) : (
         <Skeleton

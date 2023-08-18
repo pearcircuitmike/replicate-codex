@@ -29,7 +29,12 @@ const ModelOverview = ({ model }) => {
             {model?.creator}
           </Link>
         </Text>
-        <PreviewImage width={"100%"} src={model?.example} />
+        <PreviewImage
+          width={"100%"}
+          src={model?.example}
+          id={model?.id}
+          modelName={model?.modelName}
+        />
         <Box>
           {" "}
           {model?.generatedSummary
