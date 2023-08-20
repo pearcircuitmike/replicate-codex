@@ -39,10 +39,9 @@ const Navbar = () => {
         <Box flex="1" maxW="600px" mx="auto">
           <form onSubmit={handleSearchSubmit}>
             <InputGroup size="md">
-              <InputLeftElement
-                pointerEvents="none"
-                children={<SearchIcon color="gray.300" />}
-              />
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.300" />
+              </InputLeftElement>
               <Input type="text" name="query" placeholder="Quick Search..." />
             </InputGroup>
           </form>

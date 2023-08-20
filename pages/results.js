@@ -9,24 +9,6 @@ const ResultsPage = () => {
 
   return (
     <Container maxW="8xl">
-      <Center>
-        <Heading as="h2" size="md">
-          Subscribe for a free weekly digest of new AI models.
-        </Heading>
-      </Center>
-      <iframe
-        src="https://aimodels.substack.com/embed"
-        width="100%"
-        height="auto"
-        border="0px solid #EEE"
-        bg="white"
-      ></iframe>
-      <Heading as="h2" size="sm" mb={2}>
-        Search Results
-      </Heading>
-      <Text mb={2}>
-        Results displayed below. Modify your search to try again!
-      </Text>
       <ModelMatchmaker initialQuery={query} />
     </Container>
   );
