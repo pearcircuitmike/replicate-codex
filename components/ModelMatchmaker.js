@@ -7,8 +7,6 @@ import {
   Text,
   Container,
   SimpleGrid,
-  Center,
-  Heading,
 } from "@chakra-ui/react";
 
 import supabase from "../utils/supabaseClient";
@@ -99,48 +97,23 @@ const ModelMatchmaker = ({ initialQuery }) => {
 
   return (
     <>
-      <SimpleGrid mt={5} columns={{ base: 1, md: 2, lg: 2, xl: 2 }} spacing={5}>
-        <Box>
-          <Heading as="h2" size="sm" mb={2}>
-            Search Results
-          </Heading>
-          <Text mb={2}>
-            Results displayed below. Modify your search to try again!
-          </Text>
-          <Textarea
-            fullWidth
-            placeholder="e.g., I need a model that can help upscale my images without losing clarity..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={handleKeyPress}
-            width="100%"
-            margin="auto"
-          />
-
-          <Button
-            mt={3}
-            onClick={handleSearch}
-            colorScheme="blue"
-            isDisabled={loading}
-          >
-            {loading ? "Checking 240,381 models..." : "Find my AI model"}
-          </Button>
-        </Box>
-        <Box>
-          <Center>
-            <Heading as="h2" size="md">
-              Subscribe for a free weekly digest of new AI models.
-            </Heading>
-          </Center>
-          <iframe
-            src="https://aimodels.substack.com/embed"
-            width="100%"
-            height="auto"
-            border="0px solid #EEE"
-            bg="white"
-          ></iframe>
-        </Box>
-      </SimpleGrid>
+      <Textarea
+        fullWidth
+        placeholder="e.g., I need a model that can help upscale my images without losing clarity..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyPress={handleKeyPress}
+        width="100%"
+        margin="auto"
+      />
+      <Button
+        mt={3}
+        onClick={handleSearch}
+        colorScheme="blue"
+        isDisabled={loading}
+      >
+        {loading ? "Checking 240,381 models..." : "Find my AI model"}
+      </Button>
 
       {data === null ? (
         <Box mt={5} textAlign="center" color="gray.500"></Box>
