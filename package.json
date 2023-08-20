@@ -41,6 +41,7 @@
     "react-intersection-observer": "^9.4.3",
     "react-table": "^7.8.0",
     "react-window": "^1.8.8",
+    "replicate": "^0.16.1",
     "sanitize-html": "^2.11.0",
     "seedrandom": "^3.0.5",
     "synonyms": "^1.0.1",

@@ -95,8 +95,6 @@ const ModelMatchmaker = ({ initialQuery }) => {
     }
   };
 
-  console.log(data);
-
   return (
     <>
       <Textarea
