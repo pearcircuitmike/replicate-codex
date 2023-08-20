@@ -189,7 +189,7 @@ export default function Home() {
 
             {/* Right Column */}
 
-            <VStack align="start" spacing={6}>
+            <VStack align="center" spacing={6}>
               <Image
                 src="/img/test.svg"
                 alt="Test SVG"
