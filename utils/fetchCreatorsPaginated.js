@@ -2,7 +2,7 @@
 import supabase from "./supabaseClient";
 
 export async function fetchCreators({
-  viewName,
+  tableName,
   pageSize,
   currentPage,
   searchValue,
@@ -10,7 +10,7 @@ export async function fetchCreators({
   platform = null,
 }) {
   let query = supabase
-    .from(viewName)
+    .from(tableName)
     .select("creator, example, total_runs, id, creatorRank, platform", {
       count: "exact",
     });

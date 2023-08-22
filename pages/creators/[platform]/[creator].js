@@ -12,7 +12,7 @@ import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
 
 export async function getStaticPaths() {
   const creatorsData = await fetchCreators({
-    viewName: "unique_creators_with_runs",
+    tableName: "unique_creators_data",
     pageSize: 1000, // only first 1k
     currentPage: 1,
     searchValue: "", // this can be an empty string since we want all creators
@@ -55,7 +55,7 @@ export default function Creator({ creator, models, platform }) {
   useEffect(() => {
     const fetchCreatorData = async () => {
       const response = await fetchCreators({
-        viewName: "unique_creators_with_runs",
+        tableName: "unique_creators_data",
         pageSize: 1,
         currentPage: 1,
         creatorName: creator,

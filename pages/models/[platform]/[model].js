@@ -82,7 +82,7 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
   useEffect(() => {
     const fetchCreatorData = async () => {
       const creatorObject = await fetchCreators({
-        viewName: "unique_creators_with_runs",
+        tableName: "unique_creators_data",
         pageSize: 1,
         currentPage: 1,
         creatorName: model.creator,

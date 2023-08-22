@@ -8,97 +8,130 @@ import {
   Input,
   InputGroup,
   Center,
+  Button,
+  Spinner,
 } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import CreatorCard from "../../components/CreatorCard";
 import Pagination from "../../components/Pagination";
 import { fetchCreators } from "../../utils/fetchCreatorsPaginated";
 
-const pageSize = 12;
+const ITEMS_PER_PAGE = 12;
 
 export async function getStaticProps() {
   const { data, totalCount } = await fetchCreators({
-    viewName: "unique_creators_with_runs",
-    pageSize,
+    tableName: "unique_creators_data",
+    pageSize: ITEMS_PER_PAGE,
     currentPage: 1,
     searchValue: "",
   });
 
   return {
-    props: { creatorVals: data, totalCount: totalCount || 0 },
+    props: {
+      initialCreators: data,
+      initialTotalCount: totalCount || 0,
+    },
     revalidate: 60,
   };
 }
 
-const Creators = ({ creatorVals, totalCount }) => {
-  const [stateFilter, setStateFilter] = useState("");
+const Creators = ({ initialCreators, initialTotalCount }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [creators, setCreators] = useState(initialCreators);
+  const [totalCount, setTotalCount] = useState(initialTotalCount);
 
-  const handleSearch = async (event) => {
-    setStateFilter(event.target.value);
-    setCurrentPage(1);
+  const executeSearch = async () => {
+    setIsLoading(true);
     const { data, totalCount } = await fetchCreators({
-      viewName: "unique_creators_with_runs",
-      pageSize,
+      tableName: "unique_creators_data",
+      pageSize: ITEMS_PER_PAGE,
       currentPage: 1,
-      searchValue: event.target.value,
+      searchValue: searchTerm,
     });
-    setCreatorVals(data);
-    setTotalCount(totalCount || 1);
+    setCreators(data);
+    setTotalCount(totalCount || 0);
+    setCurrentPage(1);
+    setIsLoading(false);
   };
 
-  const [totalCreators, setTotalCount] = useState(totalCount);
-  const [creators, setCreatorVals] = useState(creatorVals);
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !isLoading) {
+      // Check if isLoading
+      executeSearch();
+    }
+  };
 
-  const handlePageChange = async (page) => {
-    setCurrentPage(page);
+  const changePage = async (page) => {
+    setIsLoading(true);
     const { data } = await fetchCreators({
-      viewName: "unique_creators_with_runs",
-      pageSize,
+      tableName: "unique_creators_data",
+      pageSize: ITEMS_PER_PAGE,
       currentPage: page,
-      searchValue: stateFilter,
+      searchValue: searchTerm,
     });
-    setCreatorVals(data);
+    setCreators(data);
+    setCurrentPage(page);
+    setIsLoading(false);
   };
 
   return (
     <>
       <MetaTags
-        title={"AImodels.fyi | All Creators"}
-        description={"Search AI model creators."}
+        title="AImodels.fyi | All Creators"
+        description="Search AI model creators."
       />
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>
           Creators
         </Heading>
         <Text mt={5}>Search through the list of amazing creators below!</Text>
-
         <InputGroup mt={5}>
           <Input
             variant="outline"
-            value={stateFilter}
-            onChange={handleSearch}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Search by creator name"
           />
+          <Button
+            ml={3}
+            onClick={executeSearch}
+            colorScheme="blue"
+            isDisabled={isLoading}
+          >
+            Search
+          </Button>
         </InputGroup>
       </Container>
-
       <Container maxW="8xl">
-        <Flex wrap="wrap" justify="center" mt={10}>
-          {creators.map((creator, index) => (
-            <Box m={3} w="280px" key={index}>
-              <CreatorCard creator={creator} />
-            </Box>
-          ))}
-        </Flex>
+        <Box minHeight="800px">
+          {isLoading ? (
+            <Center mt={10}>
+              <Spinner />
+            </Center>
+          ) : creators.length > 0 ? (
+            <Flex wrap="wrap" justify="center" mt={10}>
+              {creators.map((creator, index) => (
+                <Box m={3} w="280px" key={index}>
+                  <CreatorCard creator={creator} />
+                </Box>
+              ))}
+            </Flex>
+          ) : (
+            <Center mt={10}>
+              <Text>No results found</Text>
+            </Center>
+          )}
+        </Box>
       </Container>
-
       <Center my={5}>
         <Pagination
           currentPage={currentPage}
           totalCount={totalCount}
-          onPageChange={handlePageChange}
-          pageSize={pageSize}
+          onPageChange={changePage}
+          pageSize={ITEMS_PER_PAGE}
         />
       </Center>
     </>
