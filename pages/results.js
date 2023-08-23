@@ -1,6 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import ModelMatchmaker from "@/components/ModelMatchmaker";
+import RecentlyAddedModels from "@/components/RecentlyAddedModels";
 import { Container, Heading, Center, Box, Text } from "@chakra-ui/react";
 
 const ResultsPage = () => {
@@ -28,6 +29,7 @@ const ResultsPage = () => {
         Results displayed below. Modify your search to try again!
       </Text>
       <ModelMatchmaker initialQuery={query} />
+      <RecentlyAddedModels />
     </Container>
   );
 };

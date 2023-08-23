@@ -8,6 +8,7 @@ import {
   Input,
   InputGroup,
   Center,
+  Button,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import MetaTags from "../../components/MetaTags";
@@ -32,24 +33,28 @@ export async function getStaticProps() {
 }
 
 const Models = ({ modelVals, totalCount }) => {
-  const [stateFilter, setStateFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [models, setModels] = useState(modelVals);
+  const [totalModels, setTotalModels] = useState(totalCount);
 
-  const handleSearch = async (event) => {
-    setStateFilter(event.target.value);
-    setCurrentPage(1);
+  const executeSearch = async () => {
     const { data, totalCount } = await fetchModelsPaginated({
       tableName: "replicateModelsData",
       pageSize,
       currentPage: 1,
-      searchValue: event.target.value,
+      searchValue: searchTerm,
     });
-    setModelVals(data);
-    setTotalCount(totalCount || 1);
+    setModels(data);
+    setTotalModels(totalCount || 0);
+    setCurrentPage(1);
   };
 
-  const [totalModels, setTotalCount] = useState(totalCount);
-  const [models, setModelVals] = useState(modelVals);
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      executeSearch();
+    }
+  };
 
   const handlePageChange = async (page) => {
     setCurrentPage(page);
@@ -57,9 +62,9 @@ const Models = ({ modelVals, totalCount }) => {
       tableName: "replicateModelsData",
       pageSize,
       currentPage: page,
-      searchValue: stateFilter,
+      searchValue: searchTerm,
     });
-    setModelVals(data);
+    setModels(data);
   };
 
   return (
@@ -77,18 +82,22 @@ const Models = ({ modelVals, totalCount }) => {
         <InputGroup mt={5}>
           <Input
             variant="outline"
-            value={stateFilter}
-            onChange={handleSearch}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Search by model name"
           />
+          <Button ml={3} onClick={executeSearch} colorScheme="blue">
+            Search
+          </Button>
         </InputGroup>
       </Container>
 
       <Container maxW="8xl">
         <Flex wrap="wrap" justify="center" mt={10}>
-          {models.map((modelVal) => (
-            <Box m={3} w="280px" key={modelVal.id}>
-              <ModelCard model={modelVal} />
+          {models.map((model) => (
+            <Box m={3} w="280px" key={model.id}>
+              <ModelCard model={model} />
             </Box>
           ))}
         </Flex>
@@ -97,9 +106,9 @@ const Models = ({ modelVals, totalCount }) => {
       <Center my={5}>
         <Pagination
           currentPage={currentPage}
-          totalCount={totalCount}
+          totalCount={totalModels}
           onPageChange={handlePageChange}
-          pageSize={20}
+          pageSize={pageSize}
         />
       </Center>
     </>

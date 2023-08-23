@@ -20,6 +20,7 @@ import {
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 
 import ModelsTable from "../components/ModelsTable.js";
+import RecentlyAddedModels from "@/components/RecentlyAddedModels.js";
 import MetaTags from "../components/MetaTags.js";
 import ModelOfTheDay from "../components/ModelOfTheDay"; // Import the ModelOfTheDay component
 import ModelMatchmaker from "@/components/ModelMatchmaker.js";
@@ -69,7 +70,7 @@ export default function Home() {
 
       <Container maxW="8xl" mt="100px">
         <main>
-          <Grid templateColumns={["1fr", "1fr 1fr"]} gap={16} mt={8} mb={16}>
+          <Grid templateColumns={["1fr", "1fr 1fr"]} gap={16} mt={4} mb={16}>
             {/* Left Column */}
             <VStack align="start" spacing={4}>
               <Heading
@@ -241,6 +242,7 @@ export default function Home() {
               </Flex>
             </VStack>
           </Grid>
+          <RecentlyAddedModels />
 
           {/* <ModelsTable
             fetchFilteredData={fetchDataFromTable}
