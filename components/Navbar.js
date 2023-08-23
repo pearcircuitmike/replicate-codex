@@ -38,13 +38,6 @@ const Navbar = () => {
           </Flex>
         </Box>
 
-        <Box flex="1" maxW="600px" mx="auto">
-          <form onSubmit={handleSearchSubmit}>
-            <InputGroup size="md">
-              <InputLeftElement pointerEvents="none">
-                <SearchIcon color="gray.300" />
-              </InputLeftElement>
-              <Input type="text" name="query" placeholder="Quick Search..." />
         {/* Quick Search Bar for Desktop */}
         <Box
           flex="1"
@@ -52,7 +45,7 @@ const Navbar = () => {
           mx="auto"
           display={["none", "none", "flex", "flex"]}
         >
-          <Box flex="1" maxW="600px" mx="auto" mx="20px">
+          <Box flex="1" maxW="600px" mx="auto">
             <form onSubmit={handleSearchSubmit}>
               <InputGroup size="md">
                 <InputLeftElement pointerEvents="none">
