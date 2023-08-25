@@ -40,7 +40,7 @@ const Models = ({ modelVals, totalCount }) => {
 
   const executeSearch = async () => {
     const { data, totalCount } = await fetchModelsPaginated({
-      tableName: "replicateModelsData",
+      tableName: "combinedModelsData",
       pageSize,
       currentPage: 1,
       searchValue: searchTerm,
@@ -59,7 +59,7 @@ const Models = ({ modelVals, totalCount }) => {
   const handlePageChange = async (page) => {
     setCurrentPage(page);
     const { data } = await fetchModelsPaginated({
-      tableName: "replicateModelsData",
+      tableName: "combinedModelsData",
       pageSize,
       currentPage: page,
       searchValue: searchTerm,
