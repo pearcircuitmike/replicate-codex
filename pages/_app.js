@@ -51,6 +51,102 @@ export default function App({ Component, pageProps }) {
             crossOrigin="anonymous"
           ></Script>
 
+          <Script
+            id="popup"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+    console.log('Script loaded');
+    // Define and immediately invoke the function to show popup if conditions are met
+    (function() {
+      console.log('Function execution started');
+
+      var lastVisit = localStorage.getItem('lastVisitTimestamp');
+      var currentTime = new Date().getTime();
+      console.log('Last Visit:', lastVisit);
+      console.log('Current Time:', currentTime);
+
+      // 604800000 is equivalent to 7 days in milliseconds
+      if (!lastVisit || currentTime - lastVisit > 604800000) {
+        console.log('Showing popup after 15 seconds');
+        setTimeout(function() {
+          showMailingListPopup();
+        }, 15000); // After 15 seconds
+      } else {
+        console.log('No need to show popup, within the visit time frame');
+      }
+    })();
+
+    function showMailingListPopup() {
+      console.log('Executing showMailingListPopup');
+
+      // Create overlay div
+      var overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      overlay.style.zIndex = '1000';
+      overlay.style.display = 'flex';
+      overlay.style.justifyContent = 'center';
+      overlay.style.alignItems = 'center';
+      document.body.appendChild(overlay);
+      console.log('Overlay added to body');
+
+      // Wrapper to control the width and centering of the iframe
+      var wrapper = document.createElement('div');
+      wrapper.style.maxWidth = '800px';
+      wrapper.style.position = 'relative';
+      overlay.appendChild(wrapper);
+
+      // Embed the iframe into the wrapper
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://aimodels.substack.com/embed';
+      iframe.width = '480';
+      iframe.height = '320';
+      iframe.style.border = '1px solid #EEE';
+      iframe.style.background = 'white';
+      iframe.frameBorder = '0';
+      iframe.scrolling = 'no';
+      wrapper.appendChild(iframe);
+
+      // Close button
+      var closeButton = document.createElement('span');
+      closeButton.innerHTML = '&times;';
+      closeButton.style.position = 'absolute';
+      closeButton.style.right = '10px';
+      closeButton.style.top = '10px';
+      closeButton.style.fontSize = '24px';
+      closeButton.style.cursor = 'pointer';
+      closeButton.style.color = '#FFF';
+      closeButton.style.background = 'rgba(0, 0, 0, 0.6)';
+      closeButton.style.borderRadius = '50%';
+      closeButton.style.padding = '5px';
+      closeButton.style.lineHeight = '24px';
+      closeButton.style.textAlign = 'center';
+      wrapper.appendChild(closeButton);
+      console.log('Close button added');
+
+      // Update the last visit timestamp
+      localStorage.setItem('lastVisitTimestamp', new Date().getTime());
+
+      // Close the popup if the overlay is clicked
+      overlay.addEventListener('click', function () {
+        document.body.removeChild(overlay);
+        console.log('Overlay clicked and removed');
+      });
+
+      // Close the popup if the close button is clicked
+      closeButton.addEventListener('click', function () {
+        document.body.removeChild(overlay);
+        console.log('Close button clicked and overlay removed');
+      });
+    }`,
+            }}
+          />
+
           <Component {...pageProps} />
         </Layout>
       </ChakraProvider>

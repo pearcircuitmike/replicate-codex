@@ -7,6 +7,7 @@ import {
   Text,
   Container,
   SimpleGrid,
+  Center,
 } from "@chakra-ui/react";
 
 import supabase from "../utils/supabaseClient";
@@ -22,6 +23,7 @@ const ModelMatchmaker = ({ initialQuery }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [itemsToShow, setItemsToShow] = useState(5); // New state variable
   const router = useRouter();
   const queryFromURL = router.query.query;
 
@@ -95,6 +97,10 @@ const ModelMatchmaker = ({ initialQuery }) => {
     }
   };
 
+  const handleViewMore = () => {
+    setItemsToShow(itemsToShow + 10); // Show 2 more rows, 5 models per row
+  };
+
   return (
     <>
       <Textarea
@@ -123,15 +129,22 @@ const ModelMatchmaker = ({ initialQuery }) => {
           <Text mt={3}>Calculating the best matches for your request...</Text>
         </Box>
       ) : data.length > 0 ? (
-        <SimpleGrid
-          mt={5}
-          columns={{ base: 1, md: 2, lg: 4, xl: 5 }}
-          spacing={5}
-        >
-          {data.map((model) => (
-            <ModelCard key={model.id} model={model} />
-          ))}
-        </SimpleGrid>
+        <>
+          <SimpleGrid
+            mt={5}
+            columns={{ base: 1, md: 2, lg: 4, xl: 5 }}
+            spacing={5}
+          >
+            {data.slice(0, itemsToShow).map((model) => (
+              <ModelCard key={model.id} model={model} />
+            ))}
+          </SimpleGrid>
+          {itemsToShow < data.length && (
+            <Center mt={5}>
+              <Button onClick={handleViewMore}>View More</Button>
+            </Center>
+          )}
+        </>
       ) : (
         <Box mt={5} textAlign="center">
           <Text>
