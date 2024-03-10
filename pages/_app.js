@@ -13,21 +13,47 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <ChakraProvider>
-        <Layout>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
+        {/* Black subscription bar */}
+        <div
+          style={{
+            background: "black",
+            color: "white",
+            textAlign: "center",
+            padding: "10px",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            cursor: "pointer",
+          }}
+          onClick={() =>
+            window.open("https://aimodels.substack.com/", "_blank")
+          }
+        >
+          Get a weekly rundown of the latest AI models and research...
+          subscribe!{" "}
+          <span style={{ textDecoration: "underline" }}>
+            https://aimodels.substack.com/
+          </span>
+        </div>
+        <div style={{ paddingTop: "40px" }}>
+          {/* Adjust this value based on your subscription bar height */}
+          <Layout>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
 
           gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');`}
-          </Script>
-          <Script id="microsoft-clarity">
-            {`
+            </Script>
+            <Script id="microsoft-clarity">
+              {`
            (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -35,27 +61,27 @@ export default function App({ Component, pageProps }) {
         })(window, document, "clarity", "script",     '${process.env.NEXT_PUBLIC_CLARITY_KEY}');
 
         `}
-          </Script>
-          <Script
-            id="crisp"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `window.$crisp=[];window.CRISP_WEBSITE_ID="854812c2-86af-48d6-9e51-a52c31640751";
+            </Script>
+            <Script
+              id="crisp"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `window.$crisp=[];window.CRISP_WEBSITE_ID="854812c2-86af-48d6-9e51-a52c31640751";
               (function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`,
-            }}
-          />
+              }}
+            />
 
-          <Script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4489327921275613"
-            crossOrigin="anonymous"
-          ></Script>
+            <Script
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4489327921275613"
+              crossOrigin="anonymous"
+            ></Script>
 
-          <Script
-            id="popup"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
+            <Script
+              id="popup"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
     console.log('Script loaded');
     // Define and immediately invoke the function to show popup if conditions are met
     (function() {
@@ -71,7 +97,7 @@ export default function App({ Component, pageProps }) {
         console.log('Showing popup after 15 seconds');
         setTimeout(function() {
           showMailingListPopup();
-        }, 15000); // After 15 seconds
+        }, 5000); // After 5 seconds
       } else {
         console.log('No need to show popup, within the visit time frame');
       }
@@ -144,11 +170,12 @@ export default function App({ Component, pageProps }) {
         console.log('Close button clicked and overlay removed');
       });
     }`,
-            }}
-          />
+              }}
+            />
 
-          <Component {...pageProps} />
-        </Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </div>
       </ChakraProvider>
     </>
   );
