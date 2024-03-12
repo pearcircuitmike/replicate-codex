@@ -31,7 +31,7 @@ export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
   const paths = [];
   const pageSize = 1000; // Number of records to fetch per page
-  const limit = 5000; // Maximum number of pages to generate
+  const limit = 2000; // Maximum number of pages to generate
 
   for (const platform of platforms) {
     let currentPage = 1;
