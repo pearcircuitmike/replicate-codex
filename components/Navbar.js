@@ -1,3 +1,4 @@
+// Navbar.js
 import Link from "next/link";
 import {
   Heading,
@@ -10,6 +11,7 @@ import {
   Box,
   InputGroup,
   InputLeftElement,
+  Button,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
@@ -38,7 +40,6 @@ const Navbar = () => {
           </Flex>
         </Box>
 
-        {/* Quick Search Bar for Desktop */}
         <Box
           flex="1"
           maxW="600px"
@@ -66,26 +67,37 @@ const Navbar = () => {
                 m={5}
                 w="100%"
               >
-                Advertise
+                📣 Advertise
               </Link>
               <Link href="/creators" aria-label="Creators" m={5} w="100%">
-                Creators
+                👨‍🎨 Creators
               </Link>
               <Link href="/models" aria-label="Models" m={5} w="100%">
-                Models
+                🤖 Models
               </Link>
               <Link href="/trending" aria-label="Trending" m={5} w="100%">
                 🔥 Trending
               </Link>
-
+              <Link href="/tools" aria-label="Tools" m={5} w="100%">
+                🛠️ Tools
+              </Link>
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
                 m={5}
                 w="100%"
               >
-                Notes
+                📝 Notes
               </Link>
+              <Button
+                as="a"
+                href="https://bit.ly/48UUjKl"
+                target="_blank"
+                colorScheme="blue"
+                leftIcon="📩"
+              >
+                Submit
+              </Button>
             </HStack>
           </Flex>
           <IconButton
@@ -134,22 +146,24 @@ const Navbar = () => {
           <Flex flexDir="column" align="center">
             <VStack spacing={3} m={5} fontSize="xl">
               <Link href="/creators" aria-label="Creators" m={"10px"} w="100%">
-                <span onClick={() => changeDisplay("none")}>Creators</span>
+                <span onClick={() => changeDisplay("none")}>👨‍🎨 Creators</span>
               </Link>
               <Link href="/models" aria-label="Models" m={"10px"} w="100%">
-                <span onClick={() => changeDisplay("none")}>Models</span>
+                <span onClick={() => changeDisplay("none")}>🤖 Models</span>
               </Link>
               <Link href="/trending" aria-label="Trending" m={"10px"} w="100%">
-                <span onClick={() => changeDisplay("none")}>Trending</span>
+                <span onClick={() => changeDisplay("none")}>🔥 Trending</span>
               </Link>
-
+              <Link href="/tools" aria-label="Tools" m={"10px"} w="100%">
+                <span onClick={() => changeDisplay("none")}>🛠️ Tools</span>
+              </Link>
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
                 m={"10px"}
                 w="100%"
               >
-                <span onClick={() => changeDisplay("none")}>Notes</span>
+                <span onClick={() => changeDisplay("none")}>📝 Notes</span>
               </Link>
               <Link
                 href="https://www.passionfroot.me/replicate-codex"
@@ -157,8 +171,19 @@ const Navbar = () => {
                 m={"10px"}
                 w="100%"
               >
-                <span onClick={() => changeDisplay("none")}>Advertise</span>
+                <span onClick={() => changeDisplay("none")}>📣 Advertise</span>
               </Link>
+              <Button
+                as="a"
+                href="https://bit.ly/48UUjKl"
+                target="_blank"
+                colorScheme="blue"
+                leftIcon="📩"
+                m={"10px"}
+                w="100%"
+              >
+                Submit
+              </Button>
             </VStack>
           </Flex>
         </Flex>

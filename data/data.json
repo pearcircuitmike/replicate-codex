@@ -1,0 +1,173 @@
+[
+  {
+    "id": 1,
+    "name": "Fliki",
+    "description": "Fliki turns your text into videos with AI-generated avatars and realistic voices in under 2 minutes.",
+    "url": "https://fliki.ai/",
+    "image": "https://gpte.ai/content/images/2023/webp/1183.webp",
+    "isFeatured": true,
+    "category": "Video"
+  },
+  {
+    "id": 2,
+    "name": "Looka",
+    "description": "Looka is an AI-powered platform that helps you design a logo and build a brand you love.",
+    "url": "https://looka.com",
+    "image": "https://gpte.ai/content/images/2023/11/screely-1700095091227.webp",
+    "isFeatured": true,
+    "category": "Design"
+  },
+  {
+    "id": 3,
+    "name": "Aragon AI",
+    "description": "Aragon creates HD professional headshots that look exactly like you and increase your chances of getting hired. Look your best with AI-generated photos.",
+    "url": "https://aragon.ai",
+    "image": "https://gpte.ai/content/images/2023/webp/257.webp",
+    "isFeatured": true,
+    "category": "Image"
+  },
+  {
+    "id": 4,
+    "name": "Adcreative AI",
+    "description": "Adcreative.ai generates conversion-focused ad and social media post creatives in seconds. Get better results while saving time.",
+    "url": "https://adcreative.ai",
+    "image": "https://gpte.ai/content/images/2023/webp/23.webp",
+    "isFeatured": false,
+    "category": "Design"
+  },
+  {
+    "id": 5,
+    "name": "Uizard",
+    "description": "Uizard is an AI-powered design tool that lets you create stunning web and mobile apps in minutes, even without any design experience.",
+    "url": "https://uizard.io",
+    "image": "https://gpte.ai/content/images/2023/webp/3225.webp",
+    "isFeatured": false,
+    "category": "Design"
+  },
+  {
+    "id": 6,
+    "name": "Eleven Labs",
+    "description": "Eleven Labs instantly generates natural AI voices from text in any language, perfect for video creators, developers, and businesses.",
+    "url": "https://eleven-labs.com",
+    "image": "https://gpte.ai/content/images/2023/12/scrnli_12_21_2023_7-41-19-AM.webp",
+    "isFeatured": false,
+    "category": "Audio"
+  },
+  {
+    "id": 7,
+    "name": "Jasper",
+    "description": "Jasper is an AI-powered copywriting tool that helps create content faster. It's designed to supercharge your content creation process.",
+    "url": "https://jasper.ai",
+    "image": "https://gpte.ai/content/images/2023/webp/1606.webp",
+    "isFeatured": false,
+    "category": "Writing"
+  },
+  {
+    "id": 8,
+    "name": "Headshot Pro",
+    "description": "Headshot Pro provides professional corporate headshots for your team, using AI to optimize lighting, focus, and color.",
+    "url": "https://www.headshotpro.com/",
+    "image": "https://gpte.ai/content/images/2023/webp/1425.webp",
+    "isFeatured": false,
+    "category": "Image"
+  },
+  {
+    "id": 9,
+    "name": "Decktopus",
+    "description": "Decktopus is the world's #1 AI-powered presentation generator, streamlining the creation of engaging and visually appealing presentations.",
+    "url": "https://decktopus.com",
+    "image": "https://gpte.ai/content/images/2023/08/screely-1693398179718.webp",
+    "isFeatured": false,
+    "category": "Productivity"
+  },
+  {
+    "id": 10,
+    "name": "Synthesia",
+    "description": "Synthesia generates lifelike AI videos based on text scripts. It allows for the creation of professional-looking videos without the need for filming or actors.",
+    "url": "https://Synthesia.io",
+    "image": "https://gpte.ai/content/images/2023/webp/3007.webp",
+    "isFeatured": false,
+    "category": "Video"
+  },
+  {
+    "id": 11,
+    "name": "MarketingBlocks AI",
+    "description": "MarketingBlocks is an all-in-one AI marketing suite that creates landing pages, promo videos, ads, marketing copy, graphics, email swipes, blog posts, articles, art and more in minutes.",
+    "url": "https://marketingblocks.com",
+    "image": "https://gpte.ai/content/images/2023/webp/1908.webp",
+    "isFeatured": false,
+    "category": "Productivity"
+  },
+  {
+    "id": 12,
+    "name": "Notion AI",
+    "description": "Notion AI transforms your Notion pages, harnessing the power of AI to boost productivity and creativity in your writing process.",
+    "url": "https://notion.so",
+    "image": "https://gpte.ai/content/images/2023/webp/2123.webp",
+    "isFeatured": false,
+    "category": "Productivity"
+  },
+  {
+    "id": 13,
+    "name": "Munch",
+    "description": "Munch turns long-form videos into short, viral clips.",
+    "url": "https://munch.com",
+    "image": "https://gpte.ai/content/images/2023/webp/2029.webp",
+    "isFeatured": false,
+    "category": "Video"
+  },
+  {
+    "id": 14,
+    "name": "LogoAI",
+    "description": "LogoAI is an AI engine that creates unique logo designs and branding templates based on design best practices for business cards, posters, flyers, and social media.",
+    "url": "https://logoai.com/",
+    "image": "https://gpte.ai/content/images/2023/webp/1811.webp",
+    "isFeatured": false,
+    "category": "Design"
+  },
+  {
+    "id": 15,
+    "name": "Descript",
+    "description": "Descript is the only tool you need to write, record, transcribe, edit, collaborate, and share your videos and podcasts.",
+    "url": "https://descript.com",
+    "image": "https://gpte.ai/content/images/2023/webp/921.webp",
+    "isFeatured": false,
+    "category": "Audio"
+  },
+  {
+    "id": 16,
+    "name": "Pictory",
+    "description": "Pictory automatically creates short, highly sharable branded videos from long-form content, enhancing your video marketing efforts.",
+    "url": "https://pictory.io",
+    "image": "https://gpte.ai/content/images/2023/webp/2309.webp",
+    "isFeatured": false,
+    "category": "Video"
+  },
+  {
+    "id": 17,
+    "name": "Windsor",
+    "description": "Windsor sends millions of personalized videos to customers, ensuring they never forget your brand and building strong brand loyalty.",
+    "url": "https://windsor.com",
+    "image": "https://gpte.ai/content/images/2023/webp/3407.webp",
+    "isFeatured": false,
+    "category": "Video"
+  },
+  {
+    "id": 18,
+    "name": "MeetGeek",
+    "description": "MeetGeek maximizes the value of meetings by recording, summarizing, and sharing key highlights, enhancing team collaboration and productivity.",
+    "url": "https://meetgeek.com",
+    "image": "https://gpte.ai/content/images/2023/webp/1936.webp",
+    "isFeatured": false,
+    "category": "Productivity"
+  },
+  {
+    "id": 19,
+    "name": "Listnr",
+    "description": "Listnr is your go-to AI voice generator, offering voiceovers in 80+ languages and easy export in MP3 or WAV format.",
+    "url": "https://listnr.com",
+    "image": "https://gpte.ai/content/images/2023/webp/1792.webp",
+    "isFeatured": false,
+    "category": "Audio"
+  }
+]

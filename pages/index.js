@@ -243,16 +243,6 @@ export default function Home() {
             </VStack>
           </Grid>
           <RecentlyAddedModels />
-
-          {/* <ModelsTable
-            fetchFilteredData={fetchDataFromTable}
-            tableName={"combinedModelsData"}
-            selectedTags={selectedTags}
-            searchValue={searchValue}
-            sorts={sorts}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />*/}
         </main>
       </Container>
     </>
