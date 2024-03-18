@@ -14,7 +14,6 @@ import {
   Grid,
   GridItem,
 } from "@chakra-ui/react";
-import NewsletterSubscription from "../components/NewsletterSubscription";
 import data from "../data/data.json";
 
 const Tools = () => {
@@ -51,7 +50,15 @@ const Tools = () => {
             Join 65,000 users from top tech companies including Amazon, Apple,
             Google, and Microsoft reading our free newsletter.
           </Text>
-          <NewsletterSubscription />
+          <div id="custom-substack-embed"></div>
+
+          <iframe
+            src="https://aimodels.substack.com/embed"
+            width="100%"
+            height="auto"
+            border="0px solid #EEE"
+            bg="white"
+          ></iframe>
         </Box>
       </Box>
 
