@@ -48,7 +48,7 @@ const Tools = () => {
           </Heading>
           <Text fontSize="xl" mb={8}>
             Join 65,000 users from top tech companies including Amazon, Apple,
-            Google, and Microsoft reading our free newsletter.
+            Google, and Microsoft who use our site. Subscribe to the newsletter!
           </Text>
           <div id="custom-substack-embed"></div>
 
