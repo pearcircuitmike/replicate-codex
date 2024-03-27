@@ -18,21 +18,17 @@ import data from "../data/data.json";
 
 const Tools = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
-
   const categories = [
     { name: "All", emoji: "🏷️" },
-    { name: "Code", emoji: "💻" },
     { name: "Video", emoji: "📹" },
-    { name: "Writing", emoji: "✍️" },
-    { name: "Productivity", emoji: "📈" },
+    { name: "Service", emoji: "🛎️" },
+    { name: "Tool", emoji: "🔧" },
+    { name: "Coding", emoji: "💻" },
     { name: "Design", emoji: "🎨" },
-    { name: "Image", emoji: "🖼️" },
     { name: "Audio", emoji: "🎧" },
-    { name: "Assistant", emoji: "🤖" },
-    { name: "Lifestyle", emoji: "🌴" },
-    { name: "Business", emoji: "💼" },
-    { name: "Education", emoji: "🎓" },
-    { name: "Gaming", emoji: "🎮" },
+    { name: "Productivity", emoji: "📈" },
+    { name: "Writing", emoji: "✍️" },
+    { name: "Image", emoji: "🖼️" },
   ];
 
   const filteredTools = data.filter(
@@ -44,14 +40,13 @@ const Tools = () => {
       <Box bg="gray.100" py={20}>
         <Box maxW="container.lg" mx="auto" textAlign="center">
           <Heading as="h1" size="2xl" mb={4}>
-            Discover the Latest AI Tools to Solve Your Problem
+            Discover AI tools to solve your problem
           </Heading>
           <Text fontSize="xl" mb={8}>
             Join 65,000 users from top tech companies including Amazon, Apple,
             Google, and Microsoft who use our site. Subscribe to the newsletter!
           </Text>
           <div id="custom-substack-embed"></div>
-
           <iframe
             src="https://aimodels.substack.com/embed"
             width="100%"
@@ -61,7 +56,6 @@ const Tools = () => {
           ></iframe>
         </Box>
       </Box>
-
       <Box maxW="container.lg" mx="auto" my={8}>
         <Flex wrap="wrap" justifyContent="center" mb={8}>
           {categories.map((category) => (
@@ -79,7 +73,6 @@ const Tools = () => {
             </Tag>
           ))}
         </Flex>
-
         <Grid
           templateColumns={[
             "repeat(1, 1fr)",

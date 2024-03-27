@@ -9,7 +9,7 @@ import {
   InputGroup,
   Center,
   Button,
-  Spinner,
+  Skeleton,
 } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import CreatorCard from "../../components/CreatorCard";
@@ -25,7 +25,6 @@ export async function getStaticProps() {
     currentPage: 1,
     searchValue: "",
   });
-
   return {
     props: {
       initialCreators: data,
@@ -58,7 +57,6 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && !isLoading) {
-      // Check if isLoading
       executeSearch();
     }
   };
@@ -108,9 +106,15 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
       <Container maxW="8xl">
         <Box minHeight="800px">
           {isLoading ? (
-            <Center mt={10}>
-              <Spinner />
-            </Center>
+            <Flex wrap="wrap" justify="center" mt={10}>
+              {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                <Box m={3} w="280px" key={index}>
+                  <Skeleton height="200px" />
+                  <Skeleton height="20px" mt={2} />
+                  <Skeleton height="20px" mt={1} />
+                </Box>
+              ))}
+            </Flex>
           ) : creators.length > 0 ? (
             <Flex wrap="wrap" justify="center" mt={10}>
               {creators.map((creator, index) => (

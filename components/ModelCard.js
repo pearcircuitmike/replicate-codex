@@ -14,7 +14,7 @@ import { DownloadIcon, RepeatIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import { toTitleCase } from "@/utils/toTitleCase";
-import PreviewImage from "./PreviewImage"; // Ensure to import the PreviewImage component
+import PreviewImage from "./PreviewImage";
 
 const ModelCard = ({ model }) => {
   if (!model) {
@@ -47,7 +47,7 @@ const ModelCard = ({ model }) => {
         overflow="hidden"
       >
         <Link href={`/models/${model.platform}/${model.id}`}>
-          <Box maxH="250px" overflow="hidden">
+          <Box h="250px" overflow="hidden" position="relative">
             <PreviewImage
               src={model.example}
               id={model.id}
@@ -70,16 +70,16 @@ const ModelCard = ({ model }) => {
           <Flex mb="10px" alignItems="center">
             <Avatar
               src={`https://github.com/${model.creator}.png`}
-              size="xs"
+              size="sm"
               onClick={() =>
                 window.open(`/creators/${model.platform}/${model.creator}`)
               }
               cursor="pointer"
+              mr={2}
             />
             <Link href={`/creators/${model.platform}/${model.creator}`}>
               <Tooltip label="Creator or maintainer">
                 <ChakraLink
-                  ml={2}
                   color="blue.500"
                   textDecoration="underline"
                   fontSize="sm"

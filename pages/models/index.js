@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Heading,
@@ -9,6 +9,7 @@ import {
   InputGroup,
   Center,
   Button,
+  Skeleton,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import MetaTags from "../../components/MetaTags";
@@ -35,10 +36,18 @@ export async function getStaticProps() {
 const Models = ({ modelVals, totalCount }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [models, setModels] = useState(modelVals);
-  const [totalModels, setTotalModels] = useState(totalCount);
+  const [models, setModels] = useState([]);
+  const [totalModels, setTotalModels] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setModels(modelVals);
+    setTotalModels(totalCount);
+    setIsLoading(false);
+  }, [modelVals, totalCount]);
 
   const executeSearch = async () => {
+    setIsLoading(true);
     const { data, totalCount } = await fetchModelsPaginated({
       tableName: "combinedModelsData",
       pageSize,
@@ -48,6 +57,7 @@ const Models = ({ modelVals, totalCount }) => {
     setModels(data);
     setTotalModels(totalCount || 0);
     setCurrentPage(1);
+    setIsLoading(false);
   };
 
   const handleKeyDown = (event) => {
@@ -57,6 +67,7 @@ const Models = ({ modelVals, totalCount }) => {
   };
 
   const handlePageChange = async (page) => {
+    setIsLoading(true);
     setCurrentPage(page);
     const { data } = await fetchModelsPaginated({
       tableName: "combinedModelsData",
@@ -65,6 +76,7 @@ const Models = ({ modelVals, totalCount }) => {
       searchValue: searchTerm,
     });
     setModels(data);
+    setIsLoading(false);
   };
 
   return (
@@ -78,7 +90,6 @@ const Models = ({ modelVals, totalCount }) => {
           Models
         </Heading>
         <Text mt={5}>Search through the list of amazing models below!</Text>
-
         <InputGroup mt={5}>
           <Input
             variant="outline"
@@ -92,17 +103,23 @@ const Models = ({ modelVals, totalCount }) => {
           </Button>
         </InputGroup>
       </Container>
-
       <Container maxW="8xl">
         <Flex wrap="wrap" justify="center" mt={10}>
-          {models.map((model) => (
-            <Box m={3} w="280px" key={model.id}>
-              <ModelCard model={model} />
-            </Box>
-          ))}
+          {isLoading
+            ? Array.from({ length: pageSize }).map((_, index) => (
+                <Box m={3} w="280px" key={index}>
+                  <Skeleton height="200px" />
+                  <Skeleton height="20px" mt={2} />
+                  <Skeleton height="20px" mt={1} />
+                </Box>
+              ))
+            : models.map((model) => (
+                <Box m={3} w="280px" key={model.id}>
+                  <ModelCard model={model} />
+                </Box>
+              ))}
         </Flex>
       </Container>
-
       <Center my={5}>
         <Pagination
           currentPage={currentPage}
