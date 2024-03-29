@@ -33,7 +33,7 @@ const Navbar = () => {
         <Box>
           <Flex top="1rem" right="1rem" align="center">
             <Heading fontSize="2xl">
-              <Link href="/" aria-label="Home">
+              <Link href="/" aria-label="Home" legacyBehavior>
                 <div>🤖 AIModels.fyi</div>
               </Link>
             </Heading>
@@ -125,7 +125,7 @@ const Navbar = () => {
           <HStack m={5}>
             <Flex top="1rem" align="center">
               <Heading fontSize="2xl">
-                <Link href="/" aria-label="Home" my={5}>
+                <Link href="/" aria-label="Home" my={5} legacyBehavior>
                   <span onClick={() => changeDisplay("none")}>
                     🤖 AIModels.fyi
                   </span>
@@ -145,16 +145,16 @@ const Navbar = () => {
           </HStack>
           <Flex flexDir="column" align="center">
             <VStack spacing={3} m={5} fontSize="xl">
-              <Link href="/creators" aria-label="Creators" m={"10px"} w="100%">
+              <Link href="/creators" aria-label="Creators" m={"10px"} w="100%" legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>👨‍🎨 Creators</span>
               </Link>
-              <Link href="/models" aria-label="Models" m={"10px"} w="100%">
+              <Link href="/models" aria-label="Models" m={"10px"} w="100%" legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>🤖 Models</span>
               </Link>
-              <Link href="/trending" aria-label="Trending" m={"10px"} w="100%">
+              <Link href="/trending" aria-label="Trending" m={"10px"} w="100%" legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>🔥 Trending</span>
               </Link>
-              <Link href="/tools" aria-label="Tools" m={"10px"} w="100%">
+              <Link href="/tools" aria-label="Tools" m={"10px"} w="100%" legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>🛠️ Tools</span>
               </Link>
               <Link
@@ -162,7 +162,7 @@ const Navbar = () => {
                 aria-label="Notes"
                 m={"10px"}
                 w="100%"
-              >
+                legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>📝 Notes</span>
               </Link>
               <Link
@@ -170,7 +170,7 @@ const Navbar = () => {
                 aria-label="Advertise"
                 m={"10px"}
                 w="100%"
-              >
+                legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>📣 Advertise</span>
               </Link>
               <Button

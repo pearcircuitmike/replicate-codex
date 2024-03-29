@@ -58,7 +58,7 @@ const CreatorCard = ({ creator }) => {
           <Link
             href={`/creators/${creator.platform}/${creator.creator}`}
             passHref
-          >
+            legacyBehavior>
             <Button size="sm" colorScheme="blue">
               View profile
             </Button>

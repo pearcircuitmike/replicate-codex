@@ -21,7 +21,6 @@ import CreatorModelsTable from "../../../components/modelDetailsPage/CreatorMode
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import ModelPricingSummary from "../../../components/modelDetailsPage/ModelPricingSummary";
-import RunsHistoryChart from "../../../components/modelDetailsPage/RunsHistoryChart";
 import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";

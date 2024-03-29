@@ -46,7 +46,7 @@ const ModelCard = ({ model }) => {
         bg="white"
         overflow="hidden"
       >
-        <Link href={`/models/${model.platform}/${model.id}`}>
+        <Link href={`/models/${model.platform}/${model.id}`} legacyBehavior>
           <Box h="250px" overflow="hidden" position="relative">
             <PreviewImage
               src={model.example}
@@ -77,7 +77,7 @@ const ModelCard = ({ model }) => {
               cursor="pointer"
               mr={2}
             />
-            <Link href={`/creators/${model.platform}/${model.creator}`}>
+            <Link href={`/creators/${model.platform}/${model.creator}`} legacyBehavior>
               <Tooltip label="Creator or maintainer">
                 <ChakraLink
                   color="blue.500"
@@ -96,7 +96,7 @@ const ModelCard = ({ model }) => {
               : "No description available."}
           </Text>
           <Text>
-            <Link href={`/models/${model?.platform}/${model?.id}`} passHref>
+            <Link href={`/models/${model?.platform}/${model?.id}`} passHref legacyBehavior>
               <ChakraLink
                 fontSize="sm"
                 color="blue.500"
