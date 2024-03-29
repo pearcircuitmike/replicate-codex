@@ -23,18 +23,17 @@
     "date-fns": "^2.29.3",
     "dompurify": "^3.0.4",
     "eslint": "8.35.0",
-    "eslint-config-next": "13.2.3",
     "fontawesome": "^5.6.3",
     "framer-motion": "^10.1.0",
     "html-react-parser": "^4.0.0",
     "html-to-react": "^1.6.0",
     "html-truncate": "^1.2.2",
-    "next": "13.2.3",
+    "next": "^14.1.4",
     "next-sitemap": "^4.1.3",
     "openai": "^3.3.0",
-    "react": "18.2.0",
+    "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "18.2.0",
+    "react-dom": "^18.2.0",
     "react-fontawesome": "^1.7.1",
     "react-html-render": "^1.0.3",
     "react-icons": "^4.9.0",
@@ -46,5 +45,8 @@
     "seedrandom": "^3.0.5",
     "synonyms": "^1.0.1",
     "xss": "^1.0.14"
+  },
+  "devDependencies": {
+    "eslint-config-next": "^14.1.4"
   }
 }
