@@ -5,5 +5,5 @@ module.exports = {
   generateRobotsTxt: true,
   exclude: ["/components/*"],
   generateIndexSitemap: true,
-  sitemapSize: 10000,
+  sitemapSize: 20000,
 };
