@@ -46,7 +46,7 @@ const Navbar = () => {
           mx="auto"
           display={["none", "none", "flex", "flex"]}
         >
-          <Box flex="1" maxW="600px" mx="auto">
+          <Box flex="1" maxW="600px" mx={5}>
             <form onSubmit={handleSearchSubmit}>
               <InputGroup size="md">
                 <InputLeftElement pointerEvents="none">
@@ -74,6 +74,12 @@ const Navbar = () => {
               </Link>
               <Link href="/models" aria-label="Models" m={5} w="100%">
                 🤖 Models
+              </Link>
+              <Link href="/papers" aria-label="Papers" m={5} w="100%">
+                📄 Papers
+              </Link>
+              <Link href="/authors" aria-label="Science" m={5} w="100%">
+                🔬 Researchers
               </Link>
               <Link href="/trending" aria-label="Trending" m={5} w="100%">
                 🔥 Trending
@@ -145,16 +151,60 @@ const Navbar = () => {
           </HStack>
           <Flex flexDir="column" align="center">
             <VStack spacing={3} m={5} fontSize="xl">
-              <Link href="/creators" aria-label="Creators" m={"10px"} w="100%" legacyBehavior>
+              <Link
+                href="/creators"
+                aria-label="Creators"
+                m={"10px"}
+                w="100%"
+                legacyBehavior
+              >
                 <span onClick={() => changeDisplay("none")}>👨‍🎨 Creators</span>
               </Link>
-              <Link href="/models" aria-label="Models" m={"10px"} w="100%" legacyBehavior>
+              <Link
+                href="/models"
+                aria-label="Models"
+                m={"10px"}
+                w="100%"
+                legacyBehavior
+              >
                 <span onClick={() => changeDisplay("none")}>🤖 Models</span>
               </Link>
-              <Link href="/trending" aria-label="Trending" m={"10px"} w="100%" legacyBehavior>
+              <Link
+                href="/papers"
+                aria-label="Papers"
+                m={"10px"}
+                w="100%"
+                legacyBehavior
+              >
+                <span onClick={() => changeDisplay("none")}>📄 Papers</span>
+              </Link>
+              <Link
+                href="/authors"
+                aria-label="Researchers"
+                m={"10px"}
+                w="100%"
+                legacyBehavior
+              >
+                <span onClick={() => changeDisplay("none")}>
+                  🔬 Researchers
+                </span>
+              </Link>
+              <Link
+                href="/trending"
+                aria-label="Trending"
+                m={"10px"}
+                w="100%"
+                legacyBehavior
+              >
                 <span onClick={() => changeDisplay("none")}>🔥 Trending</span>
               </Link>
-              <Link href="/tools" aria-label="Tools" m={"10px"} w="100%" legacyBehavior>
+              <Link
+                href="/tools"
+                aria-label="Tools"
+                m={"10px"}
+                w="100%"
+                legacyBehavior
+              >
                 <span onClick={() => changeDisplay("none")}>🛠️ Tools</span>
               </Link>
               <Link
@@ -162,7 +212,8 @@ const Navbar = () => {
                 aria-label="Notes"
                 m={"10px"}
                 w="100%"
-                legacyBehavior>
+                legacyBehavior
+              >
                 <span onClick={() => changeDisplay("none")}>📝 Notes</span>
               </Link>
               <Link
@@ -170,7 +221,8 @@ const Navbar = () => {
                 aria-label="Advertise"
                 m={"10px"}
                 w="100%"
-                legacyBehavior>
+                legacyBehavior
+              >
                 <span onClick={() => changeDisplay("none")}>📣 Advertise</span>
               </Link>
               <Button
