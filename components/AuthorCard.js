@@ -1,7 +1,35 @@
 // components/AuthorCard.js
 import React from "react";
-import { Box, Heading, Text, Avatar, Button, Flex } from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Flex } from "@chakra-ui/react";
 import Link from "next/link";
+
+const getInitials = (name) => {
+  const names = name.split(" ");
+  const initials = names
+    .map((name) => name.charAt(0))
+    .slice(0, 2)
+    .join("");
+  return initials.toUpperCase();
+};
+
+const getColorByAuthor = (author) => {
+  const colors = [
+    "red.500",
+    "orange.500",
+    "yellow.500",
+    "green.500",
+    "teal.500",
+    "blue.500",
+    "cyan.500",
+    "purple.500",
+    "gray.500",
+  ];
+  const hash = author
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const index = hash % colors.length;
+  return colors[index];
+};
 
 const AuthorCard = ({ author }) => {
   if (!author) {
@@ -23,6 +51,8 @@ const AuthorCard = ({ author }) => {
       </Box>
     );
   } else {
+    const bgColor = getColorByAuthor(author);
+
     return (
       <Box
         borderWidth="1px"
@@ -37,7 +67,21 @@ const AuthorCard = ({ author }) => {
         justifyContent="space-between"
       >
         <Box textAlign="center">
-          <Avatar src={`https://github.com/${author}.png`} size="2xl" mb={3} />
+          <Flex
+            borderRadius="full"
+            width="100px"
+            height="100px"
+            backgroundColor={bgColor}
+            color="white"
+            fontSize="3xl"
+            fontWeight="bold"
+            mb={3}
+            alignItems="center"
+            justifyContent="center"
+            mx="auto"
+          >
+            {getInitials(author)}
+          </Flex>
           <Heading as="h2" size="md" isTruncated mb={2}>
             {author}
           </Heading>

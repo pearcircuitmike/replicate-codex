@@ -10,6 +10,11 @@ import {
   Wrap,
   WrapItem,
   Icon,
+  Center,
+  ListItem,
+  List,
+  UnorderedList,
+  OrderedList,
 } from "@chakra-ui/react";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
@@ -17,13 +22,57 @@ import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import MetaTags from "../../components/MetaTags";
 import { fetchPaperDataById } from "../../utils/fetchPapers";
 
+import emojiMap from "../../data/emojiMap.json";
+
+const getColorByTitle = (title, index) => {
+  const colors = [
+    "red.500",
+    "orange.500",
+    "yellow.500",
+    "green.500",
+    "teal.500",
+    "blue.500",
+    "cyan.500",
+    "purple.500",
+    "pink.500",
+  ];
+  const hash = title
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const colorIndex = (hash + index) % colors.length;
+  return colors[colorIndex];
+};
+
+const getHashCode = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) | 0;
+  }
+  return hash;
+};
+
+const getRandomEmoji = (title) => {
+  const emojis = Object.values(emojiMap);
+  const hash = getHashCode(title);
+  const randomIndex = Math.abs(hash) % emojis.length;
+  return emojis[randomIndex];
+};
+
+const getEmojiForPaper = (title) => {
+  const keywords = title.toLowerCase().split(" ");
+  for (const keyword of keywords) {
+    if (emojiMap[keyword]) {
+      return emojiMap[keyword];
+    }
+  }
+  return getRandomEmoji(title);
+};
+
 export async function getServerSideProps({ params }) {
   const paper = await fetchPaperDataById(params.paper);
-
   if (!paper) {
     return { notFound: true };
   }
-
   return { props: { paper } };
 }
 
@@ -32,6 +81,71 @@ const PaperDetailsPage = ({ paper }) => {
   if (!paper) {
     return <div>Loading...</div>; // or any other fallback UI
   }
+
+  // Function to format links in the text
+  const formatLinks = (text) => {
+    return text.replace(/(https?:\/\/[^\s]+)/g, (url) => `[${url}](${url})`);
+  };
+
+  // Format links in the abstract
+  const formattedAbstract = formatLinks(paper.abstract);
+
+  const bgColor1 = getColorByTitle(paper.title, 0);
+  const bgColor2 = getColorByTitle(paper.title, 1);
+  const gradientBg = `linear(to-r, ${bgColor1}, ${bgColor2})`;
+
+  const customTheme = {
+    p: (props) => {
+      const { children } = props;
+      return (
+        <Text my="15px" fontSize="md" lineHeight="1.45em">
+          {children}
+        </Text>
+      );
+    },
+    a: (props) => {
+      const { children } = props;
+      return <Link color="blue.500">{children}</Link>;
+    },
+    em: (props) => {
+      const { children } = props;
+      return (
+        <figcaption
+          style={{
+            textAlign: "center",
+            fontStyle: "italic",
+            fontSize: "small",
+          }}
+        >
+          {children}
+        </figcaption>
+      );
+    },
+    ul: (props) => {
+      const { children } = props;
+      return (
+        <UnorderedList my="18px" lineHeight="1.45em">
+          {children}
+        </UnorderedList>
+      );
+    },
+    ol: (props) => {
+      const { children } = props;
+      return (
+        <OrderedList my="18px" lineHeight="1.45em">
+          {children}
+        </OrderedList>
+      );
+    },
+    li: (props) => {
+      const { children } = props;
+      return (
+        <ListItem fontSize="md" my="9px" lineHeight="1.45em">
+          {children}
+        </ListItem>
+      );
+    },
+  };
 
   return (
     <>
@@ -88,29 +202,35 @@ const PaperDetailsPage = ({ paper }) => {
                 </Link>
               ))}
           </Box>
-          {paper.thumbnail && (
+          {paper.thumbnail ? (
             <Image
               src={paper.thumbnail}
               alt={paper.title}
               mb={6}
-              fallbackSrc="/placeholder.png"
+              objectFit="cover"
+              w="100%"
+              h="250px"
             />
+          ) : (
+            <Center h="250px" bgGradient={gradientBg}>
+              <Text fontSize="6xl">{getEmojiForPaper(paper.title)}</Text>
+            </Center>
           )}
           <Box bg="gray.100" p={4} mb={6}>
             <Heading as="h2" mb={2}>
               Abstract
             </Heading>
-            <Text>{paper.abstract}</Text>
+            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+              {formattedAbstract}
+            </ReactMarkdown>
           </Box>
-
           <div>
-            <ReactMarkdown components={ChakraUIRenderer()}>
+            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
               {paper.generatedSummary}
             </ReactMarkdown>
           </div>
           <br />
           <hr />
-
           <Box mt={8}>
             <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
               Get summaries of the top AI research delivered straight to your
