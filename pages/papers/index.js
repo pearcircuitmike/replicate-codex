@@ -1,3 +1,4 @@
+// pages/papers/index.js
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
@@ -13,13 +14,19 @@ import {
   Heading,
   Collapse,
   Icon,
+  Spinner,
 } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
 import { FaFilter } from "react-icons/fa";
-
+import { Configuration, OpenAIApi } from "openai";
 import { fetchPapersPaginated } from "../../utils/fetchPapers";
+import { fetchPapersWithEmbeddings } from "../../utils/fetchPapersWithEmbeddings";
+
+const openAi = new OpenAIApi(
+  new Configuration({ apiKey: process.env.NEXT_PUBLIC_OPENAI_CLIENT_KEY })
+);
 
 const categoryDescriptions = {
   "cs.AI": "Artificial Intelligence",
@@ -41,6 +48,7 @@ const categoryDescriptions = {
   "eess.IV": "Image and Video Processing",
   "stat.ML": "Machine Learning",
 };
+
 export async function getServerSideProps({ query }) {
   const { search, selectedCategories, page } = query;
   const currentPage = parseInt(page) || 1;
@@ -82,11 +90,53 @@ const PapersIndexPage = ({
   );
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [isCategoryControlOpen, setIsCategoryControlOpen] = useState(false);
+  const [totalCount, setTotalCount] = useState(totalPaperCount);
+  const [loading, setLoading] = useState(false);
   const pageSize = 20;
 
-  useEffect(() => {
-    const fetchPapers = async () => {
-      const { data } = await fetchPapersPaginated({
+  const fetchPapers = async (query) => {
+    setLoading(true);
+
+    if (query) {
+      const prompt = `the user's query will be sent to you to generate an answer, and then use the answer for 
+      semantic search to find an AI research paper that can produce the solution to the problem or idea or use 
+      case the user is describing. 
+
+
+example user query: infinite context window LLM
+
+hypothetical research paper that answers the user's query: This paper provides a comprehensive survey of various techniques for compressing and accelerating deep neural networks. It covers methods such as pruning, quantization, knowledge distillation, and low-rank approximation, among others. The survey discusses the principles behind each technique, their advantages and limitations, and provides insights into their effectiveness in improving inference speed without significantly compromising model accuracy.
+
+      . Now respond similarly: The user's query: ${query}. The expanded hypothetical research paper for use in semantic search:`;
+
+      console.log("LLM Prompt:", prompt);
+
+      const gptResponse = await openAi.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
+      });
+
+      const generatedResponse = gptResponse.data.choices[0].message.content;
+
+      console.log("LLM Response:", generatedResponse);
+
+      const embeddingResponse = await openAi.createEmbedding({
+        model: "text-embedding-ada-002",
+        input: generatedResponse,
+      });
+
+      const embedding = embeddingResponse.data.data[0].embedding;
+
+      const { papers, totalCount } = await fetchPapersWithEmbeddings(
+        embedding,
+        0.75,
+        pageSize,
+        selectedCategories
+      );
+      setPapers(papers);
+      setTotalCount(totalCount);
+    } else {
+      const { data, totalCount } = await fetchPapersPaginated({
         tableName: "arxivPapersData",
         pageSize,
         currentPage,
@@ -94,10 +144,30 @@ const PapersIndexPage = ({
         selectedCategories,
       });
       setPapers(data);
-    };
+      setTotalCount(totalCount);
+    }
 
-    fetchPapers();
-  }, [currentPage, searchValue, selectedCategories, pageSize]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!searchValue) {
+      fetchPapers(null);
+    }
+  }, [currentPage, selectedCategories, pageSize]);
+
+  const handleSearchSubmit = () => {
+    setCurrentPage(1);
+    router.push({
+      pathname: "/papers",
+      query: {
+        search: searchValue,
+        selectedCategories: JSON.stringify(selectedCategories),
+        page: 1,
+      },
+    });
+    fetchPapers(searchValue);
+  };
 
   const handleCategoryChange = (category) => {
     const updatedCategories = selectedCategories.includes(category)
@@ -173,22 +243,20 @@ const PapersIndexPage = ({
           <Input
             placeholder="Search papers..."
             value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              setCurrentPage(1);
-              router.push({
-                pathname: "/papers",
-                query: {
-                  search: e.target.value,
-                  selectedCategories: JSON.stringify(selectedCategories),
-                  page: 1,
-                },
-              });
-            }}
+            onChange={(e) => setSearchValue(e.target.value)}
             mr={4}
           />
           <Button
             mt={2}
+            onClick={handleSearchSubmit}
+            isLoading={loading}
+            loadingText="Searching..."
+          >
+            Search
+          </Button>
+          <Button
+            mt={2}
+            ml={2}
             leftIcon={<Icon as={FaFilter} />}
             onClick={() => setIsCategoryControlOpen(!isCategoryControlOpen)}
           >
@@ -223,7 +291,12 @@ const PapersIndexPage = ({
             </Stack>
           </Box>
         </Collapse>
-        {papers.length === 0 ? (
+        {loading ? (
+          <Box mt={6} textAlign="center">
+            <Spinner size="xl" />
+            <Text mt={2}>Searching papers...</Text>
+          </Box>
+        ) : papers.length === 0 ? (
           <Box mt={6}>
             <Text>
               No papers found. Please try a different search or category.
@@ -245,7 +318,7 @@ const PapersIndexPage = ({
               ))}
             </Grid>
             <Pagination
-              totalCount={totalPaperCount}
+              totalCount={totalCount}
               pageSize={pageSize}
               currentPage={currentPage}
               onPageChange={handlePageChange}
