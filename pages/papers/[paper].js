@@ -20,7 +20,10 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import MetaTags from "../../components/MetaTags";
-import { fetchPaperDataById } from "../../utils/fetchPapers";
+import {
+  fetchPaperDataById,
+  fetchPapersPaginated,
+} from "../../utils/fetchPapers";
 import fetchRelatedPapers from "../../utils/fetchRelatedPapers";
 import RelatedPapers from "../../components/RelatedPapers";
 import emojiMap from "../../data/emojiMap.json";
@@ -69,8 +72,40 @@ const getEmojiForPaper = (title) => {
   return getRandomEmoji(title);
 };
 
-// pages/papers/[paper].js
-export async function getServerSideProps({ params }) {
+export async function getStaticPaths() {
+  const paths = [];
+  const pageSize = 1000; // Number of records to fetch per page
+  const limit = 2000; // Maximum number of pages to generate
+
+  let currentPage = 1;
+  let totalFetched = 0;
+
+  while (totalFetched < limit) {
+    const { data: papers, totalCount } = await fetchPapersPaginated({
+      tableName: "arxivPapersData",
+      pageSize,
+      currentPage,
+    });
+
+    for (const paper of papers) {
+      paths.push({
+        params: { paper: paper.id.toString() },
+      });
+    }
+
+    totalFetched += papers.length;
+
+    if (papers.length < pageSize || totalFetched >= limit) {
+      break; // Stop fetching if there are no more records or if the limit is reached
+    }
+
+    currentPage += 1;
+  }
+
+  return { paths, fallback: "blocking" };
+}
+
+export async function getStaticProps({ params }) {
   const paper = await fetchPaperDataById(params.paper);
   if (!paper) {
     return { notFound: true };
