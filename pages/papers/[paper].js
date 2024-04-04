@@ -21,7 +21,8 @@ import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import MetaTags from "../../components/MetaTags";
 import { fetchPaperDataById } from "../../utils/fetchPapers";
-
+import fetchRelatedPapers from "../../utils/fetchRelatedPapers";
+import RelatedPapers from "../../components/RelatedPapers";
 import emojiMap from "../../data/emojiMap.json";
 
 const getColorByTitle = (title, index) => {
@@ -68,15 +69,22 @@ const getEmojiForPaper = (title) => {
   return getRandomEmoji(title);
 };
 
+// pages/papers/[paper].js
 export async function getServerSideProps({ params }) {
   const paper = await fetchPaperDataById(params.paper);
   if (!paper) {
     return { notFound: true };
   }
-  return { props: { paper } };
+
+  let relatedPapers = [];
+  if (paper.embedding) {
+    relatedPapers = await fetchRelatedPapers(paper.embedding);
+  }
+
+  return { props: { paper, relatedPapers } };
 }
 
-const PaperDetailsPage = ({ paper }) => {
+const PaperDetailsPage = ({ paper, relatedPapers }) => {
   // Check if the paper prop is defined
   if (!paper) {
     return <div>Loading...</div>; // or any other fallback UI
@@ -105,7 +113,11 @@ const PaperDetailsPage = ({ paper }) => {
     },
     a: (props) => {
       const { children } = props;
-      return <Link color="blue.500">{children}</Link>;
+      return (
+        <Link color="blue.500" href={children.toString().replace(/\.+$/, "")}>
+          {children}
+        </Link>
+      );
     },
     em: (props) => {
       const { children } = props;
@@ -145,6 +157,30 @@ const PaperDetailsPage = ({ paper }) => {
         </ListItem>
       );
     },
+    h2: (props) => {
+      const { children } = props;
+      return (
+        <Heading as="h2" size="lg" lineHeight="1.45em">
+          {children}
+        </Heading>
+      );
+    },
+    h3: (props) => {
+      const { children } = props;
+      return (
+        <Heading as="h3" lineHeight="1.38em">
+          {children}
+        </Heading>
+      );
+    },
+    h4: (props) => {
+      const { children } = props;
+      return (
+        <Heading as="h4" lineHeight="1.25em">
+          {children}
+        </Heading>
+      );
+    },
   };
 
   return (
@@ -170,7 +206,7 @@ const PaperDetailsPage = ({ paper }) => {
             {paper.arxivId}
           </Text>
           <Text fontSize="md" mb={4}>
-            Published {paper.publishedDate} by{" "}
+            Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
             <Wrap>
               {paper.authors &&
                 paper.authors.map((author, index) => (
@@ -231,23 +267,30 @@ const PaperDetailsPage = ({ paper }) => {
           </div>
           <br />
           <hr />
-          <Box mt={8}>
-            <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-              Get summaries of the top AI research delivered straight to your
-              inbox:
-            </Text>
-            <Box>
-              <div id="custom-substack-embed"></div>
-              <iframe
-                src="https://aimodels.substack.com/embed"
-                width="100%"
-                height="auto"
-                border="0px solid #EEE"
-                bg="white"
-              ></iframe>
-            </Box>
-          </Box>
         </Box>
+      </Container>
+
+      <Container maxW="container.md">
+        <Box mt={8}>
+          <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
+            Get summaries of the top AI research delivered straight to your
+            inbox:
+          </Text>
+        </Box>
+        <Box>
+          <div id="custom-substack-embed"></div>
+          <iframe
+            src="https://aimodels.substack.com/embed"
+            width="100%"
+            height="auto"
+            border="0px solid #EEE"
+            bg="white"
+          ></iframe>
+        </Box>
+      </Container>
+
+      <Container maxW="container.xl" py="12">
+        <RelatedPapers relatedPapers={relatedPapers} />
       </Container>
     </>
   );

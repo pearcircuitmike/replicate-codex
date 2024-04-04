@@ -103,6 +103,9 @@ const PaperCard = ({ paper }) => {
         >
           {paper.title}
         </Heading>
+        <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
+          {paper.authors.join(", ")}
+        </Text>
         <Text fontSize="sm" noOfLines={4}>
           {paper.abstract || "No abstract available."}
         </Text>

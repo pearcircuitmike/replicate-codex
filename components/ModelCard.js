@@ -8,13 +8,52 @@ import {
   Link as ChakraLink,
   HStack,
   Tooltip,
+  Center,
 } from "@chakra-ui/react";
 import { DownloadIcon, RepeatIcon } from "@chakra-ui/icons";
-
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import { toTitleCase } from "@/utils/toTitleCase";
 import PreviewImage from "./PreviewImage";
+import emojiMap from "../data/emojiMap.json";
+
+const getColorByTitle = (title, index) => {
+  const colors = [
+    "red.500",
+    "orange.500",
+    "yellow.500",
+    "green.500",
+    "teal.500",
+    "blue.500",
+    "cyan.500",
+    "purple.500",
+    "pink.500",
+  ];
+  const hash = title
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const colorIndex = (hash + index) % colors.length;
+  return colors[colorIndex];
+};
+
+const getRandomEmoji = (title) => {
+  const emojis = Object.values(emojiMap);
+  const hash = title
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const randomIndex = Math.abs(hash) % emojis.length;
+  return emojis[randomIndex];
+};
+
+const getEmojiForModel = (modelName) => {
+  const keywords = modelName.toLowerCase().split(" ");
+  for (const keyword of keywords) {
+    if (emojiMap[keyword]) {
+      return emojiMap[keyword];
+    }
+  }
+  return getRandomEmoji(modelName);
+};
 
 const ModelCard = ({ model }) => {
   if (!model) {
@@ -32,6 +71,10 @@ const ModelCard = ({ model }) => {
       </Box>
     );
   } else {
+    const bgColor1 = getColorByTitle(model.modelName, 0);
+    const bgColor2 = getColorByTitle(model.modelName, 1);
+    const gradientBg = `linear(to-r, ${bgColor1}, ${bgColor2})`;
+
     return (
       <Box
         w="100%"
@@ -48,11 +91,17 @@ const ModelCard = ({ model }) => {
       >
         <Link href={`/models/${model.platform}/${model.id}`} legacyBehavior>
           <Box h="250px" overflow="hidden" position="relative">
-            <PreviewImage
-              src={model.example}
-              id={model.id}
-              modelName={model.modelName}
-            />
+            {model.example ? (
+              <PreviewImage
+                src={model.example}
+                id={model.id}
+                modelName={model.modelName}
+              />
+            ) : (
+              <Center h="100%" fontSize="6xl" bgGradient={gradientBg}>
+                {getEmojiForModel(model.modelName)}
+              </Center>
+            )}
           </Box>
         </Link>
 
@@ -77,7 +126,10 @@ const ModelCard = ({ model }) => {
               cursor="pointer"
               mr={2}
             />
-            <Link href={`/creators/${model.platform}/${model.creator}`} legacyBehavior>
+            <Link
+              href={`/creators/${model.platform}/${model.creator}`}
+              legacyBehavior
+            >
               <Tooltip label="Creator or maintainer">
                 <ChakraLink
                   color="blue.500"
@@ -96,7 +148,11 @@ const ModelCard = ({ model }) => {
               : "No description available."}
           </Text>
           <Text>
-            <Link href={`/models/${model?.platform}/${model?.id}`} passHref legacyBehavior>
+            <Link
+              href={`/models/${model?.platform}/${model?.id}`}
+              passHref
+              legacyBehavior
+            >
               <ChakraLink
                 fontSize="sm"
                 color="blue.500"

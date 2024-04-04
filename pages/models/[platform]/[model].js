@@ -9,6 +9,7 @@ import {
   Text,
   Heading,
   Link,
+  Center,
 } from "@chakra-ui/react";
 import MetaTags from "../../../components/MetaTags";
 import {
@@ -25,6 +26,7 @@ import { findSimilarModels } from "../../../utils/modelsData";
 import { findCreatorModels } from "../../../utils/modelsData";
 import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";
 import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
+import emojiMap from "../../../data/emojiMap.json";
 
 export async function getStaticPaths() {
   const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
@@ -100,78 +102,80 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
     setSelectedSource(event.target.value);
   };
 
-  return <>
-    <MetaTags
-      title={`${kebabToTitleCase(model.modelName)} | ${kebabToTitleCase(
-        model.creator
-      )} | AI model details`}
-      description={`Guide to running ${kebabToTitleCase(
-        model.modelName
-      )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
-        model.platform
-      )}. Overview, ${
-        model.tags
-      } alternatives, schema, use cases, limitations, cost.`}
-    />
-    <Box overflowX="hidden">
-      <Container maxW="container.xl" py="12">
-        <Grid
-          templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
-          gap={{ base: 6, md: 10 }}
-        >
-          <GridItem>
-            <VStack spacing={6} alignItems="start">
-              <ModelOverview model={model} />
-              <ModelPricingSummary model={model} />
-              <CreatorModelsTable creatorModels={creatorModels} />
-              <SimilarModelsTable similarModels={similarModels} />
-            </VStack>
-          </GridItem>
-          <GridItem>
-            <VStack spacing={6} alignItems="start">
-              <Heading as="h2" size="lg">
-                Try it!
-              </Heading>
-              <Text>
-                You can use this area to play around with demo applications
-                that incorporate the {kebabToTitleCase(model.modelName)}{" "}
-                model. These demos are maintained and hosted externally by
-                third-party creators. If you see an error,{" "}
-                <Link
-                  href={`https://twitter.com/mikeyoung44`}
-                  color="teal.500"
-                  textDecoration="underline"
-                >
-                  message me on Twitter
-                </Link>
-                .
-              </Text>
-              {model.demoSources?.length > 0 ? (
-                <>
-                  <Select onChange={handleSourceChange}>
-                    {model.demoSources.map((source, index) => (
-                      <option key={index} value={source}>
-                        {source}
-                      </option>
-                    ))}
-                  </Select>
-                  <GradioEmbed
-                    src={`https://${selectedSource?.replace(
-                      /\//g,
-                      "-"
-                    )}.hf.space`}
-                  />
-                </>
-              ) : (
-                <Text mt={2}>
-                  Currently, there are no demos available for this model.
+  return (
+    <>
+      <MetaTags
+        title={`${kebabToTitleCase(model.modelName)} | ${kebabToTitleCase(
+          model.creator
+        )} | AI model details`}
+        description={`Guide to running ${kebabToTitleCase(
+          model.modelName
+        )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
+          model.platform
+        )}. Overview, ${
+          model.tags
+        } alternatives, schema, use cases, limitations, cost.`}
+      />
+      <Box overflowX="hidden">
+        <Container maxW="container.xl" py="12">
+          <Grid
+            templateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+            gap={{ base: 6, md: 10 }}
+          >
+            <GridItem>
+              <VStack spacing={6} alignItems="start">
+                <ModelOverview model={model} />
+                <ModelPricingSummary model={model} />
+                <CreatorModelsTable creatorModels={creatorModels} />
+                <SimilarModelsTable similarModels={similarModels} />
+              </VStack>
+            </GridItem>
+            <GridItem>
+              <VStack spacing={6} alignItems="start">
+                <Heading as="h2" size="lg">
+                  Try it!
+                </Heading>
+                <Text>
+                  You can use this area to play around with demo applications
+                  that incorporate the {kebabToTitleCase(model.modelName)}{" "}
+                  model. These demos are maintained and hosted externally by
+                  third-party creators. If you see an error,{" "}
+                  <Link
+                    href={`https://twitter.com/mikeyoung44`}
+                    color="teal.500"
+                    textDecoration="underline"
+                  >
+                    message me on Twitter
+                  </Link>
+                  .
                 </Text>
-              )}
-              <ModelDetailsTable model={model} creator={creatorData} />
-            </VStack>
-          </GridItem>
-        </Grid>
-      </Container>
-    </Box>
-  </>;
+                {model.demoSources?.length > 0 ? (
+                  <>
+                    <Select onChange={handleSourceChange}>
+                      {model.demoSources.map((source, index) => (
+                        <option key={index} value={source}>
+                          {source}
+                        </option>
+                      ))}
+                    </Select>
+                    <GradioEmbed
+                      src={`https://${selectedSource?.replace(
+                        /\//g,
+                        "-"
+                      )}.hf.space`}
+                    />
+                  </>
+                ) : (
+                  <Text mt={2}>
+                    Currently, there are no demos available for this model.
+                  </Text>
+                )}
+                <ModelDetailsTable model={model} creator={creatorData} />
+              </VStack>
+            </GridItem>
+          </Grid>
+        </Container>
+      </Box>
+    </>
+  );
 }
