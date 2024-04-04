@@ -10,9 +10,7 @@ import {
   Wrap,
   WrapItem,
   Icon,
-  Center,
   ListItem,
-  List,
   UnorderedList,
   OrderedList,
 } from "@chakra-ui/react";
@@ -26,51 +24,7 @@ import {
 } from "../../utils/fetchPapers";
 import fetchRelatedPapers from "../../utils/fetchRelatedPapers";
 import RelatedPapers from "../../components/RelatedPapers";
-import emojiMap from "../../data/emojiMap.json";
-
-const getColorByTitle = (title, index) => {
-  const colors = [
-    "red.500",
-    "orange.500",
-    "yellow.500",
-    "green.500",
-    "teal.500",
-    "blue.500",
-    "cyan.500",
-    "purple.500",
-    "pink.500",
-  ];
-  const hash = title
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const colorIndex = (hash + index) % colors.length;
-  return colors[colorIndex];
-};
-
-const getHashCode = (str) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) | 0;
-  }
-  return hash;
-};
-
-const getRandomEmoji = (title) => {
-  const emojis = Object.values(emojiMap);
-  const hash = getHashCode(title);
-  const randomIndex = Math.abs(hash) % emojis.length;
-  return emojis[randomIndex];
-};
-
-const getEmojiForPaper = (title) => {
-  const keywords = title.toLowerCase().split(" ");
-  for (const keyword of keywords) {
-    if (emojiMap[keyword]) {
-      return emojiMap[keyword];
-    }
-  }
-  return getRandomEmoji(title);
-};
+import EmojiWithGradient from "../../components/EmojiWithGradient";
 
 export async function getStaticPaths() {
   const paths = [];
@@ -132,10 +86,6 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
 
   // Format links in the abstract
   const formattedAbstract = formatLinks(paper.abstract);
-
-  const bgColor1 = getColorByTitle(paper.title, 0);
-  const bgColor2 = getColorByTitle(paper.title, 1);
-  const gradientBg = `linear(to-r, ${bgColor1}, ${bgColor2})`;
 
   const customTheme = {
     p: (props) => {
@@ -283,9 +233,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
               h="250px"
             />
           ) : (
-            <Center h="250px" bgGradient={gradientBg}>
-              <Text fontSize="6xl">{getEmojiForPaper(paper.title)}</Text>
-            </Center>
+            <EmojiWithGradient title={paper.title} height="250px" />
           )}
           <Box bg="gray.100" p={4} mb={6}>
             <Heading as="h2" mb={2}>

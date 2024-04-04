@@ -1,59 +1,20 @@
+// ModelCard.js
 import React from "react";
 import {
   Box,
-  Flex,
   Heading,
   Text,
   Avatar,
   Link as ChakraLink,
   HStack,
   Tooltip,
-  Center,
 } from "@chakra-ui/react";
 import { DownloadIcon, RepeatIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import { toTitleCase } from "@/utils/toTitleCase";
 import PreviewImage from "./PreviewImage";
-import emojiMap from "../data/emojiMap.json";
-
-const getColorByTitle = (title, index) => {
-  const colors = [
-    "red.500",
-    "orange.500",
-    "yellow.500",
-    "green.500",
-    "teal.500",
-    "blue.500",
-    "cyan.500",
-    "purple.500",
-    "pink.500",
-  ];
-  const hash = title
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const colorIndex = (hash + index) % colors.length;
-  return colors[colorIndex];
-};
-
-const getRandomEmoji = (title) => {
-  const emojis = Object.values(emojiMap);
-  const hash = title
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const randomIndex = Math.abs(hash) % emojis.length;
-  return emojis[randomIndex];
-};
-
-const getEmojiForModel = (modelName) => {
-  const keywords = modelName.toLowerCase().split(" ");
-  for (const keyword of keywords) {
-    if (emojiMap[keyword]) {
-      return emojiMap[keyword];
-    }
-  }
-  return getRandomEmoji(modelName);
-};
+import EmojiWithGradient from "./EmojiWithGradient";
 
 const ModelCard = ({ model }) => {
   if (!model) {
@@ -71,10 +32,6 @@ const ModelCard = ({ model }) => {
       </Box>
     );
   } else {
-    const bgColor1 = getColorByTitle(model.modelName, 0);
-    const bgColor2 = getColorByTitle(model.modelName, 1);
-    const gradientBg = `linear(to-r, ${bgColor1}, ${bgColor2})`;
-
     return (
       <Box
         w="100%"
@@ -98,9 +55,7 @@ const ModelCard = ({ model }) => {
                 modelName={model.modelName}
               />
             ) : (
-              <Center h="100%" fontSize="6xl" bgGradient={gradientBg}>
-                {getEmojiForModel(model.modelName)}
-              </Center>
+              <EmojiWithGradient title={model.modelName} />
             )}
           </Box>
         </Link>
@@ -115,32 +70,6 @@ const ModelCard = ({ model }) => {
           >
             {model.modelName}
           </Heading>
-
-          <Flex mb="10px" alignItems="center">
-            <Avatar
-              src={`https://github.com/${model.creator}.png`}
-              size="sm"
-              onClick={() =>
-                window.open(`/creators/${model.platform}/${model.creator}`)
-              }
-              cursor="pointer"
-              mr={2}
-            />
-            <Link
-              href={`/creators/${model.platform}/${model.creator}`}
-              legacyBehavior
-            >
-              <Tooltip label="Creator or maintainer">
-                <ChakraLink
-                  color="blue.500"
-                  textDecoration="underline"
-                  fontSize="sm"
-                >
-                  {model.creator}
-                </ChakraLink>
-              </Tooltip>
-            </Link>
-          </Flex>
 
           <Text fontSize="sm" noOfLines={4}>
             {model?.generatedSummary || model?.description

@@ -1,3 +1,4 @@
+// PaperCard.js
 import React from "react";
 import {
   Box,
@@ -7,60 +8,12 @@ import {
   Image,
   Tag,
   Flex,
-  Center,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import emojiMap from "../data/emojiMap.json";
-
-const getColorByTitle = (title, index) => {
-  const colors = [
-    "red.500",
-    "orange.500",
-    "yellow.500",
-    "green.500",
-    "teal.500",
-    "blue.500",
-    "cyan.500",
-    "purple.500",
-    "pink.500",
-  ];
-  const hash = title
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const colorIndex = (hash + index) % colors.length;
-  return colors[colorIndex];
-};
-
-const getHashCode = (str) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) | 0;
-  }
-  return hash;
-};
-
-const getRandomEmoji = (title) => {
-  const emojis = Object.values(emojiMap);
-  const hash = getHashCode(title);
-  const randomIndex = Math.abs(hash) % emojis.length;
-  return emojis[randomIndex];
-};
-
-const getEmojiForPaper = (title) => {
-  const keywords = title.toLowerCase().split(" ");
-  for (const keyword of keywords) {
-    if (emojiMap[keyword]) {
-      return emojiMap[keyword];
-    }
-  }
-  return getRandomEmoji(title);
-};
+import EmojiWithGradient from "./EmojiWithGradient";
 
 const PaperCard = ({ paper }) => {
   const thumbnailUrl = paper.thumbnail;
-  const bgColor1 = getColorByTitle(paper.title, 0);
-  const bgColor2 = getColorByTitle(paper.title, 1);
-  const gradientBg = `linear(to-r, ${bgColor1}, ${bgColor2})`;
 
   return (
     <Box
@@ -87,9 +40,7 @@ const PaperCard = ({ paper }) => {
               h="100%"
             />
           ) : (
-            <Center h="100%" bgGradient={gradientBg}>
-              <Text fontSize="6xl">{getEmojiForPaper(paper.title)}</Text>
-            </Center>
+            <EmojiWithGradient title={paper.title} />
           )}
         </Box>
       </Link>
