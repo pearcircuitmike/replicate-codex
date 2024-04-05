@@ -13,14 +13,9 @@ const fontBold = fetch(
   new URL("../../assets/Lato-Bold.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
-const fontLight = fetch(
-  new URL("../../assets/Lato-Light.ttf", import.meta.url)
-).then((res) => res.arrayBuffer());
-
 export default async function handler(request) {
   const fontRegularData = await fontRegular;
   const fontBoldData = await fontBold;
-  const fontLightData = await fontLight;
   const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -292,7 +287,7 @@ export default async function handler(request) {
           },
           {
             name: "LatoLight",
-            data: fontLightData,
+            data: fontRegularData,
             style: "light",
           },
         ],
