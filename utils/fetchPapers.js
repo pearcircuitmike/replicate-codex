@@ -6,6 +6,8 @@ export async function fetchPapersPaginated({
   currentPage,
   searchValue = null,
   selectedCategories = null,
+  startDate = null,
+  endDate = null,
 }) {
   let query = supabase
     .from(tableName)
@@ -15,12 +17,19 @@ export async function fetchPapersPaginated({
     );
 
   if (searchValue) {
-    query = query.ilike("title", `%${searchValue}%`);
+    query = query.or(
+      `title.ilike.%${searchValue}%,arxivId.ilike.%${searchValue}%`
+    );
   }
 
-  // If selectedCategories is an empty array or null, do not apply any category filter
   if (selectedCategories) {
     query = query.containedBy("arxivCategories", selectedCategories);
+  }
+
+  if (startDate && endDate) {
+    query = query
+      .gte("publishedDate", startDate.toISOString())
+      .lte("publishedDate", endDate.toISOString());
   }
 
   const { data, error, count } = await query

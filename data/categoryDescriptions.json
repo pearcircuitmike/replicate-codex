@@ -1,0 +1,20 @@
+{
+  "cs.AI": "Artificial Intelligence",
+  "cs.CL": "Computation and Language",
+  "cs.CV": "Computer Vision",
+  "cs.CY": "Computers and Society",
+  "cs.DC": "Distributed Computing",
+  "cs.ET": "Emerging Technologies",
+  "cs.HC": "Human-Computer Interaction",
+  "cs.IR": "Information Retrieval",
+  "cs.LG": "Machine Learning",
+  "cs.MA": "Multiagent Systems",
+  "cs.MM": "Multimedia",
+  "cs.NE": "Neural/Evolutionary Computing",
+  "cs.RO": "Robotics",
+  "cs.SD": "Sound",
+  "cs.NI": "Networking and Information Architecture",
+  "eess.AS": "Audio and Speech Processing",
+  "eess.IV": "Image and Video Processing",
+  "stat.ML": "Machine Learning"
+}
