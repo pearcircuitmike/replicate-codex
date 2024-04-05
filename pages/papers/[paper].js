@@ -71,7 +71,10 @@ export async function getStaticProps({ params }) {
     relatedPapers = await fetchRelatedPapers(paper.embedding);
   }
 
-  return { props: { paper, relatedPapers } };
+  return {
+    props: { paper, relatedPapers },
+    revalidate: 60,
+  };
 }
 
 const PaperDetailsPage = ({ paper, relatedPapers }) => {
