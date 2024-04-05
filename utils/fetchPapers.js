@@ -12,7 +12,7 @@ export async function fetchPapersPaginated({
   let query = supabase
     .from(tableName)
     .select(
-      "id, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail",
+      "id, slug, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail",
       { count: "exact" }
     );
 
@@ -50,6 +50,26 @@ export const fetchPaperDataById = async (paperId) => {
       .from("arxivPapersData")
       .select("*")
       .eq("id", paperId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching paper data:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching paper data:", error);
+    return null;
+  }
+};
+
+export const fetchPaperDataBySlug = async (paperSlug) => {
+  try {
+    const { data, error } = await supabase
+      .from("arxivPapersData")
+      .select("*")
+      .eq("slug", paperSlug)
       .single();
 
     if (error) {

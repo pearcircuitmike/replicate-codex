@@ -21,6 +21,7 @@ import MetaTags from "../../components/MetaTags";
 import {
   fetchPaperDataById,
   fetchPapersPaginated,
+  fetchPaperDataBySlug,
 } from "../../utils/fetchPapers";
 import fetchRelatedPapers from "../../utils/fetchRelatedPapers";
 import RelatedPapers from "../../components/RelatedPapers";
@@ -43,7 +44,7 @@ export async function getStaticPaths() {
 
     for (const paper of papers) {
       paths.push({
-        params: { paper: paper.id.toString() },
+        params: { paper: paper.slug.toString() },
       });
     }
 
@@ -60,7 +61,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const paper = await fetchPaperDataById(params.paper);
+  const paper = await fetchPaperDataBySlug(params.paper);
   if (!paper) {
     return { notFound: true };
   }
@@ -81,7 +82,11 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
 
   // Function to format links in the text
   const formatLinks = (text) => {
-    return text.replace(/(https?:\/\/[^\s]+)/g, (url) => `[${url}](${url})`);
+    const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+    return text.replace(urlRegex, (match, linkText, linkUrl) => {
+      return `[${linkText}](${linkUrl})`;
+    });
   };
 
   // Format links in the abstract
@@ -97,10 +102,14 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
       );
     },
     a: (props) => {
-      const { children } = props;
+      const { children, href } = props;
+      const linkText = children.toString();
+      const linkUrl = linkText.match(/\[(.*?)\]\((.*?)\)/)?.[2] || href;
+      const displayText = linkText.match(/\[(.*?)\]\((.*?)\)/)?.[1] || linkText;
+
       return (
-        <Link color="blue.500" href={children.toString().replace(/\.+$/, "")}>
-          {children}
+        <Link color="blue.500" href={linkUrl}>
+          {displayText}
         </Link>
       );
     },

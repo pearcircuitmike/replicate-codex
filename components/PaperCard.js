@@ -29,7 +29,7 @@ const PaperCard = ({ paper }) => {
       bg="white"
       overflow="hidden"
     >
-      <Link href={`/papers/${paper.id}`} legacyBehavior>
+      <Link href={`/papers/${encodeURIComponent(paper.slug)}`} legacyBehavior>
         <Box h="250px" overflow="hidden" position="relative">
           {thumbnailUrl ? (
             <Image
@@ -61,7 +61,11 @@ const PaperCard = ({ paper }) => {
           {paper.abstract || "No abstract available."}
         </Text>
         <Text>
-          <Link href={`/papers/${paper.id}`} passHref legacyBehavior>
+          <Link
+            href={`/papers/${encodeURIComponent(paper.slug)}`}
+            passHref
+            legacyBehavior
+          >
             <ChakraLink
               fontSize="sm"
               color="blue.500"
@@ -87,9 +91,27 @@ const PaperCard = ({ paper }) => {
       <Flex wrap="wrap" mb="10px" pl="15px" pr="15px">
         {paper.arxivCategories &&
           paper.arxivCategories.map((category, index) => (
-            <Tag key={index} size="sm" colorScheme="blue" mr="5px" mb="5px">
-              {category}
-            </Tag>
+            <Link
+              key={index}
+              href={{
+                pathname: "/papers",
+                query: {
+                  selectedCategories: JSON.stringify([category]),
+                },
+              }}
+              passHref
+            >
+              <Tag
+                as="a"
+                size="sm"
+                colorScheme="blue"
+                mr="5px"
+                mb="5px"
+                cursor="pointer"
+              >
+                {category}
+              </Tag>
+            </Link>
           ))}
       </Flex>
     </Box>

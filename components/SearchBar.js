@@ -12,7 +12,7 @@ const SearchBar = ({ searchValue, onSearchSubmit, setSearchValue }) => {
     <Box mb={6}>
       <form onSubmit={handleSubmit}>
         <Input
-          placeholder="Search papers by title, Arxiv ID, or author..."
+          placeholder="Search papers by title or Arxiv ID..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           mr={4}

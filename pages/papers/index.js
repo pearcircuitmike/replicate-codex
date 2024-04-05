@@ -40,7 +40,7 @@ export async function getServerSideProps({ query }) {
         ? JSON.parse(selectedCategories)
         : Object.keys(categoryDescriptions),
       initialPage: currentPage,
-      initialSelectedTimeRange: selectedTimeRange || "today",
+      initialSelectedTimeRange: selectedTimeRange || "allTime",
     },
   };
 }
