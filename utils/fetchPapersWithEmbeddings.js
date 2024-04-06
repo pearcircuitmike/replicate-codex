@@ -21,7 +21,9 @@ export const fetchPapersWithEmbeddings = async (
     data: papers,
     error,
     count,
-  } = await query.select("*", { count: "exact" });
+  } = await query.select("*", {
+    count: "exact",
+  });
 
   if (error) {
     console.error("Error fetching papers with embeddings:", error);

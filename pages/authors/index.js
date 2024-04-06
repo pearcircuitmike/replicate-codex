@@ -20,7 +20,7 @@ const ITEMS_PER_PAGE = 12;
 
 export async function getStaticProps() {
   const { data, totalCount } = await fetchUniqueAuthors({
-    tableName: "arxivPapersData",
+    platform: "arxiv",
     pageSize: ITEMS_PER_PAGE,
     currentPage: 1,
     searchValue: "",
@@ -42,7 +42,7 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
   const executeSearch = async () => {
     setIsLoading(true);
     const { data, totalCount } = await fetchUniqueAuthors({
-      tableName: "arxivPapersData",
+      platform: "arxiv",
       pageSize: ITEMS_PER_PAGE,
       currentPage: 1,
       searchValue: searchTerm,
@@ -62,7 +62,7 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
   const changePage = async (page) => {
     setIsLoading(true);
     const { data } = await fetchUniqueAuthors({
-      tableName: "arxivPapersData",
+      platform: "arxiv",
       pageSize: ITEMS_PER_PAGE,
       currentPage: page,
       searchValue: searchTerm,
@@ -117,7 +117,7 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
             <Flex wrap="wrap" justify="center" mt={10}>
               {authors.map((author, index) => (
                 <Box m={3} w="280px" key={index}>
-                  <AuthorCard author={author} />
+                  <AuthorCard author={author} platform="arxiv" />
                 </Box>
               ))}
             </Flex>

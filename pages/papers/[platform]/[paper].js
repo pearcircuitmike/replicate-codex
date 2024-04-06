@@ -13,55 +13,60 @@ import {
   ListItem,
   UnorderedList,
   OrderedList,
+  Button,
 } from "@chakra-ui/react";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
-import MetaTags from "../../components/MetaTags";
+import MetaTags from "../../../components/MetaTags";
 import {
   fetchPaperDataById,
   fetchPapersPaginated,
   fetchPaperDataBySlug,
-} from "../../utils/fetchPapers";
-import fetchRelatedPapers from "../../utils/fetchRelatedPapers";
-import RelatedPapers from "../../components/RelatedPapers";
-import EmojiWithGradient from "../../components/EmojiWithGradient";
+} from "../../../utils/fetchPapers";
+import fetchRelatedPapers from "../../../utils/fetchRelatedPapers";
+import RelatedPapers from "../../../components/RelatedPapers";
+import EmojiWithGradient from "../../../components/EmojiWithGradient";
 
 export async function getStaticPaths() {
+  const platforms = ["arxiv"]; // Array of platforms, currently only "arxiv"
   const paths = [];
   const pageSize = 1000; // Number of records to fetch per page
   const limit = 2000; // Maximum number of pages to generate
 
-  let currentPage = 1;
-  let totalFetched = 0;
+  for (const platform of platforms) {
+    let currentPage = 1;
+    let totalFetched = 0;
 
-  while (totalFetched < limit) {
-    const { data: papers, totalCount } = await fetchPapersPaginated({
-      tableName: "arxivPapersData",
-      pageSize,
-      currentPage,
-    });
-
-    for (const paper of papers) {
-      paths.push({
-        params: { paper: paper.slug.toString() },
+    while (totalFetched < limit) {
+      const { data: papers, totalCount } = await fetchPapersPaginated({
+        platform: `${platform}`,
+        pageSize,
+        currentPage,
       });
+
+      for (const paper of papers) {
+        paths.push({
+          params: { paper: paper.slug.toString(), platform },
+        });
+      }
+
+      totalFetched += papers.length;
+
+      if (papers.length < pageSize || totalFetched >= limit) {
+        break; // Stop fetching if there are no more records or if the limit is reached
+      }
+
+      currentPage += 1;
     }
-
-    totalFetched += papers.length;
-
-    if (papers.length < pageSize || totalFetched >= limit) {
-      break; // Stop fetching if there are no more records or if the limit is reached
-    }
-
-    currentPage += 1;
   }
 
   return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {
-  const paper = await fetchPaperDataBySlug(params.paper);
+  const { platform, paper: slug } = params;
+  const paper = await fetchPaperDataBySlug(slug, platform);
   if (!paper) {
     return { notFound: true };
   }
@@ -209,7 +214,9 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
                 paper.authors.map((author, index) => (
                   <WrapItem key={index}>
                     <Link
-                      href={`/authors/${encodeURIComponent(author)}`}
+                      href={`/authors/${encodeURIComponent(
+                        paper.platform
+                      )}/${encodeURIComponent(author)}`}
                       color="blue.500"
                       textDecoration="underline"
                     >
@@ -285,6 +292,22 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
       </Container>
 
       <Container maxW="container.xl" py="12">
+        <Box mt={8} textAlign="center">
+          <Button colorScheme="black">
+            <a
+              href="https://twitter.com/mikeyoung44?ref_src=aimodelsfyi"
+              class="twitter-follow-button"
+              data-show-count="false"
+            >
+              Follow @mikeyoung44
+            </a>
+            <script
+              async
+              src="https://platform.twitter.com/widgets.js"
+              charset="utf-8"
+            ></script>
+          </Button>
+        </Box>
         <RelatedPapers relatedPapers={relatedPapers} />
       </Container>
     </>

@@ -1,10 +1,10 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import MetaTags from "../../components/MetaTags";
-import PaperCard from "../../components/PaperCard";
-import Pagination from "../../components/Pagination";
-import { fetchPapersByAuthor } from "../../utils/fetchAuthors";
+import MetaTags from "../../../components/MetaTags";
+import PaperCard from "../../../components/PaperCard";
+import Pagination from "../../../components/Pagination";
+import { fetchPapersByAuthor } from "../../../utils/fetchAuthors";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -19,7 +19,7 @@ export default function Author() {
     const fetchPapers = async () => {
       if (author) {
         const { data, totalCount } = await fetchPapersByAuthor({
-          tableName: "arxivPapersData",
+          platform: "arxiv",
           pageSize: ITEMS_PER_PAGE,
           currentPage,
           author,

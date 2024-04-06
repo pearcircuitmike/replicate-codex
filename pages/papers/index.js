@@ -20,7 +20,7 @@ export async function getServerSideProps({ query }) {
   const { startDate, endDate } = getDateRange(selectedTimeRange);
 
   const { data, totalCount } = await fetchPapersPaginated({
-    tableName: "arxivPapersData",
+    platform: "arxiv",
     pageSize: 20,
     currentPage,
     searchValue: search || null,
@@ -73,7 +73,7 @@ const PapersIndexPage = ({
     const { startDate, endDate } = getDateRange(selectedTimeRange);
 
     const { data, totalCount } = await fetchPapersPaginated({
-      tableName: "arxivPapersData",
+      platform: "arxiv", // Add the platform parameter
       pageSize,
       currentPage,
       searchValue,

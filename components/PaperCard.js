@@ -29,7 +29,12 @@ const PaperCard = ({ paper }) => {
       bg="white"
       overflow="hidden"
     >
-      <Link href={`/papers/${encodeURIComponent(paper.slug)}`} legacyBehavior>
+      <Link
+        href={`/papers/${encodeURIComponent(
+          paper.platform
+        )}/${encodeURIComponent(paper.slug)}`}
+        legacyBehavior
+      >
         <Box h="250px" overflow="hidden" position="relative">
           {thumbnailUrl ? (
             <Image

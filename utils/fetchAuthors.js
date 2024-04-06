@@ -2,13 +2,13 @@ import supabase from "./supabaseClient";
 
 // utils/fetchAuthors.js
 export async function fetchUniqueAuthors({
-  tableName,
+  platform,
   pageSize,
   currentPage,
   searchValue = null,
 }) {
   let query = supabase
-    .from(tableName)
+    .from(`${platform}PapersData`)
     .select("authors", { count: "exact" })
     .limit(pageSize)
     .order("authors", { ascending: true });
@@ -35,15 +35,15 @@ export async function fetchUniqueAuthors({
 }
 
 export async function fetchPapersByAuthor({
-  tableName,
+  platform,
   pageSize,
   currentPage,
   author,
 }) {
   let query = supabase
-    .from(tableName)
+    .from(`${platform}PapersData`)
     .select(
-      "id, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail",
+      "id, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail, slug, platform",
       { count: "exact" }
     )
     .contains("authors", [author])

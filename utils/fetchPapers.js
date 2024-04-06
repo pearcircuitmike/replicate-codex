@@ -1,7 +1,8 @@
+// utils/fetchPapers.js
 import supabase from "./supabaseClient";
 
 export async function fetchPapersPaginated({
-  tableName,
+  platform,
   pageSize,
   currentPage,
   searchValue = null,
@@ -10,9 +11,9 @@ export async function fetchPapersPaginated({
   endDate = null,
 }) {
   let query = supabase
-    .from(tableName)
+    .from(`${platform}PapersData`)
     .select(
-      "id, slug, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail",
+      "id, slug, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail, platform",
       { count: "exact" }
     );
 
@@ -44,10 +45,10 @@ export async function fetchPapersPaginated({
   return { data, totalCount: count };
 }
 
-export const fetchPaperDataById = async (paperId) => {
+export const fetchPaperDataById = async (paperId, platform) => {
   try {
     const { data, error } = await supabase
-      .from("arxivPapersData")
+      .from(`${platform}PapersData`)
       .select("*")
       .eq("id", paperId)
       .single();
@@ -64,10 +65,10 @@ export const fetchPaperDataById = async (paperId) => {
   }
 };
 
-export const fetchPaperDataBySlug = async (paperSlug) => {
+export const fetchPaperDataBySlug = async (paperSlug, platform) => {
   try {
     const { data, error } = await supabase
-      .from("arxivPapersData")
+      .from(`${platform}PapersData`)
       .select("*")
       .eq("slug", paperSlug)
       .single();

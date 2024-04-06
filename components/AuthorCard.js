@@ -31,7 +31,7 @@ const getColorByAuthor = (author) => {
   return colors[index];
 };
 
-const AuthorCard = ({ author }) => {
+const AuthorCard = ({ author, platform }) => {
   if (!author) {
     return (
       <Box
@@ -52,7 +52,6 @@ const AuthorCard = ({ author }) => {
     );
   } else {
     const bgColor = getColorByAuthor(author);
-
     return (
       <Box
         borderWidth="1px"
@@ -87,7 +86,7 @@ const AuthorCard = ({ author }) => {
           </Heading>
         </Box>
         <Flex justifyContent="center" mt={3}>
-          <Link href={`/authors/${author}`} passHref legacyBehavior>
+          <Link href={`/authors/${platform}/${author}`} passHref legacyBehavior>
             <Button size="sm" colorScheme="blue">
               View profile
             </Button>
