@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import EmojiWithGradient from "./EmojiWithGradient";
+import SocialScore from "./SocialScore";
 
 const PaperCard = ({ paper }) => {
   const thumbnailUrl = paper.thumbnail;
@@ -62,6 +63,7 @@ const PaperCard = ({ paper }) => {
         <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
           {paper.authors.join(", ")}
         </Text>
+        <SocialScore paper={paper} />
         <Text fontSize="sm" noOfLines={4}>
           {paper.abstract || "No abstract available."}
         </Text>
@@ -100,9 +102,7 @@ const PaperCard = ({ paper }) => {
               key={index}
               href={{
                 pathname: "/papers",
-                query: {
-                  selectedCategories: JSON.stringify([category]),
-                },
+                query: { selectedCategories: JSON.stringify([category]) },
               }}
               passHref
             >

@@ -27,6 +27,7 @@ import {
 import fetchRelatedPapers from "../../../utils/fetchRelatedPapers";
 import RelatedPapers from "../../../components/RelatedPapers";
 import EmojiWithGradient from "../../../components/EmojiWithGradient";
+import SocialScore from "../../../components/SocialScore"; // Import the SocialScore component
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"]; // Array of platforms, currently only "arxiv"
@@ -207,6 +208,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           <Text fontSize="lg" mb={4}>
             {paper.arxivId}
           </Text>
+          <SocialScore paper={paper} /> {/* Render the SocialScore component */}
           <Text fontSize="md" mb={4}>
             Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
             <Wrap>
@@ -293,13 +295,13 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
 
       <Container maxW="container.xl" py="12">
         <Box mt={8} textAlign="center">
-          <Button colorScheme="black">
+          <Button colorScheme="green" borderRadius="full">
             <a
               href="https://twitter.com/mikeyoung44?ref_src=aimodelsfyi"
               class="twitter-follow-button"
               data-show-count="false"
             >
-              Follow @mikeyoung44
+              Follow @mikeyoung44 on 𝕏 for top papers →
             </a>
             <script
               async

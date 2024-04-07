@@ -13,7 +13,7 @@ export async function fetchPapersPaginated({
   let query = supabase
     .from(`${platform}PapersData`)
     .select(
-      "id, slug, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail, platform",
+      "id, slug, totalScore, redditScore, hackerNewsScore, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail, platform",
       { count: "exact" }
     );
 
@@ -34,7 +34,7 @@ export async function fetchPapersPaginated({
   }
 
   const { data, error, count } = await query
-    .order("publishedDate", { ascending: false })
+    .order("totalScore", { ascending: false }) // Sort by totalScore in descending order
     .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
 
   if (error) {

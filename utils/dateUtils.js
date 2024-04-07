@@ -6,25 +6,28 @@ export const getDateRange = (selectedTimeRange) => {
   switch (selectedTimeRange) {
     case "today":
       startDate = new Date();
+      startDate.setDate(startDate.getDate() - 1);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date();
       endDate.setHours(23, 59, 59, 999);
       break;
     case "thisWeek":
       startDate = new Date();
-      startDate.setDate(startDate.getDate() - startDate.getDay());
+      startDate.setDate(startDate.getDate() - 7);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date();
       endDate.setHours(23, 59, 59, 999);
       break;
     case "thisMonth":
-      startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date();
       endDate.setHours(23, 59, 59, 999);
       break;
     case "thisYear":
-      startDate = new Date(new Date().getFullYear(), 0, 1);
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 365);
       startDate.setHours(0, 0, 0, 0);
       endDate = new Date();
       endDate.setHours(23, 59, 59, 999);

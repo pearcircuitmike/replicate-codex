@@ -14,8 +14,8 @@ import { FaCalendarAlt, FaCaretDown } from "react-icons/fa";
 const TimeRangeFilter = ({ initialTimeRange, onTimeRangeChange }) => {
   const [isMobile] = useMediaQuery("(max-width: 768px)"); // Adjust the breakpoint as needed
   const [selectedTimeRange, setSelectedTimeRange] = useState(
-    initialTimeRange || "today"
-  ); // Initialize with initialTimeRange prop or "today"
+    initialTimeRange || "thisWeek"
+  ); // Initialize with initialTimeRange prop or "allTime"
 
   const handleTimeRangeChange = (timeRange) => {
     setSelectedTimeRange(timeRange);
