@@ -69,7 +69,9 @@ const PaperCard = ({ paper }) => {
         </Text>
         <Text>
           <Link
-            href={`/papers/${encodeURIComponent(paper.slug)}`}
+            href={`/papers/${encodeURIComponent(
+              paper.platform
+            )}/${encodeURIComponent(paper.slug)}`}
             passHref
             legacyBehavior
           >
