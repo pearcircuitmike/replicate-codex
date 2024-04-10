@@ -24,7 +24,7 @@ export async function fetchPapersPaginated({
   }
 
   if (selectedCategories) {
-    query = query.containedBy("arxivCategories", selectedCategories);
+    query = query.overlaps("arxivCategories", selectedCategories);
   }
 
   if (startDate && endDate) {
