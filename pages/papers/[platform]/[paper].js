@@ -91,11 +91,6 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
     nextPaperId: null,
   });
 
-  // Check if the paper prop is defined
-  if (!paper) {
-    return <div>Loading...</div>; // or any other fallback UI
-  }
-
   useEffect(() => {
     const fetchAdjacent = async () => {
       if (paper?.slug) {
@@ -109,6 +104,11 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
     };
     fetchAdjacent();
   }, [paper]);
+
+  // Check if the paper prop is defined
+  if (!paper) {
+    return <div>Loading...</div>; // or any other fallback UI
+  }
 
   // Function to format links in the text
   const formatLinks = (text) => {
