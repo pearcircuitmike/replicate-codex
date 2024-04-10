@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Box,
@@ -23,11 +23,13 @@ import {
   fetchPaperDataById,
   fetchPapersPaginated,
   fetchPaperDataBySlug,
+  fetchAdjacentPapers,
 } from "../../../utils/fetchPapers";
 import fetchRelatedPapers from "../../../utils/fetchRelatedPapers";
 import RelatedPapers from "../../../components/RelatedPapers";
 import EmojiWithGradient from "../../../components/EmojiWithGradient";
 import SocialScore from "../../../components/SocialScore"; // Import the SocialScore component
+import PaperNavigationButtons from "../../../components/PaperNavigationButtons";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"]; // Array of platforms, currently only "arxiv"
@@ -84,10 +86,29 @@ export async function getStaticProps({ params }) {
 }
 
 const PaperDetailsPage = ({ paper, relatedPapers }) => {
+  const [adjacentPapers, setAdjacentPapers] = useState({
+    prevPaperId: null,
+    nextPaperId: null,
+  });
+
   // Check if the paper prop is defined
   if (!paper) {
     return <div>Loading...</div>; // or any other fallback UI
   }
+
+  useEffect(() => {
+    const fetchAdjacent = async () => {
+      if (paper?.slug) {
+        const { prevSlug, nextSlug } = await fetchAdjacentPapers(
+          paper.slug,
+          paper.platform
+        );
+        console.log("Fetched adjacent papers:", prevSlug, nextSlug);
+        setAdjacentPapers({ prevSlug, nextSlug });
+      }
+    };
+    fetchAdjacent();
+  }, [paper]);
 
   // Function to format links in the text
   const formatLinks = (text) => {
@@ -193,6 +214,13 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
         description={paper.abstract}
       />
       <Container maxW="container.md" py="12">
+        <Box mb="4">
+          <PaperNavigationButtons
+            prevSlug={adjacentPapers.prevSlug}
+            nextSlug={adjacentPapers.nextSlug}
+            platform={paper.platform}
+          />
+        </Box>
         <Box>
           <Heading as="h1" mb={2}>
             <Link href={`https://arxiv.org/abs/${paper.arxivId}`} isExternal>
@@ -272,6 +300,13 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           <br />
           <hr />
         </Box>
+        <Box mt="8">
+          <PaperNavigationButtons
+            prevSlug={adjacentPapers.prevSlug}
+            nextSlug={adjacentPapers.nextSlug}
+            platform={paper.platform}
+          />
+        </Box>
       </Container>
 
       <Container maxW="container.md">
@@ -281,6 +316,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
             inbox:
           </Text>
         </Box>
+
         <Box>
           <div id="custom-substack-embed"></div>
           <iframe
@@ -297,12 +333,13 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
         <Box mt={8} textAlign="center">
           <Button colorScheme="green" borderRadius="full">
             <a
-              href="https://twitter.com/mikeyoung44?ref_src=aimodelsfyi"
+              href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
               class="twitter-follow-button"
               data-show-count="false"
             >
-              Follow @mikeyoung44 on 𝕏 for top papers →
+              Follow @aimodelsfyi on 𝕏 for trending papers →
             </a>
+
             <script
               async
               src="https://platform.twitter.com/widgets.js"

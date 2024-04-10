@@ -84,3 +84,65 @@ export const fetchPaperDataBySlug = async (paperSlug, platform) => {
     return null;
   }
 };
+
+export const fetchAdjacentPapers = async (slug, platform) => {
+  try {
+    const { data: currentPaper, error: currentPaperError } = await supabase
+      .from(`${platform}PapersData`)
+      .select("publishedDate")
+      .eq("slug", slug)
+      .single();
+
+    if (currentPaperError) {
+      console.error("Error fetching current paper:", currentPaperError);
+      return { prevSlug: null, nextSlug: null };
+    }
+
+    console.log("Current paper:", currentPaper);
+
+    const { data: prevPaper, error: prevPaperError } = await supabase
+      .from(`${platform}PapersData`)
+      .select("slug")
+      .order("publishedDate", { ascending: false })
+      .lt("publishedDate", currentPaper.publishedDate)
+      .limit(1)
+      .single();
+
+    const { data: nextPaper, error: nextPaperError } = await supabase
+      .from(`${platform}PapersData`)
+      .select("slug")
+      .order("publishedDate", { ascending: true })
+      .gt("publishedDate", currentPaper.publishedDate)
+      .limit(1)
+      .single();
+
+    if (prevPaperError && prevPaperError.code === "PGRST116") {
+      console.warn("No previous paper found");
+      return { prevSlug: null, nextSlug: nextPaper ? nextPaper.slug : null };
+    }
+
+    if (nextPaperError && nextPaperError.code === "PGRST116") {
+      console.warn("No next paper found");
+      return { prevSlug: prevPaper ? prevPaper.slug : null, nextSlug: null };
+    }
+
+    if (prevPaperError || nextPaperError) {
+      console.error(
+        "Error fetching adjacent papers:",
+        prevPaperError || nextPaperError
+      );
+      return { prevSlug: null, nextSlug: null };
+    }
+
+    console.log("Previous paper:", prevPaper);
+    console.log("Next paper:", nextPaper);
+
+    const prevSlug = prevPaper ? prevPaper.slug : null;
+    const nextSlug = nextPaper ? nextPaper.slug : null;
+
+    return { prevSlug, nextSlug };
+  } catch (error) {
+    console.error("Error fetching adjacent papers:", error);
+    return { prevSlug: null, nextSlug: null };
+  }
+};
