@@ -39,7 +39,7 @@ const PaperNavigationButtons = ({ prevSlug, nextSlug, platform }) => {
         width={{ base: "100%", md: "auto" }}
       >
         {isPrevLoading ? (
-          <BeatLoader size={8} color="white" />
+          <BeatLoader size={8} color="black" />
         ) : (
           "Previous Paper"
         )}
@@ -50,7 +50,7 @@ const PaperNavigationButtons = ({ prevSlug, nextSlug, platform }) => {
         rightIcon={<Icon as={FaArrowRight} />}
         width={{ base: "100%", md: "auto" }}
       >
-        {isNextLoading ? <BeatLoader size={8} color="white" /> : "Next Paper"}
+        {isNextLoading ? <BeatLoader size={8} color="black" /> : "Next Paper"}
       </Button>
     </Flex>
   );

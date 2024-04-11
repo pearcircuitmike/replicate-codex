@@ -237,12 +237,14 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
             {paper.arxivId}
           </Text>
           <SocialScore paper={paper} /> {/* Render the SocialScore component */}
-          <Text fontSize="md" mb={4}>
-            Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
-            <Wrap>
-              {paper.authors &&
-                paper.authors.map((author, index) => (
-                  <WrapItem key={index}>
+          <Box fontSize="md" mb={4}>
+            <Text as="span">
+              Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
+            </Text>
+            {paper.authors && paper.authors.length > 0 ? (
+              <>
+                {paper.authors.slice(0, 10).map((author, index) => (
+                  <React.Fragment key={index}>
                     <Link
                       href={`/authors/${encodeURIComponent(
                         paper.platform
@@ -252,11 +254,23 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
                     >
                       {author}
                     </Link>
-                    {index < paper.authors.length - 1 && ", "}
-                  </WrapItem>
+                    {index < 9 && index < paper.authors.length - 1 && (
+                      <Text as="span">, </Text>
+                    )}
+                  </React.Fragment>
                 ))}
-            </Wrap>
-          </Text>
+                {paper.authors.length > 10 && (
+                  <Text as="span">
+                    {" "}
+                    and {paper.authors.length - 10}{" "}
+                    {paper.authors.length - 10 === 1 ? "other" : "others"}
+                  </Text>
+                )}
+              </>
+            ) : (
+              <Text as="span">Unknown authors</Text>
+            )}
+          </Box>
           <Box mb={4}>
             {paper.arxivCategories &&
               paper.arxivCategories.map((category, index) => (
