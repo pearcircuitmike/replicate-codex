@@ -1,7 +1,7 @@
 // pages/papers/index.js
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Container, Grid, Box, Text, Spinner } from "@chakra-ui/react";
+import { Container, Grid, Box, Text } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
@@ -11,22 +11,19 @@ import SearchBar from "../../components/SearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
 import { getDateRange } from "../../utils/dateUtils";
-import categoryDescriptions from "../../data/categoryDescriptions.json"; // Add this import
+import categoryDescriptions from "../../data/categoryDescriptions.json";
 
-export async function getServerSideProps({ query }) {
-  const { search, selectedCategories, page, selectedTimeRange } = query;
-  const currentPage = parseInt(page) || 1;
-
+export async function getStaticProps() {
+  const currentPage = 1;
+  const selectedTimeRange = "thisWeek";
   const { startDate, endDate } = getDateRange(selectedTimeRange);
 
   const { data, totalCount } = await fetchPapersPaginated({
     platform: "arxiv",
     pageSize: 20,
     currentPage,
-    searchValue: search || null,
-    selectedCategories: selectedCategories
-      ? JSON.parse(selectedCategories)
-      : Object.keys(categoryDescriptions),
+    searchValue: null,
+    selectedCategories: Object.keys(categoryDescriptions),
     startDate,
     endDate,
   });
@@ -35,13 +32,12 @@ export async function getServerSideProps({ query }) {
     props: {
       initialPapers: data,
       totalPaperCount: totalCount,
-      initialSearch: search || "",
-      initialSelectedCategories: selectedCategories
-        ? JSON.parse(selectedCategories)
-        : Object.keys(categoryDescriptions),
+      initialSearch: "",
+      initialSelectedCategories: Object.keys(categoryDescriptions),
       initialPage: currentPage,
-      initialSelectedTimeRange: selectedTimeRange || "thisWeek",
+      initialSelectedTimeRange: selectedTimeRange,
     },
+    revalidate: 60,
   };
 }
 
@@ -61,19 +57,16 @@ const PapersIndexPage = ({
   );
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(totalPaperCount);
-  const [loading, setLoading] = useState(false);
   const pageSize = 20;
   const [selectedTimeRange, setSelectedTimeRange] = useState(
     initialSelectedTimeRange
   );
 
   const fetchPapers = async () => {
-    setLoading(true);
-
     const { startDate, endDate } = getDateRange(selectedTimeRange);
 
     const { data, totalCount } = await fetchPapersPaginated({
-      platform: "arxiv", // Add the platform parameter
+      platform: "arxiv",
       pageSize,
       currentPage,
       searchValue,
@@ -83,7 +76,6 @@ const PapersIndexPage = ({
     });
     setPapers(data);
     setTotalCount(totalCount);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -171,7 +163,7 @@ const PapersIndexPage = ({
         <SearchBar
           searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
-          setSearchValue={setSearchValue} // <-- Pass setSearchValue as a prop
+          setSearchValue={setSearchValue}
         />
         <CategoryFilter
           categoryDescriptions={categoryDescriptions}
@@ -182,12 +174,7 @@ const PapersIndexPage = ({
           selectedTimeRange={selectedTimeRange}
           onTimeRangeChange={handleTimeRangeChange}
         />
-        {loading ? (
-          <Box mt={6} textAlign="center">
-            <Spinner size="xl" />
-            <Text mt={2}>Loading papers...</Text>
-          </Box>
-        ) : papers.length === 0 ? (
+        {papers.length === 0 ? (
           <Box mt={6}>
             <Text>
               No papers found. Please try a different search or category.
