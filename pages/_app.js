@@ -107,7 +107,7 @@ export default function App({ Component, pageProps }) {
         console.log('Showing popup after 15 seconds');
         setTimeout(function() {
           showMailingListPopup();
-        }, 5000); // After 5 seconds
+        }, 15000); // After 15 seconds
       } else {
         console.log('No need to show popup, within the visit time frame');
       }
