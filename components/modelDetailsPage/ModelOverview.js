@@ -1,5 +1,8 @@
 import React from "react";
 import { Box, Heading, Text, Link, Tag, VStack } from "@chakra-ui/react";
+import ReactMarkdown from "react-markdown";
+import ChakraUIRenderer from "chakra-ui-markdown-renderer";
+import customTheme from "../../components/MarkdownTheme";
 import PreviewImage from "../PreviewImage";
 import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 import EmojiWithGradient from "./../EmojiWithGradient";
@@ -30,16 +33,22 @@ const ModelOverview = ({ model }) => {
           <EmojiWithGradient title={model?.modelName} />
         )}
         <Box>
-          {model?.generatedSummary
-            ? model?.generatedSummary
-            : model.description}
+          {model?.generatedSummary ? (
+            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+              {model.generatedSummary}
+            </ReactMarkdown>
+          ) : (
+            model.description
+          )}
           <br />
           {model.generatedUseCase && (
             <>
               <Heading as="h2" size="md" mt={"1em"}>
                 Use cases
               </Heading>
-              <Text>{model.generatedUseCase}</Text>
+              <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+                {model.generatedUseCase}
+              </ReactMarkdown>
             </>
           )}
         </Box>

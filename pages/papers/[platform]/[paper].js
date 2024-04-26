@@ -1,3 +1,4 @@
+// PaperDetailsPage.jsx
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -28,14 +29,15 @@ import {
 import fetchRelatedPapers from "../../../utils/fetchRelatedPapers";
 import RelatedPapers from "../../../components/RelatedPapers";
 import EmojiWithGradient from "../../../components/EmojiWithGradient";
-import SocialScore from "../../../components/SocialScore"; // Import the SocialScore component
+import SocialScore from "../../../components/SocialScore";
 import PaperNavigationButtons from "../../../components/PaperNavigationButtons";
+import customTheme from "../../../components/MarkdownTheme";
 
 export async function getStaticPaths() {
-  const platforms = ["arxiv"]; // Array of platforms, currently only "arxiv"
+  const platforms = ["arxiv"];
   const paths = [];
-  const pageSize = 1000; // Number of records to fetch per page
-  const limit = 2000; // Maximum number of pages to generate
+  const pageSize = 1000;
+  const limit = 2000;
 
   for (const platform of platforms) {
     let currentPage = 1;
@@ -57,7 +59,7 @@ export async function getStaticPaths() {
       totalFetched += papers.length;
 
       if (papers.length < pageSize || totalFetched >= limit) {
-        break; // Stop fetching if there are no more records or if the limit is reached
+        break;
       }
 
       currentPage += 1;
@@ -105,12 +107,10 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
     fetchAdjacent();
   }, [paper]);
 
-  // Check if the paper prop is defined
   if (!paper) {
-    return <div>Loading...</div>; // or any other fallback UI
+    return <div>Loading...</div>;
   }
 
-  // Function to format links in the text
   const formatLinks = (text) => {
     const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
@@ -119,93 +119,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
     });
   };
 
-  // Format links in the abstract
   const formattedAbstract = formatLinks(paper.abstract);
-
-  const customTheme = {
-    p: (props) => {
-      const { children } = props;
-      return (
-        <Text my="15px" fontSize="md" lineHeight="1.45em">
-          {children}
-        </Text>
-      );
-    },
-    a: (props) => {
-      const { children, href } = props;
-      const linkText = children.toString();
-      const linkUrl = linkText.match(/\[(.*?)\]\((.*?)\)/)?.[2] || href;
-      const displayText = linkText.match(/\[(.*?)\]\((.*?)\)/)?.[1] || linkText;
-
-      return (
-        <Link color="blue.500" href={linkUrl}>
-          {displayText}
-        </Link>
-      );
-    },
-    em: (props) => {
-      const { children } = props;
-      return (
-        <figcaption
-          style={{
-            textAlign: "center",
-            fontStyle: "italic",
-            fontSize: "small",
-          }}
-        >
-          {children}
-        </figcaption>
-      );
-    },
-    ul: (props) => {
-      const { children } = props;
-      return (
-        <UnorderedList my="18px" lineHeight="1.45em">
-          {children}
-        </UnorderedList>
-      );
-    },
-    ol: (props) => {
-      const { children } = props;
-      return (
-        <OrderedList my="18px" lineHeight="1.45em">
-          {children}
-        </OrderedList>
-      );
-    },
-    li: (props) => {
-      const { children } = props;
-      return (
-        <ListItem fontSize="md" my="9px" lineHeight="1.45em">
-          {children}
-        </ListItem>
-      );
-    },
-    h2: (props) => {
-      const { children } = props;
-      return (
-        <Heading as="h2" size="lg" lineHeight="1.45em">
-          {children}
-        </Heading>
-      );
-    },
-    h3: (props) => {
-      const { children } = props;
-      return (
-        <Heading as="h3" lineHeight="1.38em">
-          {children}
-        </Heading>
-      );
-    },
-    h4: (props) => {
-      const { children } = props;
-      return (
-        <Heading as="h4" lineHeight="1.25em">
-          {children}
-        </Heading>
-      );
-    },
-  };
 
   return (
     <>
@@ -236,7 +150,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           <Text fontSize="lg" mb={4}>
             {paper.arxivId}
           </Text>
-          <SocialScore paper={paper} /> {/* Render the SocialScore component */}
+          <SocialScore paper={paper} />
           <Box fontSize="md" mb={4}>
             <Text as="span">
               Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
