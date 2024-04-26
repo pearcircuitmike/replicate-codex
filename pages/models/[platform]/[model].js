@@ -9,68 +9,48 @@ import {
   Text,
   Heading,
   Link,
-  Center,
 } from "@chakra-ui/react";
 import MetaTags from "../../../components/MetaTags";
 import {
-  fetchModelDataById,
-  fetchAllDataFromTable,
-} from "../../../utils/modelsData.js";
+  fetchModelDataBySlug,
+  findSimilarModels,
+  findCreatorModels,
+} from "../../../utils/modelsData";
 import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
 import SimilarModelsTable from "../../../components/modelDetailsPage/SimilarModelsTable";
 import CreatorModelsTable from "../../../components/modelDetailsPage/CreatorModelsTable";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import ModelPricingSummary from "../../../components/modelDetailsPage/ModelPricingSummary";
-import { findSimilarModels } from "../../../utils/modelsData";
-import { findCreatorModels } from "../../../utils/modelsData";
 import GradioEmbed from "@/components/modelDetailsPage/GradioEmbed";
 import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
-import emojiMap from "../../../data/emojiMap.json";
+import supabase from "@/utils/supabaseClient";
 
 export async function getStaticPaths() {
-  const platforms = ["replicate", "cerebrium", "deepInfra", "huggingFace"];
-  const paths = [];
-  const pageSize = 1000; // Number of records to fetch per page
-  const limit = 2000; // Maximum number of pages to generate
+  const { data: models } = await supabase
+    .from("modelsData")
+    .select("slug, platform");
 
-  for (const platform of platforms) {
-    let currentPage = 1;
-    let totalFetched = 0;
-
-    while (totalFetched < limit) {
-      const modelsData = await fetchAllDataFromTable({
-        tableName: `${platform}ModelsData`,
-        pageSize,
-        currentPage,
-      });
-
-      for (const model of modelsData) {
-        paths.push({
-          params: { model: model.id.toString(), platform },
-        });
-      }
-
-      totalFetched += modelsData.length;
-
-      if (modelsData.length < pageSize || totalFetched >= limit) {
-        break; // Stop fetching if there are no more records or if the limit is reached
-      }
-
-      currentPage += 1;
-    }
-  }
+  const paths = models.map((model) => ({
+    params: { model: model.slug, platform: model.platform },
+  }));
 
   return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps({ params }) {
-  const model = await fetchModelDataById(params.model);
+  const { platform, model: slug } = params;
+  const model = await fetchModelDataBySlug(slug, platform);
+  if (!model) {
+    return { notFound: true };
+  }
+
   const similarModels = await findSimilarModels(model);
   const creatorModels = await findCreatorModels(model, 5);
 
   return {
     props: { model, similarModels, creatorModels },
+    revalidate: 60,
   };
 }
 
@@ -102,14 +82,18 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
     setSelectedSource(event.target.value);
   };
 
+  if (!model) {
+    return <div>Loading...</div>; // or any other fallback UI
+  }
+
   return (
     <>
       <MetaTags
-        title={`${kebabToTitleCase(model.modelName)} | ${kebabToTitleCase(
+        title={`${kebabToTitleCase(model.slug)} | ${kebabToTitleCase(
           model.creator
         )} | AI model details`}
         description={`Guide to running ${kebabToTitleCase(
-          model.modelName
+          model.slug
         )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
           model.platform
         )}. Overview, ${
@@ -137,8 +121,8 @@ export default function ModelPage({ model, similarModels, creatorModels }) {
                 </Heading>
                 <Text>
                   You can use this area to play around with demo applications
-                  that incorporate the {kebabToTitleCase(model.modelName)}{" "}
-                  model. These demos are maintained and hosted externally by
+                  that incorporate the {kebabToTitleCase(model.slug)} model.
+                  These demos are maintained and hosted externally by
                   third-party creators. If you see an error,{" "}
                   <Link
                     href={`https://twitter.com/mikeyoung44`}

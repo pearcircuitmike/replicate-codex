@@ -4,7 +4,6 @@ import {
   Box,
   Heading,
   Text,
-  Avatar,
   Link as ChakraLink,
   HStack,
   Tooltip,
@@ -46,7 +45,7 @@ const ModelCard = ({ model }) => {
         bg="white"
         overflow="hidden"
       >
-        <Link href={`/models/${model.platform}/${model.id}`} legacyBehavior>
+        <Link href={`/models/${model.platform}/${model.slug}`} legacyBehavior>
           <Box h="250px" overflow="hidden" position="relative">
             {model.example ? (
               <PreviewImage
@@ -59,7 +58,6 @@ const ModelCard = ({ model }) => {
             )}
           </Box>
         </Link>
-
         <Box p="15px">
           <Heading
             as="h3"
@@ -70,7 +68,6 @@ const ModelCard = ({ model }) => {
           >
             {model.modelName}
           </Heading>
-
           <Text fontSize="sm" noOfLines={4}>
             {model?.generatedSummary || model?.description
               ? model?.generatedSummary || model?.description
@@ -78,7 +75,7 @@ const ModelCard = ({ model }) => {
           </Text>
           <Text>
             <Link
-              href={`/models/${model?.platform}/${model?.id}`}
+              href={`/models/${model.platform}/${model.slug}`}
               passHref
               legacyBehavior
             >
@@ -92,7 +89,6 @@ const ModelCard = ({ model }) => {
             </Link>
           </Text>
         </Box>
-
         <HStack
           justify="space-between"
           mt="auto"
@@ -118,7 +114,6 @@ const ModelCard = ({ model }) => {
               {model.platform !== "replicate" && (
                 <DownloadIcon boxSize=".9em" mr=".2em" />
               )}
-
               {formatLargeNumber(model.runs)}
             </Text>
           </Tooltip>

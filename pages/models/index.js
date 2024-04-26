@@ -1,3 +1,4 @@
+// index.js
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -11,7 +12,6 @@ import {
   Button,
   Skeleton,
 } from "@chakra-ui/react";
-import Head from "next/head";
 import MetaTags from "../../components/MetaTags";
 import ModelCard from "../../components/ModelCard";
 import Pagination from "../../components/Pagination";
@@ -21,7 +21,7 @@ const pageSize = 12;
 
 export async function getStaticProps() {
   const { data, totalCount } = await fetchModelsPaginated({
-    tableName: "combinedModelsData",
+    tableName: "modelsData",
     pageSize,
     currentPage: 1,
     searchValue: "",
@@ -49,7 +49,7 @@ const Models = ({ modelVals, totalCount }) => {
   const executeSearch = async () => {
     setIsLoading(true);
     const { data, totalCount } = await fetchModelsPaginated({
-      tableName: "combinedModelsData",
+      tableName: "modelsData",
       pageSize,
       currentPage: 1,
       searchValue: searchTerm,
@@ -70,7 +70,7 @@ const Models = ({ modelVals, totalCount }) => {
     setIsLoading(true);
     setCurrentPage(page);
     const { data } = await fetchModelsPaginated({
-      tableName: "combinedModelsData",
+      tableName: "modelsData",
       pageSize,
       currentPage: page,
       searchValue: searchTerm,
