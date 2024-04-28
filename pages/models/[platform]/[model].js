@@ -13,10 +13,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import MetaTags from "../../../components/MetaTags";
-import {
-  fetchModelDataBySlug,
-  findRelatedModels,
-} from "../../../utils/modelsData";
+import { fetchModelDataBySlug } from "../../../utils/modelsData";
 import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
@@ -25,6 +22,7 @@ import PreviewImage from "@/components/PreviewImage";
 import supabase from "@/utils/supabaseClient";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
 import RelatedModels from "../../../components/RelatedModels";
+import fetchRelatedModels from "../../../utils/fetchRelatedModels";
 
 export async function getStaticPaths() {
   const { data: models } = await supabase
@@ -42,7 +40,7 @@ export async function getStaticProps({ params }) {
   if (!model) {
     return { notFound: true };
   }
-  const relatedModels = await findRelatedModels(model);
+  const relatedModels = await fetchRelatedModels(model.embedding);
   return {
     props: { model, relatedModels },
     revalidate: 60,

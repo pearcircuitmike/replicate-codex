@@ -54,7 +54,7 @@ export async function fetchAllDataFromTable({
 
   const { data, error } = await supabase
     .from(tableName)
-    .select("id, creator, modelName, runs, tags, platform")
+    .select("id, creator,  totalScore, modelName, runs, tags, platform")
     .order("runs", { ascending: false })
     .range(offset, offset + pageSize - 1);
 
@@ -73,7 +73,7 @@ export async function fetchModelDataBySlug(slug) {
     const { data, error } = await supabase
       .from("modelsData")
       .select(
-        "id, lastUpdated, generatedSummary, creator, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
+        "id, lastUpdated, generatedSummary, creator, embedding, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
       )
       .eq("slug", slug)
       .single();
@@ -141,7 +141,7 @@ export async function findRelatedModels(model, maxResults = 4) {
 
   const { data, error } = await supabase
     .from("modelsData")
-    .select("id, modelName, creator, runs, platform, description")
+    .select("id, modelName, creator,  totalScore, runs, platform, description")
     .ilike("tags", `%${model.tags}%`)
     .neq("id", model.id)
     .order("runs", { ascending: false })

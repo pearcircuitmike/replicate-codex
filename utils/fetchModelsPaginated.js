@@ -10,7 +10,7 @@ export async function fetchModelsPaginated({
   let query = supabase
     .from(tableName)
     .select(
-      "id, lastUpdated, slug, creator, modelName, description, tags, example, runs, githubUrl, licenseUrl, paperUrl, platform, modelUrl, generatedSummary",
+      "id, lastUpdated, slug, creator, modelName, description, tags, example, totalScore, githubUrl, licenseUrl, paperUrl, platform, modelUrl, generatedSummary",
       { count: "exact" }
     );
 
@@ -23,7 +23,7 @@ export async function fetchModelsPaginated({
   }
 
   const { data, error, count } = await query
-    .order("runs", { ascending: false })
+    .order("totalScore", { ascending: false })
     .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
 
   if (error) {

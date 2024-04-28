@@ -5,15 +5,16 @@ import {
   Heading,
   Text,
   Link as ChakraLink,
-  HStack,
+  Image,
+  Tag,
+  Flex,
   Tooltip,
 } from "@chakra-ui/react";
-import { DownloadIcon, RepeatIcon } from "@chakra-ui/icons";
 import Link from "next/link";
-import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import { toTitleCase } from "@/utils/toTitleCase";
 import PreviewImage from "./PreviewImage";
 import EmojiWithGradient from "./EmojiWithGradient";
+import removeMd from "remove-markdown";
 
 const ModelCard = ({ model }) => {
   if (!model) {
@@ -31,6 +32,12 @@ const ModelCard = ({ model }) => {
       </Box>
     );
   } else {
+    const cleanText = (text) => {
+      if (!text) return "";
+      const cleanedText = removeMd(text);
+      return cleanedText.replace(/^Model overview/i, "").trim();
+    };
+
     return (
       <Box
         w="100%"
@@ -68,9 +75,29 @@ const ModelCard = ({ model }) => {
           >
             {model.modelName}
           </Heading>
+          <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
+            <Link
+              href={`/creators/${encodeURIComponent(
+                model.platform
+              )}/${encodeURIComponent(model.creator)}`}
+            >
+              {model.creator}
+            </Link>
+          </Text>
+          <Flex alignItems="center" mb={4}>
+            <Tooltip label="Calculated based on factors such as likes, downloads, etc">
+              <Image
+                src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/robot-face.png"
+                alt="Total Score"
+                boxSize="24px"
+                mr={2}
+              />
+            </Tooltip>
+            <Text fontSize="md">{model.totalScore}</Text>
+          </Flex>
           <Text fontSize="sm" noOfLines={4}>
             {model?.generatedSummary || model?.description
-              ? model?.generatedSummary || model?.description
+              ? cleanText(model?.generatedSummary || model?.description)
               : "No description available."}
           </Text>
           <Text>
@@ -89,33 +116,33 @@ const ModelCard = ({ model }) => {
             </Link>
           </Text>
         </Box>
-        <HStack
-          justify="space-between"
-          mt="auto"
-          mb="10px"
-          spacing={5}
-          pl="15px"
-          pr="15px"
-        >
-          <Tooltip
-            label={model.platform === "replicate" ? "Runs" : "Downloads"}
-          >
-            <Text fontSize="sm">
-              {model.platform === "replicate" && (
-                <RepeatIcon boxSize=".8em" mr=".2em" />
-              )}
-              {model.platform !== "replicate" && (
-                <DownloadIcon boxSize=".9em" mr=".2em" />
-              )}
-              {formatLargeNumber(model.runs)}
-            </Text>
-          </Tooltip>
-          <Tooltip label="Platform">
-            <Text fontSize="sm" textAlign="right">
-              {toTitleCase(model.platform)}
-            </Text>
-          </Tooltip>
-        </HStack>
+        <Flex justify="space-between" mt="auto" mb="10px" pl="15px" pr="15px">
+          <Text fontSize="sm">
+            Updated {new Date(model.lastUpdated).toLocaleDateString()}
+          </Text>
+        </Flex>
+        <Flex wrap="wrap" mb="10px" pl="15px" pr="15px">
+          {model.tags && (
+            <Link
+              href={{
+                pathname: "/models",
+                query: { selectedTag: model.tags },
+              }}
+              passHref
+            >
+              <Tag
+                as="a"
+                size="sm"
+                colorScheme="blue"
+                mr="5px"
+                mb="5px"
+                cursor="pointer"
+              >
+                {model.tags}
+              </Tag>
+            </Link>
+          )}
+        </Flex>
       </Box>
     );
   }
