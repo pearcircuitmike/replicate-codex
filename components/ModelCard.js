@@ -15,6 +15,7 @@ import { toTitleCase } from "@/utils/toTitleCase";
 import PreviewImage from "./PreviewImage";
 import EmojiWithGradient from "./EmojiWithGradient";
 import removeMd from "remove-markdown";
+import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 const ModelCard = ({ model }) => {
   if (!model) {
@@ -93,7 +94,7 @@ const ModelCard = ({ model }) => {
                 mr={2}
               />
             </Tooltip>
-            <Text fontSize="md">{model.totalScore}</Text>
+            <Text fontSize="md">{formatLargeNumber(model.totalScore)}</Text>
           </Flex>
           <Text fontSize="sm" noOfLines={4}>
             {model?.generatedSummary || model?.description

@@ -22,16 +22,6 @@ const ModelOverview = ({ model }) => {
             </ReactMarkdown>
           )}
           <br />
-          {model.generatedUseCase && (
-            <>
-              <Heading as="h2" size="md" mt={"1em"}>
-                Use cases
-              </Heading>
-              <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
-                {model.generatedUseCase}
-              </ReactMarkdown>
-            </>
-          )}
         </Box>
       </VStack>
     </Box>

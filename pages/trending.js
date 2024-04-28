@@ -1,29 +1,7 @@
-import { useState, useEffect } from "react";
 import { Box, Heading, Text, Container } from "@chakra-ui/react";
-import TopModelsTable from "../components/TopModelsTable";
 import MetaTags from "../components/MetaTags";
-import { fetchModelDataById } from "../utils/modelsData.js";
-import { fetchTopModelIds } from "@/utils/fetchTopModelIds";
 
 export default function Trending() {
-  const [models, setModels] = useState([]);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const topModelIds = await fetchTopModelIds(10);
-        const modelDataPromises = topModelIds.map((id) =>
-          fetchModelDataById(id)
-        );
-        const topModels = await Promise.all(modelDataPromises);
-        setModels(topModels);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
-    fetchData();
-  }, []);
-
   return (
     <>
       <MetaTags
@@ -40,7 +18,7 @@ export default function Trending() {
             platforms. These models have gained attention and usage in the AI
             community!
           </Text>
-          {models && <TopModelsTable models={models} />}
+          <Text>WIP</Text>
         </Box>
       </Container>
     </>

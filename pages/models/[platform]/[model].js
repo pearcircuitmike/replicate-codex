@@ -23,6 +23,7 @@ import supabase from "@/utils/supabaseClient";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
 import RelatedModels from "../../../components/RelatedModels";
 import fetchRelatedModels from "../../../utils/fetchRelatedModels";
+import { formatLargeNumber } from "@/utils/formatLargeNumber";
 
 export async function getStaticPaths() {
   const { data: models } = await supabase
@@ -112,7 +113,7 @@ export default function ModelPage({ model, relatedModels }) {
                 mr={2}
               />
             </Tooltip>
-            <Text fontSize="md">{model.totalScore}</Text>
+            <Text fontSize="md">{formatLargeNumber(model.totalScore)}</Text>
           </Flex>
           <Box fontSize="md" mb={4}>
             <Text as="span">

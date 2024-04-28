@@ -11,7 +11,7 @@ export async function fetchCreators({
 }) {
   let query = supabase
     .from(tableName)
-    .select("creator, example, total_runs, id, creatorRank, platform", {
+    .select("creator, example,  id, platform", {
       count: "exact",
     });
 
@@ -27,9 +27,10 @@ export async function fetchCreators({
     query = query.eq("platform", platform);
   }
 
-  const { data, error, count } = await query
-    .order("creatorRank", { ascending: true })
-    .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
+  const { data, error, count } = await query.range(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize - 1
+  );
 
   if (error) {
     console.error(error);

@@ -73,7 +73,7 @@ export async function fetchModelDataBySlug(slug) {
     const { data, error } = await supabase
       .from("modelsData")
       .select(
-        "id, lastUpdated, generatedSummary, creator, embedding, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
+        "id, lastUpdated, generatedSummary, totalScore, creator, embedding, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
       )
       .eq("slug", slug)
       .single();

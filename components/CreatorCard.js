@@ -44,21 +44,15 @@ const CreatorCard = ({ creator }) => {
             mb={3}
           />
           <Heading as="h2" size="md" isTruncated mb={2}>
-            {creator.creator} {getMedalEmoji(creator.creatorRank)}
+            {creator.creator}
           </Heading>
-          <Text fontSize="sm" color="gray.500">
-            Total Runs:{" "}
-            {formatLargeNumber(creator.total_runs ? creator.total_runs : 0)}
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            Rank: {creator.creatorRank}
-          </Text>
         </Box>
         <Flex justifyContent="center" mt={3}>
           <Link
             href={`/creators/${creator.platform}/${creator.creator}`}
             passHref
-            legacyBehavior>
+            legacyBehavior
+          >
             <Button size="sm" colorScheme="blue">
               View profile
             </Button>

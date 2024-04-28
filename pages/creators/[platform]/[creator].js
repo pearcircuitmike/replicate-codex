@@ -75,15 +75,8 @@ export default function Creator({ creator, models, platform }) {
       <Container maxW="container.xl" py="12">
         <Heading as="h1" size="xl" mb="2">
           {toTitleCase(creator)}
-          {getMedalEmoji(creatorData?.creatorRank)}
         </Heading>
-        Rank: {creatorData?.creatorRank.toLocaleString()}
-        <Text fontSize="lg" color="gray.500" mb="8">
-          Number of Runs:{" "}
-          {formatLargeNumber(
-            models.reduce((sum, model) => sum + model.runs, 0).toLocaleString()
-          )}
-        </Text>
+
         <Heading as="h2" size="lg" mt={2}>
           Models by this creator
         </Heading>
