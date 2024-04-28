@@ -76,6 +76,7 @@ export async function fetchModelDataBySlug(slug) {
         "id, lastUpdated, generatedSummary, totalScore, creator, embedding, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
       )
       .eq("slug", slug)
+      .limit(1)
       .single();
 
     if (error) {
