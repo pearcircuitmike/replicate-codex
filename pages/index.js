@@ -19,19 +19,11 @@ import {
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 
-import ModelsTable from "../components/ModelsTable.js";
 import RecentlyAddedModels from "@/components/RecentlyAddedModels.js";
 import MetaTags from "../components/MetaTags.js";
-import ModelOfTheDay from "../components/ModelOfTheDay"; // Import the ModelOfTheDay component
 import ModelMatchmaker from "@/components/ModelMatchmaker.js";
 
-import { fetchDataFromTable } from "../utils/modelsData.js";
-
 export default function Home() {
-  const [searchValue, setSearchValue] = useState("");
-  const [sorts, setSorts] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const [isMobile] = useMediaQuery("(max-width: 480px)");
   const [isLoading, setIsLoading] = useState(true);

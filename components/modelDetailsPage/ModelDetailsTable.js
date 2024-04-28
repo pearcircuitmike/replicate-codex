@@ -23,10 +23,6 @@ const ModelDetailsTable = ({ model, creator }) => {
   return (
     <Box>
       <VStack spacing={5} alignItems="start">
-        <Heading as="h3" size="sm">
-          Overview
-        </Heading>
-        <Text>Summary of this model and related resources.</Text>
         <Table
           size="sm"
           variant="simple"
@@ -45,42 +41,6 @@ const ModelDetailsTable = ({ model, creator }) => {
             </Tr>
           </Thead>
           <Tbody>
-            <Tr>
-              <Td>Creator</Td>
-              <Td>
-                <Link
-                  href={`/creators/${model?.platform}/${model?.creator}`}
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  {model?.creator}
-                </Link>
-              </Td>
-            </Tr>
-            <Tr>
-              <Td>Model Name</Td>
-              <Td>{kebabToTitleCase(model?.modelName)}</Td>
-            </Tr>
-            <Tr>
-              <Td>Description</Td>
-              <Td>
-                <TruncateWithReadMore
-                  content={
-                    model.description
-                      ? model.description
-                      : "No description available"
-                  }
-                  length={75}
-                  hasReadMore={true}
-                />
-              </Td>
-            </Tr>
-            <Tr>
-              <Td>Tags</Td>
-              <Td>
-                <Tag colorScheme="teal">{model?.tags}</Tag>
-              </Td>
-            </Tr>
             <Tr>
               <Td>Model Link</Td>
               <Td>
@@ -145,82 +105,6 @@ const ModelDetailsTable = ({ model, creator }) => {
                 ) : (
                   "No paper link provided"
                 )}
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-
-        <Heading as="h3" size="sm">
-          Popularity
-        </Heading>
-        <Text>
-          How popular is this model, by number of runs? How popular is the
-          creator, by the sum of all their runs?
-        </Text>
-        <Table size="sm" variant="simple" border="1px" borderColor="gray.200">
-          <Thead>
-            <Tr>
-              <Th width="50%" bg="gray.200" color="gray.800">
-                Property
-              </Th>
-              <Th width="50%" bg="gray.200" color="gray.800">
-                Value
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>Runs</Td>
-              <Td>{model?.runs ? model?.runs?.toLocaleString() : "-"}</Td>
-            </Tr>
-            <Tr>
-              <Td>Model Rank</Td>
-              <Td>
-                {model?.modelRank} {getMedalEmoji(model?.modelRank)}
-              </Td>
-            </Tr>
-            <Tr>
-              <Td>Creator Rank</Td>
-              <Td>
-                {creator?.creatorRank} {getMedalEmoji(creator?.creatorRank)}
-              </Td>
-            </Tr>
-          </Tbody>
-        </Table>
-
-        <Heading as="h3" size="sm">
-          Cost
-        </Heading>
-        <Text>
-          How much does it cost to run this model? How long, on average, does it
-          take to complete a run?
-        </Text>
-        <Table size="sm" variant="simple" border="1px" borderColor="gray.200">
-          <Thead>
-            <Tr>
-              <Th width="50%" bg="gray.200" color="gray.800">
-                Property
-              </Th>
-              <Th width="50%" bg="gray.200" color="gray.800">
-                Value
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>Cost per Run</Td>
-              <Td>{model?.costToRun ? `$${model?.costToRun}` : "$-"}</Td>
-            </Tr>
-            <Tr>
-              <Td>Prediction Hardware</Td>
-              <Td>{model?.predictionHardware || "-"}</Td>
-            </Tr>
-            <Tr>
-              <Td>Average Completion Time</Td>
-              <Td>
-                {model?.avgCompletionTime
-                  ? `${model?.avgCompletionTime} seconds`
-                  : "-"}
               </Td>
             </Tr>
           </Tbody>

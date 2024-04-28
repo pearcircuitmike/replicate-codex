@@ -9,9 +9,6 @@ export default function MetaTags({
   ogImgUrl = "https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg", // default image url
   platform = "",
   tags = "",
-  costToRun = "",
-  avgCompletionTime = "",
-  predictionHardware = "",
 }) {
   const params = new URLSearchParams({
     creator,
@@ -21,9 +18,6 @@ export default function MetaTags({
     ogImgUrl,
     platform,
     tags,
-    costToRun,
-    avgCompletionTime,
-    predictionHardware,
   });
 
   const ogImageUrl = `https://aimodels.fyi/api/og?${params.toString()}`;

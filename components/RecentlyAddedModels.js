@@ -27,9 +27,8 @@ const RecentlyAddedModels = () => {
     setLoading(true);
 
     const { data: modelsData, error } = await supabase
-      .from("combinedModelsData")
+      .from("modelsData")
       .select("*")
-      .not("indexedDate", "eq", null)
       .order("indexedDate", { ascending: false })
       .limit(25);
 

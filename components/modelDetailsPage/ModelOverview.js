@@ -11,34 +11,15 @@ const ModelOverview = ({ model }) => {
   return (
     <Box>
       <VStack alignItems="left" spacing={2}>
-        <Heading as="h1" size="2xl" style={{ wordBreak: "break-all" }}>
-          {kebabToTitleCase(model?.modelName)}
-        </Heading>
-        <Text>
-          <Link
-            href={`/creators/${model?.platform}/${model?.creator}`}
-            color="blue.500"
-          >
-            {model?.creator}
-          </Link>
-        </Text>
-        {model?.example ? (
-          <PreviewImage
-            width={"100%"}
-            src={model?.example}
-            id={model?.id}
-            modelName={model?.modelName}
-          />
-        ) : (
-          <EmojiWithGradient title={model?.modelName} />
-        )}
         <Box>
           {model?.generatedSummary ? (
             <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
               {model.generatedSummary}
             </ReactMarkdown>
           ) : (
-            model.description
+            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+              {model.description}
+            </ReactMarkdown>
           )}
           <br />
           {model.generatedUseCase && (
@@ -51,9 +32,6 @@ const ModelOverview = ({ model }) => {
               </ReactMarkdown>
             </>
           )}
-        </Box>
-        <Box>
-          <Tag colorScheme="teal">{model?.tags}</Tag>
         </Box>
       </VStack>
     </Box>

@@ -9,7 +9,7 @@ const ModelOfTheDay = () => {
 
   useEffect(() => {
     // Load all models from the database
-    fetchAllDataFromTable("combinedModelsData")
+    fetchAllDataFromTable("modelsData")
       .then((models) => {
         setAllModels(models);
 

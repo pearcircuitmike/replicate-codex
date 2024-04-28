@@ -43,7 +43,7 @@ export async function fetchPapersByAuthor({
   let query = supabase
     .from(`${platform}PapersData`)
     .select(
-      "id, title, hackerNewsScore, redditScore, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail, slug, platform",
+      "id, title, hackerNewsScore, redditScore, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, thumbnail, slug, platform",
       { count: "exact" }
     )
     .contains("authors", [author])

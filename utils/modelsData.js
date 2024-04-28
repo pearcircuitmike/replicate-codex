@@ -54,7 +54,7 @@ export async function fetchAllDataFromTable({
 
   const { data, error } = await supabase
     .from(tableName)
-    .select("id, creator, modelName, runs, tags, costToRun, platform")
+    .select("id, creator, modelName, runs, tags, platform")
     .order("runs", { ascending: false })
     .range(offset, offset + pageSize - 1);
 
@@ -73,7 +73,7 @@ export async function fetchModelDataBySlug(slug) {
     const { data, error } = await supabase
       .from("modelsData")
       .select(
-        "id, lastUpdated, generatedSummary, generatedUseCase, creator, modelName, description, tags, example, modelUrl, runs, costToRun, githubUrl, licenseUrl, paperUrl, predictionHardware, avgCompletionTime, platform, demoSources"
+        "id, lastUpdated, generatedSummary, creator, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
       )
       .eq("slug", slug)
       .single();
@@ -134,14 +134,14 @@ export async function fetchFilteredData({
   return { data, totalCount: ids ? ids.length : count };
 }
 
-export async function findSimilarModels(model, maxResults = 5) {
+export async function findRelatedModels(model, maxResults = 4) {
   if (!model || !model.tags) {
     return [];
   }
 
   const { data, error } = await supabase
     .from("modelsData")
-    .select("id, modelName, creator, runs, platform, costToRun, description")
+    .select("id, modelName, creator, runs, platform, description")
     .ilike("tags", `%${model.tags}%`)
     .neq("id", model.id)
     .order("runs", { ascending: false })
@@ -156,31 +156,3 @@ export async function findSimilarModels(model, maxResults = 5) {
 
   return similarModels;
 }
-
-export const findCreatorModels = async (model, maxResults = null) => {
-  if (!model) {
-    return [];
-  }
-
-  let query = supabase
-    .from("modelsData")
-    .select("id, modelName, creator, runs, costToRun, description")
-    .eq("creator", model.creator)
-    .eq("platform", model.platform)
-    .neq("id", model.id);
-
-  if (maxResults !== null) {
-    query = query.limit(maxResults);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error(`Error fetching creator's other models: ${error.message}`);
-    return [];
-  }
-
-  const creatorModels = Array.isArray(data) ? data : [data].filter(Boolean);
-
-  return creatorModels;
-};

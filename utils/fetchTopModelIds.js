@@ -6,7 +6,7 @@ export async function fetchTopModelIds(
   selectedPlatforms = []
 ) {
   try {
-    let query = supabase.from("combinedModelsData").select("id");
+    let query = supabase.from("modelsData").select("id");
 
     // Filtering by platform, if needed
     if (selectedPlatforms && selectedPlatforms.length > 0) {

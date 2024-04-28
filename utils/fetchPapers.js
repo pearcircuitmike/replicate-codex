@@ -13,7 +13,7 @@ export async function fetchPapersPaginated({
   let query = supabase
     .from(`${platform}PapersData`)
     .select(
-      "id, slug, totalScore, redditScore, hackerNewsScore, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, generatedUseCase, thumbnail, platform",
+      "id, slug, totalScore, redditScore, hackerNewsScore, title, arxivCategories, abstract, authors, paperUrl, pdfUrl, lastUpdated, indexedDate, publishedDate, arxivId, generatedSummary, thumbnail, platform",
       { count: "exact" }
     );
 

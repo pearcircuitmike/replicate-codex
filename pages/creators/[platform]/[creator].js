@@ -29,7 +29,7 @@ export async function getStaticProps({ params }) {
   const { creator, platform } = params;
 
   const modelsResponse = await fetchModelsPaginated({
-    tableName: `combinedModelsData`,
+    tableName: `modelsData`,
     pageSize: 10, // Limiting the number of models fetched
     currentPage: 1,
     creator: creator,
@@ -37,14 +37,9 @@ export async function getStaticProps({ params }) {
   });
 
   const models = modelsResponse.data;
-  // Calculate average model cost
-  const avgCost =
-    models
-      .filter((model) => model.costToRun !== "")
-      .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
 
   return {
-    props: { creator, models, avgCost, platform },
+    props: { creator, models, platform },
     revalidate: 60,
   };
 }
@@ -70,11 +65,6 @@ export default function Creator({ creator, models, platform }) {
     fetchCreatorData();
   }, [creator, platform]);
 
-  const avgCost =
-    models
-      .filter((model) => model.costToRun !== "")
-      .reduce((sum, model) => sum + model.costToRun, 0) / models.length;
-
   return (
     <>
       <MetaTags
@@ -88,9 +78,6 @@ export default function Creator({ creator, models, platform }) {
           {getMedalEmoji(creatorData?.creatorRank)}
         </Heading>
         Rank: {creatorData?.creatorRank.toLocaleString()}
-        <Text fontSize="lg" color="gray.500">
-          Average Model Cost: ${avgCost.toFixed(4)}
-        </Text>
         <Text fontSize="lg" color="gray.500" mb="8">
           Number of Runs:{" "}
           {formatLargeNumber(
@@ -111,9 +98,6 @@ export default function Creator({ creator, models, platform }) {
             </Box>
           ))}
         </Box>
-        <Heading as="h2" size="lg" mt={2}>
-          Similar creators
-        </Heading>
       </Container>
     </>
   );

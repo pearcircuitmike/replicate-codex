@@ -7,6 +7,7 @@ import {
   OrderedList,
   ListItem,
   Heading,
+  Code,
 } from "@chakra-ui/react";
 
 const customTheme = {
@@ -20,10 +21,10 @@ const customTheme = {
   },
   a: (props) => {
     const { children, href } = props;
-    const linkText = children.toString();
-    const linkUrl = linkText.match(/\[(.*?)\]\((.*?)\)/)?.[2] || href;
-    const displayText = linkText.match(/\[(.*?)\]\((.*?)\)/)?.[1] || linkText;
-
+    const linkText = children?.toString();
+    const linkUrl = linkText?.match(/\\\[(.*?)\\\]\((.*?)\)/)?.[2] || href;
+    const displayText =
+      linkText?.match(/\\\[(.*?)\\\]\((.*?)\)/)?.[1] || linkText;
     return (
       <Link color="blue.500" href={linkUrl}>
         {displayText}
@@ -79,7 +80,7 @@ const customTheme = {
   h3: (props) => {
     const { children } = props;
     return (
-      <Heading as="h3" lineHeight="1.38em">
+      <Heading as="h3" size="md" lineHeight="1.38em">
         {children}
       </Heading>
     );
@@ -87,10 +88,14 @@ const customTheme = {
   h4: (props) => {
     const { children } = props;
     return (
-      <Heading as="h4" lineHeight="1.25em">
+      <Heading as="h4" size="sm" lineHeight="1.45em">
         {children}
       </Heading>
     );
+  },
+  code: (props) => {
+    const { children } = props;
+    return <Code py="0px">{children}</Code>;
   },
 };
 

@@ -97,13 +97,6 @@ const ModelCard = ({ model }) => {
           pl="15px"
           pr="15px"
         >
-          <Tooltip label="Cost per run, on average">
-            <Text fontSize="sm">
-              {model.costToRun
-                ? `$${model.costToRun.toFixed(3)}/run`
-                : "$-/run"}
-            </Text>
-          </Tooltip>
           <Tooltip
             label={model.platform === "replicate" ? "Runs" : "Downloads"}
           >
