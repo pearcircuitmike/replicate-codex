@@ -41,13 +41,18 @@ const getEmojiForTitle = (title) => {
   return getRandomEmoji(title);
 };
 
-const EmojiWithGradient = ({ title, fontSize = "6xl", height = "250px" }) => {
+const EmojiWithGradient = ({
+  title,
+  fontSize = "6xl",
+  height = "250px",
+  width = "100%",
+}) => {
   const bgColor1 = getColorByTitle(title, 0);
   const bgColor2 = getColorByTitle(title, 1);
   const gradientBg = `linear(to-r, ${bgColor1}, ${bgColor2})`;
 
   return (
-    <Center h={height} w="100%" bgGradient={gradientBg}>
+    <Center h={height} w={width} bgGradient={gradientBg}>
       <Text fontSize={fontSize}>{getEmojiForTitle(title)}</Text>
     </Center>
   );
