@@ -40,7 +40,7 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { creator, models, platform },
-    revalidate: 60,
+    revalidate: 3600,
   };
 }
 

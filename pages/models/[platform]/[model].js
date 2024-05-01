@@ -113,7 +113,9 @@ export default function ModelPage({ model, relatedModels }) {
                 mr={2}
               />
             </Tooltip>
-            <Text fontSize="md">{formatLargeNumber(model.totalScore)}</Text>
+            <Text fontSize="md">
+              {formatLargeNumber(Math.floor(model.totalScore))}
+            </Text>
           </Flex>
           <Box fontSize="md" mb={4}>
             <Text as="span">

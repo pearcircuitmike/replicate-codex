@@ -94,7 +94,9 @@ const ModelCard = ({ model }) => {
                 mr={2}
               />
             </Tooltip>
-            <Text fontSize="md">{formatLargeNumber(model.totalScore)}</Text>
+            <Text fontSize="md">
+              {formatLargeNumber(Math.floor(model.totalScore))}
+            </Text>
           </Flex>
           <Text fontSize="sm" noOfLines={4}>
             {model?.generatedSummary || model?.description

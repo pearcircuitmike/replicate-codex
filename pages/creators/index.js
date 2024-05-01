@@ -30,7 +30,7 @@ export async function getStaticProps() {
       initialCreators: data,
       initialTotalCount: totalCount || 0,
     },
-    revalidate: 60,
+    revalidate: 3600,
   };
 }
 
