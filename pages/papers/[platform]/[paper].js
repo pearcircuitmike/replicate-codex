@@ -220,6 +220,26 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
               {formattedAbstract}
             </ReactMarkdown>
           </Box>
+          <Container maxW="container.md">
+            <Box mt={8}>
+              <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
+                Get summaries of the top AI research delivered straight to your
+                inbox:
+              </Text>
+            </Box>
+
+            <Box>
+              <div id="custom-substack-embed"></div>
+              <iframe
+                src="https://aimodels.substack.com/embed"
+                width="100%"
+                height="auto"
+                border="0px solid #EEE"
+                bg="white"
+              ></iframe>
+            </Box>
+          </Container>
+
           <div>
             <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
               {paper.generatedSummary}
@@ -234,26 +254,6 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
             nextSlug={adjacentPapers.nextSlug}
             platform={paper.platform}
           />
-        </Box>
-      </Container>
-
-      <Container maxW="container.md">
-        <Box mt={8}>
-          <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-            Get summaries of the top AI research delivered straight to your
-            inbox:
-          </Text>
-        </Box>
-
-        <Box>
-          <div id="custom-substack-embed"></div>
-          <iframe
-            src="https://aimodels.substack.com/embed"
-            width="100%"
-            height="auto"
-            border="0px solid #EEE"
-            bg="white"
-          ></iframe>
         </Box>
       </Container>
 

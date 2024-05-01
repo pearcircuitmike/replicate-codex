@@ -13,17 +13,22 @@ import TimeRangeFilter from "../../components/TimeRangeFilter";
 import { getDateRange } from "../../utils/dateUtils";
 import categoryDescriptions from "../../data/categoryDescriptions.json";
 
-export async function getStaticProps() {
-  const currentPage = 1;
-  const selectedTimeRange = "thisWeek";
+export async function getStaticProps({ params }) {
+  const currentPage = parseInt(params?.page || "1", 10);
+  const selectedTimeRange = params?.selectedTimeRange || "thisWeek";
+  const selectedCategories = params?.selectedCategories
+    ? JSON.parse(params.selectedCategories)
+    : Object.keys(categoryDescriptions);
+  const searchValue = params?.search || "";
+
   const { startDate, endDate } = getDateRange(selectedTimeRange);
 
   const { data, totalCount } = await fetchPapersPaginated({
     platform: "arxiv",
     pageSize: 20,
     currentPage,
-    searchValue: null,
-    selectedCategories: Object.keys(categoryDescriptions),
+    searchValue,
+    selectedCategories,
     startDate,
     endDate,
   });
@@ -32,8 +37,8 @@ export async function getStaticProps() {
     props: {
       initialPapers: data,
       totalPaperCount: totalCount,
-      initialSearch: "",
-      initialSelectedCategories: Object.keys(categoryDescriptions),
+      initialSearch: searchValue,
+      initialSelectedCategories: selectedCategories,
       initialPage: currentPage,
       initialSelectedTimeRange: selectedTimeRange,
     },
@@ -79,14 +84,22 @@ const PapersIndexPage = ({
   };
 
   useEffect(() => {
+    const { search, selectedCategories, selectedTimeRange, page } =
+      router.query;
+
+    setSearchValue(search || initialSearch);
+    setSelectedCategories(
+      selectedCategories
+        ? JSON.parse(selectedCategories)
+        : initialSelectedCategories
+    );
+    setSelectedTimeRange(selectedTimeRange || initialSelectedTimeRange);
+    setCurrentPage(parseInt(page || initialPage.toString(), 10));
+  }, [router.query]);
+
+  useEffect(() => {
     fetchPapers();
-  }, [
-    currentPage,
-    selectedCategories,
-    pageSize,
-    searchValue,
-    selectedTimeRange,
-  ]);
+  }, [currentPage, selectedCategories, searchValue, selectedTimeRange]);
 
   const handleSearchSubmit = (newSearchValue) => {
     setSearchValue(newSearchValue);
@@ -169,6 +182,7 @@ const PapersIndexPage = ({
           categoryDescriptions={categoryDescriptions}
           selectedCategories={selectedCategories}
           onCategoryChange={handleCategoryChange}
+          isModelsPage={false}
         />
         <TimeRangeFilter
           selectedTimeRange={selectedTimeRange}

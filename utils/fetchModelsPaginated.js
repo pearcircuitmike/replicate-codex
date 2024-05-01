@@ -4,8 +4,10 @@ export async function fetchModelsPaginated({
   tableName,
   pageSize,
   currentPage,
-  searchValue,
-  creator = null,
+  searchValue = null,
+  selectedCategories = null,
+  startDate = null,
+  endDate = null,
 }) {
   let query = supabase
     .from(tableName)
@@ -18,8 +20,14 @@ export async function fetchModelsPaginated({
     query = query.ilike("modelName", `%${searchValue}%`);
   }
 
-  if (creator) {
-    query = query.eq("creator", creator);
+  if (selectedCategories) {
+    query = query.in("tags", selectedCategories);
+  }
+
+  if (startDate && endDate) {
+    query = query
+      .gte("lastUpdated", startDate.toISOString())
+      .lte("lastUpdated", endDate.toISOString());
   }
 
   const { data, error, count } = await query

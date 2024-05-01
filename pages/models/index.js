@@ -1,135 +1,245 @@
-// index.js
+// pages/models/index.js
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Heading,
-  Flex,
-  Text,
-  Box,
-  Input,
-  InputGroup,
-  Center,
-  Button,
-  Skeleton,
-} from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import { Container, Grid, Box, Text, Skeleton, Center } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import ModelCard from "../../components/ModelCard";
 import Pagination from "../../components/Pagination";
 import { fetchModelsPaginated } from "../../utils/fetchModelsPaginated";
+import SearchBar from "../../components/SearchBar";
+import CategoryFilter from "../../components/CategoryFilter";
+import TimeRangeFilter from "../../components/TimeRangeFilter";
+import { getDateRange } from "../../utils/dateUtils";
+import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json";
 
-const pageSize = 12;
+export async function getStaticProps({ params }) {
+  const currentPage = parseInt(params?.page || "1", 10);
+  const selectedTimeRange = params?.selectedTimeRange || "allTime";
+  const selectedCategories = params?.selectedCategories
+    ? JSON.parse(params.selectedCategories)
+    : Object.keys(modelCategoryDescriptions);
+  const searchValue = params?.search || "";
 
-export async function getStaticProps() {
+  const { startDate, endDate } = getDateRange(selectedTimeRange);
+
   const { data, totalCount } = await fetchModelsPaginated({
     tableName: "modelsData",
-    pageSize,
-    currentPage: 1,
-    searchValue: "",
+    pageSize: 12,
+    currentPage,
+    searchValue,
+    selectedCategories,
+    startDate,
+    endDate,
   });
 
   return {
-    props: { modelVals: data, totalCount: totalCount || 0 },
+    props: {
+      initialModels: data,
+      totalModelCount: totalCount,
+      initialSearch: searchValue,
+      initialSelectedCategories: selectedCategories,
+      initialPage: currentPage,
+      initialSelectedTimeRange: selectedTimeRange,
+    },
     revalidate: 60,
   };
 }
 
-const Models = ({ modelVals, totalCount }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [models, setModels] = useState([]);
-  const [totalModels, setTotalModels] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+const ModelsIndexPage = ({
+  initialModels,
+  totalModelCount,
+  initialSearch,
+  initialSelectedCategories,
+  initialPage,
+  initialSelectedTimeRange,
+}) => {
+  const router = useRouter();
+  const [models, setModels] = useState(initialModels);
+  const [searchValue, setSearchValue] = useState(initialSearch);
+  const [selectedCategories, setSelectedCategories] = useState(
+    initialSelectedCategories
+  );
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [totalCount, setTotalCount] = useState(totalModelCount);
+  const pageSize = 12;
+  const [selectedTimeRange, setSelectedTimeRange] = useState(
+    initialSelectedTimeRange
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    setModels(modelVals);
-    setTotalModels(totalCount);
-    setIsLoading(false);
-  }, [modelVals, totalCount]);
-
-  const executeSearch = async () => {
+  const fetchModels = async () => {
     setIsLoading(true);
+    const { startDate, endDate } = getDateRange(selectedTimeRange);
+
     const { data, totalCount } = await fetchModelsPaginated({
       tableName: "modelsData",
       pageSize,
-      currentPage: 1,
-      searchValue: searchTerm,
+      currentPage,
+      searchValue,
+      selectedCategories,
+      startDate,
+      endDate,
     });
     setModels(data);
-    setTotalModels(totalCount || 0);
+    setTotalCount(totalCount);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    const { search, selectedCategories, selectedTimeRange, page } =
+      router.query;
+
+    setSearchValue(search || initialSearch);
+    setSelectedCategories(
+      selectedCategories
+        ? JSON.parse(selectedCategories)
+        : initialSelectedCategories
+    );
+    setSelectedTimeRange(selectedTimeRange || initialSelectedTimeRange);
+    setCurrentPage(parseInt(page || initialPage.toString(), 10));
+  }, [router.query]);
+
+  useEffect(() => {
+    fetchModels();
+  }, [currentPage, selectedCategories, searchValue, selectedTimeRange]);
+
+  const handleSearchSubmit = (newSearchValue) => {
+    setSearchValue(newSearchValue);
     setCurrentPage(1);
-    setIsLoading(false);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      executeSearch();
-    }
-  };
-
-  const handlePageChange = async (page) => {
-    setIsLoading(true);
-    setCurrentPage(page);
-    const { data } = await fetchModelsPaginated({
-      tableName: "modelsData",
-      pageSize,
-      currentPage: page,
-      searchValue: searchTerm,
+    router.push({
+      pathname: "/models",
+      query: {
+        search: newSearchValue,
+        selectedCategories: JSON.stringify(selectedCategories),
+        selectedTimeRange,
+        page: 1,
+      },
     });
-    setModels(data);
-    setIsLoading(false);
+  };
+
+  const handleCategoryChange = (updatedCategories) => {
+    setSelectedCategories(updatedCategories);
+    setCurrentPage(1);
+    router.push({
+      pathname: "/models",
+      query: {
+        search: searchValue,
+        selectedCategories: JSON.stringify(updatedCategories),
+        selectedTimeRange,
+        page: 1,
+      },
+    });
+  };
+
+  const handleTimeRangeChange = (newTimeRange) => {
+    setSelectedTimeRange(newTimeRange);
+    setCurrentPage(1);
+    router.push({
+      pathname: "/models",
+      query: {
+        search: searchValue,
+        selectedCategories: JSON.stringify(selectedCategories),
+        selectedTimeRange: newTimeRange,
+        page: 1,
+      },
+    });
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    router.push({
+      pathname: "/models",
+      query: {
+        search: searchValue,
+        selectedCategories: JSON.stringify(selectedCategories),
+        selectedTimeRange,
+        page: newPage,
+      },
+    });
   };
 
   return (
     <>
       <MetaTags
-        title={"AIModels.fyi | All Models"}
-        description={"List of all AI models."}
+        title="AI Models | Browse and Discover AI Models"
+        description="Explore a wide range of AI models across different categories. Browse through model descriptions, examples, and more."
       />
-      <Container maxW="5xl">
-        <Heading as="h1" mt={5}>
-          Models
-        </Heading>
-        <Text mt={5}>Search through the list of amazing models below!</Text>
-        <InputGroup mt={5}>
-          <Input
-            variant="outline"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Search by model name"
-          />
-          <Button ml={3} onClick={executeSearch} colorScheme="blue">
-            Search
-          </Button>
-        </InputGroup>
-      </Container>
-      <Container maxW="8xl">
-        <Flex wrap="wrap" justify="center" mt={10}>
-          {isLoading
-            ? Array.from({ length: pageSize }).map((_, index) => (
-                <Box m={3} w="280px" key={index}>
-                  <Skeleton height="200px" />
-                  <Skeleton height="20px" mt={2} />
-                  <Skeleton height="20px" mt={1} />
-                </Box>
-              ))
-            : models.map((model) => (
-                <Box m={3} w="280px" key={model.id}>
-                  <ModelCard model={model} />
-                </Box>
-              ))}
-        </Flex>
-      </Container>
-      <Center my={5}>
-        <Pagination
-          currentPage={currentPage}
-          totalCount={totalModels}
-          onPageChange={handlePageChange}
-          pageSize={pageSize}
+      <Container maxW="container.xl" py="12">
+        <Box mb={6}>
+          <Text fontSize="3xl" fontWeight="bold">
+            AI Models
+          </Text>
+          <Text fontSize="lg">
+            Browse and discover AI models across various categories.
+          </Text>
+        </Box>
+        <SearchBar
+          searchValue={searchValue}
+          onSearchSubmit={handleSearchSubmit}
+          setSearchValue={setSearchValue}
         />
-      </Center>
+        <CategoryFilter
+          categoryDescriptions={modelCategoryDescriptions}
+          selectedCategories={selectedCategories}
+          onCategoryChange={handleCategoryChange}
+          isModelsPage
+        />
+        <TimeRangeFilter
+          selectedTimeRange={selectedTimeRange}
+          onTimeRangeChange={handleTimeRangeChange}
+        />
+        {isLoading ? (
+          <Grid
+            templateColumns={{
+              base: "repeat(1, 1fr)",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(3, 1fr)",
+              xl: "repeat(4, 1fr)",
+            }}
+            gap={6}
+          >
+            {Array.from({ length: pageSize }).map((_, index) => (
+              <Box key={index}>
+                <Skeleton height="200px" />
+                <Skeleton height="20px" mt={2} />
+                <Skeleton height="20px" mt={1} />
+              </Box>
+            ))}
+          </Grid>
+        ) : models.length === 0 ? (
+          <Box mt={6}>
+            <Text>
+              No models found. Please try a different search or category.
+            </Text>
+          </Box>
+        ) : (
+          <>
+            <Grid
+              templateColumns={{
+                base: "repeat(1, 1fr)",
+                md: "repeat(2, 1fr)",
+                lg: "repeat(3, 1fr)",
+                xl: "repeat(4, 1fr)",
+              }}
+              gap={6}
+            >
+              {models.map((model) => (
+                <ModelCard key={model.id} model={model} />
+              ))}
+            </Grid>
+            <Center my={5}>
+              <Pagination
+                currentPage={currentPage}
+                totalCount={totalCount}
+                onPageChange={handlePageChange}
+                pageSize={pageSize}
+              />
+            </Center>
+          </>
+        )}
+      </Container>
     </>
   );
 };
 
-export default Models;
+export default ModelsIndexPage;

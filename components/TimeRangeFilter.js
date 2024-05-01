@@ -15,7 +15,7 @@ const TimeRangeFilter = ({ initialTimeRange, onTimeRangeChange }) => {
   const [isMobile] = useMediaQuery("(max-width: 768px)"); // Adjust the breakpoint as needed
   const [selectedTimeRange, setSelectedTimeRange] = useState(
     initialTimeRange || "thisWeek"
-  ); // Initialize with initialTimeRange prop or "allTime"
+  ); // Initialize with initialTimeRange prop or "thisWeek"
 
   const handleTimeRangeChange = (timeRange) => {
     setSelectedTimeRange(timeRange);

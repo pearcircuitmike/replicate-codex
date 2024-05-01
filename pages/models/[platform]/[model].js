@@ -142,31 +142,33 @@ export default function ModelPage({ model, relatedModels }) {
           ) : (
             <EmojiWithGradient title={model?.modelName} />
           )}
+
           <Box my="8">
             <ModelDetailsTable model={model} creator={creatorData} />
           </Box>
 
+          <Container maxW="container.md">
+            <Box mt={8}>
+              <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
+                Get summaries of the top AI models delivered straight to your
+                inbox:
+              </Text>
+            </Box>
+            <Box>
+              <div id="custom-substack-embed"></div>
+              <iframe
+                src="https://aimodels.substack.com/embed"
+                width="100%"
+                height="auto"
+                border="0px solid #EEE"
+                bg="white"
+              ></iframe>
+            </Box>
+          </Container>
+
           <ModelOverview model={model} />
 
           <hr />
-        </Box>
-      </Container>
-
-      <Container maxW="container.md">
-        <Box mt={8}>
-          <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-            Get summaries of the top AI models delivered straight to your inbox:
-          </Text>
-        </Box>
-        <Box>
-          <div id="custom-substack-embed"></div>
-          <iframe
-            src="https://aimodels.substack.com/embed"
-            width="100%"
-            height="auto"
-            border="0px solid #EEE"
-            bg="white"
-          ></iframe>
         </Box>
       </Container>
 

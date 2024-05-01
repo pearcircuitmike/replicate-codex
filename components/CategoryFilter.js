@@ -15,6 +15,7 @@ const CategoryFilter = ({
   categoryDescriptions,
   selectedCategories,
   onCategoryChange,
+  isModelsPage,
 }) => {
   const [isCategoryControlOpen, setIsCategoryControlOpen] = useState(false);
 
@@ -49,11 +50,10 @@ const CategoryFilter = ({
       >
         Filter by Category ({selectedCategories.length})
       </Button>
-
       <Collapse in={isCategoryControlOpen} animateOpacity>
         <Box mt={4}>
           <Heading size="md" mb={2}>
-            Arxiv Categories
+            {isModelsPage ? "Model Categories" : "Arxiv Categories"}
           </Heading>
           <SimpleGrid columns={2} spacing={1}>
             {Object.entries(categoryDescriptions).map(
@@ -63,7 +63,13 @@ const CategoryFilter = ({
                   isChecked={selectedCategories.includes(category)}
                   onChange={() => handleCategoryChange(category)}
                 >
-                  <b>{category}</b> - {description}
+                  {isModelsPage ? (
+                    description
+                  ) : (
+                    <>
+                      <b>{category}</b> - {description}
+                    </>
+                  )}
                 </Checkbox>
               )
             )}

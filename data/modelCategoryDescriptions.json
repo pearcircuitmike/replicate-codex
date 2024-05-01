@@ -1,0 +1,17 @@
+{
+  "Image-to-Image": "Image-to-Image",
+  "Image-to-Text": "Image-to-Text",
+  "Image-to-Video": "Image-to-Video",
+  "Text-to-Image": "Text-to-Image",
+  "Text-to-Text": "Text-to-Text",
+  "Text-to-Audio": "Text-to-Audio",
+  "Text-to-Video": "Text-to-Video",
+  "Audio-to-Image": "Audio-to-Image",
+  "Audio-to-Text": "Audio-to-Text",
+  "Audio-to-Audio": "Audio-to-Audio",
+  "Audio-to-Video": "Audio-to-Video",
+  "Video-to-Image": "Video-to-Image",
+  "Video-to-Text": "Video-to-Text",
+  "Video-to-Audio": "Video-to-Audio",
+  "Video-to-Video": "Video-to-Video"
+}
