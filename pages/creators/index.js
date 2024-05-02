@@ -20,7 +20,7 @@ const ITEMS_PER_PAGE = 12;
 
 export async function getStaticProps() {
   const { data, totalCount } = await fetchCreators({
-    tableName: "unique_creators_data",
+    tableName: "unique_creators_data_view",
     pageSize: ITEMS_PER_PAGE,
     currentPage: 1,
     searchValue: "",
@@ -44,7 +44,7 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
   const executeSearch = async () => {
     setIsLoading(true);
     const { data, totalCount } = await fetchCreators({
-      tableName: "unique_creators_data",
+      tableName: "unique_creators_data_view",
       pageSize: ITEMS_PER_PAGE,
       currentPage: 1,
       searchValue: searchTerm,
@@ -64,7 +64,7 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
   const changePage = async (page) => {
     setIsLoading(true);
     const { data } = await fetchCreators({
-      tableName: "unique_creators_data",
+      tableName: "unique_creators_data_view",
       pageSize: ITEMS_PER_PAGE,
       currentPage: page,
       searchValue: searchTerm,

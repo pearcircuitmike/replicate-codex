@@ -46,6 +46,12 @@ const CreatorCard = ({ creator }) => {
           <Heading as="h2" size="md" isTruncated mb={2}>
             {creator.creator}
           </Heading>
+          <Text>
+            Rank: {formatLargeNumber(Math.floor(creator.creatorRank))}
+          </Text>
+          <Text>
+            Score: {formatLargeNumber(Math.floor(creator.totalCreatorScore))}
+          </Text>
         </Box>
         <Flex justifyContent="center" mt={3}>
           <Link

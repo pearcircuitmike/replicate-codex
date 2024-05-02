@@ -9,10 +9,11 @@ import { toTitleCase } from "@/utils/toTitleCase.js";
 import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
 import { fetchModelsPaginated } from "../../../utils/fetchModelsPaginated";
 import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
+import { fetchModelsByCreator } from "@/utils/fetchModelsByCreator";
 
 export async function getStaticPaths() {
   const creatorsData = await fetchCreators({
-    tableName: "unique_creators_data",
+    tableName: "unique_creators_data_view",
     pageSize: 1000, // only first 1k
     currentPage: 1,
     searchValue: "", // this can be an empty string since we want all creators
@@ -28,7 +29,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const { creator, platform } = params;
 
-  const modelsResponse = await fetchModelsPaginated({
+  const modelsResponse = await fetchModelsByCreator({
     tableName: `modelsData`,
     pageSize: 10, // Limiting the number of models fetched
     currentPage: 1,
@@ -50,7 +51,7 @@ export default function Creator({ creator, models, platform }) {
   useEffect(() => {
     const fetchCreatorData = async () => {
       const response = await fetchCreators({
-        tableName: "unique_creators_data",
+        tableName: "unique_creators_data_view",
         pageSize: 1,
         currentPage: 1,
         creatorName: creator,
