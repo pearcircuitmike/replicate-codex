@@ -159,8 +159,11 @@ const PapersIndexPage = ({
   return (
     <>
       <MetaTags
-        title="AI Papers | Browse and Discover Latest Research"
+        title="AI Papers | Explore Latest Research"
         description="Explore the latest research papers on artificial intelligence, machine learning, and related fields. Browse through summaries, categories, and authors."
+        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_papers.png`}
+        socialPreviewTitle="AI/ML Research Papers"
+        socialPreviewSubtitle="The all-in-one place for AI research"
       />
       <Container maxW="container.xl" py="12">
         <Box mb={6}>

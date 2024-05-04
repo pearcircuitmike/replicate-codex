@@ -79,6 +79,9 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
       <MetaTags
         title="AImodels.fyi | All Creators"
         description="Search AI model creators."
+        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_creators.png`}
+        socialPreviewTitle="Model Creators"
+        socialPreviewSubtitle="Meet the top AI model creators on Replicate, HuggingFace, and more..."
       />
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>

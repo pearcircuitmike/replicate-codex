@@ -1,7 +1,7 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Head from "next/head";
-
+import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
 import MetaTags from "../../../components/MetaTags";
 import ModelCard from "../../../components/ModelCard";
 import { formatLargeNumber } from "@/utils/formatLargeNumber.js";
@@ -66,13 +66,20 @@ export default function Creator({ creator, models, platform }) {
     fetchCreatorData();
   }, [creator, platform]);
 
+  const modelCount = models.length;
+  const modelText = modelCount === 1 ? "model" : "models";
+
   return (
     <>
       <MetaTags
         title={`AI model creator details for ${creator}`}
         description={`Details about ${creator}'s account on Replicate and their AI models`}
+        socialPreviewImage="https://em-content.zobj.net/social/emoji/artist-palette.png"
+        socialPreviewTitle={`AI models by ${kebabToTitleCase(creator)}`}
+        socialPreviewSubtitle={`Explore ${modelCount} ${kebabToTitleCase(
+          platform
+        )}  ${modelText} by ${kebabToTitleCase(creator)}`}
       />
-
       <Container maxW="container.xl" py="12">
         <Heading as="h1" size="xl" mb="2">
           {toTitleCase(creator)}

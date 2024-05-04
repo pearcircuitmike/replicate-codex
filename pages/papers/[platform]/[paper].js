@@ -124,6 +124,9 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
   return (
     <>
       <MetaTags
+        socialPreviewImage={paper.thumbnail}
+        socialPreviewTitle={paper.title}
+        socialPreviewSubtitle={paper.abstract}
         title={`${paper.title} | AI Research Paper Details`}
         description={paper.abstract}
       />

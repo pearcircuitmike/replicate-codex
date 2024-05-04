@@ -74,11 +74,18 @@ export default function ModelPage({ model, relatedModels }) {
   return (
     <>
       <MetaTags
+        socialPreviewImage={model.example} // assuming 'model' is the object containing model details
+        socialPreviewTitle={kebabToTitleCase(model.modelName)}
+        socialPreviewSubtitle={`How to use ${kebabToTitleCase(
+          model.creator
+        )}'s ${kebabToTitleCase(model.modelName)} model for
+          ${model.tags}
+         processing on ${kebabToTitleCase(model.platform)}.`}
         title={`${kebabToTitleCase(model.modelName)} by ${kebabToTitleCase(
           model.creator
         )} | AI model details`}
-        description={`Guide to running ${kebabToTitleCase(
-          model.slug
+        description={`Guide to running the ${kebabToTitleCase(
+          model.modelName
         )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
           model.platform
         )}. Overview, ${

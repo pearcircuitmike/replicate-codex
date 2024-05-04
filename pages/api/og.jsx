@@ -4,178 +4,222 @@ export const config = {
   runtime: "edge",
 };
 
-// Make sure the font exists in the specified path:
 const fontRegular = fetch(
-  new URL("../../assets/Lato-Regular.ttf", import.meta.url)
+  new URL("../../assets/NotoSans-Regular.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
 const fontBold = fetch(
-  new URL("../../assets/Lato-Bold.ttf", import.meta.url)
+  new URL("../../assets/NotoSans-Bold.ttf", import.meta.url)
 ).then((res) => res.arrayBuffer());
 
-export default async function handler(request) {
-  const fontRegularData = await fontRegular;
+export default async function handler(req) {
   const fontBoldData = await fontBold;
-  const toTitleCase = (str) => {
-    return str.replace(/\w\S*/g, (txt) => {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-  };
-  function nonEmptyString(str) {
-    return str != null && str !== "null" && str.trim().length > 0;
-  }
+  const fontRegularData = await fontRegular;
 
-  const { searchParams } = request.nextUrl;
-  const creator = searchParams.get("creator");
-  const modelName = searchParams.get("modelName");
-  const description = searchParams.get("description");
-  const ogModelDescription = searchParams.get("ogModelDescription");
+  try {
+    const { searchParams } = new URL(req.url);
+    const imageUrl = searchParams.get("image");
 
-  const ogImgUrl = decodeURIComponent(searchParams.get("ogImgUrl"));
+    // Function to truncate text with ellipsis
+    const truncateWithEllipsis = (text, maxLength) => {
+      return text.length > maxLength
+        ? text.slice(0, maxLength - 3) + "..."
+        : text;
+    };
 
-  const platform = searchParams.get("platform");
-  const tags = searchParams.get("tags");
+    // Truncate title and subtitle with ellipsis if they exceed certain lengths
+    const title = truncateWithEllipsis(
+      searchParams.get("title") || "AImodels.fyi",
+      45
+    );
+    const subtitle = truncateWithEllipsis(
+      searchParams.get("subtitle") ||
+        "The all-in-one place for AI research, models, tools, and more!",
+      150
+    );
 
-  let maxLineLength = 69; // Set the maximum length to fit your design.
+    // Function to generate a gradient based on the title
+    const generateGradient = (title) => {
+      const colors = [
+        "#ff6347", // tomato
+        "#e91e63", // pink
+        "#9c27b0", // purple
+        "#673ab7", // deep purple
+        "#3f51b5", // indigo
+        "#2196f3", // blue
+        "#03a9f4", // light blue
+        "#00bcd4", // cyan
+        "#009688", // teal
+      ];
+      const hash = title
+        .split("")
+        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const color1 = colors[hash % colors.length];
+      const color2 = colors[(hash + 1) % colors.length];
+      return `linear-gradient(to right, ${color1}, ${color2})`;
+    };
 
-  let truncatedDescription = ogModelDescription;
+    const gradientBg = generateGradient(title);
 
-  if (ogModelDescription?.length > maxLineLength) {
-    truncatedDescription =
-      ogModelDescription.substring(0, maxLineLength - 3) + "...";
-  }
-
-  if (
-    nonEmptyString(creator) &&
-    nonEmptyString(modelName) &&
-    nonEmptyString(description)
-  ) {
-    return new ImageResponse(
-      (
+    // Define the content to be displayed
+    const content = (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          background: gradientBg,
+          minHeight: "100vh",
+          width: "100%",
+        }}
+      >
         <div
           style={{
-            height: "100%",
-            width: "100%",
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center",
-            paddingTop: "20px",
-            paddingBottom: "20px",
-            borderBottom: "25px",
-            borderColor: "#5a91a0",
-            fontFamily: "LatoRegular",
-            backgroundColor: "white",
+            backgroundColor: "#F7FAFC",
+            borderRadius: "20px",
+            height: "80vh",
+            width: "1100px",
+            paddingLeft: "40px",
+            paddingTop: "0px",
+            paddingBottom: "0px",
+            paddingRight: "0px",
+            boxSizing: "border-box",
           }}
         >
-          <img
-            src={
-              ogImgUrl ||
-              "https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg"
-            }
-            alt="Model Image"
-            style={{
-              width: "250px",
-              height: "250px",
-              borderRadius: "5%",
-              objectFit: "cover",
-            }}
-          />
+          <span style={{ position: "absolute", top: "40px", left: "40px" }}>
+            <img
+              src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/robot-face.png"
+              alt="Logo"
+              style={{ width: "30px", height: "30px" }}
+            />
+            <span
+              style={{
+                fontSize: "25px",
+                fontWeight: "normal",
+                fontFamily: "NotoRegular",
+                paddingLeft: "10px",
+              }}
+            >
+              AImodels.fyi
+            </span>
+          </span>
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              textAlign: "center",
+              alignItems: "flex-start",
+              width: "600px",
+              paddingRight: "100px",
             }}
           >
-            <h1
-              style={{
-                fontSize: "70px",
-                fontWeight: "bold",
-                marginBottom: "8px",
-              }}
-            >
-              {creator}/
-              <span style={{ fontFamily: "LatoBold" }}> {modelName}</span>
-            </h1>
-
-            <p
-              style={{
-                fontSize: "35px",
-                marginBottom: "25px",
-                color: "#718096",
-              }}
-            >
-              {truncatedDescription}
-            </p>
             <div
               style={{
-                display: "flex",
-                justifyContent: "center",
-                fontSize: "30",
-                maxWidth: "1000px",
+                fontSize: "45px",
+                fontWeight: "bold",
+                marginBottom: "10px",
+                marginTop: "20px",
               }}
             >
-              <table>
-                <tbody>
-                  <tr>
-                    <td
-                      style={{
-                        padding: "4px 16px",
-                        textAlign: "center",
-                        width: "25%",
-                      }}
-                    >
-                      <span
-                        style={{
-                          margin: "auto",
-                        }}
-                      >
-                        {toTitleCase(platform)}
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              {title}
+            </div>
+            <div
+              style={{
+                fontSize: "25px",
+                fontWeight: "normal",
+                fontFamily: "NotoRegular",
+              }}
+            >
+              {subtitle}
             </div>
           </div>
-        </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-        fonts: [
-          {
-            name: "LatoRegular",
-            data: fontRegularData,
-            style: "regular",
-          },
-          {
-            name: "LatoBold",
-            data: fontBoldData,
-            style: "bold",
-          },
-          {
-            name: "LatoLight",
-            data: fontRegularData,
-            style: "light",
-          },
-        ],
-      }
-    );
-  }
 
-  return new ImageResponse(
-    (
-      <img
-        src="https://aimodels.fyi/socialImg.png"
-        alt="social og img fallback"
-      />
-    ),
-    {
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end", // Ensures that the content is aligned to the end of the parent
+              alignItems: "center", // Vertically center the content within the parent
+              width: "460px",
+            }}
+          >
+            {imageUrl && imageUrl !== "null" ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center", // Center vertically in the flex container
+                  justifyContent: "flex-end", // align horizontally in the flex container
+                  height: "504px",
+                  width: "504px",
+                  borderRadius: "0px 20px 20px 0px",
+                }}
+              >
+                <img
+                  src={imageUrl}
+                  width="504"
+                  height="504"
+                  style={{
+                    objectFit: "cover",
+                    backgroundColor: "white",
+                    borderRadius: "0px 20px 20px 0px",
+                  }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg";
+                  }}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center", // Center vertically in the flex container
+                  justifyContent: "flex-end", // align horizontally in the flex container
+                  height: "504px",
+                  width: "504px",
+                  borderRadius: "0px 20px 20px 0px",
+                }}
+              >
+                <img
+                  src="https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg"
+                  style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "0px 20px 20px 0px",
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+
+    // Return the image response
+    return new ImageResponse(content, {
       width: 1200,
       height: 630,
-    }
-  );
+      fonts: [
+        {
+          name: "NotoBold",
+          data: fontBoldData,
+          style: "bold",
+        },
+        {
+          name: "NotoRegular",
+          data: fontRegularData,
+          style: "normal",
+        },
+      ],
+    });
+  } catch (e) {
+    console.error(`Error generating image: ${e.message}`);
+    return new Response(`Failed to generate the image: ${e.message}`, {
+      status: 500,
+    });
+  }
 }

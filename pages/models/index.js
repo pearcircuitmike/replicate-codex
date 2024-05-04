@@ -163,6 +163,9 @@ const ModelsIndexPage = ({
       <MetaTags
         title="AI Models | Browse and Discover AI Models"
         description="Explore a wide range of AI models across different categories. Browse through model descriptions, examples, and more."
+        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_models.png`}
+        socialPreviewTitle="AI Models"
+        socialPreviewSubtitle="Explore the latest AI models"
       />
       <Container maxW="container.xl" py="12">
         <Box mb={6}>

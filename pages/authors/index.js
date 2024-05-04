@@ -77,6 +77,9 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
       <MetaTags
         title="AIpapers.fyi | All Authors"
         description="Search AI paper authors."
+        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_researchers.png`}
+        socialPreviewTitle="AI Researchers"
+        socialPreviewSubtitle="Explore work by the top AI/ML researchers"
       />
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>

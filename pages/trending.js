@@ -47,6 +47,9 @@ export default function Trending({ trendingPapers, startDate }) {
       <MetaTags
         title="Trending Research | AIModels.fyi"
         description="Discover the top trending AI research papers."
+        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_trending.png`}
+        socialPreviewTitle="Trending Research"
+        socialPreviewSubtitle="The top AI and ML research papers of the week!"
       />
       <Container maxW="4xl">
         <Box as="main" p={6}>

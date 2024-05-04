@@ -40,6 +40,11 @@ export default function Author() {
       <MetaTags
         title={`Papers by ${author}`}
         description={`Papers authored by ${author}`}
+        socialPreviewImage="https://media.wired.com/photos/5b32ae248d9ebd40cd3ed997/191:100/w_1280,c_limit/emojiconference.jpg"
+        socialPreviewTitle={`Papers by ${author}`}
+        socialPreviewSubtitle={`View ${totalCount} ${
+          totalCount > 1 ? "papers" : "paper"
+        } on AImodels.fyi`}
       />
       <Container maxW="container.xl" py="12">
         <Heading as="h1" size="xl" mb="2">
