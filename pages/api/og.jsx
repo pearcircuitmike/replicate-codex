@@ -4,18 +4,7 @@ export const config = {
   runtime: "edge",
 };
 
-const fontRegular = fetch(
-  new URL("../../assets/NotoSans-Regular.ttf", import.meta.url)
-).then((res) => res.arrayBuffer());
-
-const fontBold = fetch(
-  new URL("../../assets/NotoSans-Bold.ttf", import.meta.url)
-).then((res) => res.arrayBuffer());
-
 export default async function handler(req) {
-  const fontBoldData = await fontBold;
-  const fontRegularData = await fontRegular;
-
   try {
     const { searchParams } = new URL(req.url);
     const imageUrl = searchParams.get("image");
@@ -100,7 +89,7 @@ export default async function handler(req) {
               style={{
                 fontSize: "25px",
                 fontWeight: "normal",
-                fontFamily: "NotoRegular",
+
                 paddingLeft: "10px",
               }}
             >
@@ -119,7 +108,8 @@ export default async function handler(req) {
             <div
               style={{
                 fontSize: "45px",
-                fontWeight: "bold",
+                fontWeight: "normal",
+
                 marginBottom: "10px",
                 marginTop: "20px",
               }}
@@ -130,7 +120,8 @@ export default async function handler(req) {
               style={{
                 fontSize: "25px",
                 fontWeight: "normal",
-                fontFamily: "NotoRegular",
+
+                color: "#718096",
               }}
             >
               {subtitle}
@@ -203,18 +194,6 @@ export default async function handler(req) {
     return new ImageResponse(content, {
       width: 1200,
       height: 630,
-      fonts: [
-        {
-          name: "NotoBold",
-          data: fontBoldData,
-          style: "bold",
-        },
-        {
-          name: "NotoRegular",
-          data: fontRegularData,
-          style: "normal",
-        },
-      ],
     });
   } catch (e) {
     console.error(`Error generating image: ${e.message}`);
