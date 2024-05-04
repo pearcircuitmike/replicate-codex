@@ -26,8 +26,8 @@ export async function fetchModelsPaginated({
 
   if (startDate && endDate) {
     query = query
-      .gte("lastUpdated", startDate.toISOString())
-      .lte("lastUpdated", endDate.toISOString());
+      .gte("indexedDate", startDate.toISOString())
+      .lte("indexedDate", endDate.toISOString());
   }
 
   const { data, error, count } = await query
