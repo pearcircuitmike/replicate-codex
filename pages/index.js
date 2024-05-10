@@ -236,9 +236,9 @@ export default function Home() {
               >
                 <Box p={6}>
                   <Text fontSize="xl" mb={4}>
-                    "AImodels.fyi&apos;s summaries are my cheat code.
+                    &quot;AImodels.fyi&apos;s summaries are my cheat code.
                     They&apos;ve helped me rapidly parse my options based on new
-                    research and then and implement them in my code."
+                    research and then and implement them in my code.&quot;
                   </Text>
                   <Box display="flex" alignItems="center">
                     <Box
@@ -270,9 +270,10 @@ export default function Home() {
               >
                 <Box p={6}>
                   <Text fontSize="xl" mb={4}>
-                    "The expert discussions in the Discord have been a goldmine.
-                    Collaborating with other AI fanatics has turbocharged my
-                    growth and opened up new opportunities."
+                    &quot;The expert discussions in the Discord have been a
+                    goldmine. Collaborating with other AI fanatics has
+                    turbocharged my growth and opened up new
+                    opportunities.&quot;
                   </Text>
                   <Box display="flex" alignItems="center">
                     <Box
