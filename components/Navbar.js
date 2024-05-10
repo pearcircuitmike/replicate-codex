@@ -46,16 +46,16 @@ const Navbar = () => {
           mx="auto"
           display={["none", "none", "flex", "flex"]}
         >
-          <Box flex="1" maxW="600px" mx={5}>
+          {/* <Box flex="1" maxW="600px" mx={5}>
             <form onSubmit={handleSearchSubmit}>
               <InputGroup size="md">
                 <InputLeftElement pointerEvents="none">
                   <SearchIcon color="gray.300" />
                 </InputLeftElement>
-                <Input type="text" name="query" placeholder="Quick Search..." />
+               <Input type="text" name="query" placeholder="Quick Search..." /> 
               </InputGroup>
             </form>
-          </Box>
+          </Box>*/}
         </Box>
 
         <Flex top="1rem" right="1rem" align="center">
