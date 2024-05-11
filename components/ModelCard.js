@@ -39,6 +39,11 @@ const ModelCard = ({ model }) => {
       return cleanedText.replace(/^Model overview/i, "").trim();
     };
 
+    const isNew = (indexedDate) => {
+      const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
+      return new Date(indexedDate) >= seventyTwoHoursAgo;
+    };
+
     return (
       <Box
         w="100%"
@@ -74,6 +79,11 @@ const ModelCard = ({ model }) => {
             mb={2}
             style={{ whiteSpace: "normal", wordWrap: "break-word" }}
           >
+            {isNew(model.indexedDate) && (
+              <Tag size="md" colorScheme="green" mr="5px">
+                New!
+              </Tag>
+            )}
             {model.modelName}
           </Heading>
           <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>

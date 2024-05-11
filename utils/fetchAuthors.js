@@ -8,13 +8,14 @@ export async function fetchUniqueAuthors({
   searchValue = null,
 }) {
   let query = supabase
-    .from(`${platform}PapersData`)
-    .select("authors", { count: "exact" })
-    .limit(pageSize)
-    .order("authors", { ascending: true });
+    .from(`unique_authors_data_view`)
+    .select("*", { count: "exact" })
+    .eq("platform", platform)
+    .order("totalAuthorScore", { ascending: false })
+    .limit(pageSize);
 
   if (searchValue) {
-    query = query.filter(`any(authors::text[] ilike '%${searchValue}%')`);
+    query = query.ilike("author", `%${searchValue}%`);
   }
 
   const { data, error, count } = await query.range(
@@ -27,11 +28,7 @@ export async function fetchUniqueAuthors({
     return { data: [], totalCount: 0 };
   }
 
-  const uniqueAuthors = Array.from(
-    new Set(data.flatMap((item) => item.authors))
-  );
-
-  return { data: uniqueAuthors, totalCount: count };
+  return { data, totalCount: count };
 }
 
 export async function fetchPapersByAuthor({

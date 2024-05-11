@@ -1,7 +1,8 @@
 // components/AuthorCard.js
 import React from "react";
-import { Box, Heading, Text, Button, Flex } from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Flex, Image } from "@chakra-ui/react";
 import Link from "next/link";
+import { getMedalEmoji } from "../utils/getMedalEmoji";
 
 const getInitials = (name) => {
   const names = name.split(" ");
@@ -51,7 +52,9 @@ const AuthorCard = ({ author, platform }) => {
       </Box>
     );
   } else {
-    const bgColor = getColorByAuthor(author);
+    const bgColor = getColorByAuthor(author.author);
+    const medalEmoji = getMedalEmoji(author.authorRank);
+
     return (
       <Box
         borderWidth="1px"
@@ -79,14 +82,22 @@ const AuthorCard = ({ author, platform }) => {
             justifyContent="center"
             mx="auto"
           >
-            {getInitials(author)}
+            {getInitials(author.author)}
           </Flex>
           <Heading as="h2" size="md" isTruncated mb={2}>
-            {author}
+            {author.author}
           </Heading>
+          <Text>Total Score: {author.totalAuthorScore} </Text>
+          <Text>
+            Author Rank: {author.authorRank} {medalEmoji}
+          </Text>
         </Box>
         <Flex justifyContent="center" mt={3}>
-          <Link href={`/authors/${platform}/${author}`} passHref legacyBehavior>
+          <Link
+            href={`/authors/${platform}/${encodeURIComponent(author.author)}`}
+            passHref
+            legacyBehavior
+          >
             <Button size="sm" colorScheme="blue">
               View profile
             </Button>

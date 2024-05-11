@@ -4,9 +4,9 @@ import supabase from "./supabaseClient";
 export async function fetchTrendingModels(limit = 5) {
   const currentDate = new Date();
   const startDate = new Date();
-  startDate.setDate(currentDate.getDate() - 17);
+  startDate.setDate(currentDate.getDate() - 7);
   const endDate = new Date();
-  endDate.setDate(currentDate.getDate() - 10);
+  endDate.setDate(currentDate.getDate());
 
   let query = supabase
     .from("modelsData")
@@ -29,9 +29,9 @@ export async function fetchTrendingModels(limit = 5) {
 export async function fetchTrendingPapers(platform, limit = 5) {
   const currentDate = new Date();
   const startDate = new Date();
-  startDate.setDate(currentDate.getDate() - 17);
+  startDate.setDate(currentDate.getDate() - 7);
   const endDate = new Date();
-  endDate.setDate(currentDate.getDate() - 14);
+  endDate.setDate(currentDate.getDate());
 
   let query = supabase
     .from(`${platform}PapersData`)
@@ -60,7 +60,7 @@ export async function fetchTrendingCreators(limit = 5) {
     .from("unique_creators_data_view")
     .select("creator, example, id, platform, totalCreatorScore, creatorRank")
     .order("totalCreatorScore", { ascending: false })
-    // there's no indexDate in this table currently
+    // there's no indexDate in this table currently, need to add
     .limit(limit);
 
   const { data, error } = await query;
@@ -78,6 +78,7 @@ export async function fetchTrendingAuthors(platform, limit = 5) {
   const endDate = new Date();
   endDate.setDate(currentDate.getDate() - 14);
 
+  // this needs to be fixed
   let query = supabase
     .from(`${platform}PapersData`)
     .select("authors, totalScore")

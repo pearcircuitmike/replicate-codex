@@ -16,6 +16,11 @@ import SocialScore from "./SocialScore";
 const PaperCard = ({ paper }) => {
   const thumbnailUrl = paper.thumbnail;
 
+  const isNew = (indexedDate) => {
+    const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
+    return new Date(indexedDate) >= seventyTwoHoursAgo;
+  };
+
   return (
     <Box
       w="100%"
@@ -58,12 +63,18 @@ const PaperCard = ({ paper }) => {
           mb={2}
           style={{ whiteSpace: "normal", wordWrap: "break-word" }}
         >
+          {isNew(paper.indexedDate) && (
+            <Tag size="md" colorScheme="green" mr="5px">
+              New!
+            </Tag>
+          )}
           {paper.title}
         </Heading>
         <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
           {paper.authors.join(", ")}
         </Text>
         <SocialScore paper={paper} />
+
         <Text fontSize="sm" noOfLines={4}>
           {paper.abstract || "No abstract available."}
         </Text>

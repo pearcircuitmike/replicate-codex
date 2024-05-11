@@ -178,6 +178,11 @@ export default function ModelPage({ model, relatedModels }) {
           <ModelOverview model={model} />
 
           <hr />
+          <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
+            This summary was produced with help from an AI and may contain
+            inaccuracies - check out the links to read the original source
+            documents!
+          </Text>
         </Box>
       </Container>
 

@@ -120,7 +120,7 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
             <Flex wrap="wrap" justify="center" mt={10}>
               {authors.map((author, index) => (
                 <Box m={3} w="280px" key={index}>
-                  <AuthorCard author={author} platform="arxiv" />
+                  <AuthorCard author={author} platform={author.platform} />
                 </Box>
               ))}
             </Flex>

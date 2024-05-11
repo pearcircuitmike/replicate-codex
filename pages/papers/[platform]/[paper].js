@@ -250,6 +250,11 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           </div>
           <br />
           <hr />
+          <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
+            This summary was produced with help from an AI and may contain
+            inaccuracies - check out the links to read the original source
+            documents!
+          </Text>
         </Box>
         <Box mt="8">
           <PaperNavigationButtons
@@ -278,6 +283,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
             ></script>
           </Button>
         </Box>
+
         <RelatedPapers relatedPapers={relatedPapers} />
       </Container>
     </>
