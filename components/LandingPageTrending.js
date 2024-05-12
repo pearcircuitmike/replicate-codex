@@ -279,7 +279,9 @@ const LandingPageTrending = ({
                         <HStack align="center">
                           <VStack align="start" spacing={1}>
                             <Text fontWeight="bold">{creator.creator}</Text>
-                            <Text fontSize="sm">Platform: arXiv</Text>
+                            <Text fontSize="sm">
+                              Platform: {creator.platform}
+                            </Text>
                             <HStack mt={2}>
                               <Image
                                 src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"

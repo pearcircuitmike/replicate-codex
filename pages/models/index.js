@@ -14,7 +14,7 @@ import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json
 
 export async function getStaticProps({ params }) {
   const currentPage = parseInt(params?.page || "1", 10);
-  const selectedTimeRange = params?.selectedTimeRange || "allTime";
+  const selectedTimeRange = params?.selectedTimeRange || "thisWeek";
   const selectedCategories = params?.selectedCategories
     ? JSON.parse(params.selectedCategories)
     : Object.keys(modelCategoryDescriptions);

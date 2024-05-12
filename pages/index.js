@@ -23,6 +23,12 @@ import {
   fetchTrendingAuthors,
 } from "../utils/fetchLandingPageData";
 
+const getStartOfWeek = (date) => {
+  const startOfWeek = new Date(date);
+  startOfWeek.setDate(date.getDate() - date.getDay());
+  return startOfWeek;
+};
+
 export default function Home() {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
   const [trendingModels, setTrendingModels] = useState([]);
@@ -68,10 +74,11 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const models = await fetchTrendingModels(4);
-      const papers = await fetchTrendingPapers("arxiv", 4);
-      const creators = await fetchTrendingCreators(4);
-      const authors = await fetchTrendingAuthors("arxiv", 4);
+      const startDate = getStartOfWeek(new Date());
+      const models = await fetchTrendingModels(startDate, 4);
+      const papers = await fetchTrendingPapers("arxiv", startDate, 4);
+      const creators = await fetchTrendingCreators(startDate, 4);
+      const authors = await fetchTrendingAuthors("arxiv", startDate, 4);
 
       setTrendingModels(models);
       setTrendingPapers(papers);

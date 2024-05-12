@@ -9,14 +9,15 @@ import {
   HStack,
   Spacer,
   Button,
-  Image,
-  Center,
-  Link,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
 import MetaTags from "../components/MetaTags";
-import { fetchTrendingPapers } from "../utils/fetchTrendingPapers";
-import EmojiWithGradient from "@/components/EmojiWithGradient";
+import {
+  fetchTrendingModels,
+  fetchTrendingCreators,
+  fetchTrendingAuthors,
+  fetchTrendingPapers,
+} from "../utils/fetchLandingPageData";
+import LandingPageTrending from "../components/LandingPageTrending";
 
 const getStartOfWeek = (date) => {
   const startOfWeek = new Date(date);
@@ -24,7 +25,13 @@ const getStartOfWeek = (date) => {
   return startOfWeek;
 };
 
-export default function Trending({ trendingPapers, startDate }) {
+export default function Trending({
+  trendingPapers,
+  trendingModels,
+  trendingCreators,
+  trendingAuthors,
+  startDate,
+}) {
   const router = useRouter();
 
   const handlePrevWeek = () => {
@@ -101,68 +108,17 @@ export default function Trending({ trendingPapers, startDate }) {
               Next Week
             </Button>
           </HStack>
-
-          <VStack spacing={4} align="stretch">
-            {trendingPapers.map((paper) => (
-              <NextLink
-                key={paper.id}
-                href={`/papers/${encodeURIComponent(
-                  paper.platform
-                )}/${encodeURIComponent(paper.slug)}`}
-                passHref
-              >
-                <Link _hover={{ textDecoration: "none" }}>
-                  <Box
-                    p={4}
-                    borderWidth={1}
-                    borderRadius="md"
-                    _hover={{ boxShadow: "md" }}
-                  >
-                    <HStack align="center">
-                      <VStack align="start" spacing={1}>
-                        <Text fontWeight="bold">{paper.title}</Text>
-                        <Text fontSize="sm">
-                          Indexed Date:{" "}
-                          {new Date(paper.indexedDate).toLocaleDateString()}
-                        </Text>
-                        <HStack mt={2}>
-                          <Image
-                            src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/robot-face.png"
-                            alt="Total Score"
-                            boxSize="24px"
-                            mr={2}
-                          />
-                          <Text>{Math.floor(paper.totalScore)}</Text>
-                        </HStack>
-                      </VStack>
-                      <Spacer />
-                      <Center height="100%">
-                        {paper.thumbnail && (
-                          <Image
-                            src={paper.thumbnail || paper.emojiWithGradient}
-                            alt={paper.title}
-                            boxSize="80px"
-                            objectFit="cover"
-                            borderRadius="md"
-                          />
-                        )}
-                        {!paper.thumbnail && (
-                          <EmojiWithGradient
-                            title={paper.title}
-                            height="80px"
-                            width="80px"
-                            objectFit="cover"
-                          />
-                        )}
-                      </Center>
-                    </HStack>
-                  </Box>
-                </Link>
-              </NextLink>
-            ))}
-          </VStack>
         </Box>
       </Container>
+      <Box py={16} px={0} width="100%">
+        <LandingPageTrending
+          trendingModels={trendingModels}
+          trendingPapers={trendingPapers}
+          trendingCreators={trendingCreators}
+          trendingAuthors={trendingAuthors}
+          isLoading={false}
+        />
+      </Box>
     </>
   );
 }
@@ -173,9 +129,15 @@ export async function getServerSideProps(context) {
     ? new Date(startDateQuery)
     : getStartOfWeek(new Date());
   const trendingPapers = await fetchTrendingPapers("arxiv", startDate);
+  const trendingModels = await fetchTrendingModels(startDate);
+  const trendingCreators = await fetchTrendingCreators(startDate);
+  const trendingAuthors = await fetchTrendingAuthors("arxiv", startDate);
   return {
     props: {
       trendingPapers,
+      trendingModels,
+      trendingCreators,
+      trendingAuthors,
       startDate: startDate.toISOString(),
     },
   };
