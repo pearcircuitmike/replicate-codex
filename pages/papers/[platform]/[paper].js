@@ -8,22 +8,17 @@ import {
   Link,
   Image,
   Tag,
-  Wrap,
-  WrapItem,
   Icon,
-  ListItem,
-  UnorderedList,
-  OrderedList,
   Button,
+  Center,
 } from "@chakra-ui/react";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import MetaTags from "../../../components/MetaTags";
 import {
-  fetchPaperDataById,
-  fetchPapersPaginated,
   fetchPaperDataBySlug,
+  fetchPapersPaginated,
   fetchAdjacentPapers,
 } from "../../../utils/fetchPapers";
 import fetchRelatedPapers from "../../../utils/fetchRelatedPapers";
@@ -89,8 +84,8 @@ export async function getStaticProps({ params }) {
 
 const PaperDetailsPage = ({ paper, relatedPapers }) => {
   const [adjacentPapers, setAdjacentPapers] = useState({
-    prevPaperId: null,
-    nextPaperId: null,
+    prevSlug: null,
+    nextSlug: null,
   });
 
   useEffect(() => {
@@ -100,12 +95,47 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           paper.slug,
           paper.platform
         );
-        console.log("Fetched adjacent papers:", prevSlug, nextSlug);
         setAdjacentPapers({ prevSlug, nextSlug });
       }
     };
     fetchAdjacent();
   }, [paper]);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://substackcdn.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    const customScript = document.createElement("script");
+    customScript.innerHTML = `
+      window.CustomSubstackWidget = {
+        substackUrl: "aimodels.substack.com",
+        placeholder: "example@gmail.com",
+        buttonText: "Try it for free!",
+        theme: "custom",
+        colors: {
+          primary: "#319795",
+          input: "white",
+          email: "#1A202C",
+          text: "white",
+        },
+        redirect: "/thank-you"
+      };
+    `;
+    document.body.appendChild(customScript);
+
+    const widgetScript = document.createElement("script");
+    widgetScript.src = "https://substackapi.com/widget.js";
+    widgetScript.async = true;
+    document.body.appendChild(widgetScript);
+
+    return () => {
+      document.body.removeChild(script);
+      document.body.removeChild(customScript);
+      document.body.removeChild(widgetScript);
+    };
+  }, []);
 
   if (!paper) {
     return <div>Loading...</div>;
@@ -231,16 +261,9 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
               </Text>
             </Box>
 
-            <Box>
+            <Center my={"45px"}>
               <div id="custom-substack-embed"></div>
-              <iframe
-                src="https://aimodels.substack.com/embed"
-                width="100%"
-                height="auto"
-                border="0px solid #EEE"
-                bg="white"
-              ></iframe>
-            </Box>
+            </Center>
           </Container>
 
           <div>
@@ -270,7 +293,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           <Button colorScheme="green" borderRadius="full">
             <a
               href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
-              class="twitter-follow-button"
+              className="twitter-follow-button"
               data-show-count="false"
             >
               Follow @aimodelsfyi on 𝕏 for trending papers →
@@ -279,7 +302,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
             <script
               async
               src="https://platform.twitter.com/widgets.js"
-              charset="utf-8"
+              charSet="utf-8"
             ></script>
           </Button>
         </Box>

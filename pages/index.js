@@ -56,6 +56,9 @@ export default function Home() {
           email: "#1A202C",
           text: "white",
         },
+
+        redirect: "/thank-you"
+        
       };
     `;
     document.body.appendChild(customScript);
