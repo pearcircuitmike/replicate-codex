@@ -11,6 +11,7 @@ import {
   Flex,
   Tag,
   Tooltip,
+  Center,
 } from "@chakra-ui/react";
 import MetaTags from "../../../components/MetaTags";
 import { fetchModelDataBySlug } from "../../../utils/modelsData";
@@ -43,12 +44,12 @@ export async function getStaticProps({ params }) {
   }
   const relatedModels = await fetchRelatedModels(model.embedding);
   return {
-    props: { model, relatedModels },
-    revalidate: 60,
+    props: { model, relatedModels, slug },
+    revalidate: 3600,
   };
 }
 
-export default function ModelPage({ model, relatedModels }) {
+export default function ModelPage({ model, relatedModels, slug }) {
   const [creatorData, setCreatorData] = useState(null);
 
   useEffect(() => {
@@ -67,6 +68,42 @@ export default function ModelPage({ model, relatedModels }) {
     fetchCreatorData();
   }, [model.creator, model.platform]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://substackcdn.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    const customScript = document.createElement("script");
+    customScript.innerHTML = `
+      window.CustomSubstackWidget = {
+        substackUrl: "aimodels.substack.com",
+        placeholder: "example@gmail.com",
+        buttonText: "Try it for free!",
+        theme: "custom",
+        colors: {
+          primary: "#319795",
+          input: "white",
+          email: "#1A202C",
+          text: "white",
+        },
+        redirect: "/thank-you?source=models&slug=${encodeURIComponent(slug)}"
+      };
+    `;
+    document.body.appendChild(customScript);
+
+    const widgetScript = document.createElement("script");
+    widgetScript.src = "https://substackapi.com/widget.js";
+    widgetScript.async = true;
+    document.body.appendChild(widgetScript);
+
+    return () => {
+      document.body.removeChild(script);
+      document.body.removeChild(customScript);
+      document.body.removeChild(widgetScript);
+    };
+  }, [slug]);
+
   if (!model) {
     return <div>Loading...</div>; // or any other fallback UI
   }
@@ -74,7 +111,7 @@ export default function ModelPage({ model, relatedModels }) {
   return (
     <>
       <MetaTags
-        socialPreviewImage={model.example} // assuming 'model' is the object containing model details
+        socialPreviewImage={model.example}
         socialPreviewTitle={kebabToTitleCase(model.modelName)}
         socialPreviewSubtitle={`How to use ${kebabToTitleCase(
           model.creator
@@ -163,16 +200,10 @@ export default function ModelPage({ model, relatedModels }) {
                 inbox:
               </Text>
             </Box>
-            <Box>
+
+            <Center my={"45px"}>
               <div id="custom-substack-embed"></div>
-              <iframe
-                src="https://aimodels.substack.com/embed"
-                width="100%"
-                height="auto"
-                border="0px solid #EEE"
-                bg="white"
-              ></iframe>
-            </Box>
+            </Center>
           </Container>
 
           <ModelOverview model={model} />

@@ -1,4 +1,5 @@
-// pages/trending.js
+"use client";
+
 import { useRouter } from "next/router";
 import {
   Box,
@@ -9,7 +10,9 @@ import {
   HStack,
   Spacer,
   Button,
+  Center,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
 import MetaTags from "../components/MetaTags";
 import {
   fetchTrendingModels,
@@ -49,6 +52,42 @@ export default function Trending({
     }
   };
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://substackcdn.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    const customScript = document.createElement("script");
+    customScript.innerHTML = `
+      window.CustomSubstackWidget = {
+        substackUrl: "aimodels.substack.com",
+        placeholder: "example@gmail.com",
+        buttonText: "Try it for free!",
+        theme: "custom",
+        colors: {
+          primary: "#319795",
+          input: "white",
+          email: "#1A202C",
+          text: "white",
+        },
+        redirect: "/thank-you?source=trending"
+      };
+    `;
+    document.body.appendChild(customScript);
+
+    const widgetScript = document.createElement("script");
+    widgetScript.src = "https://substackapi.com/widget.js";
+    widgetScript.async = true;
+    document.body.appendChild(widgetScript);
+
+    return () => {
+      document.body.removeChild(script);
+      document.body.removeChild(customScript);
+      document.body.removeChild(widgetScript);
+    };
+  }, []);
+
   return (
     <>
       <MetaTags
@@ -75,16 +114,9 @@ export default function Trending({
               </Text>
             </Box>
 
-            <Box>
+            <Center my={"45px"}>
               <div id="custom-substack-embed"></div>
-              <iframe
-                src="https://aimodels.substack.com/embed"
-                width="100%"
-                height="auto"
-                border="0px solid #EEE"
-                bg="white"
-              ></iframe>
-            </Box>
+            </Center>
           </Container>
 
           <Text mb={4}>

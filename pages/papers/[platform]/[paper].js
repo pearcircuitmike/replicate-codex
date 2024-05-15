@@ -77,12 +77,12 @@ export async function getStaticProps({ params }) {
   }
 
   return {
-    props: { paper, relatedPapers },
-    revalidate: 60,
+    props: { paper, relatedPapers, slug },
+    revalidate: 3600,
   };
 }
 
-const PaperDetailsPage = ({ paper, relatedPapers }) => {
+const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   const [adjacentPapers, setAdjacentPapers] = useState({
     prevSlug: null,
     nextSlug: null,
@@ -120,7 +120,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
           email: "#1A202C",
           text: "white",
         },
-        redirect: "/thank-you"
+        redirect: "/thank-you?source=papers&slug=${encodeURIComponent(slug)}"
       };
     `;
     document.body.appendChild(customScript);
@@ -135,7 +135,7 @@ const PaperDetailsPage = ({ paper, relatedPapers }) => {
       document.body.removeChild(customScript);
       document.body.removeChild(widgetScript);
     };
-  }, []);
+  }, [slug]);
 
   if (!paper) {
     return <div>Loading...</div>;
