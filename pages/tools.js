@@ -1,5 +1,7 @@
 // pages/tools.js
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -13,6 +15,7 @@ import {
   Stack,
   Grid,
   GridItem,
+  Center,
 } from "@chakra-ui/react";
 import data from "../data/data.json";
 import MetaTags from "@/components/MetaTags";
@@ -36,6 +39,42 @@ const Tools = () => {
     (tool) => selectedCategory === "All" || tool.category === selectedCategory
   );
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://substackcdn.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    const customScript = document.createElement("script");
+    customScript.innerHTML = `
+      window.CustomSubstackWidget = {
+        substackUrl: "aimodels.substack.com",
+        placeholder: "example@gmail.com",
+        buttonText: "Try it for free!",
+        theme: "custom",
+        colors: {
+          primary: "#319795",
+          input: "white",
+          email: "#1A202C",
+          text: "white",
+        },
+        redirect: "/thank-you?source=tools"
+      };
+    `;
+    document.body.appendChild(customScript);
+
+    const widgetScript = document.createElement("script");
+    widgetScript.src = "https://substackapi.com/widget.js";
+    widgetScript.async = true;
+    document.body.appendChild(widgetScript);
+
+    return () => {
+      document.body.removeChild(script);
+      document.body.removeChild(customScript);
+      document.body.removeChild(widgetScript);
+    };
+  }, []);
+
   return (
     <>
       <MetaTags
@@ -56,14 +95,9 @@ const Tools = () => {
               Google, and Microsoft who use our site. Subscribe to the
               newsletter!
             </Text>
-            <div id="custom-substack-embed"></div>
-            <iframe
-              src="https://aimodels.substack.com/embed"
-              width="100%"
-              height="auto"
-              border="0px solid #EEE"
-              bg="white"
-            ></iframe>
+            <Center>
+              <div id="custom-substack-embed"></div>
+            </Center>
           </Box>
         </Box>
         <Box maxW="container.lg" mx="auto" my={8}>

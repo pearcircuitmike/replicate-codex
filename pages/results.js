@@ -15,13 +15,7 @@ const ResultsPage = () => {
           Subscribe for a free weekly digest of new AI models.
         </Heading>
       </Center>
-      <iframe
-        src="https://aimodels.substack.com/embed"
-        width="100%"
-        height="auto"
-        border="0px solid #EEE"
-        bg="white"
-      ></iframe>
+
       <Heading as="h2" size="sm" mb={2}>
         Search Results
       </Heading>
