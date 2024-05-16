@@ -1,62 +1,13 @@
 import "../styles/globals.css";
 import Layout from "../components/Layout";
 import Script from "next/script";
-import {
-  ChakraProvider,
-  Box,
-  Text,
-  IconButton,
-  Collapse,
-} from "@chakra-ui/react";
-import { CloseIcon } from "@chakra-ui/icons";
-import { useEffect } from "react";
-import { useDisclosure } from "@chakra-ui/react";
+import { ChakraProvider, Box } from "@chakra-ui/react";
 
 export default function App({ Component, pageProps }) {
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
-
   return (
     <>
       <ChakraProvider>
-        <Collapse in={isOpen} animateOpacity>
-          <Box
-            bg="black"
-            color="white"
-            textAlign="center"
-            p={2}
-            position="fixed"
-            top={0}
-            left={0}
-            right={0}
-            zIndex={1000}
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Text
-              flexGrow={1}
-              cursor="pointer"
-              onClick={() =>
-                window.open("https://aimodels.substack.com/", "_blank")
-              }
-            >
-              Get a weekly rundown of the latest AI models and research...
-              subscribe!{" "}
-              <Text as="span" textDecoration="underline">
-                https://aimodels.substack.com/
-              </Text>
-            </Text>
-            <IconButton
-              aria-label="Close"
-              icon={<CloseIcon />}
-              size="sm"
-              variant="ghost"
-              color="white"
-              onClick={onToggle}
-            />
-          </Box>
-        </Collapse>
-        <Box pt={isOpen ? "40px" : 0} transition="padding-top 0.3s">
+        <Box>
           <Layout>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
