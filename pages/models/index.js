@@ -177,6 +177,7 @@ const ModelsIndexPage = ({
           </Text>
         </Box>
         <SearchBar
+          placeholder={"Search by model name..."}
           searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
           setSearchValue={setSearchValue}

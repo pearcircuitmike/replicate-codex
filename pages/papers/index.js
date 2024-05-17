@@ -177,6 +177,7 @@ const PapersIndexPage = ({
         </Box>
         {/* <PaperMatchmaker />  KEEP THIS DO NOT DELETE*/}
         <SearchBar
+          placeholder={"Search papers by title or arXiv ID..."}
           searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
           setSearchValue={setSearchValue}

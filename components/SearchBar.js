@@ -2,7 +2,12 @@
 import React from "react";
 import { Box, Input, Button } from "@chakra-ui/react";
 
-const SearchBar = ({ searchValue, onSearchSubmit, setSearchValue }) => {
+const SearchBar = ({
+  searchValue,
+  onSearchSubmit,
+  setSearchValue,
+  placeholder,
+}) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSearchSubmit(searchValue);
@@ -12,7 +17,7 @@ const SearchBar = ({ searchValue, onSearchSubmit, setSearchValue }) => {
     <Box mb={6}>
       <form onSubmit={handleSubmit}>
         <Input
-          placeholder="Search papers by title or Arxiv ID..."
+          placeholder={placeholder}
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           mr={4}
