@@ -25,7 +25,7 @@ export async function getStaticProps({ params }) {
       initialSearch: searchValue,
       initialPage: currentPage,
     },
-    revalidate: 3600,
+    revalidate: 3600 * 48,
   };
 }
 
@@ -86,6 +86,42 @@ const ToolsIndexPage = ({
     });
   };
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://substackcdn.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    const customScript = document.createElement("script");
+    customScript.innerHTML = `
+      window.CustomSubstackWidget = {
+        substackUrl: "aimodels.substack.com",
+        placeholder: "example@gmail.com",
+        buttonText: "Try it for free!",
+        theme: "custom",
+        colors: {
+          primary: "#319795",
+          input: "white",
+          email: "#1A202C",
+          text: "white",
+        },
+        redirect: "/thank-you?source=tools"
+      };
+    `;
+    document.body.appendChild(customScript);
+
+    const widgetScript = document.createElement("script");
+    widgetScript.src = "https://substackapi.com/widget.js";
+    widgetScript.async = true;
+    document.body.appendChild(widgetScript);
+
+    return () => {
+      document.body.removeChild(script);
+      document.body.removeChild(customScript);
+      document.body.removeChild(widgetScript);
+    };
+  }, []);
+
   return (
     <>
       <MetaTags
@@ -102,9 +138,8 @@ const ToolsIndexPage = ({
               Discover AI tools to solve your problem
             </Heading>
             <Text fontSize="xl" mb={8}>
-              Join 65,000 users from top tech companies including Amazon, Apple,
-              Google, and Microsoft who use our site. Subscribe to the
-              newsletter!
+              Get summaries of the best new tools in your inbox. Subscribe to
+              the newsletter!
             </Text>
             <Center>
               <div id="custom-substack-embed"></div>

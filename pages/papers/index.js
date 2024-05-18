@@ -42,7 +42,7 @@ export async function getStaticProps({ params }) {
       initialPage: currentPage,
       initialSelectedTimeRange: selectedTimeRange,
     },
-    revalidate: 3600,
+    revalidate: 3600 * 12,
   };
 }
 

@@ -41,7 +41,7 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { creator, models, platform },
-    revalidate: 3600,
+    revalidate: 3600 * 2,
   };
 }
 

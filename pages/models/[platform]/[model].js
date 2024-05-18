@@ -45,7 +45,7 @@ export async function getStaticProps({ params }) {
   const relatedModels = await fetchRelatedModels(model.embedding);
   return {
     props: { model, relatedModels, slug },
-    revalidate: 3600,
+    revalidate: 3600 * 2,
   };
 }
 

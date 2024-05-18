@@ -28,7 +28,7 @@ export async function getStaticProps() {
 
   return {
     props: { initialAuthors: data, initialTotalCount: totalCount || 0 },
-    revalidate: 3600,
+    revalidate: 3600 * 12,
   };
 }
 
