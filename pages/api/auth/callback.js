@@ -1,6 +1,5 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import supabase from "../../utils/supabaseClient";
+import supabase from "../../../utils/supabaseClient";
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url);
