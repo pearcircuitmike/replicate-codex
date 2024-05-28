@@ -1,4 +1,4 @@
-// PaperCard.js
+// components/PaperCard.js
 import React from "react";
 import {
   Box,
@@ -12,10 +12,10 @@ import {
 import Link from "next/link";
 import EmojiWithGradient from "./EmojiWithGradient";
 import SocialScore from "./SocialScore";
+import BookmarkButton from "./BookmarkButton";
 
-const PaperCard = ({ paper }) => {
+const PaperCard = ({ paper, onBookmarkChange }) => {
   const thumbnailUrl = paper.thumbnail;
-
   const isNew = (indexedDate) => {
     const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
     return new Date(indexedDate) >= seventyTwoHoursAgo;
@@ -74,7 +74,6 @@ const PaperCard = ({ paper }) => {
           {paper.authors.join(", ")}
         </Text>
         <SocialScore paper={paper} />
-
         <Text fontSize="sm" noOfLines={4}>
           {paper.abstract || "No abstract available."}
         </Text>
@@ -132,6 +131,11 @@ const PaperCard = ({ paper }) => {
             </Link>
           ))}
       </Flex>
+      <BookmarkButton
+        resourceType="paper"
+        resourceId={paper.id}
+        onBookmarkChange={onBookmarkChange}
+      />
     </Box>
   );
 };

@@ -16,8 +16,9 @@ import PreviewImage from "./PreviewImage";
 import EmojiWithGradient from "./EmojiWithGradient";
 import removeMd from "remove-markdown";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import BookmarkButton from "./BookmarkButton";
 
-const ModelCard = ({ model }) => {
+const ModelCard = ({ model, onBookmarkChange }) => {
   if (!model) {
     return (
       <Box
@@ -156,6 +157,11 @@ const ModelCard = ({ model }) => {
             </Link>
           )}
         </Flex>
+        <BookmarkButton
+          resourceType="model"
+          resourceId={model.id}
+          onBookmarkChange={onBookmarkChange}
+        />
       </Box>
     );
   }

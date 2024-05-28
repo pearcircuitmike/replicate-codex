@@ -1,4 +1,4 @@
-// Navbar.js
+// components/Navbar.js
 import Link from "next/link";
 import {
   Heading,
@@ -6,26 +6,24 @@ import {
   Flex,
   IconButton,
   Spacer,
-  Input,
   VStack,
   Box,
-  InputGroup,
-  InputLeftElement,
   Button,
+  Avatar,
+  Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Divider,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, SearchIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const [display, changeDisplay] = useState("none");
-  const router = useRouter();
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const query = e.target.query.value;
-    router.push(`/results?query=${encodeURIComponent(query)}`);
-  };
+  const { user, logout } = useAuth();
 
   return (
     <nav>
@@ -38,24 +36,6 @@ const Navbar = () => {
               </Link>
             </Heading>
           </Flex>
-        </Box>
-
-        <Box
-          flex="1"
-          maxW="600px"
-          mx="auto"
-          display={["none", "none", "flex", "flex"]}
-        >
-          {/* <Box flex="1" maxW="600px" mx={5}>
-            <form onSubmit={handleSearchSubmit}>
-              <InputGroup size="md">
-                <InputLeftElement pointerEvents="none">
-                  <SearchIcon color="gray.300" />
-                </InputLeftElement>
-               <Input type="text" name="query" placeholder="Quick Search..." /> 
-              </InputGroup>
-            </form>
-          </Box>*/}
         </Box>
 
         <Flex top="1rem" right="1rem" align="center">
@@ -95,15 +75,31 @@ const Navbar = () => {
               >
                 📝 Notes
               </Link>
-              <Button
-                as="a"
-                href="https://bit.ly/48UUjKl"
-                target="_blank"
-                colorScheme="blue"
-                leftIcon="📩"
-              >
-                Submit
-              </Button>
+              {user ? (
+                <Menu>
+                  <MenuButton>
+                    <Flex align="center">
+                      <Avatar
+                        size="sm"
+                        name={user.user_metadata.full_name}
+                        src={user.user_metadata.avatar_url}
+                        mr={2}
+                      />
+                      <Text>{user.user_metadata.full_name}</Text>
+                    </Flex>
+                  </MenuButton>
+                  <MenuList>
+                    <MenuItem as={Link} href="/dashboard">
+                      Dashboard
+                    </MenuItem>
+                    <MenuItem onClick={logout}>Log Out</MenuItem>
+                  </MenuList>
+                </Menu>
+              ) : (
+                <Button as="a" href="/login" colorScheme="blue">
+                  Sign in / sign up
+                </Button>
+              )}
             </HStack>
           </Flex>
           <IconButton
@@ -149,6 +145,20 @@ const Navbar = () => {
               ></IconButton>
             </Flex>
           </HStack>
+          {user && (
+            <>
+              <Flex align="center" flexDir="column" mb={4}>
+                <Avatar
+                  size="lg"
+                  name={user.user_metadata.full_name}
+                  src={user.user_metadata.avatar_url}
+                  mb={2}
+                />
+                <Text fontSize="xl">{user.user_metadata.full_name}</Text>
+              </Flex>
+              <Divider />
+            </>
+          )}
           <Flex flexDir="column" align="center">
             <VStack spacing={3} m={5} fontSize="xl">
               <Link
@@ -225,17 +235,44 @@ const Navbar = () => {
               >
                 <span onClick={() => changeDisplay("none")}>📣 Advertise</span>
               </Link>
-              <Button
-                as="a"
-                href="https://bit.ly/48UUjKl"
-                target="_blank"
-                colorScheme="blue"
-                leftIcon="📩"
-                m={"10px"}
-                w="100%"
-              >
-                Submit
-              </Button>
+              {user && (
+                <>
+                  <Link
+                    href="/dashboard"
+                    aria-label="Dashboard"
+                    m={"10px"}
+                    w="100%"
+                    legacyBehavior
+                  >
+                    <span onClick={() => changeDisplay("none")}>
+                      📊 Dashboard
+                    </span>
+                  </Link>
+                  <Button
+                    onClick={() => {
+                      logout();
+                      changeDisplay("none");
+                    }}
+                    colorScheme="blue"
+                    leftIcon="🚪"
+                    m={"10px"}
+                    w="100%"
+                  >
+                    Log Out
+                  </Button>
+                </>
+              )}
+              {!user && (
+                <Button
+                  as="a"
+                  href="/login"
+                  colorScheme="blue"
+                  m={"10px"}
+                  w="100%"
+                >
+                  Sign in / sign up
+                </Button>
+              )}
             </VStack>
           </Flex>
         </Flex>

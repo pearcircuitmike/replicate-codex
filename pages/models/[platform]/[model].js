@@ -25,6 +25,7 @@ import EmojiWithGradient from "@/components/EmojiWithGradient";
 import RelatedModels from "../../../components/RelatedModels";
 import fetchRelatedModels from "../../../utils/fetchRelatedModels";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import BookmarkButton from "../../../components/BookmarkButton";
 
 export async function getStaticPaths() {
   const { data: models } = await supabase
@@ -166,7 +167,9 @@ export default function ModelPage({ model, relatedModels, slug }) {
               Last updated {new Date(model.lastUpdated).toLocaleDateString()}
             </Text>
           </Box>
-          <Box mb={4}>
+          <BookmarkButton resourceType="model" resourceId={model.id} />
+
+          <Box my={4}>
             {model.tags && (
               <Link
                 href={`/models?selectedTag=${encodeURIComponent(model.tags)}`}

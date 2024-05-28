@@ -27,6 +27,7 @@ import EmojiWithGradient from "../../../components/EmojiWithGradient";
 import SocialScore from "../../../components/SocialScore";
 import PaperNavigationButtons from "../../../components/PaperNavigationButtons";
 import customTheme from "../../../components/MarkdownTheme";
+import BookmarkButton from "../../../components/BookmarkButton";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -218,7 +219,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <Text as="span">Unknown authors</Text>
             )}
           </Box>
-          <Box mb={4}>
+          <BookmarkButton resourceType="paper" resourceId={paper.id} />
+
+          <Box my={4}>
             {paper.arxivCategories &&
               paper.arxivCategories.map((category, index) => (
                 <Link
