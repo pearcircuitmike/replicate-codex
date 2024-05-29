@@ -16,7 +16,7 @@ const TermsOfService = () => {
       </Heading>
       <Box mb={5}>
         <Text mb={2}>
-          By accessing the website at http://aimodels.fyi, you are agreeing to
+          By accessing the website at https://aimodels.fyi, you are agreeing to
           be bound by these terms of service, all applicable laws and
           regulations, and agree that you are responsible for compliance with
           any applicable local laws. If you do not agree with any of these
