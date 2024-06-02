@@ -1,4 +1,4 @@
-//"use server"; is needed? i removed otherwise doesn't work
+"use server";
 
 import Stripe from "stripe";
 import { stripe } from "@/utils/stripe/config";
