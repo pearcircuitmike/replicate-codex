@@ -9,9 +9,7 @@ const urlMap = JSON.parse(
 
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    middleware: true,
-  },
+
   async redirects() {
     // existing redirects
     const existingRedirects = [
