@@ -1,4 +1,3 @@
-// components/Navbar.js
 import Link from "next/link";
 import {
   Heading,
@@ -91,6 +90,9 @@ const Navbar = () => {
                   <MenuList>
                     <MenuItem as={Link} href="/dashboard">
                       Dashboard
+                    </MenuItem>
+                    <MenuItem as={Link} href="/account">
+                      My Account
                     </MenuItem>
                     <MenuItem onClick={logout}>Log Out</MenuItem>
                   </MenuList>
@@ -246,6 +248,17 @@ const Navbar = () => {
                   >
                     <span onClick={() => changeDisplay("none")}>
                       📊 Dashboard
+                    </span>
+                  </Link>
+                  <Link
+                    href="/account"
+                    aria-label="My Account"
+                    m={"10px"}
+                    w="100%"
+                    legacyBehavior
+                  >
+                    <span onClick={() => changeDisplay("none")}>
+                      👤 My Account
                     </span>
                   </Link>
                   <Button
