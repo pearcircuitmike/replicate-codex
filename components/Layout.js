@@ -3,10 +3,16 @@ import Footer from "./Footer";
 
 const Layout = ({ children }) => {
   return (
-    <div className="content">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
       <Navbar />
-      {children}
-      <Footer />
+      <main style={{ flex: 1, padding: "1rem" }}>{children}</main>
+      <Footer style={{ padding: "1rem", borderTop: "1px solid #ccc" }} />
     </div>
   );
 };

@@ -3,28 +3,30 @@ import Layout from "../components/Layout";
 import Script from "next/script";
 import { ChakraProvider, Box } from "@chakra-ui/react";
 import { AuthProvider } from "../context/AuthContext";
+import RouteGuard from "../utils/routeGuard";
 
 export default function App({ Component, pageProps }) {
   return (
     <>
       <ChakraProvider>
         <AuthProvider>
-          <Box>
-            <Layout>
-              <Script
-                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
-                strategy="afterInteractive"
-              />
-              <Script id="google-analytics" strategy="afterInteractive">
-                {`
+          <RouteGuard>
+            <Box>
+              <Layout>
+                <Script
+                  src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
+                  strategy="afterInteractive"
+                />
+                <Script id="google-analytics" strategy="afterInteractive">
+                  {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
 
           gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');`}
-              </Script>
-              <Script id="microsoft-clarity">
-                {`
+                </Script>
+                <Script id="microsoft-clarity">
+                  {`
            (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -32,19 +34,19 @@ export default function App({ Component, pageProps }) {
         })(window, document, "clarity", "script",     '${process.env.NEXT_PUBLIC_CLARITY_KEY}');
 
         `}
-              </Script>
+                </Script>
 
-              {/*  <Script
+                {/*  <Script
               async
               src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4489327921275613"
               crossOrigin="anonymous"
             ></Script>
 */}
-              <Script
-                id="popup"
-                strategy="afterInteractive"
-                dangerouslySetInnerHTML={{
-                  __html: `
+                <Script
+                  id="popup"
+                  strategy="afterInteractive"
+                  dangerouslySetInnerHTML={{
+                    __html: `
     console.log('Script loaded');
     // Define and immediately invoke the function to show popup if conditions are met
     (function() {
@@ -137,12 +139,13 @@ export default function App({ Component, pageProps }) {
         console.log('Close button clicked and overlay removed');
       });
     }`,
-                }}
-              />
+                  }}
+                />
 
-              <Component {...pageProps} />
-            </Layout>
-          </Box>
+                <Component {...pageProps} />
+              </Layout>
+            </Box>
+          </RouteGuard>
         </AuthProvider>
       </ChakraProvider>
     </>
