@@ -40,7 +40,7 @@ const PricingPage = () => {
         and stay ahead of the AI curve.
       </Text>
       <Text fontSize="xl" mb={4}>
-        As a subscriber, you'll get access to:
+        As a subscriber, you get access to:
       </Text>
       <UnorderedList mb={8}>
         <ListItem>
