@@ -17,20 +17,23 @@ const PricingPage = () => {
   const { user } = useAuth();
   const [isYearly, setIsYearly] = useState(false);
 
+  console.log(process.env.NEXT_PUBLIC_STRIPE_YEARLY_URL);
+  console.log(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_URL);
+
   const handleSubscription = () => {
-    const stripeUrl = new URL(
-      isYearly
-        ? "https://buy.stripe.com/test_bIY6qba7Aacz7bq001"
-        : "https://buy.stripe.com/test_4gw7ufdjM2K7anC4gg"
-    );
-    stripeUrl.searchParams.append("client_reference_id", user.id);
-    window.location.href = stripeUrl.toString();
+    const stripeUrl = isYearly
+      ? process.env.NEXT_PUBLIC_STRIPE_YEARLY_URL
+      : process.env.NEXT_PUBLIC_STRIPE_MONTHLY_URL;
+
+    const url = new URL(stripeUrl);
+    url.searchParams.append("client_reference_id", user.id);
+    window.location.href = url.toString();
   };
 
   return (
     <Box p={8} maxW="container.md" mx="auto">
       <Heading as="h1" size="xl" mb={8}>
-        One Last Step to Complete Your Signup
+        One last step to complete your signup
       </Heading>
       <Text fontSize="xl" mb={8}>
         Choose a subscription plan to unlock the full potential of AImodels.fyi
@@ -49,8 +52,7 @@ const PricingPage = () => {
         <ListItem>
           Exclusive access to the Discord community with AI experts and builders
         </ListItem>
-        <ListItem>Bookmark articles for easy reference</ListItem>
-        <ListItem>Custom feed based on your preferred categories</ListItem>
+        <ListItem>Bookmark resources for easy reference</ListItem>
         <ListItem>
           Weekly digests of top models and papers based on your interests
         </ListItem>
@@ -66,7 +68,7 @@ const PricingPage = () => {
         mx="auto"
       >
         <Heading as="h2" size="lg" mb={4}>
-          {isYearly ? "Yearly Pro Plan" : "Monthly Pro Plan"}
+          {isYearly ? "Yearly pro plan" : "Monthly pro plan"}
         </Heading>
         <Stack direction="row" justify="center" align="center" mb={4}>
           <Text fontSize="xl" fontWeight="bold">
@@ -86,11 +88,11 @@ const PricingPage = () => {
           <>
             <Text fontSize="xl" fontWeight="bold" mb={2}>
               <Text as="s" color="gray.500">
-                $180/year
+                $192/year
               </Text>
             </Text>
             <Text fontSize="2xl" fontWeight="bold" mb={4} color="green.500">
-              $90/year
+              $97/year
             </Text>
           </>
         ) : (
@@ -118,9 +120,11 @@ const PricingPage = () => {
         grad students working with AI in staying up-to-date with the latest
         breakthroughs that matter.
       </Text>
-      <Link as={NextLink} href="/" mt={8}>
-        Back to Home
-      </Link>
+      <Box mt={"150px"}>
+        <Link as={NextLink} href="/">
+          Back to Home
+        </Link>
+      </Box>
     </Box>
   );
 };

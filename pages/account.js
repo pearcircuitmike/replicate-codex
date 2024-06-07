@@ -1,9 +1,13 @@
 import { useAuth } from "../context/AuthContext";
 import { Box, Heading, Text, Button, VStack, Link } from "@chakra-ui/react";
-import NextLink from "next/link";
 
 const Account = () => {
   const { user, logout } = useAuth();
+
+  const handleManageSubscription = () => {
+    window.location.href =
+      process.env.NEXT_PUBLIC_STRIPE_MANAGE_SUBSCRIPTION_URL;
+  };
 
   return (
     <Box maxW="container.md" mx="auto" py={8}>
@@ -29,9 +33,9 @@ const Account = () => {
         <Link href="mailto:mike@replicatecodex.com?subject=Feedback" isExternal>
           <Button colorScheme="green">Feedback</Button>
         </Link>
-        <NextLink href="https://cnn.com" passHref>
-          <Button colorScheme="purple">Manage Subscription</Button>
-        </NextLink>
+        <Button colorScheme="purple" onClick={handleManageSubscription}>
+          Manage Subscription
+        </Button>
       </VStack>
     </Box>
   );

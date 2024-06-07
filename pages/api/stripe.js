@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripe = new Stripe(process.env.STRIPE_WEBHOOK_SECRET, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2020-08-27",
 });
 
@@ -30,28 +30,25 @@ async function manageSubscriptionStatusChange(
   createAction = false
 ) {
   try {
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("stripe_customer_id", customerId) // Ensure this field is of type text or varchar
-      .single();
-
-    if (profileError) {
-      throw profileError;
-    }
+    console.log("Managing subscription status change");
+    console.log("Subscription ID:", subscriptionId);
+    console.log("Customer ID:", customerId);
+    console.log("Create Action:", createAction);
 
     // Update the subscription record
     const { error: subscriptionError } = await supabase
-      .from("profiles")
+      .from("subscriptions")
       .update({
-        stripe_subscription_id: subscriptionId,
-        stripe_subscription_status: createAction ? "active" : "inactive",
+        status: createAction ? "active" : "inactive",
       })
-      .eq("id", profileData.id);
+      .eq("id", subscriptionId);
 
     if (subscriptionError) {
+      console.log("Error updating subscription status:", subscriptionError);
       throw subscriptionError;
     }
+
+    console.log("Subscription status updated successfully");
   } catch (error) {
     console.log("Error in manageSubscriptionStatusChange:", error);
     throw error;
@@ -67,6 +64,7 @@ export default async function handler(req, res) {
 
     try {
       if (!sig || !webhookSecret) {
+        console.log("Webhook secret not found");
         return res.status(400).send("Webhook secret not found.");
       }
       event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
@@ -81,8 +79,64 @@ export default async function handler(req, res) {
         switch (event.type) {
           case "customer.subscription.created":
           case "customer.subscription.updated":
+            const updatedSubscription = event.data.object;
+            console.log("Updated subscription data:", updatedSubscription);
+
+            // Update the subscription record in the subscriptions table
+            const { data: updatedSubscriptionData, error: updateError } =
+              await supabase
+                .from("subscriptions")
+                .update({
+                  status: updatedSubscription.status,
+                  metadata: updatedSubscription.metadata,
+                  price: updatedSubscription.items.data[0].price.id,
+                  quantity: updatedSubscription.items.data[0].quantity,
+                  cancel_at_period_end:
+                    updatedSubscription.cancel_at_period_end,
+                  current_period_start: new Date(
+                    updatedSubscription.current_period_start * 1000
+                  ).toISOString(),
+                  current_period_end: new Date(
+                    updatedSubscription.current_period_end * 1000
+                  ).toISOString(),
+                  ended_at: updatedSubscription.ended_at
+                    ? new Date(
+                        updatedSubscription.ended_at * 1000
+                      ).toISOString()
+                    : null,
+                  cancel_at: updatedSubscription.cancel_at
+                    ? new Date(
+                        updatedSubscription.cancel_at * 1000
+                      ).toISOString()
+                    : null,
+                  canceled_at: updatedSubscription.canceled_at
+                    ? new Date(
+                        updatedSubscription.canceled_at * 1000
+                      ).toISOString()
+                    : null,
+                  trial_start: updatedSubscription.trial_start
+                    ? new Date(
+                        updatedSubscription.trial_start * 1000
+                      ).toISOString()
+                    : null,
+                  trial_end: updatedSubscription.trial_end
+                    ? new Date(
+                        updatedSubscription.trial_end * 1000
+                      ).toISOString()
+                    : null,
+                })
+                .eq("id", updatedSubscription.id);
+
+            if (updateError) {
+              console.log("Error updating subscription:", updateError);
+            } else {
+              console.log("Subscription updated:", updatedSubscriptionData);
+            }
+            break;
+
           case "customer.subscription.deleted":
             const subscription = event.data.object;
+            console.log("Subscription data:", subscription);
             await manageSubscriptionStatusChange(
               subscription.id,
               subscription.customer,
@@ -91,39 +145,61 @@ export default async function handler(req, res) {
             break;
           case "checkout.session.completed":
             const checkoutSession = event.data.object;
+            console.log("Checkout session data:", checkoutSession);
             if (checkoutSession.mode === "subscription") {
               const subscriptionId = checkoutSession.subscription;
               const customerId = checkoutSession.customer;
-              const profileId = checkoutSession.client_reference_id; // Extract the profile ID from metadata
 
               console.log(
                 "Checkout session completed. Customer ID:",
                 customerId
               );
 
-              console.lo;
-
-              // Update the user's profile with the actual Stripe customerId
-              const { data: updatedProfileData, error: updateError } =
-                await supabase
-                  .from("profiles")
-                  .update({ stripe_customer_id: customerId }) // Ensure this field is of type text or varchar
-                  .eq("id", profileId);
-
-              if (updateError) {
-                console.log("Error updating stripe_customer_id:", updateError);
-              } else {
-                console.log(
-                  "Profile updated with stripe_customer_id:",
-                  updatedProfileData
-                );
-              }
-
-              await manageSubscriptionStatusChange(
-                subscriptionId,
-                customerId,
-                true
+              // Fetch the subscription object from Stripe
+              const subscription = await stripe.subscriptions.retrieve(
+                subscriptionId
               );
+              console.log("Retrieved subscription data:", subscription);
+
+              // Insert the subscription data into the subscriptions table
+              const { data: subscriptionData, error: subscriptionError } =
+                await supabase.from("subscriptions").insert({
+                  id: subscription.id,
+                  user_id: checkoutSession.client_reference_id,
+                  status: subscription.status,
+                  metadata: subscription.metadata,
+                  price: subscription.items.data[0].price.id,
+                  quantity: subscription.items.data[0].quantity,
+                  cancel_at_period_end: subscription.cancel_at_period_end,
+                  created: new Date(subscription.created * 1000).toISOString(),
+                  current_period_start: new Date(
+                    subscription.current_period_start * 1000
+                  ).toISOString(),
+                  current_period_end: new Date(
+                    subscription.current_period_end * 1000
+                  ).toISOString(),
+                  ended_at: subscription.ended_at
+                    ? new Date(subscription.ended_at * 1000).toISOString()
+                    : null,
+                  cancel_at: subscription.cancel_at
+                    ? new Date(subscription.cancel_at * 1000).toISOString()
+                    : null,
+                  canceled_at: subscription.canceled_at
+                    ? new Date(subscription.canceled_at * 1000).toISOString()
+                    : null,
+                  trial_start: subscription.trial_start
+                    ? new Date(subscription.trial_start * 1000).toISOString()
+                    : null,
+                  trial_end: subscription.trial_end
+                    ? new Date(subscription.trial_end * 1000).toISOString()
+                    : null,
+                });
+
+              if (subscriptionError) {
+                console.log("Error inserting subscription:", subscriptionError);
+              } else {
+                console.log("Subscription inserted:", subscriptionData);
+              }
             }
             break;
           case "payment_intent.created":
@@ -140,7 +216,8 @@ export default async function handler(req, res) {
           .send("Webhook handler failed. View your Next.js function logs.");
       }
     } else {
-      return res.status(400).send(`Unsupported event type: ${event.type}`);
+      console.log("Unhandled event type:", event.type);
+      return res.status(200).json({ received: true });
     }
 
     return res.status(200).json({ received: true });
