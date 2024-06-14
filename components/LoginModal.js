@@ -24,7 +24,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         <ModalBody>
           <Text mb={4}>
             Unlock all features of AImodels.fyi with a pro account. As a pro
-            user, you'll get:
+            user, you get:
           </Text>
           <UnorderedList mb={6}>
             <ListItem>Unlimited bookmarking</ListItem>

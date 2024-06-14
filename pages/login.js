@@ -43,7 +43,7 @@ export default function Login() {
           Sign in to your account
         </Heading>
         <VStack spacing={4}>
-          <Text>Sign in with your Google account</Text>
+          <Text>Sign in or up with your Google account</Text>
           <Button
             colorScheme="blue"
             leftIcon={<FaGoogle />}

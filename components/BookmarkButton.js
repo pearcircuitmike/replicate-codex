@@ -1,17 +1,17 @@
 // components/BookmarkButton.js
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Button, Icon, useToast, useDisclosure } from "@chakra-ui/react";
-import { FaBookmark } from "react-icons/fa"; // Changed from FaHeart to FaBookmark
+import { Button, Icon, useToast } from "@chakra-ui/react";
+import { FaBookmark } from "react-icons/fa";
 import supabase from "../utils/supabaseClient";
-import LoginModal from "./LoginModal";
+import { useRouter } from "next/router";
 
 const BookmarkButton = ({ resourceType, resourceId, onBookmarkChange }) => {
   const { user } = useAuth();
   const [isBookmark, setIsBookmark] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const router = useRouter();
 
   useEffect(() => {
     const checkBookmark = async () => {
@@ -38,7 +38,7 @@ const BookmarkButton = ({ resourceType, resourceId, onBookmarkChange }) => {
 
   const toggleBookmark = async () => {
     if (!user) {
-      onOpen();
+      router.push("/login");
       return;
     }
 
@@ -85,22 +85,19 @@ const BookmarkButton = ({ resourceType, resourceId, onBookmarkChange }) => {
   };
 
   return (
-    <>
-      <Button
-        variant="outline"
-        onClick={toggleBookmark}
-        isLoading={isLoading}
-        loadingText="Updating..."
-      >
-        <Icon
-          as={FaBookmark}
-          color={isBookmark ? "yellow.500" : "gray.500"}
-          mr={2}
-        />
-        {isBookmark ? "Bookmarked" : "Add to bookmarks"}
-      </Button>
-      <LoginModal isOpen={isOpen} onClose={onClose} />
-    </>
+    <Button
+      variant="outline"
+      onClick={toggleBookmark}
+      isLoading={isLoading}
+      loadingText="Updating..."
+    >
+      <Icon
+        as={FaBookmark}
+        color={isBookmark ? "yellow.500" : "gray.500"}
+        mr={2}
+      />
+      {isBookmark ? "Bookmarked" : "Add to bookmarks"}
+    </Button>
   );
 };
 
