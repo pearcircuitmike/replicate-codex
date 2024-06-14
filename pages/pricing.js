@@ -108,9 +108,9 @@ const PricingPage = () => {
             <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
               <Box p={6}>
                 <Text fontSize="xl" mb={4}>
-                  "AImodels.fyi's summaries are my cheat code. They've helped me
-                  rapidly parse my options based on new research and then
-                  implement them in my code."
+                  AImodels.fyi&apos;s summaries are my cheat code. They&apos;ve
+                  helped me rapidly parse my options based on new research and
+                  then implement them in my code.
                 </Text>
                 <Box display="flex" alignItems="center">
                   <Box
@@ -166,9 +166,9 @@ const PricingPage = () => {
             <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
               <Box p={6}>
                 <Text fontSize="xl" mb={4}>
-                  "It makes it easier for us that don't have the time or ideas
-                  to dig deep learn this amazingly fast paced field, and for
-                  that we thank you"
+                  It makes it easier for us that don&apos;t have the time or
+                  ideas to dig deep learn this amazingly fast paced field, and
+                  for that we thank you
                 </Text>
                 <Box display="flex" alignItems="center">
                   <Box
@@ -195,13 +195,13 @@ const PricingPage = () => {
             <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
               <Box p={6}>
                 <Text fontSize="xl" mb={4}>
-                  "So many A.I. Newsletters focus on the big-ticket industry
-                  news items (e.g. the latest model releases, or which company
-                  bought a different company, etc.) But as an actual
-                  practitioner and educator in A.I. and NLP, I need a way to
-                  keep up to date on the latest{" "}
+                  So many A.I. Newsletters focus on the big-ticket industry news
+                  items (e.g. the latest model releases, or which company bought
+                  a different company, etc.) But as an actual practitioner and
+                  educator in A.I. and NLP, I need a way to keep up to date on
+                  the latest{" "}
                   <span style={{ fontWeight: "bold" }}>research</span>.... you
-                  do just that!"
+                  do just that!
                 </Text>
                 <Box display="flex" alignItems="center">
                   <Box
