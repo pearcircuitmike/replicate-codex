@@ -3,22 +3,24 @@ import {
   Heading,
   Text,
   Button,
-  Stack,
-  Link,
-  UnorderedList,
+  List,
   ListItem,
-  Switch,
+  ListIcon,
+  Link,
+  SimpleGrid,
+  Container,
+  HStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useAuth } from "../context/AuthContext";
+import { FaCheckCircle } from "react-icons/fa";
 import { useState } from "react";
 
 const PricingPage = () => {
   const { user } = useAuth();
   const [isYearly, setIsYearly] = useState(false);
-
-  console.log(process.env.NEXT_PUBLIC_STRIPE_YEARLY_URL);
-  console.log(process.env.NEXT_PUBLIC_STRIPE_MONTHLY_URL);
+  const price = isYearly ? 8 : 9;
+  const billingPeriod = isYearly ? "mo" : "month";
 
   const handleSubscription = () => {
     const stripeUrl = isYearly
@@ -31,32 +33,25 @@ const PricingPage = () => {
   };
 
   return (
-    <Box p={8} maxW="container.md" mx="auto">
-      <Heading as="h1" size="xl" mb={8}>
-        One last step to complete your signup
-      </Heading>
-      <Text fontSize="xl" mb={8}>
-        Choose a subscription plan to unlock the full potential of AImodels.fyi
-        and stay ahead of the AI curve.
-      </Text>
-      <Text fontSize="xl" mb={4}>
-        As a subscriber, you get access to:
-      </Text>
-      <UnorderedList mb={8}>
-        <ListItem>
-          Unlimited access to all AI content, personalized to your interests
-        </ListItem>
-        <ListItem>
-          Guides to the top models, papers, and tools - no PhD required!
-        </ListItem>
-        <ListItem>
-          Exclusive access to the Discord community with AI experts and builders
-        </ListItem>
-        <ListItem>Bookmark resources for easy reference</ListItem>
-        <ListItem>
-          Weekly digests of top models and papers based on your interests
-        </ListItem>
-      </UnorderedList>
+    <Box p={8} maxW="container.lg" mx="auto">
+      <Box textAlign="center" mb={8}>
+        <HStack justify="center" mb={4}>
+          <Button
+            onClick={() => setIsYearly(false)}
+            colorScheme={isYearly ? "gray" : "blue"}
+            variant={isYearly ? "outline" : "solid"}
+          >
+            Monthly
+          </Button>
+          <Button
+            onClick={() => setIsYearly(true)}
+            colorScheme={isYearly ? "blue" : "gray"}
+            variant={isYearly ? "solid" : "outline"}
+          >
+            🔥 Yearly: Get 2 months free
+          </Button>
+        </HStack>
+      </Box>
       <Box
         p={6}
         borderWidth={1}
@@ -68,59 +63,172 @@ const PricingPage = () => {
         mx="auto"
       >
         <Heading as="h2" size="lg" mb={4}>
-          {isYearly ? "Yearly pro plan" : "Monthly pro plan"}
+          Pro Plan
         </Heading>
-        <Stack direction="row" justify="center" align="center" mb={4}>
-          <Text fontSize="xl" fontWeight="bold">
-            Monthly
+        <Text fontSize="2xl" fontWeight="bold" mb={2}>
+          ${price}/{billingPeriod}
+        </Text>
+        {isYearly && (
+          <Text fontSize="lg" mb={4}>
+            2 months free, billed yearly $97
           </Text>
-          <Switch
-            size="lg"
-            colorScheme="green"
-            isChecked={isYearly}
-            onChange={() => setIsYearly(!isYearly)}
-          />
-          <Text fontSize="xl" fontWeight="bold">
-            Yearly
-          </Text>
-        </Stack>
-        {isYearly ? (
-          <>
-            <Text fontSize="xl" fontWeight="bold" mb={2}>
-              <Text as="s" color="gray.500">
-                $192/year
-              </Text>
-            </Text>
-            <Text fontSize="2xl" fontWeight="bold" mb={4} color="green.500">
-              $97/year
-            </Text>
-          </>
-        ) : (
-          <>
-            <Text fontSize="xl" fontWeight="bold" mb={2}>
-              <Text as="s" color="gray.500">
-                $18/month
-              </Text>
-            </Text>
-            <Text fontSize="2xl" fontWeight="bold" mb={4} color="green.500">
-              $9/month
-            </Text>
-          </>
         )}
-        <Button
-          colorScheme={isYearly ? "green" : "blue"}
-          size="lg"
-          onClick={handleSubscription}
-        >
-          {isYearly ? "Subscribe Yearly" : "Subscribe Monthly"}
+        <Button colorScheme="blue" size="lg" onClick={handleSubscription}>
+          Subscribe
         </Button>
+        <List spacing={4} textAlign="left" mt={8}>
+          <ListItem>
+            <ListIcon as={FaCheckCircle} color="green.500" />
+            Bookmark resources for easy reference
+          </ListItem>
+          <ListItem>
+            <ListIcon as={FaCheckCircle} color="green.500" />
+            Unlimited paper summaries
+          </ListItem>
+          <ListItem>
+            <ListIcon as={FaCheckCircle} color="green.500" />
+            Unlimited model guides
+          </ListItem>
+          <ListItem>
+            <ListIcon as={FaCheckCircle} color="green.500" />
+            Join the Discord community with AI experts
+          </ListItem>
+          <ListItem>
+            <ListIcon as={FaCheckCircle} color="green.500" />
+            Weekly digests of top models and papers
+          </ListItem>
+        </List>
       </Box>
-      <Text fontSize="lg" mb={8}>
-        Join researchers, academics, software developers, startup founders, and
-        grad students working with AI in staying up-to-date with the latest
-        breakthroughs that matter.
-      </Text>
-      <Box mt={"150px"}>
+      <Box py={16} px={8}>
+        <Container maxW="8xl">
+          <Heading as="h2" fontSize="4xl" mt="50px" mb={4} textAlign="center">
+            What our users say
+          </Heading>
+          <SimpleGrid columns={1} spacing={8}>
+            <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
+              <Box p={6}>
+                <Text fontSize="xl" mb={4}>
+                  "AImodels.fyi's summaries are my cheat code. They've helped me
+                  rapidly parse my options based on new research and then
+                  implement them in my code."
+                </Text>
+                <Box display="flex" alignItems="center">
+                  <Box
+                    borderRadius="full"
+                    width="48px"
+                    height="48px"
+                    overflow="hidden"
+                    mr={4}
+                  >
+                    <img
+                      src="https://media.licdn.com/dms/image/C5603AQFhkTZjZxF6cQ/profile-displayphoto-shrink_100_100/0/1627310111771?e=1720656000&v=beta&t=b-b_lq8TiGtu29b5XVBB2Ohj3GtYIETUylajANz9rFg"
+                      alt="Philip"
+                    />
+                  </Box>
+                  <Box>
+                    <Text fontWeight="bold">Philip P.</Text>
+                    <Text fontSize="sm" color="gray.500">
+                      AI Founder
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+            <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
+              <Box p={6}>
+                <Text fontSize="xl" mb={4}>
+                  "The most comprehensive and meaningful index of AI models that
+                  are both emerging and production-ready so I can focus on
+                  building without getting left behind."
+                </Text>
+                <Box display="flex" alignItems="center">
+                  <Box
+                    borderRadius="full"
+                    width="48px"
+                    height="48px"
+                    overflow="hidden"
+                    mr={4}
+                  >
+                    <img
+                      src="https://pbs.twimg.com/profile_images/1967113482/Ink-meNEWa_400x400.png"
+                      alt="Andy"
+                    />
+                  </Box>
+                  <Box>
+                    <Text fontWeight="bold">Andy M.</Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Founder, Safemail AI
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+            <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
+              <Box p={6}>
+                <Text fontSize="xl" mb={4}>
+                  "It makes it easier for us that don't have the time or ideas
+                  to dig deep learn this amazingly fast paced field, and for
+                  that we thank you"
+                </Text>
+                <Box display="flex" alignItems="center">
+                  <Box
+                    borderRadius="full"
+                    width="48px"
+                    height="48px"
+                    overflow="hidden"
+                    mr={4}
+                  >
+                    <img
+                      src="https://substackcdn.com/image/fetch/w_88,h_88,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Favatars%2Fyellow.png"
+                      alt="Anon"
+                    />
+                  </Box>
+                  <Box>
+                    <Text fontWeight="bold">The AC guys</Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Anon.
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+            <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
+              <Box p={6}>
+                <Text fontSize="xl" mb={4}>
+                  "So many A.I. Newsletters focus on the big-ticket industry
+                  news items (e.g. the latest model releases, or which company
+                  bought a different company, etc.) But as an actual
+                  practitioner and educator in A.I. and NLP, I need a way to
+                  keep up to date on the latest{" "}
+                  <span style={{ fontWeight: "bold" }}>research</span>.... you
+                  do just that!"
+                </Text>
+                <Box display="flex" alignItems="center">
+                  <Box
+                    borderRadius="full"
+                    width="48px"
+                    height="48px"
+                    overflow="hidden"
+                    mr={4}
+                  >
+                    <img
+                      src="https://media.licdn.com/dms/image/C5603AQFAiqtIGY2xnw/profile-displayphoto-shrink_800_800/0/1572043262240?e=1720656000&v=beta&t=boEhSBYDd0qNfWON1I6aNL1x3CMd8YvVHUruX6zEVok"
+                      alt="Christian Monson"
+                    />
+                  </Box>
+                  <Box>
+                    <Text fontWeight="bold">Christian Monson</Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Tutor and mentor, A.I., Machine Learning, and NLP
+                    </Text>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </SimpleGrid>
+        </Container>
+      </Box>
+      <Box mt={"150px"} textAlign="center">
         <Link as={NextLink} href="/">
           Back to Home
         </Link>

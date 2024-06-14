@@ -14,7 +14,7 @@ import { fetchModelsByCreator } from "@/utils/fetchModelsByCreator";
 export async function getStaticPaths() {
   const creatorsData = await fetchCreators({
     tableName: "unique_creators_data_view",
-    pageSize: 1000, // only first 1k
+    pageSize: 100, // only first 100
     currentPage: 1,
     searchValue: "", // this can be an empty string since we want all creators
   });
@@ -41,7 +41,7 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { creator, models, platform },
-    revalidate: 3600 * 2,
+    revalidate: 3600 * 24,
   };
 }
 

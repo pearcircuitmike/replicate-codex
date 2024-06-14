@@ -10,6 +10,8 @@ import {
   Button,
   Text,
   Link,
+  UnorderedList,
+  ListItem,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 
@@ -18,15 +20,31 @@ const LoginModal = ({ isOpen, onClose }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Sign in Required</ModalHeader>
+        <ModalHeader>Get a Pro Account for Unlimited Bookmarking</ModalHeader>
         <ModalBody>
-          <Text>Please sign up or sign in to save your bookmarks.</Text>
+          <Text mb={4}>
+            Unlock all features of AImodels.fyi with a pro account. As a pro
+            user, you'll get:
+          </Text>
+          <UnorderedList mb={6}>
+            <ListItem>Unlimited bookmarking</ListItem>
+            <ListItem>Personalized AI content</ListItem>
+            <ListItem>
+              Exclusive guides to top models, papers, and tools
+            </ListItem>
+            <ListItem>Access to the AI expert Discord community</ListItem>
+            <ListItem>Weekly AI breakthrough digests</ListItem>
+          </UnorderedList>
+          <Text>
+            Join researchers, developers, and students who stay ahead in AI.
+            Create your pro account now!
+          </Text>
         </ModalBody>
         <ModalFooter>
-          <NextLink href="/login" passHref>
+          <NextLink href="/pricing" passHref>
             <Link>
               <Button colorScheme="blue" mr={3}>
-                Sign up / sign in
+                Create Pro Account
               </Button>
             </Link>
           </NextLink>

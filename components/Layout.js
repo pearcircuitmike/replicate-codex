@@ -1,7 +1,11 @@
+import { useRouter } from "next/router";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 const Layout = ({ children }) => {
+  const router = useRouter();
+  const isPricingPage = router.pathname === "/pricing";
+
   return (
     <div
       style={{
@@ -10,9 +14,11 @@ const Layout = ({ children }) => {
         minHeight: "100vh",
       }}
     >
-      <Navbar />
+      {!isPricingPage && <Navbar />}
       <main style={{ flex: 1, padding: "1rem" }}>{children}</main>
-      <Footer style={{ padding: "1rem", borderTop: "1px solid #ccc" }} />
+      {!isPricingPage && (
+        <Footer style={{ padding: "1rem", borderTop: "1px solid #ccc" }} />
+      )}
     </div>
   );
 };
