@@ -137,9 +137,9 @@ const PricingPage = () => {
             <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
               <Box p={6}>
                 <Text fontSize="xl" mb={4}>
-                  "The most comprehensive and meaningful index of AI models that
+                  The most comprehensive and meaningful index of AI models that
                   are both emerging and production-ready so I can focus on
-                  building without getting left behind."
+                  building without getting left behind.
                 </Text>
                 <Box display="flex" alignItems="center">
                   <Box
