@@ -30,7 +30,7 @@ const PricingPage = () => {
         Choose a subscription plan and stay ahead in AI.
       </Text>
       <Text fontSize="xl" mb={4}>
-        As a subscriber, you'll get:
+        As a subscriber, you get:
       </Text>
       <UnorderedList mb={8}>
         <ListItem>
