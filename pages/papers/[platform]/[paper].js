@@ -33,7 +33,7 @@ export async function getStaticPaths() {
   const platforms = ["arxiv"];
   const paths = [];
   const pageSize = 1000;
-  const limit = 2000;
+  const limit = 500; // was 2000, cutting to 500
 
   for (const platform of platforms) {
     let currentPage = 1;
