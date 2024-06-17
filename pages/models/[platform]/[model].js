@@ -27,13 +27,15 @@ import fetchRelatedModels from "../../../utils/fetchRelatedModels";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import BookmarkButton from "../../../components/BookmarkButton";
 
-export async function getStaticPaths() {
+export async function getStaticPaths({ numPages = 100 }) {
   const { data: models } = await supabase
     .from("modelsData")
     .select("slug, platform");
-  const paths = models.map((model) => ({
+
+  const paths = models.slice(0, numPages).map((model) => ({
     params: { model: model.slug, platform: model.platform },
   }));
+
   return { paths, fallback: "blocking" };
 }
 
