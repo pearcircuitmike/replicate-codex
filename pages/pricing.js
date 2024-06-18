@@ -35,6 +35,9 @@ const PricingPage = () => {
   return (
     <Box p={8} maxW="container.lg" mx="auto">
       <Box textAlign="center" mb={8}>
+        <Heading my={"45px"} size="lg">
+          Finish setting up your account
+        </Heading>
         <HStack justify="center" mb={4}>
           <Button
             onClick={() => setIsYearly(false)}

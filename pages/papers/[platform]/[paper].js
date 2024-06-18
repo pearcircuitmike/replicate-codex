@@ -28,6 +28,7 @@ import SocialScore from "../../../components/SocialScore";
 import PaperNavigationButtons from "../../../components/PaperNavigationButtons";
 import customTheme from "../../../components/MarkdownTheme";
 import BookmarkButton from "../../../components/BookmarkButton";
+import AuthForm from "../../../components/AuthForm";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -120,42 +121,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     };
     fetchAdjacent();
   }, [paper]);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://substackcdn.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    const customScript = document.createElement("script");
-    customScript.innerHTML = `
-      window.CustomSubstackWidget = {
-        substackUrl: "aimodels.substack.com",
-        placeholder: "example@gmail.com",
-        buttonText: "Try it for free!",
-        theme: "custom",
-        colors: {
-          primary: "#319795",
-          input: "white",
-          email: "#1A202C",
-          text: "white",
-        },
-        redirect: "/thank-you?source=papers&slug=${encodeURIComponent(slug)}"
-      };
-    `;
-    document.body.appendChild(customScript);
-
-    const widgetScript = document.createElement("script");
-    widgetScript.src = "https://substackapi.com/widget.js";
-    widgetScript.async = true;
-    document.body.appendChild(widgetScript);
-
-    return () => {
-      document.body.removeChild(script);
-      document.body.removeChild(customScript);
-      document.body.removeChild(widgetScript);
-    };
-  }, [slug]);
 
   if (!paper) {
     return <div>Loading...</div>;
@@ -277,14 +242,13 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           </Box>
           <Container maxW="container.md">
             <Box mt={8}>
-              <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-                Get summaries of the top AI research delivered straight to your
-                inbox:
+              <Text fontWeight="bold" fontSize="lg" align="center">
+                Create account to get full access
               </Text>
             </Box>
 
-            <Center my={"45px"}>
-              <div id="custom-substack-embed"></div>
+            <Center my={"20px"}>
+              <AuthForm />
             </Center>
           </Container>
 
