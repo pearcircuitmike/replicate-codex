@@ -82,11 +82,16 @@ export async function getStaticProps({ params }) {
 
   console.log(`Paper: ${paper.title}`);
   console.log(`Last Updated: ${paper.lastUpdated}`);
+  console.log(`One Week Ago: ${oneWeekAgo}`);
 
-  if (new Date(paper.lastUpdated) < oneWeekAgo) {
+  const lastUpdatedDate = new Date(paper.lastUpdated);
+  console.log(`Last Updated Date: ${lastUpdatedDate}`);
+
+  if (lastUpdatedDate <= oneWeekAgo) {
     console.log("Using SSG for this paper");
     return {
       props: { paper, relatedPapers, slug },
+      revalidate: false, // Explicitly set revalidate to false for SSG
     };
   } else {
     console.log("Using ISR for this paper");
