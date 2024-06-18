@@ -77,10 +77,24 @@ export async function getStaticProps({ params }) {
     relatedPapers = await fetchRelatedPapers(paper.embedding);
   }
 
-  return {
-    props: { paper, relatedPapers, slug },
-    revalidate: 3600 * 2,
-  };
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  console.log(`Paper: ${paper.title}`);
+  console.log(`Last Updated: ${paper.lastUpdated}`);
+
+  if (new Date(paper.lastUpdated) < oneWeekAgo) {
+    console.log("Using SSG for this paper");
+    return {
+      props: { paper, relatedPapers, slug },
+    };
+  } else {
+    console.log("Using ISR for this paper");
+    return {
+      props: { paper, relatedPapers, slug },
+      revalidate: 3600 * 2, // Revalidate every 2 hours
+    };
+  }
 }
 
 const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
