@@ -564,7 +564,7 @@ const nextConfig = {
         headers: [
           {
             key: "Cloudflare-CDN-Cache-Control",
-            value: "public, s-maxage=86400, stale-while-revalidate=3600",
+            value: "public, max-age=86400, stale-while-revalidate=3600",
           },
         ],
       },
