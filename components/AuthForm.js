@@ -130,7 +130,7 @@ export default function AuthForm() {
             <Text fontSize="sm">Sign in with Google</Text>
           </Button>
           <Text fontSize="xs" color="gray.500">
-            If you already have an account, we'll log you in
+            If you already have an account, we&apos;ll log you in
           </Text>
         </VStack>
       </Box>
