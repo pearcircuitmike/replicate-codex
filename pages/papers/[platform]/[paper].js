@@ -77,10 +77,21 @@ export async function getStaticProps({ params }) {
     relatedPapers = await fetchRelatedPapers(paper.embedding);
   }
 
-  return {
-    props: { paper, relatedPapers, slug },
-    revalidate: 3600 * 2,
-  };
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  if (new Date(paper.lastUpdated) < oneWeekAgo) {
+    // Use SSG for papers older than a week
+    return {
+      props: { paper, relatedPapers, slug },
+    };
+  } else {
+    // Use ISR for newer papers
+    return {
+      props: { paper, relatedPapers, slug },
+      revalidate: 3600 * 2, // Revalidate every 2 hours
+    };
+  }
 }
 
 const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
