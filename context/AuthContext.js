@@ -28,7 +28,8 @@ export const AuthProvider = ({ children }) => {
         if (profileData && !profileError) {
           setFirstTimeUser(profileData.first_login);
           setHasActiveSubscription(
-            profileData.stripe_subscription_status === "active"
+            profileData.stripe_subscription_status === "active" ||
+              profileData.stripe_subscription_status === "substack"
           );
         }
       } else {
