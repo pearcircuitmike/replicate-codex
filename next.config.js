@@ -556,20 +556,6 @@ const nextConfig = {
     // return the combined list of redirects
     return [...existingRedirects, ...newRedirects, ...rearchitectureRedirects];
   },
-
-  async headers() {
-    return [
-      {
-        source: "/papers/:platform/:paper*",
-        headers: [
-          {
-            key: "Cloudflare-CDN-Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=3600",
-          },
-        ],
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;

@@ -25,7 +25,7 @@ export async function getStaticProps({ params }) {
       initialSearch: searchValue,
       initialPage: currentPage,
     },
-    revalidate: 3600 * 48,
+    revalidate: false,
   };
 }
 
