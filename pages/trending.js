@@ -12,7 +12,6 @@ import {
   Button,
   Center,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
 import MetaTags from "../components/MetaTags";
 import {
   fetchTrendingModels,
@@ -21,6 +20,7 @@ import {
   fetchTrendingPapers,
 } from "../utils/fetchLandingPageData";
 import LandingPageTrending from "../components/LandingPageTrending";
+import AuthForm from "../components/AuthForm";
 
 const getStartOfWeek = (date) => {
   const startOfWeek = new Date(date);
@@ -52,42 +52,6 @@ export default function Trending({
     }
   };
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://substackcdn.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    const customScript = document.createElement("script");
-    customScript.innerHTML = `
-      window.CustomSubstackWidget = {
-        substackUrl: "aimodels.substack.com",
-        placeholder: "example@gmail.com",
-        buttonText: "Try it for free!",
-        theme: "custom",
-        colors: {
-          primary: "#319795",
-          input: "white",
-          email: "#1A202C",
-          text: "white",
-        },
-        redirect: "/thank-you?source=trending"
-      };
-    `;
-    document.body.appendChild(customScript);
-
-    const widgetScript = document.createElement("script");
-    widgetScript.src = "https://substackapi.com/widget.js";
-    widgetScript.async = true;
-    document.body.appendChild(widgetScript);
-
-    return () => {
-      document.body.removeChild(script);
-      document.body.removeChild(customScript);
-      document.body.removeChild(widgetScript);
-    };
-  }, []);
-
   return (
     <>
       <MetaTags
@@ -102,20 +66,13 @@ export default function Trending({
           <Heading as="h1" size="xl" mb={4}>
             Trending Research
           </Heading>
-          <Text fontSize="xl" mb={8}>
+          <Text fontSize="xl" mb={3}>
             Explore the most popular and trending AI research, as measured by
             stars, upvotes, likes, and more.
           </Text>
           <Container maxW="container.md">
-            <Box mt={8}>
-              <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-                Get summaries of the top AI research delivered straight to your
-                inbox:
-              </Text>
-            </Box>
-
             <Center my={"45px"}>
-              <div id="custom-substack-embed"></div>
+              <AuthForm />
             </Center>
           </Container>
 

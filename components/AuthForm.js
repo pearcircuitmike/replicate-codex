@@ -70,9 +70,10 @@ export default function AuthForm() {
         maxW="md"
         w="full"
         bg={useColorModeValue("white", "gray.800")}
-        boxShadow="2xl"
-        rounded="lg"
-        p={6}
+        boxShadow="base"
+        rounded="md"
+        px={5}
+        py={3}
         textAlign="center"
         position="relative"
       >
@@ -92,7 +93,10 @@ export default function AuthForm() {
           </FormControl>
           <Button
             type="submit"
-            colorScheme="blue"
+            bgGradient="linear(to-tr, #3182CE,#38A169)"
+            _hover={{ bgGradient: "linear(to-tr, #2B6CB0,#2F855A)" }}
+            _active={{ bgGradient: "linear(to-tr, #2C5282,#276749)" }}
+            color="white"
             isLoading={loading}
             loadingText="Sending magic link..."
             width="100%"
