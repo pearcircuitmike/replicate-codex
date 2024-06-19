@@ -14,6 +14,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import supabase from "../utils/supabaseClient";
@@ -22,6 +23,7 @@ export default function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleSignInWithGoogle = async () => {
     setLoading(true);
@@ -51,12 +53,13 @@ export default function AuthForm() {
     } else {
       console.log("Magic link sent to your email!");
       setEmailSent(true);
+      onOpen();
     }
     setLoading(false);
   };
 
   const closeModal = () => {
-    setEmailSent(false);
+    onClose();
   };
 
   return (
@@ -81,6 +84,11 @@ export default function AuthForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Type your email..."
             />
+            {emailSent && (
+              <Text fontWeight="bold" color="red.500" mt={2}>
+                Check your email for the magic link!
+              </Text>
+            )}
           </FormControl>
           <Button
             type="submit"
@@ -135,7 +143,7 @@ export default function AuthForm() {
         </VStack>
       </Box>
 
-      <Modal isOpen={emailSent} onClose={closeModal}>
+      <Modal isOpen={isOpen} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Check your inbox</ModalHeader>

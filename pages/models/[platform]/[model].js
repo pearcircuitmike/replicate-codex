@@ -26,6 +26,7 @@ import RelatedModels from "../../../components/RelatedModels";
 import fetchRelatedModels from "../../../utils/fetchRelatedModels";
 import { formatLargeNumber } from "@/utils/formatLargeNumber";
 import BookmarkButton from "../../../components/BookmarkButton";
+import AuthForm from "../../../components/AuthForm";
 
 export async function getStaticPaths({ numPages = 100 }) {
   const { data: models } = await supabase
@@ -70,42 +71,6 @@ export default function ModelPage({ model, relatedModels, slug }) {
     };
     fetchCreatorData();
   }, [model.creator, model.platform]);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://substackcdn.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    const customScript = document.createElement("script");
-    customScript.innerHTML = `
-      window.CustomSubstackWidget = {
-        substackUrl: "aimodels.substack.com",
-        placeholder: "example@gmail.com",
-        buttonText: "Try it for free!",
-        theme: "custom",
-        colors: {
-          primary: "#319795",
-          input: "white",
-          email: "#1A202C",
-          text: "white",
-        },
-        redirect: "/thank-you?source=models&slug=${encodeURIComponent(slug)}"
-      };
-    `;
-    document.body.appendChild(customScript);
-
-    const widgetScript = document.createElement("script");
-    widgetScript.src = "https://substackapi.com/widget.js";
-    widgetScript.async = true;
-    document.body.appendChild(widgetScript);
-
-    return () => {
-      document.body.removeChild(script);
-      document.body.removeChild(customScript);
-      document.body.removeChild(widgetScript);
-    };
-  }, [slug]);
 
   if (!model) {
     return <div>Loading...</div>; // or any other fallback UI
@@ -200,14 +165,13 @@ export default function ModelPage({ model, relatedModels, slug }) {
 
           <Container maxW="container.md">
             <Box mt={8}>
-              <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-                Get summaries of the top AI models delivered straight to your
-                inbox:
+              <Text fontWeight="bold" fontSize="lg" align="center">
+                Create account to get full access
               </Text>
             </Box>
 
-            <Center my={"45px"}>
-              <div id="custom-substack-embed"></div>
+            <Center my={"20px"}>
+              <AuthForm />
             </Center>
           </Container>
 
