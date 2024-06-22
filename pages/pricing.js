@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Box,
   Heading,
@@ -9,16 +10,21 @@ import {
   Link,
   Container,
   HStack,
+  keyframes,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { FaCheckCircle } from "react-icons/fa";
-import { useState } from "react";
 import Testimonials from "../components/Testimonials";
+
+const shine = keyframes`
+  0% { left: -400%; }
+  100% { left: 400%; }
+`;
 
 const PricingPage = () => {
   const { user } = useAuth();
-  const [isYearly, setIsYearly] = useState(false);
+  const [isYearly, setIsYearly] = useState(true);
   const price = isYearly ? 8 : 9;
   const billingPeriod = isYearly ? "mo" : "month";
 
@@ -36,71 +42,116 @@ const PricingPage = () => {
     <Box p={8} maxW="container.lg" mx="auto">
       <Box textAlign="center" mb={8}>
         <Heading my={"45px"} size="lg">
-          Finish setting up your account
+          Complete signup to access your dashboard
         </Heading>
         <HStack justify="center" mb={4}>
           <Button
-            onClick={() => setIsYearly(false)}
-            colorScheme={isYearly ? "gray" : "blue"}
-            variant={isYearly ? "outline" : "solid"}
-          >
-            Monthly
-          </Button>
-          <Button
             onClick={() => setIsYearly(true)}
-            colorScheme={isYearly ? "blue" : "gray"}
-            variant={isYearly ? "solid" : "outline"}
+            bg={isYearly ? "white" : "gray.100"}
+            color={isYearly ? "gray.800" : "gray.500"}
+            border="1px solid"
+            borderColor={isYearly ? "gray.200" : "transparent"}
+            _hover={{ bg: isYearly ? "white" : "gray.200" }}
+            borderRadius="md"
+            px={6}
+            py={2}
+            fontWeight={isYearly ? "semibold" : "normal"}
           >
             🔥 Yearly: Get 2 months free
+          </Button>
+          <Button
+            onClick={() => setIsYearly(false)}
+            bg={!isYearly ? "white" : "gray.100"}
+            color={!isYearly ? "gray.800" : "gray.500"}
+            border="1px solid"
+            borderColor={!isYearly ? "gray.200" : "transparent"}
+            _hover={{ bg: !isYearly ? "white" : "gray.200" }}
+            borderRadius="md"
+            px={6}
+            py={2}
+            fontWeight={!isYearly ? "semibold" : "normal"}
+          >
+            Monthly
           </Button>
         </HStack>
       </Box>
       <Box
-        p={6}
-        borderWidth={1}
-        borderRadius="lg"
-        boxShadow="md"
-        textAlign="center"
-        mb={8}
+        as={Link}
+        onClick={handleSubscription}
+        cursor="pointer"
+        _hover={{ textDecoration: "none" }}
+        display="block"
         maxW="md"
         mx="auto"
       >
-        <Heading as="h2" size="lg" mb={4}>
-          Pro Plan
-        </Heading>
-        <Text fontSize="2xl" fontWeight="bold" mb={2}>
-          ${price}/{billingPeriod}
-        </Text>
-        {isYearly && (
-          <Text fontSize="lg" mb={4}>
-            2 months free, billed yearly $97
+        <Box
+          p={6}
+          borderWidth={1}
+          borderRadius="lg"
+          boxShadow="md"
+          textAlign="center"
+          mb={8}
+          transition="all 0.2s"
+          _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
+        >
+          <Heading as="h2" size="lg" mb={4}>
+            Pro Plan
+          </Heading>
+          <Text fontSize="2xl" fontWeight="bold" mb={2}>
+            ${price}/{billingPeriod}
           </Text>
-        )}
-        <Button colorScheme="blue" size="lg" onClick={handleSubscription}>
-          Subscribe
-        </Button>
-        <List spacing={4} textAlign="left" mt={8}>
-          <ListItem>
-            <ListIcon as={FaCheckCircle} color="green.500" />
-            Bookmark resources for easy reference
-          </ListItem>
-          <ListItem>
-            <ListIcon as={FaCheckCircle} color="green.500" />
-            Unlimited paper summaries
-          </ListItem>
-          <ListItem>
-            <ListIcon as={FaCheckCircle} color="green.500" />
-            Unlimited model guides
-          </ListItem>
-          <ListItem>
-            <ListIcon as={FaCheckCircle} color="green.500" />
-            Join the Discord community with AI experts
-          </ListItem>
-          <ListItem>
-            <ListIcon as={FaCheckCircle} color="green.500" />
-            Weekly digests of top models and papers
-          </ListItem>
-        </List>
+          {isYearly && (
+            <Text fontSize="sm" mb={4} color="gray.500">
+              (2 months free, billed yearly $97)
+            </Text>
+          )}
+          <Button
+            position="relative"
+            colorScheme="blue"
+            size="lg"
+            overflow="hidden"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSubscription();
+            }}
+            _before={{
+              content: "''",
+              position: "absolute",
+              top: "-50%",
+              left: "-50%",
+              right: "-50%",
+              bottom: "-50%",
+              background:
+                "linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent)",
+              transform: "rotate(45deg)",
+              animation: `${shine} 6s infinite`,
+            }}
+          >
+            Subscribe
+          </Button>
+          <List spacing={4} textAlign="left" mt={8}>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Bookmark resources for easy reference
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Unlimited paper summaries
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Unlimited model guides
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Join the Discord community with AI experts
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Weekly digests of top models and papers
+            </ListItem>
+          </List>
+        </Box>
       </Box>
       <Box py={16} px={8}>
         <Container maxW="8xl">
