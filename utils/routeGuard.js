@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
 
-const protectedRoutes = ["/dashboard", "/welcome", "/account"];
+const protectedRoutes = ["/dashboard", "/welcome", "/account", "/trending"];
 
 const RouteGuard = ({ children }) => {
   const { user, loading, firstTimeUser, hasActiveSubscription } = useAuth();

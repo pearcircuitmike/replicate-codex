@@ -46,6 +46,9 @@ const Dashboard = () => {
             >
               <Button colorScheme="green">Give Feedback</Button>
             </Link>
+            <Link href="https://discord.gg/PKnYe6B4A6" isExternal>
+              <Button colorScheme="purple">Join Discord</Button>
+            </Link>
           </HStack>
           <VStack spacing={8} align="stretch">
             <Box>

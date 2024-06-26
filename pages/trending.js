@@ -6,11 +6,9 @@ import {
   Heading,
   Text,
   Container,
-  VStack,
   HStack,
   Spacer,
   Button,
-  Center,
 } from "@chakra-ui/react";
 import MetaTags from "../components/MetaTags";
 import {
@@ -20,7 +18,6 @@ import {
   fetchTrendingPapers,
 } from "../utils/fetchLandingPageData";
 import LandingPageTrending from "../components/LandingPageTrending";
-import AuthForm from "../components/AuthForm";
 
 const getStartOfWeek = (date) => {
   const startOfWeek = new Date(date);
@@ -70,11 +67,6 @@ export default function Trending({
             Explore the most popular and trending AI research, as measured by
             stars, upvotes, likes, and more.
           </Text>
-          <Container maxW="container.md">
-            <Center my={"45px"}>
-              <AuthForm />
-            </Center>
-          </Container>
 
           <Text mb={4}>
             Week: {new Date(startDate).toLocaleDateString()} -{" "}
