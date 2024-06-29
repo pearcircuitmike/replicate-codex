@@ -5,65 +5,57 @@ import {
   Heading,
   Text,
   Container,
-  Button,
-  VStack,
-  Link,
-  HStack,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Icon,
 } from "@chakra-ui/react";
+import { FaBookmark, FaChartLine } from "react-icons/fa";
 import UserBookmarks from "../components/UserBookmarks";
+import TrendingSection from "../components/TrendingSection";
 
 const Dashboard = () => {
-  const { user, loading, logout } = useAuth();
+  const { user } = useAuth();
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!user) {
+    return (
+      <Container maxW="7xl" py={8}>
+        <Text fontSize="xl" mb={8}>
+          Please log in to view your dashboard.
+        </Text>
+      </Container>
+    );
   }
 
   return (
     <Container maxW="7xl" py={8}>
-      {user ? (
-        <Box>
-          <Heading as="h1" size="2xl" mb={8}>
-            Dashboard
-          </Heading>
-          <Text fontSize="lg" mb={8}>
-            Here you can find your bookmarked papers and models. Click on a card
-            to view more details or remove the bookmark.
-          </Text>
-          <HStack spacing={4} mb={8}>
-            <Button colorScheme="blue" onClick={logout}>
-              Log Out
-            </Button>
-            <Link
-              href="mailto:mike@replicatecodex.com?subject=Help%20Request"
-              isExternal
-            >
-              <Button colorScheme="yellow">Get Support</Button>
-            </Link>
-            <Link
-              href="mailto:mike@replicatecodex.com?subject=Feedback"
-              isExternal
-            >
-              <Button colorScheme="green">Give Feedback</Button>
-            </Link>
-            <Link href="https://discord.gg/PKnYe6B4A6" isExternal>
-              <Button colorScheme="purple">Join Discord</Button>
-            </Link>
-          </HStack>
-          <VStack spacing={8} align="stretch">
-            <Box>
-              <UserBookmarks resourceType="paper" />
-            </Box>
-            <Box>
-              <UserBookmarks resourceType="model" />
-            </Box>
-          </VStack>
-        </Box>
-      ) : (
-        <Text fontSize="xl" mb={8}>
-          Please log in to view your dashboard.
-        </Text>
-      )}
+      <Heading as="h1" size="2xl" mb={8}>
+        Dashboard
+      </Heading>
+
+      <Tabs isFitted variant="enclosed" defaultIndex={0}>
+        <TabList mb="1em">
+          <Tab>
+            <Icon as={FaChartLine} mr={2} />
+            Trending
+          </Tab>
+          <Tab>
+            <Icon as={FaBookmark} mr={2} />
+            Bookmarks
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <TrendingSection />
+          </TabPanel>
+          <TabPanel>
+            <UserBookmarks resourceType="paper" />
+            <UserBookmarks resourceType="model" />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Container>
   );
 };

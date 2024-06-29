@@ -60,9 +60,7 @@ const Navbar = () => {
               <Link href="/authors" aria-label="Science" m={5} w="100%">
                 🔬 Researchers
               </Link>
-              <Link href="/trending" aria-label="Trending" m={5} w="100%">
-                🔥 Trending
-              </Link>
+
               <Link href="/tools" aria-label="Tools" m={5} w="100%">
                 🛠️ Tools
               </Link>
@@ -201,15 +199,7 @@ const Navbar = () => {
                   🔬 Researchers
                 </span>
               </Link>
-              <Link
-                href="/trending"
-                aria-label="Trending"
-                m={"10px"}
-                w="100%"
-                legacyBehavior
-              >
-                <span onClick={() => changeDisplay("none")}>🔥 Trending</span>
-              </Link>
+
               <Link
                 href="/tools"
                 aria-label="Tools"
