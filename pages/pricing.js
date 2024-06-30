@@ -24,7 +24,7 @@ const shine = keyframes`
 
 const PricingPage = () => {
   const { user } = useAuth();
-  const [isYearly, setIsYearly] = useState(true);
+  const [isYearly, setIsYearly] = useState(false);
   const price = isYearly ? 8 : 9;
   const billingPeriod = isYearly ? "mo" : "month";
 
@@ -46,20 +46,6 @@ const PricingPage = () => {
         </Heading>
         <HStack justify="center" mb={4}>
           <Button
-            onClick={() => setIsYearly(true)}
-            bg={isYearly ? "white" : "gray.100"}
-            color={isYearly ? "gray.800" : "gray.500"}
-            border="1px solid"
-            borderColor={isYearly ? "gray.200" : "transparent"}
-            _hover={{ bg: isYearly ? "white" : "gray.200" }}
-            borderRadius="md"
-            px={6}
-            py={2}
-            fontWeight={isYearly ? "semibold" : "normal"}
-          >
-            🔥 Yearly: Get 2 months free
-          </Button>
-          <Button
             onClick={() => setIsYearly(false)}
             bg={!isYearly ? "white" : "gray.100"}
             color={!isYearly ? "gray.800" : "gray.500"}
@@ -71,10 +57,25 @@ const PricingPage = () => {
             py={2}
             fontWeight={!isYearly ? "semibold" : "normal"}
           >
-            Monthly
+            🔥 Monthly (Most Popular)
+          </Button>
+          <Button
+            onClick={() => setIsYearly(true)}
+            bg={isYearly ? "white" : "gray.100"}
+            color={isYearly ? "gray.800" : "gray.500"}
+            border="1px solid"
+            borderColor={isYearly ? "gray.200" : "transparent"}
+            _hover={{ bg: isYearly ? "white" : "gray.200" }}
+            borderRadius="md"
+            px={6}
+            py={2}
+            fontWeight={isYearly ? "semibold" : "normal"}
+          >
+            Yearly
           </Button>
         </HStack>
       </Box>
+      {/* Rest of the component remains unchanged */}
       <Box
         as={Link}
         onClick={handleSubscription}
