@@ -2,7 +2,7 @@
 
 import Stripe from "stripe";
 import { stripe } from "@/pages/api/utils/stripe/config";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { createOrRetrieveCustomer } from "@/pages/api/utils/supabase/admin";
 import {
   getURL,

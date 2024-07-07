@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { toTitleCase } from "@/pages/api/utils/toTitleCase";
+import { toTitleCase } from "@/lib/toTitleCase";
 import PreviewImage from "./PreviewImage";
 import EmojiWithGradient from "./EmojiWithGradient";
 import removeMd from "remove-markdown";

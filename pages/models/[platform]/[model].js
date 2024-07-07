@@ -18,7 +18,7 @@ import { fetchModelDataBySlug } from "../../api/utils/modelsData";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
-import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
+import { kebabToTitleCase } from "@/lib/kebabToTitleCase";
 import PreviewImage from "@/components/PreviewImage";
 import supabase from "@/pages/api/utils/supabaseClient";
 import EmojiWithGradient from "@/components/EmojiWithGradient";

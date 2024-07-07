@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Heading, Text, Avatar, Button, Flex } from "@chakra-ui/react";
 import Link from "next/link";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
-import { getMedalEmoji } from "@/pages/api/utils/getMedalEmoji.js";
+import { getMedalEmoji } from "@/lib/getMedalEmoji.js";
 
 const CreatorCard = ({ creator }) => {
   if (!creator) {

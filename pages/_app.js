@@ -13,7 +13,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { AuthProvider, useAuth } from "../context/AuthContext";
-import RouteGuard from "@/components/routeGuard";
+import RouteGuard from "@/components/RouteGuard";
 import { useEffect } from "react";
 import AuthForm from "@/components/AuthForm";
 

@@ -10,7 +10,7 @@ import PaperMatchmaker from "../../components/PaperMatchmaker";
 import SearchBar from "../../components/SearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
-import { getDateRange } from "../api/utils/dateUtils";
+import { getDateRange } from "../../lib/dateUtils";
 import categoryDescriptions from "../../data/categoryDescriptions.json";
 
 export async function getStaticProps({ params }) {

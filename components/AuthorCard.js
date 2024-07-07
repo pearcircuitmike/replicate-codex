@@ -2,7 +2,7 @@
 import React from "react";
 import { Box, Heading, Text, Button, Flex, Image } from "@chakra-ui/react";
 import Link from "next/link";
-import { getMedalEmoji } from "../pages/api/utils/getMedalEmoji";
+import { getMedalEmoji } from "../lib/getMedalEmoji";
 
 const getInitials = (name) => {
   const names = name.split(" ");
