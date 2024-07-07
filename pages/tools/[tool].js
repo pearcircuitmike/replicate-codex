@@ -17,7 +17,7 @@ import MetaTags from "../../components/MetaTags";
 import {
   fetchToolDataBySlug,
   fetchToolsPaginated,
-} from "../../utils/fetchTools";
+} from "../api/utils/fetchTools";
 
 export async function getStaticPaths() {
   const { data: tools } = await fetchToolsPaginated({

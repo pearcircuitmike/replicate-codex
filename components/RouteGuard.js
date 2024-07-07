@@ -10,12 +10,10 @@ const RouteGuard = ({ children }) => {
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
-        if (protectedRoutes.includes(router.pathname)) {
-          console.log("Unauthorized access detected, redirecting to /login.");
-          router.push("/login");
-        }
-      } else {
+      if (!user && protectedRoutes.includes(router.pathname)) {
+        console.log("Unauthorized access detected, redirecting to /login.");
+        router.push("/login");
+      } else if (user) {
         if (
           protectedRoutes.includes(router.pathname) &&
           !hasActiveSubscription
@@ -24,7 +22,11 @@ const RouteGuard = ({ children }) => {
             "User does not have an active subscription, redirecting to /pricing."
           );
           router.push("/pricing");
-        } else if (firstTimeUser && hasActiveSubscription) {
+        } else if (
+          firstTimeUser &&
+          hasActiveSubscription &&
+          router.pathname !== "/welcome"
+        ) {
           console.log(
             "First time user with active subscription, redirecting to /welcome."
           );
@@ -38,6 +40,10 @@ const RouteGuard = ({ children }) => {
       }
     }
   }, [user, firstTimeUser, hasActiveSubscription, loading, router.pathname]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or your custom loading component
+  }
 
   return <>{children}</>;
 };

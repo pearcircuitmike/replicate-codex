@@ -5,12 +5,12 @@ import { Container, Grid, Box, Text } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
-import { fetchPapersPaginated } from "../../utils/fetchPapers";
+import { fetchPapersPaginated } from "../api/utils/fetchPapers";
 import PaperMatchmaker from "../../components/PaperMatchmaker";
 import SearchBar from "../../components/SearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
-import { getDateRange } from "../../utils/dateUtils";
+import { getDateRange } from "../api/utils/dateUtils";
 import categoryDescriptions from "../../data/categoryDescriptions.json";
 
 export async function getStaticProps({ params }) {

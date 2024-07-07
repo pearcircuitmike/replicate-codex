@@ -14,7 +14,7 @@ import {
 import MetaTags from "../../components/MetaTags";
 import CreatorCard from "../../components/CreatorCard";
 import Pagination from "../../components/Pagination";
-import { fetchCreators } from "../../utils/fetchCreatorsPaginated";
+import { fetchCreators } from "../api/utils/fetchCreatorsPaginated";
 
 const ITEMS_PER_PAGE = 12;
 

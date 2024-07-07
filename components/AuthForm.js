@@ -17,7 +17,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
-import supabase from "../utils/supabaseClient";
+import supabase from "../pages/api/utils/supabaseClient";
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);

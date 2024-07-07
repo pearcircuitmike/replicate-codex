@@ -23,7 +23,7 @@ import {
   fetchTrendingPapers,
   fetchTrendingCreators,
   fetchTrendingAuthors,
-} from "../utils/fetchLandingPageData";
+} from "./api/utils/fetchLandingPageData.js";
 
 const getStartOfWeek = (date) => {
   const startOfWeek = new Date(date);

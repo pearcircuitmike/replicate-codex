@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Box, Heading, Text, Grid, GridItem, Center } from "@chakra-ui/react";
 import MetaTags from "@/components/MetaTags";
-import { fetchToolsPaginated } from "../../utils/fetchTools";
+import { fetchToolsPaginated } from "../api/utils/fetchTools";
 import SearchBar from "../../components/SearchBar";
 import Pagination from "../../components/Pagination";
 import ToolCard from "../../components/ToolCard";

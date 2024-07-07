@@ -10,7 +10,7 @@ import {
   Center,
 } from "@chakra-ui/react";
 
-import supabase from "../utils/supabaseClient";
+import supabase from "../pages/api/utils/supabaseClient";
 import { Configuration, OpenAIApi } from "openai";
 import { useRouter } from "next/router";
 import ModelCard from "@/components/ModelCard";

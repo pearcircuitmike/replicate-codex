@@ -10,7 +10,7 @@ import {
   Center,
 } from "@chakra-ui/react";
 import { Configuration, OpenAIApi } from "openai";
-import { fetchPapersWithEmbeddings } from "../utils/fetchPapersWithEmbeddings";
+import { fetchPapersWithEmbeddings } from "../pages/api/utils/fetchPapersWithEmbeddings";
 import PaperCard from "./PaperCard";
 
 const openAi = new OpenAIApi(

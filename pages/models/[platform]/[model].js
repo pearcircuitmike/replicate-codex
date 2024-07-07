@@ -14,17 +14,17 @@ import {
   Center,
 } from "@chakra-ui/react";
 import MetaTags from "../../../components/MetaTags";
-import { fetchModelDataBySlug } from "../../../utils/modelsData";
-import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
+import { fetchModelDataBySlug } from "../../api/utils/modelsData";
+import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
-import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
+import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 import PreviewImage from "@/components/PreviewImage";
-import supabase from "@/utils/supabaseClient";
+import supabase from "@/pages/api/utils/supabaseClient";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
 import RelatedModels from "../../../components/RelatedModels";
-import fetchRelatedModels from "../../../utils/fetchRelatedModels";
-import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import fetchRelatedModels from "../../api/utils/fetchRelatedModels";
+import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 

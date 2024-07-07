@@ -5,11 +5,11 @@ import { Container, Grid, Box, Text, Skeleton, Center } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import ModelCard from "../../components/ModelCard";
 import Pagination from "../../components/Pagination";
-import { fetchModelsPaginated } from "../../utils/fetchModelsPaginated";
+import { fetchModelsPaginated } from "../api/utils/fetchModelsPaginated";
 import SearchBar from "../../components/SearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
-import { getDateRange } from "../../utils/dateUtils";
+import { getDateRange } from "../api/utils/dateUtils";
 import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json";
 
 export async function getStaticProps({ params }) {

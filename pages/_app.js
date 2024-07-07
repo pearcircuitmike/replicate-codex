@@ -13,35 +13,36 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { AuthProvider, useAuth } from "../context/AuthContext";
-import RouteGuard from "../utils/routeGuard";
+import RouteGuard from "@/components/routeGuard";
 import { useEffect } from "react";
-import AuthForm from "../components/AuthForm";
+import AuthForm from "@/components/AuthForm";
 
 export default function App({ Component, pageProps }) {
   return (
-    <>
-      <ChakraProvider>
-        <AuthProvider>
-          <AppContent Component={Component} pageProps={pageProps} />
-        </AuthProvider>
-      </ChakraProvider>
-    </>
+    <ChakraProvider>
+      <AuthProvider>
+        <AppContent Component={Component} pageProps={pageProps} />
+      </AuthProvider>
+    </ChakraProvider>
   );
 }
 
 function AppContent({ Component, pageProps }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       const timer = setTimeout(() => {
         onOpen();
       }, 15000); // Open the modal after 15 seconds if the user is not authenticated
-
       return () => clearTimeout(timer);
     }
-  }, [user, onOpen]);
+  }, [user, loading, onOpen]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or your custom loading component
+  }
 
   return (
     <RouteGuard>
@@ -56,9 +57,7 @@ function AppContent({ Component, pageProps }) {
               window.dataLayer = window.dataLayer || [];
               function gtag(){window.dataLayer.push(arguments);}
               gtag('js', new Date());
-
-              gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
-            `}
+              gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');`}
           </Script>
           <Script id="microsoft-clarity">
             {`

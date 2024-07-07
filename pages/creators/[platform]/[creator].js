@@ -1,15 +1,15 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
+import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 import MetaTags from "../../../components/MetaTags";
 import ModelCard from "../../../components/ModelCard";
-import { formatLargeNumber } from "@/utils/formatLargeNumber.js";
-import { toTitleCase } from "@/utils/toTitleCase.js";
-import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
-import { fetchModelsPaginated } from "../../../utils/fetchModelsPaginated";
-import { fetchCreators } from "../../../utils/fetchCreatorsPaginated";
-import { fetchModelsByCreator } from "@/utils/fetchModelsByCreator";
+import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber.js";
+import { toTitleCase } from "@/pages/api/utils/toTitleCase.js";
+import { getMedalEmoji } from "@/pages/api/utils/getMedalEmoji.js";
+import { fetchModelsPaginated } from "../../api/utils/fetchModelsPaginated";
+import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
+import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";
 
 export async function getStaticPaths() {
   const creatorsData = await fetchCreators({

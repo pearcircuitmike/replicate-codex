@@ -9,7 +9,7 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import supabase from "../utils/supabaseClient";
+import supabase from "./api/utils/supabaseClient";
 
 export default function ConfirmEmail() {
   const router = useRouter();

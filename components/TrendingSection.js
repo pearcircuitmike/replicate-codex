@@ -5,7 +5,7 @@ import {
   fetchTrendingModels,
   fetchTrendingCreators,
   fetchTrendingAuthors,
-} from "../utils/fetchLandingPageData";
+} from "../pages/api/utils/fetchLandingPageData";
 import LandingPageTrending from "./LandingPageTrending";
 
 const getStartOfWeek = (date) => {
@@ -65,12 +65,9 @@ const TrendingSection = () => {
 
   return (
     <Box>
-      <Heading as="h2" size="xl" mb={4}>
-        Trending Research
-      </Heading>
       <Text fontSize="xl" mb={3}>
-        Explore the most popular and trending AI research, as measured by stars,
-        upvotes, likes, and more.
+        Your weekly digest of the most popular and trending AI research, as
+        measured by stars, upvotes, likes, and more.
       </Text>
 
       <Text mb={4}>

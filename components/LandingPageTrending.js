@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
-import { formatLargeNumber } from "@/utils/formatLargeNumber";
+import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const LandingPageTrending = ({
   trendingModels,

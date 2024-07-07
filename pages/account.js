@@ -11,7 +11,7 @@ import {
   FormControl,
   FormLabel,
 } from "@chakra-ui/react";
-import supabase from "../utils/supabaseClient";
+import supabase from "./api/utils/supabaseClient";
 
 const Account = () => {
   const { user, logout } = useAuth();

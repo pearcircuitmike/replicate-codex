@@ -14,7 +14,7 @@ import {
 import MetaTags from "../../components/MetaTags";
 import AuthorCard from "../../components/AuthorCard";
 import Pagination from "../../components/Pagination";
-import { fetchUniqueAuthors } from "../../utils/fetchAuthors";
+import { fetchUniqueAuthors } from "../api/utils/fetchAuthors";
 
 const ITEMS_PER_PAGE = 12;
 

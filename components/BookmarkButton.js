@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Button, Icon, useToast } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
-import supabase from "../utils/supabaseClient";
+import supabase from "../pages/api/utils/supabaseClient";
 import { useRouter } from "next/router";
 
 const BookmarkButton = ({ resourceType, resourceId, onBookmarkChange }) => {

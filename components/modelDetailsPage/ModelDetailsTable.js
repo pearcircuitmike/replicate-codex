@@ -16,8 +16,8 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import TruncateWithReadMore from "@/components/TruncateWithReadMore";
 
-import { getMedalEmoji } from "@/utils/getMedalEmoji";
-import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
+import { getMedalEmoji } from "@/pages/api/utils/getMedalEmoji";
+import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 
 const ModelDetailsTable = ({ model, creator }) => {
   return (

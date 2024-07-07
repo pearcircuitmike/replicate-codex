@@ -1,14 +1,14 @@
 "use server";
 
 import Stripe from "stripe";
-import { stripe } from "@/utils/stripe/config";
+import { stripe } from "@/pages/api/utils/stripe/config";
 import { createClient } from "@/utils/supabase/server";
-import { createOrRetrieveCustomer } from "@/utils/supabase/admin";
+import { createOrRetrieveCustomer } from "@/pages/api/utils/supabase/admin";
 import {
   getURL,
   getErrorRedirect,
   calculateTrialEndUnixTimestamp,
-} from "@/utils/helpers";
+} from "@/pages/api/utils/helpers";
 
 export async function checkoutWithStripe(price, redirectPath = "/account") {
   try {

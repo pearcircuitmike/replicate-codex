@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Heading, SimpleGrid, Text } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
-import supabase from "../utils/supabaseClient";
+import supabase from "../pages/api/utils/supabaseClient";
 import PaperCard from "./PaperCard";
 import ModelCard from "./ModelCard";
 

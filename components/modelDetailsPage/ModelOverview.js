@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import customTheme from "../../components/MarkdownTheme";
 import PreviewImage from "../PreviewImage";
-import { kebabToTitleCase } from "@/utils/kebabToTitleCase";
+import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 import EmojiWithGradient from "./../EmojiWithGradient";
 
 const ModelOverview = ({ model }) => {

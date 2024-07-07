@@ -16,7 +16,7 @@ import {
   fetchTrendingCreators,
   fetchTrendingAuthors,
   fetchTrendingPapers,
-} from "../utils/fetchLandingPageData";
+} from "./api/utils/fetchLandingPageData";
 import LandingPageTrending from "../components/LandingPageTrending";
 
 const getStartOfWeek = (date) => {

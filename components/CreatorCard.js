@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Heading, Text, Avatar, Button, Flex } from "@chakra-ui/react";
 import Link from "next/link";
-import { formatLargeNumber } from "@/utils/formatLargeNumber";
-import { getMedalEmoji } from "@/utils/getMedalEmoji.js";
+import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
+import { getMedalEmoji } from "@/pages/api/utils/getMedalEmoji.js";
 
 const CreatorCard = ({ creator }) => {
   if (!creator) {

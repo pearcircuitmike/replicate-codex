@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import MetaTags from "../../../components/MetaTags";
 import PaperCard from "../../../components/PaperCard";
 import Pagination from "../../../components/Pagination";
-import { fetchPapersByAuthor } from "../../../utils/fetchAuthors";
+import { fetchPapersByAuthor } from "../../api/utils/fetchAuthors";
 
 const ITEMS_PER_PAGE = 10;
 

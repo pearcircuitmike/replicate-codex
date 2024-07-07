@@ -1,5 +1,4 @@
-// PaperDetailsPage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Box,
@@ -7,12 +6,20 @@ import {
   Heading,
   Link,
   Image,
-  Tag,
   Icon,
   Button,
   Center,
+  Stack,
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody,
+  useToast,
 } from "@chakra-ui/react";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import MetaTags from "../../../components/MetaTags";
@@ -20,8 +27,8 @@ import {
   fetchPaperDataBySlug,
   fetchPapersPaginated,
   fetchAdjacentPapers,
-} from "../../../utils/fetchPapers";
-import fetchRelatedPapers from "../../../utils/fetchRelatedPapers";
+} from "../../api/utils/fetchPapers";
+import fetchRelatedPapers from "../../api/utils/fetchRelatedPapers";
 import RelatedPapers from "../../../components/RelatedPapers";
 import EmojiWithGradient from "../../../components/EmojiWithGradient";
 import SocialScore from "../../../components/SocialScore";
@@ -29,12 +36,15 @@ import PaperNavigationButtons from "../../../components/PaperNavigationButtons";
 import customTheme from "../../../components/MarkdownTheme";
 import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
+import PaperNotes from "../../../components/notes/PaperNotes";
+import NoteButton from "../../../components/NoteButton";
+import { useAuth } from "../../../context/AuthContext";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
   const paths = [];
   const pageSize = 1000;
-  const limit = 100; // was 2000, cutting to 100
+  const limit = 100;
 
   for (const platform of platforms) {
     let currentPage = 1;
@@ -81,24 +91,17 @@ export async function getStaticProps({ params }) {
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  console.log(`Paper: ${paper.title}`);
-  console.log(`Last Updated: ${paper.lastUpdated}`);
-  console.log(`One Week Ago: ${oneWeekAgo}`);
-
   const lastUpdatedDate = new Date(paper.lastUpdated);
-  console.log(`Last Updated Date: ${lastUpdatedDate}`);
 
   if (lastUpdatedDate <= oneWeekAgo) {
-    console.log("Using SSG for this paper");
     return {
       props: { paper, relatedPapers, slug },
-      revalidate: false, // Explicitly set revalidate to false for SSG
+      revalidate: false,
     };
   } else {
-    console.log("Using ISR for this paper");
     return {
       props: { paper, relatedPapers, slug },
-      revalidate: 3600 * 2, // Revalidate every 2 hours
+      revalidate: 3600 * 2,
     };
   }
 }
@@ -108,15 +111,23 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     prevSlug: null,
     nextSlug: null,
   });
+  const { user, hasActiveSubscription } = useAuth();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   useEffect(() => {
     const fetchAdjacent = async () => {
       if (paper?.slug) {
-        const { prevSlug, nextSlug } = await fetchAdjacentPapers(
-          paper.slug,
-          paper.platform
-        );
-        setAdjacentPapers({ prevSlug, nextSlug });
+        try {
+          const { prevSlug, nextSlug } = await fetchAdjacentPapers(
+            paper.slug,
+            paper.platform
+          );
+          setAdjacentPapers({ prevSlug, nextSlug });
+        } catch (error) {
+          console.error("Error fetching adjacent papers:", error);
+          setAdjacentPapers({ prevSlug: null, nextSlug: null });
+        }
       }
     };
     fetchAdjacent();
@@ -128,13 +139,16 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
   const formatLinks = (text) => {
     const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-
     return text.replace(urlRegex, (match, linkText, linkUrl) => {
       return `[${linkText}](${linkUrl})`;
     });
   };
 
   const formattedAbstract = formatLinks(paper.abstract);
+
+  const handleAddNoteClick = () => {
+    onOpen();
+  };
 
   return (
     <>
@@ -146,13 +160,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         description={paper.abstract}
       />
       <Container maxW="container.md" py="12">
-        <Box mb="4">
-          <PaperNavigationButtons
-            prevSlug={adjacentPapers.prevSlug}
-            nextSlug={adjacentPapers.nextSlug}
-            platform={paper.platform}
-          />
-        </Box>
         <Box>
           <Heading as="h1" mb={2}>
             <Link href={`https://arxiv.org/abs/${paper.arxivId}`} isExternal>
@@ -168,7 +175,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           <Text fontSize="lg" mb={4}>
             {paper.arxivId}
           </Text>
-          <SocialScore paper={paper} />
           <Box fontSize="md" mb={4}>
             <Text as="span">
               Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
@@ -203,23 +209,36 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <Text as="span">Unknown authors</Text>
             )}
           </Box>
-          <BookmarkButton resourceType="paper" resourceId={paper.id} />
 
-          <Box my={4}>
-            {paper.arxivCategories &&
-              paper.arxivCategories.map((category, index) => (
-                <Link
-                  key={index}
-                  href={`/papers?selectedCategories=${encodeURIComponent(
-                    JSON.stringify([category])
-                  )}`}
-                >
-                  <Tag size="md" colorScheme="blue" mr="10px">
-                    {category}
-                  </Tag>
-                </Link>
-              ))}
-          </Box>
+          <Stack
+            direction={["column", "column", "row"]}
+            spacing={4}
+            align="center"
+            my={8}
+          >
+            <SocialScore paper={paper} />
+            <Stack
+              direction={["column", "row"]}
+              spacing={4}
+              align="center"
+              w={["100%", "auto"]}
+            >
+              <BookmarkButton
+                resourceType="paper"
+                resourceId={paper.id}
+                w={["100%", "auto"]}
+                leftIcon={<FaBookmark />}
+              >
+                Add to Bookmarks
+              </BookmarkButton>
+              <NoteButton
+                paperId={paper.id}
+                onClick={handleAddNoteClick}
+                w={["100%", "auto"]}
+              />
+            </Stack>
+          </Stack>
+
           {paper.thumbnail ? (
             <Image
               src={paper.thumbnail}
@@ -240,18 +259,19 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               {formattedAbstract}
             </ReactMarkdown>
           </Box>
-          <Container maxW="container.md">
-            <Box mt={8}>
-              <Text fontWeight="bold" fontSize="lg" align="center">
-                Create account to get full access
-              </Text>
-            </Box>
+          {!user && (
+            <Container maxW="container.md">
+              <Box mt={8}>
+                <Text fontWeight="bold" fontSize="lg" align="center">
+                  Create account to get full access
+                </Text>
+              </Box>
 
-            <Center my={"20px"}>
-              <AuthForm />
-            </Center>
-          </Container>
-
+              <Center my={"20px"}>
+                <AuthForm />
+              </Center>
+            </Container>
+          )}
           <div>
             <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
               {paper.generatedSummary}
@@ -276,25 +296,29 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
       <Container maxW="container.xl" py="12">
         <Box mt={8} textAlign="center">
-          <Button colorScheme="green" borderRadius="full">
-            <a
-              href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
-              className="twitter-follow-button"
-              data-show-count="false"
-            >
-              Follow @aimodelsfyi on 𝕏 for trending papers →
-            </a>
-
-            <script
-              async
-              src="https://platform.twitter.com/widgets.js"
-              charSet="utf-8"
-            ></script>
+          <Button
+            as="a"
+            href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
+            colorScheme="green"
+            borderRadius="full"
+          >
+            Follow @aimodelsfyi on 𝕏 for trending papers →
           </Button>
         </Box>
 
         <RelatedPapers relatedPapers={relatedPapers} />
       </Container>
+
+      <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Notes</DrawerHeader>
+          <DrawerBody>
+            <PaperNotes paperId={paper.id} />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };

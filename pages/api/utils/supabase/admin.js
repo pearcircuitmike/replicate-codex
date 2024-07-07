@@ -1,5 +1,5 @@
-import { toDateTime } from "@/utils/helpers";
-import { stripe } from "@/utils/stripe/config";
+import { toDateTime } from "@/pages/api/utils/helpers";
+import { stripe } from "@/pages/api/utils/stripe/config";
 import { createClient } from "@supabase/supabase-js";
 
 // Change to control trial period length, ref https://github.com/vercel/nextjs-subscription-payments/issues/321
