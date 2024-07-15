@@ -165,12 +165,12 @@ const PapersIndexPage = ({
         socialPreviewTitle="AI/ML Research Papers"
         socialPreviewSubtitle="The all-in-one place for AI research"
       />
-      <Container maxW="container.xl" py="12">
+      <Container maxW="container.xl" py="2">
         <Box mb={6}>
           <Text fontSize="3xl" fontWeight="bold">
             AI Papers
           </Text>
-          <Text fontSize="lg">
+          <Text fontSize="lg" color="gray.500">
             Browse and discover the latest research papers on artificial
             intelligence, machine learning, and related fields.
           </Text>

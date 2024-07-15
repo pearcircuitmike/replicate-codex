@@ -1,102 +1,20 @@
-// components/BookmarkButton.js
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { Button, Icon, useToast } from "@chakra-ui/react";
+import React from "react";
+import { Button, Icon } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
-import supabase from "../pages/api/utils/supabaseClient";
-import { useRouter } from "next/router";
 
-const BookmarkButton = ({ resourceType, resourceId, onBookmarkChange }) => {
-  const { user } = useAuth();
-  const [isBookmark, setIsBookmark] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const toast = useToast();
-  const router = useRouter();
-
-  useEffect(() => {
-    const checkBookmark = async () => {
-      setIsLoading(true);
-      if (user) {
-        const { data, error } = await supabase
-          .from("bookmarks")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("bookmarked_resource", resourceId)
-          .eq("resource_type", resourceType);
-
-        if (error) {
-          console.error("Error checking Bookmark status:", error);
-        } else {
-          setIsBookmark(data.length > 0);
-        }
-      }
-      setIsLoading(false);
-    };
-
-    checkBookmark();
-  }, [user, resourceType, resourceId]);
-
-  const toggleBookmark = async () => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-
-      if (isBookmark) {
-        const { error } = await supabase
-          .from("bookmarks")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("bookmarked_resource", resourceId)
-          .eq("resource_type", resourceType);
-
-        if (error) {
-          console.error("Error removing bookmark:", error);
-          return;
-        }
-      } else {
-        const { error } = await supabase.from("bookmarks").insert({
-          user_id: user.id,
-          bookmarked_resource: resourceId,
-          resource_type: resourceType,
-        });
-
-        if (error) {
-          console.error("Error adding Bookmark:", error);
-          return;
-        }
-      }
-
-      setIsBookmark(!isBookmark);
-      toast({
-        title: isBookmark ? "Removed from Bookmarks" : "Added to Bookmarks",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-      onBookmarkChange && onBookmarkChange();
-    } catch (error) {
-      console.error("Error toggling Bookmark:", error);
-    }
-    setIsLoading(false);
-  };
-
+const BookmarkButton = ({ isBookmarked, onToggle }) => {
   return (
     <Button
       variant="outline"
-      onClick={toggleBookmark}
-      isLoading={isLoading}
-      loadingText="Updating..."
+      onClick={onToggle}
+      leftIcon={
+        <Icon
+          as={FaBookmark}
+          color={isBookmarked ? "yellow.500" : "gray.500"}
+        />
+      }
     >
-      <Icon
-        as={FaBookmark}
-        color={isBookmark ? "yellow.500" : "gray.500"}
-        mr={2}
-      />
-      {isBookmark ? "Bookmarked" : "Add to bookmarks"}
+      {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
     </Button>
   );
 };

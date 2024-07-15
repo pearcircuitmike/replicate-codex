@@ -15,6 +15,7 @@ import {
   MenuList,
   MenuItem,
   Divider,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { useState } from "react";
@@ -23,13 +24,14 @@ import { useAuth } from "../context/AuthContext";
 const Navbar = () => {
   const [display, changeDisplay] = useState("none");
   const { user, logout } = useAuth();
+  const [isMobile] = useMediaQuery("(max-width: 48em)");
 
   return (
     <nav>
-      <Flex p={5} justify="space-between" align="center">
+      <Flex p={isMobile ? 2 : 5} justify="space-between" align="center">
         <Box>
           <Flex top="1rem" right="1rem" align="center">
-            <Heading fontSize="2xl">
+            <Heading fontSize={isMobile ? "xl" : "2xl"}>
               <Link href="/" aria-label="Home" legacyBehavior>
                 <div>🤖 AIModels.fyi</div>
               </Link>
@@ -39,35 +41,51 @@ const Navbar = () => {
 
         <Flex top="1rem" right="1rem" align="center">
           <Flex display={["none", "none", "flex", "flex"]}>
-            <HStack spacing={10}>
+            <HStack spacing={isMobile ? 4 : 10}>
               <Link
-                href="https://www.passionfroot.me/replicate-codex"
-                aria-label="Advertise"
-                m={5}
+                href="/creators"
+                aria-label="Creators"
+                m={isMobile ? 2 : 5}
                 w="100%"
               >
-                📣 Advertise
-              </Link>
-              <Link href="/creators" aria-label="Creators" m={5} w="100%">
                 👨‍🎨 Creators
               </Link>
-              <Link href="/models" aria-label="Models" m={5} w="100%">
+              <Link
+                href="/models"
+                aria-label="Models"
+                m={isMobile ? 2 : 5}
+                w="100%"
+              >
                 🤖 Models
               </Link>
-              <Link href="/papers" aria-label="Papers" m={5} w="100%">
+              <Link
+                href="/papers"
+                aria-label="Papers"
+                m={isMobile ? 2 : 5}
+                w="100%"
+              >
                 📄 Papers
               </Link>
-              <Link href="/authors" aria-label="Science" m={5} w="100%">
+              <Link
+                href="/authors"
+                aria-label="Science"
+                m={isMobile ? 2 : 5}
+                w="100%"
+              >
                 🔬 Researchers
               </Link>
-
-              <Link href="/tools" aria-label="Tools" m={5} w="100%">
+              <Link
+                href="/tools"
+                aria-label="Tools"
+                m={isMobile ? 2 : 5}
+                w="100%"
+              >
                 🛠️ Tools
               </Link>
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
-                m={5}
+                m={isMobile ? 2 : 5}
                 w="100%"
               >
                 📝 Notes
@@ -104,12 +122,12 @@ const Navbar = () => {
           </Flex>
           <IconButton
             aria-label="Open Menu"
-            size="lg"
-            mr={2}
+            size={isMobile ? "md" : "lg"}
+            mr={isMobile ? 1 : 2}
             icon={<HamburgerIcon />}
             onClick={() => changeDisplay("flex")}
             display={["flex", "flex", "none", "none"]}
-          ></IconButton>
+          />
         </Flex>
 
         <Flex
@@ -124,10 +142,15 @@ const Navbar = () => {
           overflowY="auto"
           flexDir="column"
         >
-          <HStack m={5}>
+          <HStack m={isMobile ? 2 : 5}>
             <Flex top="1rem" align="center">
-              <Heading fontSize="2xl">
-                <Link href="/" aria-label="Home" my={5} legacyBehavior>
+              <Heading fontSize={isMobile ? "xl" : "2xl"}>
+                <Link
+                  href="/"
+                  aria-label="Home"
+                  my={isMobile ? 2 : 5}
+                  legacyBehavior
+                >
                   <span onClick={() => changeDisplay("none")}>
                     🤖 AIModels.fyi
                   </span>
@@ -137,34 +160,40 @@ const Navbar = () => {
             <Spacer />
             <Flex>
               <IconButton
-                mr={2}
+                mr={isMobile ? 1 : 2}
                 aria-label="Close Menu"
-                size="lg"
+                size={isMobile ? "md" : "lg"}
                 icon={<CloseIcon />}
                 onClick={() => changeDisplay("none")}
-              ></IconButton>
+              />
             </Flex>
           </HStack>
           {user && (
             <>
-              <Flex align="center" flexDir="column" mb={4}>
+              <Flex align="center" flexDir="column" mb={isMobile ? 2 : 4}>
                 <Avatar
-                  size="lg"
+                  size={isMobile ? "md" : "lg"}
                   name={user.user_metadata.full_name}
                   src={user.user_metadata.avatar_url}
-                  mb={2}
+                  mb={isMobile ? 1 : 2}
                 />
-                <Text fontSize="xl">{user.user_metadata.full_name}</Text>
+                <Text fontSize={isMobile ? "lg" : "xl"}>
+                  {user.user_metadata.full_name}
+                </Text>
               </Flex>
               <Divider />
             </>
           )}
           <Flex flexDir="column" align="center">
-            <VStack spacing={3} m={5} fontSize="xl">
+            <VStack
+              spacing={isMobile ? 2 : 3}
+              m={isMobile ? 2 : 5}
+              fontSize={isMobile ? "lg" : "xl"}
+            >
               <Link
                 href="/creators"
                 aria-label="Creators"
-                m={"10px"}
+                m={isMobile ? "5px" : "10px"}
                 w="100%"
                 legacyBehavior
               >
@@ -173,7 +202,7 @@ const Navbar = () => {
               <Link
                 href="/models"
                 aria-label="Models"
-                m={"10px"}
+                m={isMobile ? "5px" : "10px"}
                 w="100%"
                 legacyBehavior
               >
@@ -182,7 +211,7 @@ const Navbar = () => {
               <Link
                 href="/papers"
                 aria-label="Papers"
-                m={"10px"}
+                m={isMobile ? "5px" : "10px"}
                 w="100%"
                 legacyBehavior
               >
@@ -191,7 +220,7 @@ const Navbar = () => {
               <Link
                 href="/authors"
                 aria-label="Researchers"
-                m={"10px"}
+                m={isMobile ? "5px" : "10px"}
                 w="100%"
                 legacyBehavior
               >
@@ -199,11 +228,10 @@ const Navbar = () => {
                   🔬 Researchers
                 </span>
               </Link>
-
               <Link
                 href="/tools"
                 aria-label="Tools"
-                m={"10px"}
+                m={isMobile ? "5px" : "10px"}
                 w="100%"
                 legacyBehavior
               >
@@ -212,27 +240,19 @@ const Navbar = () => {
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
-                m={"10px"}
+                m={isMobile ? "5px" : "10px"}
                 w="100%"
                 legacyBehavior
               >
                 <span onClick={() => changeDisplay("none")}>📝 Notes</span>
               </Link>
-              <Link
-                href="https://www.passionfroot.me/replicate-codex"
-                aria-label="Advertise"
-                m={"10px"}
-                w="100%"
-                legacyBehavior
-              >
-                <span onClick={() => changeDisplay("none")}>📣 Advertise</span>
-              </Link>
+
               {user && (
                 <>
                   <Link
                     href="/dashboard"
                     aria-label="Dashboard"
-                    m={"10px"}
+                    m={isMobile ? "5px" : "10px"}
                     w="100%"
                     legacyBehavior
                   >
@@ -243,7 +263,7 @@ const Navbar = () => {
                   <Link
                     href="/account"
                     aria-label="My Account"
-                    m={"10px"}
+                    m={isMobile ? "5px" : "10px"}
                     w="100%"
                     legacyBehavior
                   >
@@ -258,7 +278,7 @@ const Navbar = () => {
                     }}
                     colorScheme="blue"
                     leftIcon="🚪"
-                    m={"10px"}
+                    m={isMobile ? "5px" : "10px"}
                     w="100%"
                   >
                     Log Out
@@ -270,7 +290,7 @@ const Navbar = () => {
                   as="a"
                   href="/login"
                   colorScheme="blue"
-                  m={"10px"}
+                  m={isMobile ? "5px" : "10px"}
                   w="100%"
                 >
                   Sign in / sign up

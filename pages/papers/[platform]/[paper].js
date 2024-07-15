@@ -302,7 +302,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             colorScheme="green"
             borderRadius="full"
           >
-            Follow @aimodelsfyi on 𝕏 for trending papers →
+            Follow @aimodelsfyi on 𝕏 →
           </Button>
         </Box>
 

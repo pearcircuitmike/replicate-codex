@@ -167,12 +167,12 @@ const ModelsIndexPage = ({
         socialPreviewTitle="AI Models"
         socialPreviewSubtitle="Explore the latest AI models"
       />
-      <Container maxW="container.xl" py="12">
+      <Container maxW="container.xl" py="2">
         <Box mb={6}>
           <Text fontSize="3xl" fontWeight="bold">
             AI Models
           </Text>
-          <Text fontSize="lg">
+          <Text fontSize="lg" color="gray.500">
             Browse and discover AI models across various categories.
           </Text>
         </Box>

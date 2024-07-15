@@ -194,7 +194,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
               className="twitter-follow-button"
               data-show-count="false"
             >
-              Follow @aimodelsfyi on 𝕏 for trending papers →
+              Follow @aimodelsfyi on 𝕏 →
             </a>
             <script
               async
