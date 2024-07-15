@@ -1,65 +1,39 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Heading, SimpleGrid, Text } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
-import supabase from "../pages/api/utils/supabaseClient";
 import PaperCard from "./PaperCard";
 import ModelCard from "./ModelCard";
-
-const getTableName = (resourceType) => {
-  switch (resourceType) {
-    case "paper":
-      return "arxivPapersData";
-    case "model":
-      return "modelsData";
-    default:
-      throw new Error(`Unsupported resource type: ${resourceType}`);
-  }
-};
 
 const UserBookmarks = ({ resourceType }) => {
   const { user } = useAuth();
   const [bookmarkedResources, setBookmarkedResources] = useState([]);
-  const [triggerRefresh, setTriggerRefresh] = useState(false);
 
   const fetchBookmarkedResources = useCallback(async () => {
     if (user) {
-      const { data: bookmarkData, error: bookmarkError } = await supabase
-        .from("bookmarks")
-        .select("bookmarked_resource, created_at")
-        .eq("user_id", user.id)
-        .eq("resource_type", resourceType)
-        .order("created_at", { ascending: false });
-
-      if (bookmarkError) {
-        console.error("Error fetching bookmarks:", bookmarkError);
-        return;
-      }
-
-      const resourceIds = bookmarkData.map(
-        (bookmark) => bookmark.bookmarked_resource
-      );
-
-      const tableName = getTableName(resourceType);
-
-      const { data: resources, error: resourcesError } = await supabase
-        .from(tableName)
-        .select("*")
-        .in("id", resourceIds);
-
-      if (resourcesError) {
-        console.error("Error fetching resource details:", resourcesError);
-      } else {
-        const orderedResources = resourceIds.map((id) =>
-          resources.find((resource) => resource.id === id)
+      try {
+        const response = await fetch(
+          `/api/dashboard/bookmarks?userId=${user.id}&resourceType=${resourceType}`
         );
-        setBookmarkedResources(orderedResources);
+        if (!response.ok) {
+          throw new Error("Failed to fetch bookmarked resources");
+        }
+        const data = await response.json();
+        setBookmarkedResources(data);
+      } catch (error) {
+        console.error("Error fetching bookmarked resources:", error);
       }
     }
   }, [user, resourceType]);
 
   useEffect(() => {
     fetchBookmarkedResources();
-  }, [fetchBookmarkedResources, triggerRefresh]);
+  }, [fetchBookmarkedResources]);
+
+  const handleBookmarkChange = useCallback((resourceId) => {
+    setBookmarkedResources((prevResources) =>
+      prevResources.filter((resource) => resource.id !== resourceId)
+    );
+  }, []);
 
   const renderResourceCard = (resource) => {
     switch (resourceType) {
@@ -68,7 +42,7 @@ const UserBookmarks = ({ resourceType }) => {
           <PaperCard
             key={resource.id}
             paper={resource}
-            onBookmarkChange={() => setTriggerRefresh((prev) => !prev)}
+            onBookmarkChange={() => handleBookmarkChange(resource.id)}
           />
         );
       case "model":
@@ -76,7 +50,7 @@ const UserBookmarks = ({ resourceType }) => {
           <ModelCard
             key={resource.id}
             model={resource}
-            onBookmarkChange={() => setTriggerRefresh((prev) => !prev)}
+            onBookmarkChange={() => handleBookmarkChange(resource.id)}
           />
         );
       default:

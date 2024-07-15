@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         .from("topic_modeling_results")
         .select("id, created_at, topic_name, keywords, keyword_probabilities")
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(5);
 
       if (error) throw error;
 
