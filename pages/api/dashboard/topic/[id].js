@@ -24,12 +24,16 @@ export default async function handler(req, res) {
       const { data: papers, error: papersError } = await supabase
         .from("arxivPapersData")
         .select("*")
-        .filter("id", "in", `(${topic.paper_ids.join(",")})`)
-        .order("totalScore", { ascending: false });
+        .filter("id", "in", `(${topic.paper_ids.join(",")})`);
 
       if (papersError) throw papersError;
 
-      res.status(200).json({ ...topic, papers });
+      // Sort papers based on their position in topic.paper_ids
+      const sortedPapers = papers.sort(
+        (a, b) => topic.paper_ids.indexOf(a.id) - topic.paper_ids.indexOf(b.id)
+      );
+
+      res.status(200).json({ ...topic, papers: sortedPapers });
     } catch (error) {
       console.error("Error fetching topic and papers:", error);
       res
