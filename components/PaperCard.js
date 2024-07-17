@@ -7,11 +7,12 @@ import {
   Image,
   Tag,
   Flex,
+  Tooltip,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import EmojiWithGradient from "./EmojiWithGradient";
-import SocialScore from "./SocialScore";
 import BookmarkButton from "./BookmarkButton";
+import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const PaperCard = ({ paper, onBookmarkChange }) => {
   const thumbnailUrl = paper.thumbnail;
@@ -19,7 +20,6 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
     return new Date(indexedDate) >= seventyTwoHoursAgo;
   };
-
   return (
     <Box
       w="100%"
@@ -52,6 +52,28 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           ) : (
             <EmojiWithGradient title={paper.title} />
           )}
+          <Tooltip label="Calculated based on factors such as likes, downloads, etc">
+            <Flex
+              position="absolute"
+              bottom="10px"
+              right="10px"
+              bg="white"
+              borderRadius="md"
+              p="4px 8px"
+              alignItems="center"
+              boxShadow="md"
+            >
+              <Image
+                src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
+                alt="Total Score"
+                boxSize="16px"
+                mr={1}
+              />
+              <Text fontSize="sm" fontWeight="bold">
+                {formatLargeNumber(Math.floor(paper.totalScore))}
+              </Text>
+            </Flex>
+          </Tooltip>
         </Box>
       </Link>
       <Box p="15px">
@@ -72,7 +94,6 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
           {paper.authors.join(", ")}
         </Text>
-        <SocialScore paper={paper} />
         <Text fontSize="sm" noOfLines={4}>
           {paper.abstract || "No abstract available."}
         </Text>

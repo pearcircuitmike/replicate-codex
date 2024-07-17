@@ -27,8 +27,8 @@ const SidebarItem = ({ icon, text, href, onClick }) => {
         display="flex"
         alignItems="center"
         p={2}
-        bg={isActive ? "gray.100" : "transparent"}
-        _hover={{ bg: "gray.100" }}
+        bg={isActive ? "gray.50" : "transparent"}
+        _hover={{ bg: "gray.50" }}
         cursor="pointer"
         onClick={onClick}
       >

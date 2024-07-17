@@ -82,6 +82,8 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
       }
       variant="outline"
       w="100%"
+      borderTopRadius="0"
+      boxShadow="0"
     >
       {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
     </Button>

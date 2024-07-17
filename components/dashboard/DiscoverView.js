@@ -67,6 +67,7 @@ const DiscoverView = () => {
             onClick={handleSearch}
             isLoading={isSearching}
             width={{ base: "100%", md: "auto" }}
+            colorScheme="blue"
           >
             Search
           </Button>

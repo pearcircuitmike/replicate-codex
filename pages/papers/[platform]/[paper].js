@@ -210,33 +210,25 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             )}
           </Box>
 
-          <Stack
-            direction={["column", "column", "row"]}
-            spacing={4}
-            align="center"
-            my={8}
-          >
+          <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
             <SocialScore paper={paper} />
-            <Stack
-              direction={["column", "row"]}
-              spacing={4}
-              align="center"
-              w={["100%", "auto"]}
-            >
+            <Box w={["100%", "auto"]}>
               <BookmarkButton
                 resourceType="paper"
                 resourceId={paper.id}
-                w={["100%", "auto"]}
                 leftIcon={<FaBookmark />}
+                w={["100%", "140px"]}
               >
-                Add to Bookmarks
+                Bookmark
               </BookmarkButton>
+            </Box>
+            <Box w={["100%", "auto"]}>
               <NoteButton
                 paperId={paper.id}
                 onClick={handleAddNoteClick}
                 w={["100%", "auto"]}
               />
-            </Stack>
+            </Box>
           </Stack>
 
           {paper.thumbnail ? (

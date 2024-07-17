@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       let query = supabase
         .from("arxivPapersData")
         .select(
-          "id, slug, totalScore, title, abstract, authors, thumbnail, publishedDate",
+          "id, slug, totalScore, platform, title, abstract, authors, thumbnail, publishedDate",
           { count: "exact" }
         );
 

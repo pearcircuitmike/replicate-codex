@@ -54,7 +54,7 @@ const DashboardLayout = ({ children }) => {
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
       {isLargerThan768 && (
-        <Box width="200px" bg="white" boxShadow="md" py={8}>
+        <Box width="200px" bg="white" py={8}>
           <VStack spacing={4} align="stretch">
             {navItems.map((item) => (
               <NavItem key={item.href} {...item} />
@@ -74,7 +74,7 @@ const DashboardLayout = ({ children }) => {
         {children}
       </Box>
       {isLargerThan1024 && (
-        <Box width="250px">
+        <Box width="350px">
           <TrendingTopics />
         </Box>
       )}
