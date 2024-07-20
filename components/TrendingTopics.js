@@ -38,8 +38,8 @@ const TrendingTopics = () => {
 
     const diffHours = Math.floor((now - topicDate) / (1000 * 60 * 60));
 
-    if (diffHours < 2) return "now";
-    return `${diffHours} hours ago`;
+    if (diffHours < 2) return "Trending now";
+    return `Trending ${diffHours} hours ago`;
   };
 
   if (isLoading) {
@@ -53,7 +53,7 @@ const TrendingTopics = () => {
   return (
     <Box width="100%" p={4}>
       <Heading as="h2" size="md" mb={4}>
-        Explore
+        Trending topics
       </Heading>
       <VStack spacing={4} align="stretch">
         {topics.map((topic) => (

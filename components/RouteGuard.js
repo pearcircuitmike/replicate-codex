@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
 
-const protectedRoutes = ["/dashboard", "/welcome", "/account", "/trending"];
+const protectedRoutes = ["/welcome", "/account", "/trending"];
 
 const RouteGuard = ({ children }) => {
   const { user, loading, firstTimeUser, hasActiveSubscription } = useAuth();
@@ -10,12 +10,17 @@ const RouteGuard = ({ children }) => {
 
   useEffect(() => {
     if (!loading) {
-      if (!user && protectedRoutes.includes(router.pathname)) {
+      if (
+        !user &&
+        (router.pathname.startsWith("/dashboard") ||
+          protectedRoutes.includes(router.pathname))
+      ) {
         console.log("Unauthorized access detected, redirecting to /login.");
         router.push("/login");
       } else if (user) {
         if (
-          protectedRoutes.includes(router.pathname) &&
+          (router.pathname.startsWith("/dashboard") ||
+            protectedRoutes.includes(router.pathname)) &&
           !hasActiveSubscription
         ) {
           console.log(

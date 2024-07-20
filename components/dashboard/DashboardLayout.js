@@ -1,4 +1,3 @@
-// components/DashboardLayout.js
 import React from "react";
 import {
   Box,
@@ -11,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { FaSearch, FaBook, FaUser } from "react-icons/fa";
+import { FaSearch, FaBook, FaUser, FaNewspaper } from "react-icons/fa";
 import TrendingTopics from "../TrendingTopics";
 
 const NavItem = ({ icon, label, href }) => {
@@ -47,6 +46,11 @@ const DashboardLayout = ({ children }) => {
   const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
   const navItems = [
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
+    {
+      icon: <FaNewspaper />,
+      label: "Weekly Summary",
+      href: "/dashboard/weekly-paper-summary",
+    },
     { icon: <FaBook />, label: "My Library", href: "/dashboard/library" },
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
