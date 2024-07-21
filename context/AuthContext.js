@@ -1,9 +1,16 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import supabase from "../pages/api/utils/supabaseClient";
+import { trackEvent } from "../pages/api/utils/analytics-util";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
+
+const trackedEvent = {
+  login: false,
+  signup: false,
+  logout: false,
+};
 
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({
@@ -13,63 +20,70 @@ export const AuthProvider = ({ children }) => {
     hasActiveSubscription: false,
   });
 
-  const setUser = (user) => setState((prev) => ({ ...prev, user }));
-  const setLoading = (loading) => setState((prev) => ({ ...prev, loading }));
-  const setFirstTimeUser = (firstTimeUser) =>
-    setState((prev) => ({ ...prev, firstTimeUser }));
-  const setHasActiveSubscription = (hasActiveSubscription) =>
-    setState((prev) => ({ ...prev, hasActiveSubscription }));
+  const handleSession = async (session) => {
+    if (session) {
+      const { user } = session;
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("first_login, stripe_subscription_status")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching profile data:", profileError);
+        return;
+      }
+
+      const firstTimeUser = profileData?.first_login || false;
+      const hasActiveSubscription =
+        profileData?.stripe_subscription_status === "active" ||
+        profileData?.stripe_subscription_status === "substack";
+
+      setState({
+        user,
+        loading: false,
+        firstTimeUser,
+        hasActiveSubscription,
+      });
+
+      if (firstTimeUser && !trackedEvent.signup) {
+        trackEvent("signup");
+        trackedEvent.signup = true;
+      } else if (!firstTimeUser && !trackedEvent.login) {
+        trackEvent("login");
+        trackedEvent.login = true;
+      }
+    } else {
+      setState({
+        user: null,
+        loading: false,
+        firstTimeUser: false,
+        hasActiveSubscription: false,
+      });
+      trackedEvent.login = false;
+      trackedEvent.signup = false;
+      trackedEvent.logout = false;
+    }
+  };
 
   useEffect(() => {
     const getUserAndCheckStatus = async () => {
-      try {
-        const { data: sessionData, error: sessionError } =
-          await supabase.auth.getSession();
-        if (sessionError) throw sessionError;
-
-        if (sessionData.session) {
-          const { data: profileData, error: profileError } = await supabase
-            .from("profiles")
-            .select("first_login, stripe_subscription_status")
-            .eq("id", sessionData.session.user.id)
-            .single();
-
-          if (profileError) throw profileError;
-
-          setState({
-            user: sessionData.session.user,
-            loading: false,
-            firstTimeUser: profileData?.first_login || false,
-            hasActiveSubscription:
-              profileData?.stripe_subscription_status === "active" ||
-              profileData?.stripe_subscription_status === "substack",
-          });
-        } else {
-          setState({
-            user: null,
-            loading: false,
-            firstTimeUser: false,
-            hasActiveSubscription: false,
-          });
-        }
-      } catch (error) {
-        console.error("Error in getUserAndCheckStatus:", error);
-        setState({
-          user: null,
-          loading: false,
-          firstTimeUser: false,
-          hasActiveSubscription: false,
-        });
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Error getting session:", sessionError);
+        setState((prev) => ({ ...prev, loading: false }));
+        return;
       }
+      handleSession(sessionData.session);
     };
 
     getUserAndCheckStatus();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (event === "SIGNED_IN") {
-          setUser(session.user);
-          // You may want to fetch profile data here as well
+          handleSession(session);
         } else if (event === "SIGNED_OUT") {
           setState({
             user: null,
@@ -87,7 +101,44 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error);
+    } else {
+      trackEvent("logout");
+      trackedEvent.logout = true;
+      setState({
+        user: null,
+        loading: false,
+        firstTimeUser: false,
+        hasActiveSubscription: false,
+      });
+    }
+  };
+
+  const handleSignInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_BASE_URL}/dashboard`,
+      },
+    });
+    if (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
+  const handleSignInWithEmail = async (email) => {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_BASE_URL}/dashboard`,
+      },
+    });
+    if (error) {
+      console.error("Error signing in with email:", error);
+    }
+    return { data, error };
   };
 
   return (
@@ -95,10 +146,8 @@ export const AuthProvider = ({ children }) => {
       value={{
         ...state,
         logout,
-        setUser,
-        setLoading,
-        setFirstTimeUser,
-        setHasActiveSubscription,
+        handleSignInWithGoogle,
+        handleSignInWithEmail,
       }}
     >
       {children}

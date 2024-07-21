@@ -1,30 +1,57 @@
 import React from "react";
-import { Input, InputGroup, InputLeftElement, Icon } from "@chakra-ui/react";
-import { FaSearch } from "react-icons/fa";
+import { Input, Button, Box, useBreakpointValue } from "@chakra-ui/react";
+import { trackEvent } from "../pages/api/utils/analytics-util";
 
-const SearchBar = ({ searchValue, setSearchValue, onSearch, placeholder }) => {
+const SearchBar = ({
+  searchValue,
+  setSearchValue,
+  onSearchSubmit,
+  placeholder,
+  resourceType,
+}) => {
   const handleChange = (e) => {
     setSearchValue(e.target.value);
   };
 
+  const handleSearch = () => {
+    onSearchSubmit(searchValue);
+    trackEvent("search", { resource_type: resourceType, query: searchValue });
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      onSearch();
+      handleSearch();
     }
   };
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
-    <InputGroup>
-      <InputLeftElement pointerEvents="none">
-        <Icon as={FaSearch} color="gray.300" />
-      </InputLeftElement>
+    <Box
+      display="flex"
+      flexDirection={isMobile ? "column" : "row"}
+      alignItems="center"
+      width="100%"
+    >
       <Input
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        mb={isMobile ? 2 : 0}
+        flex={isMobile ? "none" : "1"}
+        mr={isMobile ? 0 : 2}
+        width={isMobile ? "100%" : "auto"}
       />
-    </InputGroup>
+      <Button
+        colorScheme="blue"
+        onClick={handleSearch}
+        width={isMobile ? "100%" : "auto"}
+        flexShrink={0}
+      >
+        Search
+      </Button>
+    </Box>
   );
 };
 

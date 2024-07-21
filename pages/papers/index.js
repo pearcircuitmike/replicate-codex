@@ -1,4 +1,3 @@
-// pages/papers/index.js
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Container, Grid, Box, Text } from "@chakra-ui/react";
@@ -6,20 +5,19 @@ import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
 import { fetchPapersPaginated } from "../api/utils/fetchPapers";
-import PaperMatchmaker from "../../components/PaperMatchmaker";
 import SearchBar from "../../components/SearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
 import { getDateRange } from "../../lib/dateUtils";
 import categoryDescriptions from "../../data/categoryDescriptions.json";
 
-export async function getStaticProps({ params }) {
-  const currentPage = parseInt(params?.page || "1", 10);
-  const selectedTimeRange = params?.selectedTimeRange || "thisWeek";
-  const selectedCategories = params?.selectedCategories
-    ? JSON.parse(params.selectedCategories)
+export async function getServerSideProps({ query }) {
+  const currentPage = parseInt(query.page || "1", 10);
+  const selectedTimeRange = query.selectedTimeRange || "thisWeek";
+  const selectedCategories = query.selectedCategories
+    ? JSON.parse(query.selectedCategories)
     : Object.keys(categoryDescriptions);
-  const searchValue = params?.search || "";
+  const searchValue = query.search || "";
 
   const { startDate, endDate } = getDateRange(selectedTimeRange);
 
@@ -42,7 +40,6 @@ export async function getStaticProps({ params }) {
       initialPage: currentPage,
       initialSelectedTimeRange: selectedTimeRange,
     },
-    revalidate: false,
   };
 }
 
@@ -84,22 +81,8 @@ const PapersIndexPage = ({
   };
 
   useEffect(() => {
-    const { search, selectedCategories, selectedTimeRange, page } =
-      router.query;
-
-    setSearchValue(search || initialSearch);
-    setSelectedCategories(
-      selectedCategories
-        ? JSON.parse(selectedCategories)
-        : initialSelectedCategories
-    );
-    setSelectedTimeRange(selectedTimeRange || initialSelectedTimeRange);
-    setCurrentPage(parseInt(page || initialPage.toString(), 10));
-  }, [router.query]);
-
-  useEffect(() => {
     fetchPapers();
-  }, [currentPage, selectedCategories, searchValue, selectedTimeRange]);
+  }, [currentPage, selectedCategories, selectedTimeRange]);
 
   const handleSearchSubmit = (newSearchValue) => {
     setSearchValue(newSearchValue);
@@ -113,6 +96,7 @@ const PapersIndexPage = ({
         page: 1,
       },
     });
+    fetchPapers(); // Fetch papers on search submit
   };
 
   const handleCategoryChange = (updatedCategories) => {
@@ -175,12 +159,13 @@ const PapersIndexPage = ({
             intelligence, machine learning, and related fields.
           </Text>
         </Box>
-        {/* <PaperMatchmaker />  KEEP THIS DO NOT DELETE*/}
+
         <SearchBar
-          placeholder={"Search papers by title or arXiv ID..."}
+          placeholder="Search papers by title or arXiv ID..."
           searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
           setSearchValue={setSearchValue}
+          resourceType="paper"
         />
         <CategoryFilter
           categoryDescriptions={categoryDescriptions}

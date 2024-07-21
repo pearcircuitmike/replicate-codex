@@ -5,16 +5,14 @@ import {
   Flex,
   Text,
   Box,
-  Input,
-  InputGroup,
   Center,
-  Button,
   Skeleton,
 } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import CreatorCard from "../../components/CreatorCard";
 import Pagination from "../../components/Pagination";
 import { fetchCreators } from "../api/utils/fetchCreatorsPaginated";
+import SearchBar from "../../components/SearchBar";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -41,24 +39,18 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
   const [creators, setCreators] = useState(initialCreators);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
 
-  const executeSearch = async () => {
+  const executeSearch = async (newSearchTerm) => {
     setIsLoading(true);
     const { data, totalCount } = await fetchCreators({
       tableName: "unique_creators_data_view",
       pageSize: ITEMS_PER_PAGE,
       currentPage: 1,
-      searchValue: searchTerm,
+      searchValue: newSearchTerm,
     });
     setCreators(data);
     setTotalCount(totalCount || 0);
     setCurrentPage(1);
     setIsLoading(false);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !isLoading) {
-      executeSearch();
-    }
   };
 
   const changePage = async (page) => {
@@ -88,23 +80,13 @@ const Creators = ({ initialCreators, initialTotalCount }) => {
           Creators
         </Heading>
         <Text mt={5}>Search through the list of amazing creators below!</Text>
-        <InputGroup mt={5}>
-          <Input
-            variant="outline"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Search by creator name"
-          />
-          <Button
-            ml={3}
-            onClick={executeSearch}
-            colorScheme="blue"
-            isDisabled={isLoading}
-          >
-            Search
-          </Button>
-        </InputGroup>
+        <SearchBar
+          placeholder="Search by creator name"
+          searchValue={searchTerm}
+          onSearchSubmit={executeSearch}
+          setSearchValue={setSearchTerm}
+          resourceType="creator"
+        />
       </Container>
       <Container maxW="8xl">
         <Box minHeight="800px">

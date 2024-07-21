@@ -1,4 +1,3 @@
-// components/AuthForm.js
 import { useState } from "react";
 import {
   Box,
@@ -17,41 +16,26 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
-import supabase from "../pages/api/utils/supabaseClient";
+import { useAuth } from "../context/AuthContext";
 
 export default function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { handleSignInWithGoogle, handleSignInWithEmail } = useAuth();
 
-  const handleSignInWithGoogle = async () => {
+  const signInWithGoogle = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_BASE_URL}/dashboard`,
-      },
-    });
-    if (error) {
-      console.log("Error signing in with Google:", error);
-    }
+    await handleSignInWithGoogle();
     setLoading(false);
   };
 
-  const handleSignInWithEmail = async (e) => {
+  const signInWithEmail = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_BASE_URL}/dashboard`,
-      },
-    });
-    if (error) {
-      console.log("Error signing in with email:", error);
-    } else {
-      console.log("Magic link sent to your email!");
+    const { data, error } = await handleSignInWithEmail(email);
+    if (!error) {
       setEmailSent(true);
       onOpen();
     }
@@ -66,7 +50,7 @@ export default function AuthForm() {
     <>
       <Box
         as="form"
-        onSubmit={handleSignInWithEmail}
+        onSubmit={signInWithEmail}
         maxW="md"
         w="full"
         bg={useColorModeValue("white", "gray.800")}
@@ -133,7 +117,7 @@ export default function AuthForm() {
           <Button
             type="button"
             leftIcon={<FaGoogle />}
-            onClick={handleSignInWithGoogle}
+            onClick={signInWithGoogle}
             isLoading={loading}
             width="100%"
             loadingText="Signing in..."

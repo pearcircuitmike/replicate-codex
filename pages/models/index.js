@@ -1,4 +1,3 @@
-// pages/models/index.js
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Container, Grid, Box, Text, Skeleton, Center } from "@chakra-ui/react";
@@ -101,7 +100,7 @@ const ModelsIndexPage = ({
 
   useEffect(() => {
     fetchModels();
-  }, [currentPage, selectedCategories, searchValue, selectedTimeRange]);
+  }, [currentPage, selectedCategories, selectedTimeRange]);
 
   const handleSearchSubmit = (newSearchValue) => {
     setSearchValue(newSearchValue);
@@ -115,6 +114,7 @@ const ModelsIndexPage = ({
         page: 1,
       },
     });
+    fetchModels(); // Fetch models on search submit
   };
 
   const handleCategoryChange = (updatedCategories) => {
@@ -177,10 +177,11 @@ const ModelsIndexPage = ({
           </Text>
         </Box>
         <SearchBar
-          placeholder={"Search by model name..."}
+          placeholder="Search by model name..."
           searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
           setSearchValue={setSearchValue}
+          resourceType="model"
         />
         <CategoryFilter
           categoryDescriptions={modelCategoryDescriptions}

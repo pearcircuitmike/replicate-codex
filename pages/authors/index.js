@@ -5,16 +5,14 @@ import {
   Flex,
   Text,
   Box,
-  Input,
-  InputGroup,
   Center,
-  Button,
   Skeleton,
 } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import AuthorCard from "../../components/AuthorCard";
 import Pagination from "../../components/Pagination";
 import { fetchUniqueAuthors } from "../api/utils/fetchAuthors";
+import SearchBar from "../../components/SearchBar";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -39,24 +37,18 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
   const [authors, setAuthors] = useState(initialAuthors);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
 
-  const executeSearch = async () => {
+  const executeSearch = async (newSearchTerm) => {
     setIsLoading(true);
     const { data, totalCount } = await fetchUniqueAuthors({
       platform: "arxiv",
       pageSize: ITEMS_PER_PAGE,
       currentPage: 1,
-      searchValue: searchTerm,
+      searchValue: newSearchTerm,
     });
     setAuthors(data);
     setTotalCount(totalCount || 0);
     setCurrentPage(1);
     setIsLoading(false);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !isLoading) {
-      executeSearch();
-    }
   };
 
   const changePage = async (page) => {
@@ -86,23 +78,13 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
           Authors
         </Heading>
         <Text mt={5}>Search through the list of authors below!</Text>
-        <InputGroup mt={5}>
-          <Input
-            variant="outline"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Search by author name"
-          />
-          <Button
-            ml={3}
-            onClick={executeSearch}
-            colorScheme="blue"
-            isDisabled={isLoading}
-          >
-            Search
-          </Button>
-        </InputGroup>
+        <SearchBar
+          placeholder="Search by author name"
+          searchValue={searchTerm}
+          onSearchSubmit={executeSearch}
+          setSearchValue={setSearchTerm}
+          resourceType="author"
+        />
       </Container>
       <Container maxW="8xl">
         <Box minHeight="800px">

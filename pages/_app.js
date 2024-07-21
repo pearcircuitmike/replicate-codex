@@ -16,20 +16,14 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 import RouteGuard from "@/components/RouteGuard";
 import { useEffect } from "react";
 import AuthForm from "@/components/AuthForm";
-
-export default function App({ Component, pageProps }) {
-  return (
-    <ChakraProvider>
-      <AuthProvider>
-        <AppContent Component={Component} pageProps={pageProps} />
-      </AuthProvider>
-    </ChakraProvider>
-  );
-}
+import { usePageView } from "../hooks/usePageView";
 
 function AppContent({ Component, pageProps }) {
   const { user, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Use the custom hook for page view tracking
+  usePageView();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -83,5 +77,15 @@ function AppContent({ Component, pageProps }) {
         </Layout>
       </Box>
     </RouteGuard>
+  );
+}
+
+export default function App({ Component, pageProps }) {
+  return (
+    <ChakraProvider>
+      <AuthProvider>
+        <AppContent Component={Component} pageProps={pageProps} />
+      </AuthProvider>
+    </ChakraProvider>
   );
 }
