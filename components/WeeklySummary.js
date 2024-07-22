@@ -48,10 +48,9 @@ const WeeklySummary = () => {
   };
 
   const getWeekDates = (date) => {
-    const startDate = new Date(date);
-    startDate.setDate(startDate.getDate() - startDate.getDay());
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 6);
+    const endDate = new Date(date);
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 6);
     return { startDate, endDate };
   };
 
@@ -99,7 +98,7 @@ const WeeklySummary = () => {
   }
 
   const { startDate, endDate } = getWeekDates(summary.created_at);
-  const weekNumber = getWeekNumber(startDate);
+  const weekNumber = getWeekNumber(endDate);
   const weekRange = `Week ${weekNumber} - ${formatDate(
     startDate
   )} to ${formatDate(endDate)}`;
