@@ -9,9 +9,7 @@ import {
   TabPanels,
   TabPanel,
   VStack,
-  Button,
   useMediaQuery,
-  Flex,
 } from "@chakra-ui/react";
 import Feed from "../Feed/Feed";
 import SearchBar from "../SearchBar";
@@ -54,24 +52,15 @@ const DiscoverView = () => {
             Explore the latest AI breakthroughs and trending research.
           </Text>
         )}
-        <Flex direction={{ base: "column", md: "row" }} align="stretch" mb={4}>
-          <Box flex="1" mr={{ base: 0, md: 2 }} mb={{ base: 2, md: 0 }}>
-            <SearchBar
-              searchValue={searchInput}
-              setSearchValue={setSearchInput}
-              onSearch={handleSearch}
-              placeholder="Search papers and models..."
-            />
-          </Box>
-          <Button
-            onClick={handleSearch}
-            isLoading={isSearching}
-            width={{ base: "100%", md: "auto" }}
-            colorScheme="blue"
-          >
-            Search
-          </Button>
-        </Flex>
+        <Box mb={4}>
+          <SearchBar
+            searchValue={searchInput}
+            setSearchValue={setSearchInput}
+            onSearchSubmit={handleSearch}
+            placeholder="Search papers and models..."
+            resourceType="discover"
+          />
+        </Box>
       </Box>
       <Box flex={1} overflowY="auto">
         <Tabs

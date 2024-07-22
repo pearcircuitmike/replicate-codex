@@ -3,11 +3,13 @@ import { Button, Icon } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
 import supabase from "../pages/api/utils/supabaseClient";
 import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/router";
 
 const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const checkBookmarkStatus = async () => {
@@ -39,7 +41,11 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
   }, [user, resourceId, resourceType]);
 
   const toggleBookmark = async () => {
-    if (!user) return;
+    if (!user) {
+      // Redirect to login page if user is not authenticated
+      router.push("/login");
+      return;
+    }
 
     setIsLoading(true);
 
