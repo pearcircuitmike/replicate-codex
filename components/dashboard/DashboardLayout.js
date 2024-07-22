@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { FaSearch, FaBook, FaUser, FaNewspaper } from "react-icons/fa";
 import TrendingTopics from "../TrendingTopics";
+import TopViewedPapers from "../TopViewedPapers";
+import TopSearchQueries from "../TopSearchQueries";
 
 const NavItem = ({ icon, label, href }) => {
   const router = useRouter();
@@ -80,6 +82,8 @@ const DashboardLayout = ({ children }) => {
       {isLargerThan1024 && (
         <Box width="350px">
           <TrendingTopics />
+          <TopViewedPapers />
+          <TopSearchQueries />
         </Box>
       )}
       {!isLargerThan768 && (

@@ -1,4 +1,4 @@
-// pages/api/dashboard/trending-topics.js
+// pages/api/dashboard/top-search-queries.js
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -10,19 +10,19 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const { data, error } = await supabase
-        .from("topic_modeling_results")
-        .select("id, created_at, topic_name, keywords, keyword_probabilities")
-        .order("created_at", { ascending: false })
+        .from("top_search_queries")
+        .select("uuid, search_query, resource_type, search_count")
+        .order("search_count", { ascending: false })
         .limit(4);
 
       if (error) throw error;
 
       res.status(200).json(data);
     } catch (error) {
-      console.error("Error fetching trending topics:", error);
+      console.error("Error fetching top search queries:", error);
       res
         .status(500)
-        .json({ error: "An error occurred while fetching trending topics" });
+        .json({ error: "An error occurred while fetching top search queries" });
     }
   } else {
     res.setHeader("Allow", ["GET"]);

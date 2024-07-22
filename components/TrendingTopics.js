@@ -52,9 +52,12 @@ const TrendingTopics = () => {
 
   return (
     <Box width="100%" p={4}>
-      <Heading as="h2" size="md" mb={4}>
-        Trending topics
+      <Heading as="h2" size="md" mb={1}>
+        📈 Trending research areas
       </Heading>
+      <Text color="gray.500" mb={4} fontSize="sm">
+        Today&apos;s top published research topics
+      </Text>
       <VStack spacing={4} align="stretch">
         {topics.map((topic) => (
           <NextLink

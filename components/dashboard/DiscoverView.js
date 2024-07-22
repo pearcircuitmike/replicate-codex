@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Box,
   Heading,
@@ -11,8 +11,10 @@ import {
   VStack,
   useMediaQuery,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import Feed from "../Feed/Feed";
 import SearchBar from "../SearchBar";
+import TopSearchQueries from "../TopSearchQueries";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const DiscoverView = () => {
@@ -25,16 +27,38 @@ const DiscoverView = () => {
   });
   const [searchParams, setSearchParams] = useState({ searchValue: "" });
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
+  const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
+  const router = useRouter();
 
-  const handleSearch = useCallback(() => {
-    setIsSearching(true);
-    setSearchParams({ searchValue: searchInput });
-    setTimeout(() => setIsSearching(false), 500);
-  }, [searchInput]);
+  useEffect(() => {
+    if (router.query.q) {
+      setSearchInput(router.query.q);
+      handleSearch(router.query.q);
+    }
+  }, [router.query.q]);
+
+  const handleSearch = useCallback(
+    (value = searchInput) => {
+      setIsSearching(true);
+      setSearchParams({ searchValue: value });
+      router.push(
+        `/dashboard/discover?q=${encodeURIComponent(value)}`,
+        undefined,
+        { shallow: true }
+      );
+      setTimeout(() => setIsSearching(false), 500);
+    },
+    [searchInput, router]
+  );
 
   const updateResultCount = useCallback((type, count) => {
     setResultCounts((prev) => ({ ...prev, [type]: count }));
   }, []);
+
+  const handleSearchQuery = (query) => {
+    setSearchInput(query);
+    handleSearch(query);
+  };
 
   return (
     <VStack
@@ -56,7 +80,7 @@ const DiscoverView = () => {
           <SearchBar
             searchValue={searchInput}
             setSearchValue={setSearchInput}
-            onSearchSubmit={handleSearch}
+            onSearchSubmit={() => handleSearch()}
             placeholder="Search papers and models..."
             resourceType="discover"
           />
