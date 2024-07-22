@@ -55,7 +55,7 @@ const TopSearchQueries = ({ onSearchQuery }) => {
         🔍 Top searches
       </Heading>
       <Text color="gray.500" mb={4} fontSize="sm">
-        Today's top search terms
+        Today&apos;s top search terms
       </Text>
       <VStack spacing={4} align="stretch">
         {queries.map((query) => (
