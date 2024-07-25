@@ -53,21 +53,19 @@ const TopViewedPapers = () => {
             href={`/papers/arxiv/${paper.slug}`}
             passHref
           >
-            <Link>
-              <Box
-                p={3}
-                borderWidth={1}
-                borderRadius="md"
-                boxShadow="sm"
-                _hover={{ bg: "gray.50" }}
-              >
-                <Text fontWeight="bold">{paper.title}</Text>
+            <Box
+              p={3}
+              borderWidth={1}
+              borderRadius="md"
+              boxShadow="sm"
+              _hover={{ bg: "gray.50" }}
+            >
+              <Text fontWeight="bold">{paper.title}</Text>
 
-                <Text fontSize="xs" color="gray.400" mt={1}>
-                  {getViewCountText(paper.view_count)}
-                </Text>
-              </Box>
-            </Link>
+              <Text fontSize="xs" color="gray.400" mt={1}>
+                {getViewCountText(paper.view_count)}
+              </Text>
+            </Box>
           </NextLink>
         ))}
       </VStack>

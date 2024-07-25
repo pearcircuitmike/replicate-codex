@@ -65,23 +65,21 @@ const TrendingTopics = () => {
             href={`/dashboard/explore/${topic.id}`}
             passHref
           >
-            <Link>
-              <Box
-                p={3}
-                borderWidth={1}
-                borderRadius="md"
-                boxShadow="sm"
-                _hover={{ bg: "gray.50" }}
-              >
-                <Text fontWeight="bold">{topic.topic_name}</Text>
-                <Text fontSize="sm" color="gray.600">
-                  {topic.keywords.slice(0, 3).join(", ")}
-                </Text>
-                <Text fontSize="xs" color="gray.400" mt={1}>
-                  {getTopicAge(topic.created_at)}
-                </Text>
-              </Box>
-            </Link>
+            <Box
+              p={3}
+              borderWidth={1}
+              borderRadius="md"
+              boxShadow="sm"
+              _hover={{ bg: "gray.50" }}
+            >
+              <Text fontWeight="bold">{topic.topic_name}</Text>
+              <Text fontSize="sm" color="gray.600">
+                {topic.keywords.slice(0, 3).join(", ")}
+              </Text>
+              <Text fontSize="xs" color="gray.400" mt={1}>
+                {getTopicAge(topic.created_at)}
+              </Text>
+            </Box>
           </NextLink>
         ))}
       </VStack>

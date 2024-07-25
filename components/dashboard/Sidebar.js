@@ -23,7 +23,6 @@ const SidebarItem = ({ icon, text, href, onClick }) => {
   return (
     <Link href={href} passHref>
       <Box
-        as="a"
         display="flex"
         alignItems="center"
         p={2}
@@ -60,7 +59,6 @@ const Sidebar = ({ isOpen, onClose, ...props }) => {
   return (
     <>
       <Box
-        as="nav"
         width="200px"
         bg="white"
         boxShadow="md"

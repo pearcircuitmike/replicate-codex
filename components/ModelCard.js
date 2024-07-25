@@ -145,7 +145,6 @@ const ModelCard = ({ model, onBookmarkChange }) => {
               passHref
             >
               <Tag
-                as="a"
                 size="sm"
                 colorScheme="blue"
                 mr="5px"

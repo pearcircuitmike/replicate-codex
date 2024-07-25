@@ -20,9 +20,8 @@ const NavItem = ({ icon, label, href }) => {
   const isActive = router.pathname === href;
 
   return (
-    <Link href={href} passHref>
+    <Link href={href}>
       <Flex
-        as="a"
         align="center"
         p={2}
         mx={2}

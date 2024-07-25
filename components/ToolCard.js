@@ -96,7 +96,6 @@ const ToolCard = ({ tool }) => {
               passHref
             >
               <Tag
-                as="a"
                 size="sm"
                 colorScheme="blue"
                 mr="5px"
