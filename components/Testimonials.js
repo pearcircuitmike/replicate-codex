@@ -20,7 +20,7 @@ const Testimonials = () => {
               mr={4}
             >
               <img
-                src="https://media.licdn.com/dms/image/C5603AQFhkTZjZxF6cQ/profile-displayphoto-shrink_100_100/0/1627310111771?e=1720656000&v=beta&t=b-b_lq8TiGtu29b5XVBB2Ohj3GtYIETUylajANz9rFg"
+                src="https://media.licdn.com/dms/image/C5603AQFhkTZjZxF6cQ/profile-displayphoto-shrink_100_100/0/1627310111771?e=1727308800&v=beta&t=4XvMSyMAxkjKaoljd7A0jkVYM6j2NSWdCWCtzUVwOqg"
                 alt="Philip"
               />
             </Box>
@@ -110,7 +110,7 @@ const Testimonials = () => {
               mr={4}
             >
               <img
-                src="https://media.licdn.com/dms/image/C5603AQFAiqtIGY2xnw/profile-displayphoto-shrink_800_800/0/1572043262240?e=1720656000&v=beta&t=boEhSBYDd0qNfWON1I6aNL1x3CMd8YvVHUruX6zEVok"
+                src="https://media.licdn.com/dms/image/C5603AQFAiqtIGY2xnw/profile-displayphoto-shrink_200_200/0/1572043262163?e=1727308800&v=beta&t=OBvwxjJJiUomhm9VzeshifLT09_L8Qw7zgYOIoyj8_w"
                 alt="Christian Monson"
               />
             </Box>

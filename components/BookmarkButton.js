@@ -15,18 +15,14 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
     const checkBookmarkStatus = async () => {
       if (user) {
         try {
-          const { data, error } = await supabase
-            .from("bookmarks")
-            .select("*")
-            .eq("user_id", user.id)
-            .eq("bookmarked_resource", resourceId)
-            .eq("resource_type", resourceType)
-            .single();
-
-          if (error && error.code !== "PGRST116") {
-            console.error("Error checking bookmark status:", error);
+          const response = await fetch(
+            `/api/bookmark-status?userId=${user.id}&resourceId=${resourceId}&resourceType=${resourceType}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch bookmark status");
           }
-          setIsBookmarked(!!data);
+          const { isBookmarked } = await response.json();
+          setIsBookmarked(isBookmarked);
         } catch (error) {
           console.error("Error checking bookmark status:", error);
         } finally {
@@ -36,19 +32,15 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
         setIsLoading(false);
       }
     };
-
     checkBookmarkStatus();
   }, [user, resourceId, resourceType]);
 
   const toggleBookmark = async () => {
     if (!user) {
-      // Redirect to login page if user is not authenticated
       router.push("/login");
       return;
     }
-
     setIsLoading(true);
-
     try {
       if (isBookmarked) {
         await supabase
@@ -64,7 +56,6 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
           resource_type: resourceType,
         });
       }
-
       setIsBookmarked(!isBookmarked);
       if (onBookmarkChange) {
         onBookmarkChange(resourceId);

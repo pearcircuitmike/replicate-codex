@@ -17,6 +17,18 @@ const getTableName = (resourceType) => {
 };
 
 export default async function handler(req, res) {
+  // Set default headers
+  res.setHeader("Content-Type", "application/json");
+
+  // Basic CORS setup (if needed)
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method === "GET") {
     const { userId, resourceType } = req.query;
 
@@ -51,15 +63,15 @@ export default async function handler(req, res) {
         resources.find((resource) => resource.id === id)
       );
 
-      res.status(200).json(orderedResources);
+      return res.status(200).json(orderedResources);
     } catch (error) {
       console.error("Error fetching bookmarked resources:", error);
-      res.status(500).json({
+      return res.status(500).json({
         error: "An error occurred while fetching bookmarked resources",
       });
     }
   } else {
     res.setHeader("Allow", ["GET"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 }
