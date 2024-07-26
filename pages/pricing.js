@@ -11,6 +11,7 @@ import {
   Container,
   HStack,
   keyframes,
+  Image,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useAuth } from "../context/AuthContext";
@@ -44,6 +45,12 @@ const PricingPage = () => {
         <Heading my={"45px"} size="lg">
           Complete signup to access your dashboard
         </Heading>
+        <Image
+          src="./img/_discoverBg.png"
+          alt="Dashboard Preview"
+          maxW="100%"
+          h="auto"
+        />
         <HStack justify="center" mb={4}>
           <Button
             onClick={() => setIsYearly(false)}
