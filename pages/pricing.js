@@ -17,6 +17,7 @@ import NextLink from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { FaCheckCircle } from "react-icons/fa";
 import Testimonials from "../components/Testimonials";
+import { trackEvent } from "../pages/api/utils/analytics-util";
 
 const shine = keyframes`
   0% { left: -400%; }
@@ -36,15 +37,21 @@ const PricingPage = () => {
 
     const url = new URL(stripeUrl);
     url.searchParams.append("client_reference_id", user.id);
+
+    // Track the subscription event
+    trackEvent("subscription_initiated", {
+      plan_type: isYearly ? "yearly" : "monthly",
+      price: price,
+      user_id: user.id,
+    });
+
     window.location.href = url.toString();
   };
 
   return (
     <Box p={8} maxW="container.lg" mx="auto">
       <Box textAlign="center" mb={8}>
-        <Heading my={"45px"} size="lg">
-          Complete signup to access your dashboard
-        </Heading>
+        <Heading size="lg">Complete signup to access your dashboard</Heading>
         <Image
           src="./img/_discoverBg.png"
           alt="Dashboard Preview"
@@ -82,7 +89,6 @@ const PricingPage = () => {
           </Button>
         </HStack>
       </Box>
-      {/* Rest of the component remains unchanged */}
       <Box
         as={Link}
         onClick={handleSubscription}
@@ -144,19 +150,27 @@ const PricingPage = () => {
             </ListItem>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
-              Unlimited paper summaries
+              See publication trends
             </ListItem>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
-              Unlimited model guides
+              See the most-read papers
             </ListItem>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
-              Join the Discord community with AI experts
+              See what other users are searching for
             </ListItem>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
-              Weekly digests of top models and papers
+              Read unlimited summaries
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Join the Discord
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Get weekly digests of top models and papers
             </ListItem>
           </List>
         </Box>
