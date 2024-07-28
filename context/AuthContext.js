@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       const firstTimeUser = profileData?.first_login || false;
       const hasActiveSubscription =
         profileData?.stripe_subscription_status === "active" ||
+        profileData?.stripe_subscription_status === "trialing" ||
         profileData?.stripe_subscription_status === "substack";
 
       setState({

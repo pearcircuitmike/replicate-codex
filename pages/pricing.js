@@ -51,13 +51,10 @@ const PricingPage = () => {
   return (
     <Box p={8} maxW="container.lg" mx="auto">
       <Box textAlign="center" mb={8}>
-        <Heading size="lg">Complete signup to access your dashboard</Heading>
-        <Image
-          src="./img/_discoverBg.png"
-          alt="Dashboard Preview"
-          maxW="100%"
-          h="auto"
-        />
+        <Heading size="xl" mb={6}>
+          Complete signup to access your dashboard
+        </Heading>
+
         <HStack justify="center" mb={4}>
           <Button
             onClick={() => setIsYearly(false)}
@@ -141,7 +138,7 @@ const PricingPage = () => {
               animation: `${shine} 6s infinite`,
             }}
           >
-            Subscribe
+            Start 30-day free trial
           </Button>
           <List spacing={4} textAlign="left" mt={8}>
             <ListItem>
@@ -177,6 +174,12 @@ const PricingPage = () => {
       </Box>
       <Box py={16} px={8}>
         <Container maxW="8xl">
+          <Image
+            src="./img/_discoverBg.png"
+            alt="Dashboard Preview"
+            maxW="100%"
+            h="auto"
+          />
           <Heading as="h2" fontSize="4xl" mt="50px" mb={4} textAlign="center">
             What our users say
           </Heading>
