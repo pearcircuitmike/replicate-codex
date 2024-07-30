@@ -1,13 +1,10 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { kebabToTitleCase } from "@/lib/kebabToTitleCase";
+import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 import MetaTags from "../../../components/MetaTags";
 import ModelCard from "../../../components/ModelCard";
-import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber.js";
-import { toTitleCase } from "@/lib/toTitleCase.js";
-import { getMedalEmoji } from "@/lib/getMedalEmoji.js";
-import { fetchModelsPaginated } from "../../api/utils/fetchModelsPaginated";
+import { toTitleCase } from "@/pages/api/utils/toTitleCase";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";
 

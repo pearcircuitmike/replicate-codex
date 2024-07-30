@@ -1,11 +1,8 @@
 import React from "react";
-import { Box, Heading, Text, Link, Tag, VStack } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import customTheme from "../../components/MarkdownTheme";
-import PreviewImage from "../PreviewImage";
-import { kebabToTitleCase } from "@/lib/kebabToTitleCase";
-import EmojiWithGradient from "./../EmojiWithGradient";
 
 const ModelOverview = ({ model }) => {
   return (
