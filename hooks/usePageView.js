@@ -16,7 +16,7 @@ export function usePageView() {
       }
     };
 
-    // Track the initial page load, but only once
+    // Track the initial page load, but only once (i hope)
     if (lastTrackedPath.current !== router.asPath) {
       trackEvent("page_view", { page: router.asPath });
       lastTrackedPath.current = router.asPath;
