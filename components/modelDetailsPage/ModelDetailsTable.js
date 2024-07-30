@@ -16,9 +16,6 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 import TruncateWithReadMore from "@/components/TruncateWithReadMore";
 
-import { getMedalEmoji } from "@/lib/getMedalEmoji";
-import { kebabToTitleCase } from "@/lib/kebabToTitleCase";
-
 const ModelDetailsTable = ({ model, creator }) => {
   return (
     <Box>
