@@ -8,7 +8,7 @@ import { fetchPapersPaginated } from "../api/utils/fetchPapers";
 import SearchBar from "../../components/SearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
-import { getDateRange } from "../../lib/dateUtils";
+import { getDateRange } from "../api/utils/dateUtils";
 import categoryDescriptions from "../../data/categoryDescriptions.json";
 
 export async function getServerSideProps({ query }) {
@@ -23,7 +23,7 @@ export async function getServerSideProps({ query }) {
 
   const { data, totalCount } = await fetchPapersPaginated({
     platform: "arxiv",
-    pageSize: 20,
+    pageSize: 16,
     currentPage,
     searchValue,
     selectedCategories,
