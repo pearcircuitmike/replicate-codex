@@ -38,6 +38,8 @@ import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
+import Head from "next/head";
+
 import { useAuth } from "../../../context/AuthContext";
 
 export async function getStaticPaths() {
@@ -159,6 +161,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         title={`${paper.title} | AI Research Paper Details`}
         description={paper.abstract}
       />
+
       <Container maxW="container.md" py="12">
         <Box>
           <Heading as="h1" mb={2}>

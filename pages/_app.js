@@ -9,7 +9,6 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
 import { AuthProvider, useAuth } from "../context/AuthContext";
@@ -19,24 +18,17 @@ import AuthForm from "@/components/AuthForm";
 import { usePageView } from "../hooks/usePageView";
 
 function AppContent({ Component, pageProps }) {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Use the custom hook for page view tracking
-  usePageView();
-
   useEffect(() => {
-    if (!loading && !user) {
+    if (!user) {
       const timer = setTimeout(() => {
         onOpen();
-      }, 15000); // Open the modal after 15 seconds if the user is not authenticated
+      }, 15000);
       return () => clearTimeout(timer);
     }
-  }, [user, loading, onOpen]);
-
-  if (loading) {
-    return <div>Loading...</div>; // Or your custom loading component
-  }
+  }, [user, onOpen]);
 
   return (
     <RouteGuard>
@@ -68,7 +60,6 @@ function AppContent({ Component, pageProps }) {
             <ModalOverlay />
             <ModalContent p={2}>
               <ModalHeader>Create an account for full access</ModalHeader>
-
               <ModalBody>
                 <AuthForm />
               </ModalBody>
