@@ -20,7 +20,7 @@ import { usePageView } from "../hooks/usePageView";
 import Head from "next/head";
 
 function AppContent({ Component, pageProps }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Use the custom hook for page view tracking
@@ -33,7 +33,7 @@ function AppContent({ Component, pageProps }) {
       }, 15000); // Open the modal after 15 seconds if the user is not authenticated
       return () => clearTimeout(timer);
     }
-  }, [user, onOpen]);
+  }, [user, loading, onOpen]);
 
   return (
     <RouteGuard>
@@ -60,7 +60,7 @@ function AppContent({ Component, pageProps }) {
             `}
           </Script>
 
-          <Component {...pageProps} />
+          <Component {...pageProps} loading={loading} />
 
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
