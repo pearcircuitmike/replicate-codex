@@ -46,10 +46,6 @@ const RouteGuard = ({ children }) => {
     }
   }, [user, firstTimeUser, hasActiveSubscription, loading, router.pathname]);
 
-  if (loading) {
-    return <div>Loading...</div>; // Or your custom loading component
-  }
-
   return <>{children}</>;
 };
 
