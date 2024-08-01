@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import Feed from "../Feed/Feed";
 import SearchBar from "../SearchBar";
 import TopSearchQueries from "../TopSearchQueries";
+import TimeRangeFilter from "../TimeRangeFilter";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const DiscoverView = () => {
@@ -25,7 +26,10 @@ const DiscoverView = () => {
     papers: null,
     models: null,
   });
-  const [searchParams, setSearchParams] = useState({ searchValue: "" });
+  const [searchParams, setSearchParams] = useState({
+    searchValue: "",
+    timeRange: "thisWeek",
+  });
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
   const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
@@ -40,7 +44,7 @@ const DiscoverView = () => {
   const handleSearch = useCallback(
     (value = searchInput) => {
       setIsSearching(true);
-      setSearchParams({ searchValue: value });
+      setSearchParams((prevParams) => ({ ...prevParams, searchValue: value }));
       router.push(
         `/dashboard/discover?q=${encodeURIComponent(value)}`,
         undefined,
@@ -51,14 +55,13 @@ const DiscoverView = () => {
     [searchInput, router]
   );
 
+  const handleTimeRangeChange = useCallback((timeRange) => {
+    setSearchParams((prevParams) => ({ ...prevParams, timeRange }));
+  }, []);
+
   const updateResultCount = useCallback((type, count) => {
     setResultCounts((prev) => ({ ...prev, [type]: count }));
   }, []);
-
-  const handleSearchQuery = (query) => {
-    setSearchInput(query);
-    handleSearch(query);
-  };
 
   return (
     <VStack
@@ -85,6 +88,10 @@ const DiscoverView = () => {
             resourceType="discover"
           />
         </Box>
+        <TimeRangeFilter
+          initialTimeRange={searchParams.timeRange}
+          onTimeRangeChange={handleTimeRangeChange}
+        />
       </Box>
       <Box flex={1} overflowY="auto">
         <Tabs

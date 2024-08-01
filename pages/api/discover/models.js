@@ -12,8 +12,7 @@ export default async function handler(req, res) {
       pageSize = 10,
       searchValue,
       selectedCategories,
-      startDate,
-      endDate,
+      timeRange,
     } = req.query;
 
     try {
@@ -32,8 +31,31 @@ export default async function handler(req, res) {
         query = query.overlaps("tags", selectedCategories.split(","));
       }
 
-      if (startDate && endDate) {
-        query = query.gte("indexedDate", startDate).lte("indexedDate", endDate);
+      if (timeRange) {
+        const now = new Date();
+        let startDate;
+
+        switch (timeRange) {
+          case "today":
+            startDate = new Date(now.setHours(0, 0, 0, 0));
+            break;
+          case "thisWeek":
+            startDate = new Date(now.setDate(now.getDate() - 7));
+            break;
+          case "thisMonth":
+            startDate = new Date(now.setMonth(now.getMonth() - 1));
+            break;
+          case "thisYear":
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            break;
+          case "allTime":
+          default:
+            startDate = null;
+        }
+
+        if (startDate) {
+          query = query.gte("indexedDate", startDate.toISOString());
+        }
       }
 
       const { data, error, count } = await query
