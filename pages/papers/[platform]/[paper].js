@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 import {
   Container,
   Box,
@@ -113,9 +115,64 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     prevSlug: null,
     nextSlug: null,
   });
-  const { user, hasActiveSubscription } = useAuth();
+  const { user, hasActiveSubscription, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
+  const [viewCounts, setViewCounts] = useState({
+    totalUniqueViews: 0,
+    uniqueResources: [],
+    canViewFullArticle: true,
+  });
+
+  useEffect(() => {
+    if (!loading) {
+      console.log("hasActiveSubscription:", hasActiveSubscription);
+    }
+  }, [hasActiveSubscription, loading]);
+
+  useEffect(() => {
+    const fetchViewCounts = async () => {
+      if (!paper?.slug || loading) return;
+
+      // Get session ID from local storage
+      let sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        sessionId = uuidv4();
+        localStorage.setItem("sessionId", sessionId);
+      }
+
+      try {
+        const response = await axios.get(`/api/resource-view-count`, {
+          params: {
+            session_id: sessionId,
+            resource_type: "papers",
+          },
+        });
+
+        if (!response.data) throw new Error("Failed to fetch view counts");
+
+        const data = response.data;
+        setViewCounts(data);
+
+        // Log the number of papers read
+        console.log("Number of papers read:", data.totalUniqueViews);
+      } catch (error) {
+        console.error("Error fetching view counts:", error);
+        if (!hasActiveSubscription) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch article view information",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      }
+    };
+
+    fetchViewCounts();
+  }, [paper?.slug, hasActiveSubscription, loading, toast]);
 
   useEffect(() => {
     const fetchAdjacent = async () => {
@@ -135,7 +192,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     fetchAdjacent();
   }, [paper]);
 
-  if (!paper) {
+  if (loading || !paper) {
     return <div>Loading...</div>;
   }
 
@@ -246,39 +303,43 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           ) : (
             <EmojiWithGradient title={paper.title} height="250px" />
           )}
-          <Box bg="gray.100" p={4} mb={6}>
-            <Heading as="h2" mb={2}>
-              Abstract
-            </Heading>
-            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
-              {formattedAbstract}
-            </ReactMarkdown>
-          </Box>
-          {!user && (
+
+          {viewCounts.canViewFullArticle || hasActiveSubscription ? (
+            <>
+              <Box bg="gray.100" p={4} mb={6}>
+                <Heading as="h2" mb={2}>
+                  Abstract
+                </Heading>
+                <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+                  {formattedAbstract}
+                </ReactMarkdown>
+              </Box>
+              <div>
+                <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+                  {paper.generatedSummary}
+                </ReactMarkdown>
+              </div>
+              <br />
+              <hr />
+              <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
+                This summary was produced with help from an AI and may contain
+                inaccuracies - check out the links to read the original source
+                documents!
+              </Text>
+            </>
+          ) : (
             <Container maxW="container.md">
               <Box mt={8}>
                 <Text fontWeight="bold" fontSize="lg" align="center">
-                  Create account to get full access
+                  You reached the limit of 50 free paper summaries for the
+                  month. Wow! Become a paid subscriber to get unlimited access.
                 </Text>
               </Box>
-
               <Center my={"20px"}>
                 <AuthForm />
               </Center>
             </Container>
           )}
-          <div>
-            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
-              {paper.generatedSummary}
-            </ReactMarkdown>
-          </div>
-          <br />
-          <hr />
-          <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
-            This summary was produced with help from an AI and may contain
-            inaccuracies - check out the links to read the original source
-            documents!
-          </Text>
         </Box>
         <Box mt="8">
           <PaperNavigationButtons
