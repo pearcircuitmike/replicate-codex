@@ -7,9 +7,9 @@ const Testimonials = () => {
       <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
         <Box p={6}>
           <Text fontSize="xl" mb={4}>
-            &quot;AImodels.fyi&apos;s summaries are my cheat code. They&apos;ve
-            helped me rapidly parse my options based on new research and then
-            implement them in my code.&quot;
+            &quot;AI Models is consistently three weeks ahead of Twitter. Since
+            subscribing I&pos;ve been able to mute all the AI influencers and am
+            better informed than ever. &quot;
           </Text>
           <Box display="flex" alignItems="center">
             <Box

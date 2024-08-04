@@ -40,7 +40,6 @@ import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
-import Head from "next/head";
 
 import { useAuth } from "../../../context/AuthContext";
 
