@@ -138,7 +138,7 @@ const PricingPage = () => {
               animation: `${shine} 6s infinite`,
             }}
           >
-            Start 7-day free trial
+            Start 30-day free trial
           </Button>
           <List spacing={4} textAlign="left" mt={8}>
             <ListItem>
