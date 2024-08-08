@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@chakra-ui/react";
+import { Button, Icon } from "@chakra-ui/react";
 import { FaComment } from "react-icons/fa";
 import supabase from "../pages/api/utils/supabaseClient";
 
@@ -27,11 +27,11 @@ const NoteButton = ({ paperId, onClick, ...props }) => {
   return (
     <Button
       onClick={onClick}
-      leftIcon={<FaComment />}
+      leftIcon={<Icon as={FaComment} color="gray.500" />}
       variant="outline"
       {...props}
     >
-      {noteCount > 0 ? `Notes (${noteCount})` : "Notes"}
+      {noteCount > 0 ? `Comment (${noteCount})` : "Add a comment"}
     </Button>
   );
 };

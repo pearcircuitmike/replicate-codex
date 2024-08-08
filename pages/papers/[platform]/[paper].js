@@ -220,23 +220,21 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
       <Container maxW="container.md" py="12">
         <Box>
-          <Heading as="h1" mb={2}>
-            <Link href={`https://arxiv.org/abs/${paper.arxivId}`} isExternal>
-              {paper.title}{" "}
-              <Icon
-                color="blue.500"
-                as={FaExternalLinkAlt}
-                style={{ display: "inline" }}
-                boxSize={5}
-              />
-            </Link>
+          <Heading as="h1" size="xl" mb={5}>
+            {paper.title}
           </Heading>
-          <Text fontSize="lg" mb={4}>
-            {paper.arxivId}
-          </Text>
-          <Box fontSize="md" mb={4}>
+
+          <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
             <Text as="span">
-              Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
+              <Link
+                href={`https://arxiv.org/abs/${paper.arxivId}`}
+                isExternal
+                _hover={{ color: "blackAlpha.900" }}
+              >
+                {paper.arxivId}
+              </Link>{" "}
+              - Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
+              by{" "}
             </Text>
             {paper.authors && paper.authors.length > 0 ? (
               <>
@@ -246,8 +244,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                       href={`/authors/${encodeURIComponent(
                         paper.platform
                       )}/${encodeURIComponent(author)}`}
-                      color="blue.500"
-                      textDecoration="underline"
+                      _hover={{ color: "blackAlpha.900" }}
                     >
                       {author}
                     </Link>
@@ -294,17 +291,35 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             <Image
               src={paper.thumbnail}
               alt={paper.title}
-              mb={6}
+              my={6}
               objectFit="cover"
               w="100%"
-              h="250px"
+              h="350px"
             />
           ) : (
-            <EmojiWithGradient title={paper.title} height="250px" />
+            <Box my={6}>
+              <EmojiWithGradient title={paper.title} height="350px" />
+            </Box>
           )}
 
           {viewCounts.canViewFullArticle || hasActiveSubscription ? (
             <>
+              {!user && (
+                <Box>
+                  <Text align="center" fontWeight={"bold"} mt={10}>
+                    Sign in to get full access
+                  </Text>
+                  <Box
+                    mb={10}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <AuthForm />
+                  </Box>
+                </Box>
+              )}
+              {/*
               <Box bg="gray.100" p={4} mb={6}>
                 <Heading as="h2" mb={2}>
                   Abstract
@@ -313,6 +328,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   {formattedAbstract}
                 </ReactMarkdown>
               </Box>
+              */}
               <div>
                 <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
                   {paper.generatedSummary}
