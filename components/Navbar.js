@@ -43,22 +43,22 @@ const Navbar = () => {
           <Flex display={["none", "none", "flex", "flex"]}>
             <HStack spacing={isMobile ? 4 : 10}>
               <Link href="/creators" aria-label="Creators">
-                👨‍🎨 Creators
+                Creators
               </Link>
               <Link href="/models" aria-label="Models">
-                🤖 Models
+                Models
               </Link>
               <Link href="/papers" aria-label="Papers">
-                📄 Papers
+                Papers
               </Link>
               <Link href="/authors" aria-label="Researchers">
-                🔬 Researchers
+                Researchers
               </Link>
               <Link href="/tools" aria-label="Tools">
-                🛠️ Tools
+                Tools
               </Link>
               <Link href="https://notes.aimodels.fyi" aria-label="Notes">
-                📝 Notes
+                Notes
               </Link>
               {user ? (
                 <Menu>
@@ -117,7 +117,7 @@ const Navbar = () => {
               <Heading fontSize={isMobile ? "xl" : "2xl"}>
                 <Link href="/" aria-label="Home" legacyBehavior>
                   <span onClick={() => changeDisplay("none")}>
-                    🤖 AIModels.fyi
+                    AIModels.fyi
                   </span>
                 </Link>
               </Heading>
@@ -156,40 +156,36 @@ const Navbar = () => {
               fontSize={isMobile ? "lg" : "xl"}
             >
               <Link href="/creators" aria-label="Creators" legacyBehavior>
-                <span onClick={() => changeDisplay("none")}>👨‍🎨 Creators</span>
+                <span onClick={() => changeDisplay("none")}>Creators</span>
               </Link>
               <Link href="/models" aria-label="Models" legacyBehavior>
-                <span onClick={() => changeDisplay("none")}>🤖 Models</span>
+                <span onClick={() => changeDisplay("none")}>Models</span>
               </Link>
               <Link href="/papers" aria-label="Papers" legacyBehavior>
-                <span onClick={() => changeDisplay("none")}>📄 Papers</span>
+                <span onClick={() => changeDisplay("none")}>Papers</span>
               </Link>
               <Link href="/authors" aria-label="Researchers" legacyBehavior>
-                <span onClick={() => changeDisplay("none")}>
-                  🔬 Researchers
-                </span>
+                <span onClick={() => changeDisplay("none")}>Researchers</span>
               </Link>
               <Link href="/tools" aria-label="Tools" legacyBehavior>
-                <span onClick={() => changeDisplay("none")}>🛠️ Tools</span>
+                <span onClick={() => changeDisplay("none")}>Tools</span>
               </Link>
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
                 legacyBehavior
               >
-                <span onClick={() => changeDisplay("none")}>📝 Notes</span>
+                <span onClick={() => changeDisplay("none")}>Notes</span>
               </Link>
 
               {user && (
                 <>
                   <Link href="/dashboard" aria-label="Dashboard" legacyBehavior>
-                    <span onClick={() => changeDisplay("none")}>
-                      📊 Dashboard
-                    </span>
+                    <span onClick={() => changeDisplay("none")}>Dashboard</span>
                   </Link>
                   <Link href="/account" aria-label="My Account" legacyBehavior>
                     <span onClick={() => changeDisplay("none")}>
-                      👤 My Account
+                      My Account
                     </span>
                   </Link>
                   <Button
@@ -198,7 +194,6 @@ const Navbar = () => {
                       changeDisplay("none");
                     }}
                     colorScheme="blue"
-                    leftIcon="🚪"
                     m={isMobile ? "5px" : "10px"}
                     w="100%"
                   >
