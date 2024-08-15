@@ -226,12 +226,16 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
           <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
             <Text as="span">
+              Read original:{" "}
               <Link
                 href={`https://arxiv.org/abs/${paper.arxivId}`}
                 isExternal
                 _hover={{ color: "blackAlpha.900" }}
+                color="black.500"
               >
-                {paper.arxivId}
+                <Text as="span" textDecoration="underline">
+                  arXiv:{paper.arxivId}
+                </Text>
               </Link>{" "}
               - Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
               by{" "}
