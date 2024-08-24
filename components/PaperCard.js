@@ -15,11 +15,30 @@ import BookmarkButton from "./BookmarkButton";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const PaperCard = ({ paper, onBookmarkChange }) => {
-  const thumbnailUrl = paper.thumbnail;
-  const isNew = (indexedDate) => {
+  const {
+    id,
+    title,
+    authors,
+    abstract,
+    publishedDate,
+    indexedDate,
+    arxivCategories,
+    thumbnail,
+    platform,
+    slug,
+    totalScore,
+  } = paper;
+
+  const isNew = React.useMemo(() => {
     const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
     return new Date(indexedDate) >= seventyTwoHoursAgo;
-  };
+  }, [indexedDate]);
+
+  const formattedDate = React.useMemo(
+    () => new Date(publishedDate).toLocaleDateString(),
+    [publishedDate]
+  );
+
   return (
     <Box
       w="100%"
@@ -35,22 +54,23 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       overflow="hidden"
     >
       <Link
-        href={`/papers/${encodeURIComponent(
-          paper.platform
-        )}/${encodeURIComponent(paper.slug)}`}
-        legacyBehavior
+        href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
+          slug
+        )}`}
+        passHref
       >
         <Box h="250px" overflow="hidden" position="relative">
-          {thumbnailUrl ? (
+          {thumbnail ? (
             <Image
-              src={thumbnailUrl}
-              alt={paper.title}
+              src={thumbnail}
+              alt={title}
               objectFit="cover"
               w="100%"
               h="100%"
+              loading="lazy"
             />
           ) : (
-            <EmojiWithGradient title={paper.title} />
+            <EmojiWithGradient title={title} />
           )}
           <Tooltip label="Calculated based on factors such as likes, downloads, etc">
             <Flex
@@ -70,7 +90,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
                 mr={1}
               />
               <Text fontSize="sm" fontWeight="bold">
-                {formatLargeNumber(Math.floor(paper.totalScore))}
+                {formatLargeNumber(Math.floor(totalScore))}
               </Text>
             </Flex>
           </Tooltip>
@@ -84,26 +104,25 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           mb={2}
           style={{ whiteSpace: "normal", wordWrap: "break-word" }}
         >
-          {isNew(paper.indexedDate) && (
+          {isNew && (
             <Tag size="md" colorScheme="green" mr="5px">
               New!
             </Tag>
           )}
-          {paper.title}
+          {title}
         </Heading>
         <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
-          {paper.authors.join(", ")}
+          {authors.join(", ")}
         </Text>
         <Text fontSize="sm" noOfLines={4}>
-          {paper.abstract || "No abstract available."}
+          {abstract || "No abstract available."}
         </Text>
         <Text>
           <Link
-            href={`/papers/${encodeURIComponent(
-              paper.platform
-            )}/${encodeURIComponent(paper.slug)}`}
+            href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
+              slug
+            )}`}
             passHref
-            legacyBehavior
           >
             <ChakraLink
               fontSize="sm"
@@ -123,36 +142,33 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         pl="15px"
         pr="15px"
       >
-        <Text fontSize="sm">
-          {new Date(paper.publishedDate).toLocaleDateString()}
-        </Text>
+        <Text fontSize="sm">{formattedDate}</Text>
       </Flex>
       <Flex wrap="wrap" mb="10px" pl="15px" pr="15px">
-        {paper.arxivCategories &&
-          paper.arxivCategories.map((category, index) => (
-            <Link
-              key={index}
-              href={{
-                pathname: "/papers",
-                query: { selectedCategories: JSON.stringify([category]) },
-              }}
-              passHref
+        {arxivCategories.map((category, index) => (
+          <Link
+            key={`${category}-${index}`}
+            href={{
+              pathname: "/papers",
+              query: { selectedCategories: JSON.stringify([category]) },
+            }}
+            passHref
+          >
+            <Tag
+              size="sm"
+              colorScheme="blue"
+              mr="5px"
+              mb="5px"
+              cursor="pointer"
             >
-              <Tag
-                size="sm"
-                colorScheme="blue"
-                mr="5px"
-                mb="5px"
-                cursor="pointer"
-              >
-                {category}
-              </Tag>
-            </Link>
-          ))}
+              {category}
+            </Tag>
+          </Link>
+        ))}
       </Flex>
       <BookmarkButton
         resourceType="paper"
-        resourceId={paper.id}
+        resourceId={id}
         onBookmarkChange={onBookmarkChange}
       />
     </Box>
