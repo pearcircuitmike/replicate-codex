@@ -125,12 +125,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   });
 
   useEffect(() => {
-    if (!loading) {
-      console.log("hasActiveSubscription:", hasActiveSubscription);
-    }
-  }, [hasActiveSubscription, loading]);
-
-  useEffect(() => {
     const fetchViewCounts = async () => {
       if (!paper?.slug || loading) return;
 
@@ -187,10 +181,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     };
     fetchAdjacent();
   }, [paper]);
-
-  if (loading || !paper) {
-    return <div>Loading...</div>;
-  }
 
   const formatLinks = (text) => {
     const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
