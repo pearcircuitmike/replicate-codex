@@ -147,7 +147,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         <Text fontSize="sm">{formattedDate}</Text>
       </Flex>
       <Flex wrap="wrap" mb="10px" pl="15px" pr="15px">
-        {arxivCategories.map((category, index) => (
+        {(arxivCategories ?? []).map((category, index) => (
           <Link
             key={`${category}-${index}`}
             href={{
