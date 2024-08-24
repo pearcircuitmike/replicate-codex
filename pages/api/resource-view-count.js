@@ -46,9 +46,6 @@ export default async function handler(req, res) {
     const totalCount = uniqueResources.size;
     const canViewFullArticle = totalCount <= 5;
 
-    console.log(`Total unique ${resource_type} views: ${totalCount}`);
-    console.log("Unique resources:", Array.from(uniqueResources));
-
     res.status(200).json({
       totalUniqueViews: totalCount,
       uniqueResources: Array.from(uniqueResources),

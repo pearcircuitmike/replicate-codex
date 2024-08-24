@@ -9,7 +9,6 @@ const getSessionId = () => {
       sessionId = uuidv4();
       localStorage.setItem("sessionId", sessionId);
     }
-    console.log("Session ID:", sessionId); // Debugging: Log the session ID
     return sessionId;
   } catch (error) {
     console.error("Error accessing localStorage:", error);

@@ -93,8 +93,6 @@ export const addNote = async (userId, paperId, noteText, replyToId = null) => {
 };
 
 export const editNote = async (noteId, newText, userId) => {
-  console.log("Attempting to edit note:", { noteId, newText, userId });
-
   if (typeof newText !== "string" || newText.length > 5000) {
     throw new Error("Invalid note text");
   }
@@ -118,8 +116,6 @@ export const editNote = async (noteId, newText, userId) => {
     `
     )
     .single();
-
-  console.log("Edit operation result:", { data, error });
 
   if (error) {
     console.error("Error editing note:", error);

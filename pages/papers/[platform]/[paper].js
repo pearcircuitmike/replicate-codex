@@ -153,9 +153,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
         const data = response.data;
         setViewCounts(data);
-
-        // Log the number of papers read
-        console.log("Number of papers read:", data.totalUniqueViews);
       } catch (error) {
         console.error("Error fetching view counts:", error);
         if (!hasActiveSubscription) {
