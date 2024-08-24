@@ -58,19 +58,19 @@ export async function fetchTrendingCreators(startDate, limit = 5) {
 }
 
 export async function fetchTrendingAuthors(limit = 5) {
-  // Query the unique_authors_data_view view
   let query = supabase
     .from("unique_authors_data_view")
-    .select("author, totalAuthorScore")
+    .select("author, totalAuthorScore, authorRank") // Fetch both author and score
     .order("totalAuthorScore", { ascending: false })
     .limit(limit);
 
   const { data, error } = await query;
+
   if (error) {
     console.error(error);
     return [];
   }
 
-  const trendingAuthors = data.map((item) => item.author).slice(0, limit);
-  return trendingAuthors;
+  // Return the full data including both author and totalAuthorScore
+  return data;
 }

@@ -130,12 +130,12 @@ const LandingPageTrending = ({
                     {renderSkeletonCard()}
                   </React.Fragment>
                 ))
-              : trendingAuthors.map((author, index) => (
+              : trendingAuthors.map((authorData, index) => (
                   <NextLink
                     key={index}
                     href={`/authors/${encodeURIComponent(
                       "arxiv"
-                    )}/${encodeURIComponent(author)}`}
+                    )}/${encodeURIComponent(authorData.author)}`}
                     passHref
                   >
                     <Link _hover={{ textDecoration: "none" }}>
@@ -147,7 +147,7 @@ const LandingPageTrending = ({
                       >
                         <HStack align="center">
                           <VStack align="start" spacing={1}>
-                            <Text fontWeight="bold">{author}</Text>
+                            <Text fontWeight="bold">{authorData.author}</Text>
                             <Text fontSize="sm">Platform: arxiv</Text>
                             <HStack mt={2}>
                               <Image
@@ -157,14 +157,14 @@ const LandingPageTrending = ({
                                 mr={1}
                               />
                               <Text>
-                                {formatLargeNumber(author.totalAuthorScore)}
+                                {formatLargeNumber(authorData.totalAuthorScore)}
                               </Text>
                             </HStack>
                           </VStack>
                           <Spacer />
                           <Center height="100%">
                             <EmojiWithGradient
-                              title={author || "Author"}
+                              title={authorData.author || "Author"}
                               height="80px"
                               width="80px"
                               objectFit="cover"
