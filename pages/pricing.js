@@ -49,8 +49,8 @@ const PricingPage = () => {
   };
 
   return (
-    <Box p={8} maxW="container.lg" mx="auto">
-      <Box textAlign="center" mb={8}>
+    <Box my={4}>
+      <Box textAlign="center" mb={6}>
         <Heading size="xl" mb={6}>
           Complete signup to access your dashboard
         </Heading>
@@ -172,19 +172,11 @@ const PricingPage = () => {
           </List>
         </Box>
       </Box>
-      <Box py={16} px={8}>
-        <Container maxW="8xl">
-          <Image
-            src="./img/_discoverBg.png"
-            alt="Dashboard Preview"
-            maxW="100%"
-            h="auto"
-          />
-          <Heading as="h2" fontSize="4xl" mt="50px" mb={4} textAlign="center">
-            What our users say
-          </Heading>
-          <Testimonials />
-        </Container>
+      <Box p={4}>
+        <Heading as="h2" fontSize="3xl" mt="50px" mb={4} textAlign="center">
+          What our subscribers say
+        </Heading>
+        <Testimonials />
       </Box>
       <Box mt={"150px"} textAlign="center">
         <Link as={NextLink} href="/">
