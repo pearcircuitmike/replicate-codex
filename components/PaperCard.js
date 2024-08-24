@@ -117,20 +117,22 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         <Text fontSize="sm" noOfLines={4}>
           {abstract || "No abstract available."}
         </Text>
-        <Text>
+        <Text
+          as="span"
+          fontSize="sm"
+          color="blue.500"
+          textDecoration="underline"
+          _hover={{
+            textDecoration: "none",
+            color: "blue.700",
+          }}
+        >
           <Link
             href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
               slug
             )}`}
-            passHref
           >
-            <ChakraLink
-              fontSize="sm"
-              color="blue.500"
-              textDecoration="underline"
-            >
-              Read more
-            </ChakraLink>
+            Read more
           </Link>
         </Text>
       </Box>

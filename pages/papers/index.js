@@ -23,7 +23,7 @@ export async function getServerSideProps({ query }) {
 
   const { data, totalCount } = await fetchPapersPaginated({
     platform: "arxiv",
-    pageSize: 16,
+    pageSize: 12,
     currentPage,
     searchValue,
     selectedCategories,
@@ -59,7 +59,7 @@ const PapersIndexPage = ({
   );
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(totalPaperCount);
-  const pageSize = 20;
+  const pageSize = 12;
   const [selectedTimeRange, setSelectedTimeRange] = useState(
     initialSelectedTimeRange
   );
