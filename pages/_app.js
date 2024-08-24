@@ -27,13 +27,13 @@ function AppContent({ Component, pageProps }) {
   usePageView();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!user) {
       const timer = setTimeout(() => {
         onOpen();
       }, 15000); // Open the modal after 15 seconds if the user is not authenticated
       return () => clearTimeout(timer);
     }
-  }, [user, loading, onOpen]);
+  }, [user, onOpen]);
 
   return (
     <RouteGuard>
