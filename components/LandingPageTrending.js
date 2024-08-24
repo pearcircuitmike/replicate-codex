@@ -156,7 +156,9 @@ const LandingPageTrending = ({
                                 boxSize="20px"
                                 mr={1}
                               />
-                              <Text>{formatLargeNumber(Math.floor(10))}</Text>
+                              <Text>
+                                {formatLargeNumber(author.totalAuthorScore)}
+                              </Text>
                             </HStack>
                           </VStack>
                           <Spacer />

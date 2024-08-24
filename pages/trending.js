@@ -112,7 +112,7 @@ export async function getServerSideProps(context) {
   const trendingPapers = await fetchTrendingPapers("arxiv", startDate);
   const trendingModels = await fetchTrendingModels(startDate);
   const trendingCreators = await fetchTrendingCreators(startDate);
-  const trendingAuthors = await fetchTrendingAuthors("arxiv", startDate);
+  const trendingAuthors = await fetchTrendingAuthors(4);
   return {
     props: {
       trendingPapers,

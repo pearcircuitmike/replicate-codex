@@ -45,7 +45,7 @@ export default function Home() {
       const models = await fetchTrendingModels(startDate, 4);
       const papers = await fetchTrendingPapers("arxiv", startDate, 4);
       const creators = await fetchTrendingCreators(startDate, 4);
-      const authors = await fetchTrendingAuthors("arxiv", startDate, 4);
+      const authors = await fetchTrendingAuthors(4);
 
       setTrendingModels(models);
       setTrendingPapers(papers);

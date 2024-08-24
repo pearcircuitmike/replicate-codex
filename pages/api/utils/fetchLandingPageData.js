@@ -57,14 +57,12 @@ export async function fetchTrendingCreators(startDate, limit = 5) {
   return data;
 }
 
-export async function fetchTrendingAuthors(platform, startDate, limit = 5) {
-  const endDate = new Date(startDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+export async function fetchTrendingAuthors(limit = 5) {
+  // Query the unique_authors_data_view view
   let query = supabase
-    .from(`${platform}PapersData`)
-    .select("authors, totalScore")
-    .order("totalScore", { ascending: false })
-    .lte("lastUpdated", startDate.toISOString())
-    .gte("lastUpdated", endDate.toISOString())
+    .from("unique_authors_data_view")
+    .select("author, totalAuthorScore")
+    .order("totalAuthorScore", { ascending: false })
     .limit(limit);
 
   const { data, error } = await query;
@@ -72,8 +70,7 @@ export async function fetchTrendingAuthors(platform, startDate, limit = 5) {
     console.error(error);
     return [];
   }
-  const trendingAuthors = Array.from(
-    new Set(data.flatMap((item) => item.authors))
-  ).slice(0, limit);
+
+  const trendingAuthors = data.map((item) => item.author).slice(0, limit);
   return trendingAuthors;
 }
