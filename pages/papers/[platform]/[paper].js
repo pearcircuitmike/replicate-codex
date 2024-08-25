@@ -40,6 +40,7 @@ import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
+import CarbonAd from "../../../components/CarbonAd"; // Import the new CarbonAd component
 
 import { useAuth } from "../../../context/AuthContext";
 
@@ -292,6 +293,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <EmojiWithGradient title={paper.title} height="350px" />
             </Box>
           )}
+
+          {/* Conditionally render CarbonAd for unauthenticated users */}
+          {!user && <CarbonAd />}
 
           {viewCounts.canViewFullArticle || hasActiveSubscription ? (
             <>
