@@ -22,7 +22,6 @@ import Head from "next/head";
 function AppContent({ Component, pageProps }) {
   const { user, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   // Use the custom hook for page view tracking
   usePageView();
 
@@ -59,9 +58,21 @@ function AppContent({ Component, pageProps }) {
               })(window, document, "clarity", "script", '${process.env.NEXT_PUBLIC_CLARITY_KEY}');
             `}
           </Script>
-
+          {/* Google Adsense tag */}
+          <Script id="google-adsense" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'AW-16682209532');
+            `}
+          </Script>
+          <Script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=AW-16682209532"
+            strategy="afterInteractive"
+          />
           <Component {...pageProps} loading={loading} />
-
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent p={2}>
