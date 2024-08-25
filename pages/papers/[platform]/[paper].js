@@ -295,7 +295,11 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           )}
 
           {/* Conditionally render CarbonAd for unauthenticated users */}
-          {!user && <CarbonAd />}
+          {!user && (
+            <Box>
+              <CarbonAd />
+            </Box>
+          )}
 
           {viewCounts.canViewFullArticle || hasActiveSubscription ? (
             <>
