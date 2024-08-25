@@ -7,7 +7,7 @@ const CarbonAd = () => {
     script.async = true;
     script.type = "text/javascript";
     script.src =
-      "//cdn.carbonads.com/carbon.js?serve=CW7DV23J&placement=wwwaimodelsfyi&format=cover";
+      "//cdn.carbonads.com/carbon.js?serve=CW7DV23J&placement=wwwaimodelsfyi&format=classic";
     script.id = "_carbonads_js";
     document.body.appendChild(script);
 
