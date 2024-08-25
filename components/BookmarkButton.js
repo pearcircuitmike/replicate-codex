@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Button, Icon } from "@chakra-ui/react";
+import { Button, Icon, useDisclosure } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
 import supabase from "../pages/api/utils/supabaseClient";
 import { useAuth } from "../context/AuthContext";
-import { useRouter } from "next/router";
+import LoginModal from "./LoginModal";
 
 const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
-  const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const checkBookmarkStatus = async () => {
@@ -37,7 +37,7 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
 
   const toggleBookmark = async () => {
     if (!user) {
-      router.push("/login");
+      onOpen();
       return;
     }
     setIsLoading(true);
@@ -68,22 +68,25 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
   };
 
   return (
-    <Button
-      onClick={toggleBookmark}
-      isLoading={isLoading}
-      leftIcon={
-        <Icon
-          as={FaBookmark}
-          color={isBookmarked ? "yellow.500" : "gray.500"}
-        />
-      }
-      variant="outline"
-      w="100%"
-      borderTopRadius="0"
-      boxShadow="0"
-    >
-      {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
-    </Button>
+    <>
+      <Button
+        onClick={toggleBookmark}
+        isLoading={isLoading}
+        leftIcon={
+          <Icon
+            as={FaBookmark}
+            color={isBookmarked ? "yellow.500" : "gray.500"}
+          />
+        }
+        variant="outline"
+        w="100%"
+        borderTopRadius="0"
+        boxShadow="0"
+      >
+        {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
+      </Button>
+      <LoginModal isOpen={isOpen} onClose={onClose} />
+    </>
   );
 };
 

@@ -41,7 +41,7 @@ const LoginModal = ({ isOpen, onClose }) => {
           </Text>
         </ModalBody>
         <ModalFooter>
-          <NextLink href="/pricing" passHref>
+          <NextLink href="/login" passHref>
             <Link>
               <Button colorScheme="blue" mr={3}>
                 Create Pro Account
