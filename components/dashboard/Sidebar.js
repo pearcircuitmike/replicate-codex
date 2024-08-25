@@ -49,7 +49,7 @@ const Sidebar = ({ isOpen, onClose, ...props }) => {
       />
       <SidebarItem
         icon={FaBook}
-        text="My Library"
+        text="My Bookmarks"
         href="/dashboard/library"
         onClick={onClose}
       />

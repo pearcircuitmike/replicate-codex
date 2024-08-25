@@ -35,7 +35,7 @@ const LibraryView = () => {
   return (
     <Box p={4}>
       <Heading as="h1" size="xl" mb={6}>
-        My Library
+        My Bookmarks
       </Heading>
       <Text mb={4}>Your saved AI models, papers, and resources.</Text>
 

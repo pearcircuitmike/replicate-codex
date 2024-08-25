@@ -52,7 +52,7 @@ const DashboardLayout = ({ children }) => {
       label: "Weekly Summary",
       href: "/dashboard/weekly-paper-summary",
     },
-    { icon: <FaBook />, label: "My Library", href: "/dashboard/library" },
+    { icon: <FaBook />, label: "My Bookmarks", href: "/dashboard/library" },
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
 
