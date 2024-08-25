@@ -39,7 +39,23 @@ const ModelDetailsTable = ({ model, creator }) => {
           </Thead>
           <Tbody>
             <Tr>
-              <Td>Model Link</Td>
+              <Td>Run this model</Td>
+              <Td>
+                <Link
+                  href={model.modelUrl}
+                  isExternal
+                  color="blue.500"
+                  textDecoration="underline"
+                >
+                  Run on{" "}
+                  {model.platform.charAt(0).toUpperCase() +
+                    model.platform.slice(1)}{" "}
+                  <ExternalLinkIcon mx="2px" />
+                </Link>
+              </Td>
+            </Tr>
+            <Tr>
+              <Td>API spec</Td>
               <Td>
                 <Link
                   href={model.modelUrl}
@@ -55,23 +71,7 @@ const ModelDetailsTable = ({ model, creator }) => {
               </Td>
             </Tr>
             <Tr>
-              <Td>API Spec</Td>
-              <Td>
-                <Link
-                  href={model.modelUrl}
-                  isExternal
-                  color="blue.500"
-                  textDecoration="underline"
-                >
-                  View on{" "}
-                  {model.platform.charAt(0).toUpperCase() +
-                    model.platform.slice(1)}{" "}
-                  <ExternalLinkIcon mx="2px" />
-                </Link>
-              </Td>
-            </Tr>
-            <Tr>
-              <Td>Github Link</Td>
+              <Td>Github link</Td>
               <Td>
                 {model?.githubUrl ? (
                   <Link
@@ -88,7 +88,7 @@ const ModelDetailsTable = ({ model, creator }) => {
               </Td>
             </Tr>
             <Tr>
-              <Td>Paper Link</Td>
+              <Td>Paper link</Td>
               <Td>
                 {model?.paperUrl ? (
                   <Link
