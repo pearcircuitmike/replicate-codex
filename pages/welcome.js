@@ -14,6 +14,16 @@ const WelcomePage = () => {
   useEffect(() => {
     if (!user || !isFirstTimeUser) {
       router.push("/dashboard");
+    } else {
+      // Trigger the conversion event when the page loads for a first-time user
+      if (window.gtag) {
+        window.gtag("event", "conversion", {
+          send_to: "AW-16682209532/NzM3CJPenM0ZEPyh2ZI-",
+          value: 1.0,
+          currency: "USD",
+          transaction_id: "",
+        });
+      }
     }
   }, [user, isFirstTimeUser, router]);
 
