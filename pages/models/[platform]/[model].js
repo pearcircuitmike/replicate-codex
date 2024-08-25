@@ -27,6 +27,7 @@ import fetchRelatedModels from "../../api/utils/fetchRelatedModels";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
+import CarbonAd from "@/components/CarbonAd";
 
 export async function getStaticPaths({ numPages = 100 }) {
   const { data: models } = await supabase
@@ -158,6 +159,12 @@ export default function ModelPage({ model, relatedModels, slug }) {
           ) : (
             <EmojiWithGradient title={model?.modelName} />
           )}
+
+          {/* Render CarbonAd for all users */}
+
+          <Box>
+            <CarbonAd />
+          </Box>
 
           <Box my="8">
             <ModelDetailsTable model={model} creator={creatorData} />
