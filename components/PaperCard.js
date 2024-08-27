@@ -22,7 +22,6 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     abstract,
     publishedDate,
     indexedDate,
-    arxivCategories,
     thumbnail,
     platform,
     slug,
@@ -146,28 +145,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       >
         <Text fontSize="sm">{formattedDate}</Text>
       </Flex>
-      <Flex wrap="wrap" mb="10px" pl="15px" pr="15px">
-        {(arxivCategories ?? []).map((category, index) => (
-          <Link
-            key={`${category}-${index}`}
-            href={{
-              pathname: "/papers",
-              query: { selectedCategories: JSON.stringify([category]) },
-            }}
-            passHref
-          >
-            <Tag
-              size="sm"
-              colorScheme="blue"
-              mr="5px"
-              mb="5px"
-              cursor="pointer"
-            >
-              {category}
-            </Tag>
-          </Link>
-        ))}
-      </Flex>
+
       <BookmarkButton
         resourceType="paper"
         resourceId={id}
