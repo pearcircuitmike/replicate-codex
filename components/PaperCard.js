@@ -99,9 +99,9 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       <Box p="15px">
         <Heading
           as="h3"
-          size="md"
-          noOfLines={2}
-          mb={2}
+          size="sm"
+          noOfLines={3}
+          mb={1}
           style={{ whiteSpace: "normal", wordWrap: "break-word" }}
         >
           {isNew && (
@@ -111,7 +111,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           )}
           {title}
         </Heading>
-        <Text fontSize="sm" color="gray.500" noOfLines={2} mb={4}>
+        <Text fontSize="sm" color="gray.500" noOfLines={2} mb={2}>
           {authors.join(", ")}
         </Text>
         <Text fontSize="sm" noOfLines={4}>
