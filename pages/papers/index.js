@@ -6,17 +6,12 @@ import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
 import { fetchPapersPaginated } from "../api/utils/fetchPapers";
 import SearchBar from "../../components/SearchBar";
-import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
-import categoryDescriptions from "../../data/categoryDescriptions.json";
 
 export async function getServerSideProps({ query }) {
   const currentPage = parseInt(query.page || "1", 10);
   const selectedTimeRange = query.selectedTimeRange || "thisWeek";
-  const selectedCategories = query.selectedCategories
-    ? JSON.parse(query.selectedCategories)
-    : Object.keys(categoryDescriptions);
   const searchValue = query.search || "";
 
   const { startDate, endDate } = getDateRange(selectedTimeRange);
@@ -26,7 +21,6 @@ export async function getServerSideProps({ query }) {
     pageSize: 12,
     currentPage,
     searchValue,
-    selectedCategories,
     startDate,
     endDate,
   });
@@ -36,7 +30,6 @@ export async function getServerSideProps({ query }) {
       initialPapers: data,
       totalPaperCount: totalCount,
       initialSearch: searchValue,
-      initialSelectedCategories: selectedCategories,
       initialPage: currentPage,
       initialSelectedTimeRange: selectedTimeRange,
     },
@@ -47,16 +40,12 @@ const PapersIndexPage = ({
   initialPapers,
   totalPaperCount,
   initialSearch,
-  initialSelectedCategories,
   initialPage,
   initialSelectedTimeRange,
 }) => {
   const router = useRouter();
   const [papers, setPapers] = useState(initialPapers);
   const [searchValue, setSearchValue] = useState(initialSearch);
-  const [selectedCategories, setSelectedCategories] = useState(
-    initialSelectedCategories
-  );
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(totalPaperCount);
   const pageSize = 12;
@@ -72,7 +61,6 @@ const PapersIndexPage = ({
       pageSize,
       currentPage,
       searchValue,
-      selectedCategories,
       startDate,
       endDate,
     });
@@ -82,7 +70,7 @@ const PapersIndexPage = ({
 
   useEffect(() => {
     fetchPapers();
-  }, [currentPage, selectedCategories, selectedTimeRange]);
+  }, [currentPage, selectedTimeRange]);
 
   const handleSearchSubmit = (newSearchValue) => {
     setSearchValue(newSearchValue);
@@ -91,26 +79,11 @@ const PapersIndexPage = ({
       pathname: "/papers",
       query: {
         search: newSearchValue,
-        selectedCategories: JSON.stringify(selectedCategories),
         selectedTimeRange,
         page: 1,
       },
     });
-    fetchPapers(); // Fetch papers on search submit
-  };
-
-  const handleCategoryChange = (updatedCategories) => {
-    setSelectedCategories(updatedCategories);
-    setCurrentPage(1);
-    router.push({
-      pathname: "/papers",
-      query: {
-        search: searchValue,
-        selectedCategories: JSON.stringify(updatedCategories),
-        selectedTimeRange,
-        page: 1,
-      },
-    });
+    fetchPapers();
   };
 
   const handleTimeRangeChange = (newTimeRange) => {
@@ -120,7 +93,6 @@ const PapersIndexPage = ({
       pathname: "/papers",
       query: {
         search: searchValue,
-        selectedCategories: JSON.stringify(selectedCategories),
         selectedTimeRange: newTimeRange,
         page: 1,
       },
@@ -133,7 +105,6 @@ const PapersIndexPage = ({
       pathname: "/papers",
       query: {
         search: searchValue,
-        selectedCategories: JSON.stringify(selectedCategories),
         selectedTimeRange,
         page: newPage,
       },
@@ -167,20 +138,16 @@ const PapersIndexPage = ({
           setSearchValue={setSearchValue}
           resourceType="paper"
         />
-        <CategoryFilter
-          categoryDescriptions={categoryDescriptions}
-          selectedCategories={selectedCategories}
-          onCategoryChange={handleCategoryChange}
-          isModelsPage={false}
-        />
-        <TimeRangeFilter
-          selectedTimeRange={selectedTimeRange}
-          onTimeRangeChange={handleTimeRangeChange}
-        />
+        <Box mt={2}>
+          <TimeRangeFilter
+            selectedTimeRange={selectedTimeRange}
+            onTimeRangeChange={handleTimeRangeChange}
+          />
+        </Box>
         {papers.length === 0 ? (
           <Box mt={6}>
             <Text>
-              No papers found. Please try a different search or category.
+              No papers found. Please try a different search or time range.
             </Text>
           </Box>
         ) : (
