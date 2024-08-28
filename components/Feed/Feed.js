@@ -91,7 +91,7 @@ const Feed = ({
   return (
     <Box
       width="100%"
-      height={{ base: "calc(100vh - 250px)", md: "calc(100vh - 200px)" }}
+      height={{ base: "calc(200vh - 250px)", md: "calc(200vh - 200px)" }} // Changed 100vh to 200vh
       overflowY="auto"
       ref={feedRef}
       css={{

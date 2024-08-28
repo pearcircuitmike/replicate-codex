@@ -49,17 +49,17 @@ const DashboardLayout = ({ children }) => {
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
     {
       icon: <FaNewspaper />,
-      label: "Weekly Summary",
+      label: "Weekly Digest",
       href: "/dashboard/weekly-paper-summary",
     },
-    { icon: <FaBook />, label: "My Bookmarks", href: "/dashboard/library" },
+    { icon: <FaBook />, label: "Bookmarks", href: "/dashboard/library" },
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
 
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
       {isLargerThan768 && (
-        <Box width="200px" bg="white" py={8}>
+        <Box width="180px" bg="white" py={8}>
           <VStack spacing={4} align="stretch">
             {navItems.map((item) => (
               <NavItem key={item.href} {...item} />
@@ -79,7 +79,7 @@ const DashboardLayout = ({ children }) => {
         {children}
       </Box>
       {isLargerThan1024 && (
-        <Box width="350px">
+        <Box width="250px">
           <TrendingTopics />
           <TopViewedPapers />
           <TopSearchQueries />
