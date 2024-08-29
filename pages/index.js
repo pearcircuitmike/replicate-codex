@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useMediaQuery } from "@chakra-ui/react";
 import {
   Container,
@@ -14,16 +14,20 @@ import {
 import { CheckCircleIcon } from "@chakra-ui/icons";
 
 import MetaTags from "../components/MetaTags.js";
-import LandingPageTrending from "../components/LandingPageTrending";
 import AuthForm from "../components/AuthForm";
 import Testimonials from "../components/Testimonials";
 
 import {
-  fetchTrendingModels,
   fetchTrendingPapers,
+  fetchTrendingModels,
   fetchTrendingCreators,
   fetchTrendingAuthors,
 } from "./api/utils/fetchLandingPageData.js";
+
+// Lazy load the LandingPageTrending component
+const LandingPageTrending = lazy(() =>
+  import("../components/LandingPageTrending")
+);
 
 const getStartOfWeek = (date) => {
   const startOfWeek = new Date(date);
@@ -33,24 +37,34 @@ const getStartOfWeek = (date) => {
 
 export default function Home() {
   const [isMobile] = useMediaQuery("(max-width: 480px)");
-  const [trendingModels, setTrendingModels] = useState([]);
-  const [trendingPapers, setTrendingPapers] = useState([]);
-  const [trendingCreators, setTrendingCreators] = useState([]);
-  const [trendingAuthors, setTrendingAuthors] = useState([]);
+  const [trendingData, setTrendingData] = useState({
+    models: [],
+    papers: [],
+    creators: [],
+    authors: [],
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       const startDate = getStartOfWeek(new Date());
-      const models = await fetchTrendingModels(startDate, 4);
-      const papers = await fetchTrendingPapers("arxiv", startDate, 4);
-      const creators = await fetchTrendingCreators(startDate, 4);
-      const authors = await fetchTrendingAuthors(4);
 
-      setTrendingModels(models);
-      setTrendingPapers(papers);
-      setTrendingCreators(creators);
-      setTrendingAuthors(authors);
+      fetchTrendingPapers("arxiv", startDate, 4).then((papers) => {
+        setTrendingData((prevData) => ({ ...prevData, papers }));
+      });
+
+      fetchTrendingModels(startDate, 4).then((models) => {
+        setTrendingData((prevData) => ({ ...prevData, models }));
+      });
+
+      fetchTrendingCreators(startDate, 4).then((creators) => {
+        setTrendingData((prevData) => ({ ...prevData, creators }));
+      });
+
+      fetchTrendingAuthors(4).then((authors) => {
+        setTrendingData((prevData) => ({ ...prevData, authors }));
+      });
+
       setIsLoading(false);
     }
 
@@ -95,15 +109,17 @@ export default function Home() {
           </Center>
         </main>
       </Container>
-      {/* Full-width trending section */}
+      {/* Full-width trending section with lazy loading */}
       <Box py={16} px={0} width="100%">
-        <LandingPageTrending
-          trendingModels={trendingModels}
-          trendingPapers={trendingPapers}
-          trendingCreators={trendingCreators}
-          trendingAuthors={trendingAuthors}
-          isLoading={isLoading}
-        />
+        <Suspense fallback={<div>Loading trending content...</div>}>
+          <LandingPageTrending
+            trendingModels={trendingData.models}
+            trendingPapers={trendingData.papers}
+            trendingCreators={trendingData.creators}
+            trendingAuthors={trendingData.authors}
+            isLoading={isLoading}
+          />
+        </Suspense>
       </Box>
       <main>
         <Box bg="gray.100" py={16} px={8} width="100%">
