@@ -12,18 +12,14 @@ const WelcomePage = () => {
   const toast = useToast();
 
   useEffect(() => {
-    if (!user || !isFirstTimeUser) {
-      router.push("/dashboard");
-    } else {
-      // Trigger the conversion event when the page loads for a first-time user
-      if (window.gtag) {
-        window.gtag("event", "conversion", {
-          send_to: "AW-16682209532/NzM3CJPenM0ZEPyh2ZI-",
-          value: 1.0,
-          currency: "USD",
-          transaction_id: "",
-        });
-      }
+    if (!user) {
+      router.push("/login").catch((error) => {
+        console.error("Redirect to login failed:", error);
+      });
+    } else if (!isFirstTimeUser) {
+      router.push("/dashboard").catch((error) => {
+        console.error("Redirect to dashboard failed:", error);
+      });
     }
   }, [user, isFirstTimeUser, router]);
 
@@ -46,20 +42,6 @@ const WelcomePage = () => {
         duration: 5000,
         isClosable: true,
       });
-
-      // Delay navigation to ensure state updates are processed
-      setTimeout(() => {
-        router.push("/dashboard").catch((navError) => {
-          console.error("Navigation error:", navError);
-          toast({
-            title: "Navigation Error",
-            description: "Unable to access the dashboard. Please try again.",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
-        });
-      }, 100);
     } catch (error) {
       console.error("Failed to update first login status:", error.message);
       toast({
@@ -75,7 +57,7 @@ const WelcomePage = () => {
   };
 
   if (!user || !isFirstTimeUser) {
-    return null; // or a loading spinner
+    return null; // Optionally, display a loading spinner
   }
 
   return (

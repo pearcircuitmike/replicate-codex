@@ -1,16 +1,10 @@
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "../pages/api/utils/supabaseClient";
 import { trackEvent } from "../pages/api/utils/analytics-util";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
-
-const trackedEvent = {
-  login: false,
-  signup: false,
-  logout: false,
-};
 
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({
@@ -47,12 +41,10 @@ export const AuthProvider = ({ children }) => {
         hasActiveSubscription,
       });
 
-      if (firstTimeUser && !trackedEvent.signup) {
+      if (firstTimeUser) {
         trackEvent("signup");
-        trackedEvent.signup = true;
-      } else if (!firstTimeUser && !trackedEvent.login) {
+      } else {
         trackEvent("login");
-        trackedEvent.login = true;
       }
     } else {
       setState({
@@ -61,9 +53,6 @@ export const AuthProvider = ({ children }) => {
         firstTimeUser: false,
         hasActiveSubscription: false,
       });
-      trackedEvent.login = false;
-      trackedEvent.signup = false;
-      trackedEvent.logout = false;
     }
   };
 
@@ -83,16 +72,7 @@ export const AuthProvider = ({ children }) => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === "SIGNED_IN") {
-          handleSession(session);
-        } else if (event === "SIGNED_OUT") {
-          setState({
-            user: null,
-            loading: false,
-            firstTimeUser: false,
-            hasActiveSubscription: false,
-          });
-        }
+        handleSession(session);
       }
     );
 
@@ -107,7 +87,6 @@ export const AuthProvider = ({ children }) => {
       console.error("Error logging out:", error);
     } else {
       trackEvent("logout");
-      trackedEvent.logout = true;
       setState({
         user: null,
         loading: false,
