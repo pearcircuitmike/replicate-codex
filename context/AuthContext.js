@@ -9,8 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({
     user: null,
-    loading: true,
-    firstTimeUser: false,
+    loading: true, // Start with loading true to indicate we're checking the session
     hasActiveSubscription: false,
   });
 
@@ -19,16 +18,16 @@ export const AuthProvider = ({ children }) => {
       const { user } = session;
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
-        .select("first_login, stripe_subscription_status")
+        .select("stripe_subscription_status")
         .eq("id", user.id)
         .single();
 
       if (profileError) {
         console.error("Error fetching profile data:", profileError);
+        setState({ user: null, loading: false, hasActiveSubscription: false });
         return;
       }
 
-      const firstTimeUser = profileData?.first_login || false;
       const hasActiveSubscription =
         profileData?.stripe_subscription_status === "active" ||
         profileData?.stripe_subscription_status === "trialing" ||
@@ -37,20 +36,14 @@ export const AuthProvider = ({ children }) => {
       setState({
         user,
         loading: false,
-        firstTimeUser,
         hasActiveSubscription,
       });
 
-      if (firstTimeUser) {
-        trackEvent("signup");
-      } else {
-        trackEvent("login");
-      }
+      trackEvent("login");
     } else {
       setState({
         user: null,
         loading: false,
-        firstTimeUser: false,
         hasActiveSubscription: false,
       });
     }
@@ -90,7 +83,6 @@ export const AuthProvider = ({ children }) => {
       setState({
         user: null,
         loading: false,
-        firstTimeUser: false,
         hasActiveSubscription: false,
       });
     }
