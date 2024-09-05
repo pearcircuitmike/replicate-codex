@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Feed from "../Feed/Feed";
-import SearchBar from "../SearchBar";
+import SemanticSearchBar from "../SemanticSearchBar";
 import TopSearchQueries from "../TopSearchQueries";
 import TimeRangeFilter from "../TimeRangeFilter";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
@@ -42,14 +42,21 @@ const DiscoverView = () => {
   }, [router.query.q]);
 
   const handleSearch = useCallback(
-    (value = searchInput) => {
+    (semanticSearchResults = null) => {
       setIsSearching(true);
-      setSearchParams((prevParams) => ({ ...prevParams, searchValue: value }));
+      setSearchParams((prevParams) => ({
+        ...prevParams,
+        searchValue: searchInput,
+        timeRange: "allTime", // Set time range to "allTime" when performing a search
+      }));
       router.push(
-        `/dashboard/discover?q=${encodeURIComponent(value)}`,
+        `/dashboard/discover?q=${encodeURIComponent(searchInput)}`,
         undefined,
         { shallow: true }
       );
+      if (semanticSearchResults) {
+        console.log("Semantic search results:", semanticSearchResults);
+      }
       setTimeout(() => setIsSearching(false), 500);
     },
     [searchInput, router]
@@ -80,16 +87,16 @@ const DiscoverView = () => {
           </Text>
         )}
         <Box mb={4}>
-          <SearchBar
+          <SemanticSearchBar
             searchValue={searchInput}
             setSearchValue={setSearchInput}
-            onSearchSubmit={() => handleSearch()}
+            onSearchSubmit={handleSearch}
             placeholder="Search papers and models..."
             resourceType="discover"
           />
         </Box>
         <TimeRangeFilter
-          initialTimeRange={searchParams.timeRange}
+          selectedTimeRange={searchParams.timeRange}
           onTimeRangeChange={handleTimeRangeChange}
         />
       </Box>
