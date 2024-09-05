@@ -5,7 +5,7 @@ import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
 import { fetchPapersPaginated } from "../api/utils/fetchPapers";
-import SearchBar from "../../components/SearchBar";
+import SemanticSearchBar from "../../components/SemanticSearchBar";
 import TimeRangeFilter from "../../components/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
 
@@ -53,37 +53,43 @@ const PapersIndexPage = ({
     initialSelectedTimeRange
   );
 
-  const fetchPapers = async () => {
-    const { startDate, endDate } = getDateRange(selectedTimeRange);
+  const fetchPapers = async (semanticSearchResults = null) => {
+    if (semanticSearchResults) {
+      setPapers(semanticSearchResults);
+      setTotalCount(semanticSearchResults.length);
+    } else {
+      const { startDate, endDate } = getDateRange(selectedTimeRange);
 
-    const { data, totalCount } = await fetchPapersPaginated({
-      platform: "arxiv",
-      pageSize,
-      currentPage,
-      searchValue,
-      startDate,
-      endDate,
-    });
-    setPapers(data);
-    setTotalCount(totalCount);
+      const { data, totalCount } = await fetchPapersPaginated({
+        platform: "arxiv",
+        pageSize,
+        currentPage,
+        searchValue,
+        startDate,
+        endDate,
+      });
+      setPapers(data);
+      setTotalCount(totalCount);
+    }
   };
 
   useEffect(() => {
-    fetchPapers();
-  }, [currentPage, selectedTimeRange]);
+    if (!searchValue) {
+      fetchPapers();
+    }
+  }, [currentPage, selectedTimeRange, searchValue]);
 
-  const handleSearchSubmit = (newSearchValue) => {
-    setSearchValue(newSearchValue);
+  const handleSearchSubmit = (semanticSearchResults) => {
     setCurrentPage(1);
     router.push({
       pathname: "/papers",
       query: {
-        search: newSearchValue,
+        search: searchValue,
         selectedTimeRange,
         page: 1,
       },
     });
-    fetchPapers();
+    fetchPapers(semanticSearchResults);
   };
 
   const handleTimeRangeChange = (newTimeRange) => {
@@ -97,6 +103,9 @@ const PapersIndexPage = ({
         page: 1,
       },
     });
+    if (!searchValue) {
+      fetchPapers();
+    }
   };
 
   const handlePageChange = (newPage) => {
@@ -109,6 +118,9 @@ const PapersIndexPage = ({
         page: newPage,
       },
     });
+    if (!searchValue) {
+      fetchPapers();
+    }
   };
 
   return (
@@ -131,7 +143,7 @@ const PapersIndexPage = ({
           </Text>
         </Box>
 
-        <SearchBar
+        <SemanticSearchBar
           placeholder="Search papers by title or arXiv ID..."
           searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
