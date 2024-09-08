@@ -9,24 +9,29 @@ export default async function handler(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
-  if (req.method === "GET") {
-    const { userId, resourceId, resourceType } = req.query;
+  const { user, error } = await supabase.auth.api.getUserByCookie(req);
+  if (error || !user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-    if (!userId || !resourceId || !resourceType) {
+  if (req.method === "GET") {
+    const { resourceId, resourceType } = req.query;
+
+    if (!resourceId || !resourceType) {
       return res.status(400).json({ error: "Missing required parameters" });
     }
 
     try {
       const { data, error } = await supabase
         .from("bookmarks")
-        .select("*")
-        .eq("user_id", userId)
+        .select("*, folders(*)")
+        .eq("user_id", user.id)
         .eq("bookmarked_resource", resourceId)
         .eq("resource_type", resourceType)
         .single();
@@ -35,7 +40,10 @@ export default async function handler(req, res) {
         throw error;
       }
 
-      return res.status(200).json({ isBookmarked: !!data });
+      return res.status(200).json({
+        isBookmarked: !!data,
+        folder: data ? data.folders : null,
+      });
     } catch (error) {
       console.error("Error checking bookmark status:", error);
       return res.status(500).json({ error: "Error checking bookmark status" });
