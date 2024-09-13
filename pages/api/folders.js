@@ -58,15 +58,21 @@ async function getFolders(userId, res) {
 }
 
 async function createFolder(userId, { name }, res) {
+  if (!name) {
+    return res.status(400).json({ error: "Folder name is required" });
+  }
+
   try {
     const { data, error } = await supabase
       .from("folders")
       .insert({ user_id: userId, name })
-      .single();
+      .select(); // Removed single(), use select() instead for flexibility
 
-    if (error) throw error;
+    if (error || !data) {
+      throw new Error("Folder creation failed");
+    }
 
-    return res.status(201).json(data);
+    return res.status(201).json(data[0]); // Return the first folder object
   } catch (error) {
     console.error("Error creating folder:", error);
     return res.status(500).json({ error: "Error creating folder" });
@@ -74,16 +80,22 @@ async function createFolder(userId, { name }, res) {
 }
 
 async function updateFolder(userId, { id, name }, res) {
+  if (!id || !name) {
+    return res.status(400).json({ error: "ID and name are required" });
+  }
+
   try {
     const { data, error } = await supabase
       .from("folders")
       .update({ name })
       .match({ id, user_id: userId })
-      .single();
+      .select(); // Use select() to get the updated folder
 
-    if (error) throw error;
+    if (error || !data) {
+      throw new Error("Folder update failed");
+    }
 
-    return res.status(200).json(data);
+    return res.status(200).json(data[0]); // Return the updated folder
   } catch (error) {
     console.error("Error updating folder:", error);
     return res.status(500).json({ error: "Error updating folder" });
@@ -91,6 +103,10 @@ async function updateFolder(userId, { id, name }, res) {
 }
 
 async function deleteFolder(userId, { id }, res) {
+  if (!id) {
+    return res.status(400).json({ error: "Folder ID is required" });
+  }
+
   try {
     const { data: uncategorizedFolder } = await supabase
       .from("folders")
@@ -98,6 +114,10 @@ async function deleteFolder(userId, { id }, res) {
       .eq("user_id", userId)
       .eq("name", "Uncategorized")
       .single();
+
+    if (!uncategorizedFolder) {
+      throw new Error("Uncategorized folder not found");
+    }
 
     await supabase
       .from("bookmarks")

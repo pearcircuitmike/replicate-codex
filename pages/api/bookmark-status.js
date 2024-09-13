@@ -34,9 +34,9 @@ export default async function handler(req, res) {
         .eq("user_id", user.id)
         .eq("bookmarked_resource", resourceId)
         .eq("resource_type", resourceType)
-        .single();
+        .maybeSingle(); // Use maybeSingle to handle no bookmark case gracefully
 
-      if (error && error.code !== "PGRST116") {
+      if (error) {
         throw error;
       }
 
