@@ -1,3 +1,4 @@
+// pages/api/folders.js
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -57,7 +58,7 @@ async function getFolders(userId, res) {
   }
 }
 
-async function createFolder(userId, { name }, res) {
+async function createFolder(userId, { name, color }, res) {
   if (!name) {
     return res.status(400).json({ error: "Folder name is required" });
   }
@@ -65,37 +66,45 @@ async function createFolder(userId, { name }, res) {
   try {
     const { data, error } = await supabase
       .from("folders")
-      .insert({ user_id: userId, name })
-      .select(); // Removed single(), use select() instead for flexibility
+      .insert({ user_id: userId, name, color })
+      .select();
 
     if (error || !data) {
       throw new Error("Folder creation failed");
     }
 
-    return res.status(201).json(data[0]); // Return the first folder object
+    return res.status(201).json(data[0]);
   } catch (error) {
     console.error("Error creating folder:", error);
     return res.status(500).json({ error: "Error creating folder" });
   }
 }
 
-async function updateFolder(userId, { id, name }, res) {
-  if (!id || !name) {
-    return res.status(400).json({ error: "ID and name are required" });
+async function updateFolder(userId, { id, name, color }, res) {
+  if (!id || (!name && !color)) {
+    return res
+      .status(400)
+      .json({
+        error: "Folder ID and at least one field to update are required",
+      });
   }
 
   try {
+    const updates = {};
+    if (name) updates.name = name;
+    if (color) updates.color = color;
+
     const { data, error } = await supabase
       .from("folders")
-      .update({ name })
+      .update(updates)
       .match({ id, user_id: userId })
-      .select(); // Use select() to get the updated folder
+      .select();
 
     if (error || !data) {
       throw new Error("Folder update failed");
     }
 
-    return res.status(200).json(data[0]); // Return the updated folder
+    return res.status(200).json(data[0]);
   } catch (error) {
     console.error("Error updating folder:", error);
     return res.status(500).json({ error: "Error updating folder" });
@@ -113,7 +122,7 @@ async function deleteFolder(userId, { id }, res) {
       .select("id")
       .eq("user_id", userId)
       .eq("name", "Uncategorized")
-      .single();
+      .maybeSingle();
 
     if (!uncategorizedFolder) {
       throw new Error("Uncategorized folder not found");

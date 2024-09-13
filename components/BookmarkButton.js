@@ -1,3 +1,4 @@
+// components/BookmarkButton.js
 import React, { useState, useEffect } from "react";
 import { Button, Icon, useDisclosure, useToast } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
@@ -12,6 +13,7 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
   const [folders, setFolders] = useState([]);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [folderName, setFolderName] = useState("");
+  const [folderColor, setFolderColor] = useState("#000000"); // Default color
   const { user } = useAuth();
   const {
     isOpen: isFolderModalOpen,
@@ -63,7 +65,7 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
         .select("*, folders(*)")
         .eq("bookmarked_resource", resourceId)
         .eq("resource_type", resourceType)
-        .maybeSingle(); // Handle no bookmark case gracefully
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -107,7 +109,7 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
           resource_type: resourceType,
           folder_id: folderId,
         })
-        .select(); // Return the inserted data
+        .select();
 
       if (error) throw error;
 
@@ -174,8 +176,12 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
     try {
       const { data, error } = await supabase
         .from("folders")
-        .insert({ user_id: user.id, name: folderName.trim() })
-        .select(); // Use select to return the created folder
+        .insert({
+          user_id: user.id,
+          name: folderName.trim(),
+          color: folderColor,
+        })
+        .select();
 
       if (error || !data) {
         throw new Error("Folder creation failed");
@@ -186,6 +192,7 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
       setSelectedFolderId(newFolder.id);
       await addBookmark(newFolder.id);
       setFolderName("");
+      setFolderColor("#000000");
     } catch (error) {
       console.error("Error creating new folder:", error);
       toast({
@@ -227,6 +234,8 @@ const BookmarkButton = ({ resourceId, resourceType, onBookmarkChange }) => {
         onClose={onFolderModalClose}
         folderName={folderName}
         setFolderName={setFolderName}
+        folderColor={folderColor}
+        setFolderColor={setFolderColor}
         onSave={handleSaveFolder}
         mode="create"
         folders={folders}
