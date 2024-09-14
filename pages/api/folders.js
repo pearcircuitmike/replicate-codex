@@ -45,9 +45,9 @@ async function getFolders(userId, res) {
   try {
     const { data, error } = await supabase
       .from("folders")
-      .select("*")
+      .select("*, bookmarks(count)")
       .eq("user_id", userId)
-      .order("name");
+      .order("position");
 
     if (error) throw error;
 
@@ -64,9 +64,25 @@ async function createFolder(userId, { name, color }, res) {
   }
 
   try {
+    // Get the highest current position
+    const { data: maxPositionData } = await supabase
+      .from("folders")
+      .select("position")
+      .eq("user_id", userId)
+      .order("position", { ascending: false })
+      .limit(1)
+      .single();
+
+    const newPosition = maxPositionData ? maxPositionData.position + 1 : 0;
+
     const { data, error } = await supabase
       .from("folders")
-      .insert({ user_id: userId, name, color })
+      .insert({
+        user_id: userId,
+        name,
+        color,
+        position: newPosition,
+      })
       .select();
 
     if (error || !data) {
@@ -80,8 +96,8 @@ async function createFolder(userId, { name, color }, res) {
   }
 }
 
-async function updateFolder(userId, { id, name, color }, res) {
-  if (!id || (!name && !color)) {
+async function updateFolder(userId, { id, name, color, position }, res) {
+  if (!id || (!name && !color && position === undefined)) {
     return res
       .status(400)
       .json({
@@ -93,6 +109,7 @@ async function updateFolder(userId, { id, name, color }, res) {
     const updates = {};
     if (name) updates.name = name;
     if (color) updates.color = color;
+    if (position !== undefined) updates.position = position;
 
     const { data, error } = await supabase
       .from("folders")
@@ -117,7 +134,22 @@ async function deleteFolder(userId, { id }, res) {
   }
 
   try {
-    const { data: uncategorizedFolder } = await supabase
+    // Prevent deletion of 'Uncategorized' folder
+    const { data: folderToDelete } = await supabase
+      .from("folders")
+      .select("name")
+      .eq("id", id)
+      .eq("user_id", userId)
+      .single();
+
+    if (folderToDelete.name === "Uncategorized") {
+      return res
+        .status(403)
+        .json({ error: "Cannot delete the Uncategorized folder" });
+    }
+
+    // Get or create 'Uncategorized' folder
+    let { data: uncategorizedFolder } = await supabase
       .from("folders")
       .select("id")
       .eq("user_id", userId)
@@ -125,7 +157,21 @@ async function deleteFolder(userId, { id }, res) {
       .maybeSingle();
 
     if (!uncategorizedFolder) {
-      throw new Error("Uncategorized folder not found");
+      const { data: newUncategorizedFolder, error: uncategorizedError } =
+        await supabase
+          .from("folders")
+          .insert({
+            user_id: userId,
+            name: "Uncategorized",
+            color: "#A0AEC0", // Default gray color
+            position: 0,
+          })
+          .select()
+          .single();
+
+      if (uncategorizedError) throw uncategorizedError;
+
+      uncategorizedFolder = newUncategorizedFolder;
     }
 
     await supabase

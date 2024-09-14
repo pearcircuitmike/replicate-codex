@@ -1,4 +1,3 @@
-// components/DashboardLayout.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -6,117 +5,86 @@ import {
   useMediaQuery,
   VStack,
   HStack,
-  IconButton,
   Text,
-  useDisclosure,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import { FaSearch, FaBook, FaUser, FaNewspaper, FaEdit } from "react-icons/fa";
+import { FaSearch, FaUser, FaNewspaper } from "react-icons/fa";
+import NavItem from "./NavItem";
+import FolderSidebar from "./FolderSidebar";
+import FolderModal from "./FolderModal";
+import supabase from "@/pages/api/utils/supabaseClient";
+import { useAuth } from "../../context/AuthContext";
 import TrendingTopics from "../TrendingTopics";
 import TopViewedPapers from "../TopViewedPapers";
 import TopSearchQueries from "../TopSearchQueries";
-import { useAuth } from "@/context/AuthContext";
-import supabase from "@/pages/api/utils/supabaseClient";
-import FolderModal from "../FolderModal";
-
-const NavItem = ({ icon, label, href, isActive }) => {
-  return (
-    <Link href={href}>
-      <Flex
-        align="center"
-        p={2}
-        mx={2}
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        color={isActive ? "blue.500" : "gray.600"}
-        _hover={{
-          bg: "blue.50",
-        }}
-      >
-        {icon}
-        <Text ml={4} display={{ base: "none", md: "block" }}>
-          {label}
-        </Text>
-      </Flex>
-    </Link>
-  );
-};
 
 const DashboardLayout = ({ children }) => {
+  console.log("Rendering DashboardLayout");
+
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
   const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
   const { user } = useAuth();
   const [folders, setFolders] = useState([]);
-  const [editingFolder, setEditingFolder] = useState(null);
-  const [folderName, setFolderName] = useState("");
-  const [folderColor, setFolderColor] = useState("#000000");
-  const {
-    isOpen: isFolderModalOpen,
-    onOpen: onFolderModalOpen,
-    onClose: onFolderModalClose,
-  } = useDisclosure();
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
 
   useEffect(() => {
+    console.log("DashboardLayout useEffect triggered");
+    console.log("User:", user);
     if (user) {
       fetchFolders();
     }
   }, [user]);
 
   const fetchFolders = async () => {
+    console.log("Fetching folders");
     try {
-      const { data, error } = await supabase
+      // Fetch folders for the current user
+      const { data: folderData, error: folderError } = await supabase
         .from("folders")
-        .select("*")
+        .select("id, name, color, position")
         .eq("user_id", user.id)
-        .order("name");
+        .order("name", { ascending: true });
 
-      if (error) throw error;
+      if (folderError) throw folderError;
 
-      setFolders(data || []);
+      console.log("Folder data:", folderData);
+
+      // Fetch bookmark counts for each folder
+      const foldersWithCounts = await Promise.all(
+        folderData.map(async (folder) => {
+          const { count, error: countError } = await supabase
+            .from("bookmarks")
+            .select("id", { count: "exact", head: true })
+            .eq("folder_id", folder.id)
+            .eq("user_id", user.id);
+
+          if (countError) throw countError;
+
+          return {
+            ...folder,
+            bookmarkCount: count || 0,
+          };
+        })
+      );
+
+      console.log("Folders with counts:", foldersWithCounts);
+      setFolders(foldersWithCounts);
     } catch (error) {
       console.error("Error fetching folders:", error);
     }
   };
 
-  const handleEditFolder = (folder) => {
-    setEditingFolder(folder);
-    setFolderName(folder.name);
-    setFolderColor(folder.color || "#000000");
-    onFolderModalOpen();
+  const handleFolderModalOpen = () => {
+    console.log("Opening folder modal");
+    setIsFolderModalOpen(true);
   };
 
-  const handleSaveFolder = async () => {
-    if (!folderName.trim()) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("folders")
-        .update({
-          name: folderName.trim(),
-          color: folderColor,
-        })
-        .eq("id", editingFolder.id)
-        .eq("user_id", user.id)
-        .select();
-
-      if (error || !data) {
-        throw new Error("Folder update failed");
-      }
-
-      setFolders(folders.map((f) => (f.id === editingFolder.id ? data[0] : f)));
-      setEditingFolder(null);
-      setFolderName("");
-      setFolderColor("#000000");
-      onFolderModalClose();
-    } catch (error) {
-      console.error("Error updating folder:", error);
-    }
+  const handleFolderModalClose = () => {
+    console.log("Closing folder modal");
+    setIsFolderModalOpen(false);
   };
 
-  // Define navigation items before and after folders
   const navItemsBeforeFolders = [
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
     {
@@ -124,19 +92,26 @@ const DashboardLayout = ({ children }) => {
       label: "Weekly Digest",
       href: "/dashboard/weekly-paper-summary",
     },
-    { icon: <FaBook />, label: "Bookmarks", href: "/dashboard/library" },
   ];
 
   const navItemsAfterFolders = [
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
 
+  console.log("Current route:", router.pathname);
+
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
       {isLargerThan768 && (
-        <Box width="180px" bg="white" py={8}>
-          <VStack spacing={4} align="stretch">
-            {/* Render nav items before folders */}
+        <Box
+          width="200px"
+          bg="white"
+          py={8}
+          overflowY="auto"
+          borderRight="1px solid #e2e8f0"
+        >
+          <VStack spacing={2} align="stretch">
+            {/* Navigation items before folders */}
             {navItemsBeforeFolders.map((item) => (
               <NavItem
                 key={item.href}
@@ -146,49 +121,20 @@ const DashboardLayout = ({ children }) => {
                 isActive={router.pathname === item.href}
               />
             ))}
-
-            {/* Render folders indented under "Bookmarks" */}
-            {folders.map((folder) => (
-              <Flex
-                key={folder.id}
-                align="center"
-                pl={8} // Indent folders
-                pr={2}
-                py={1}
-                bg={
-                  router.query.folderId === folder.id
-                    ? "blue.50"
-                    : "transparent"
-                }
-                cursor="pointer"
-                onClick={() =>
-                  router.push(`/dashboard/library?folderId=${folder.id}`)
-                }
-              >
-                <Box
-                  width="12px"
-                  height="12px"
-                  borderRadius="50%"
-                  bg={folder.color || "gray.500"}
-                  mr={2}
-                />
-                <Text flex="1" fontSize="sm">
-                  {folder.name}
-                </Text>
-                <IconButton
-                  icon={<FaEdit />}
-                  size="xs"
-                  variant="ghost"
-                  aria-label="Edit Folder"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditFolder(folder);
-                  }}
-                />
-              </Flex>
-            ))}
-
-            {/* Render nav items after folders */}
+            {/* "My Folders" label */}
+            <Box px={4} py={2}>
+              <Text fontSize="lg" fontWeight="bold">
+                My Folders
+              </Text>
+            </Box>
+            {/* Folder Sidebar */}
+            <FolderSidebar
+              folders={folders}
+              setFolders={setFolders}
+              onFolderModalOpen={handleFolderModalOpen}
+              fetchFolders={fetchFolders}
+            />
+            {/* Navigation items after folders */}
             {navItemsAfterFolders.map((item) => (
               <NavItem
                 key={item.href}
@@ -201,24 +147,23 @@ const DashboardLayout = ({ children }) => {
           </VStack>
         </Box>
       )}
-      <Box
-        flex={1}
-        overflowY="auto"
-        width={{
-          base: "100%",
-          md: "calc(100% - 200px)",
-          lg: "calc(100% - 450px)",
-        }}
-      >
+
+      {/* Main content */}
+      <Box flex={1} overflowY="auto">
+        {console.log("Rendering children in DashboardLayout")}
         {children}
       </Box>
+
+      {/* Right Sidebar */}
       {isLargerThan1024 && (
-        <Box width="250px">
+        <Box width="250px" bg="white" py={8} borderLeft="1px solid #e2e8f0">
           <TrendingTopics />
           <TopViewedPapers />
           <TopSearchQueries />
         </Box>
       )}
+
+      {/* Bottom navigation for mobile */}
       {!isLargerThan768 && (
         <Box
           position="fixed"
@@ -241,19 +186,12 @@ const DashboardLayout = ({ children }) => {
           </HStack>
         </Box>
       )}
-      {/* Folder Edit Modal */}
+
+      {/* Folder Modal */}
       <FolderModal
         isOpen={isFolderModalOpen}
-        onClose={() => {
-          onFolderModalClose();
-          setEditingFolder(null);
-        }}
-        folderName={folderName}
-        setFolderName={setFolderName}
-        folderColor={folderColor}
-        setFolderColor={setFolderColor}
-        onSave={handleSaveFolder}
-        mode="edit"
+        onClose={handleFolderModalClose}
+        fetchFolders={fetchFolders}
       />
     </Flex>
   );
