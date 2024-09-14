@@ -1,5 +1,3 @@
-// components/dashboard/FolderSidebar.js
-
 import React, { useState } from "react";
 import {
   Box,
@@ -18,6 +16,7 @@ import {
   FormControl,
   FormLabel,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/router";
@@ -35,6 +34,7 @@ const FolderSidebar = ({
   const [folderName, setFolderName] = useState("");
   const [folderColor, setFolderColor] = useState("#000000");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const handleFolderClick = (folderId) => {
     router.push(`/dashboard/library?folderId=${folderId}`);
@@ -49,37 +49,74 @@ const FolderSidebar = ({
 
   const handleSaveChanges = async () => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("folders")
         .update({ name: folderName.trim(), color: folderColor })
         .eq("id", editingFolder.id)
-        .eq("user_id", editingFolder.user_id); // Ensure the folder belongs to the user
+        .select();
 
       if (error) throw error;
 
-      // Refresh folders list
-      fetchFolders();
-
-      onClose();
+      if (data && data.length > 0) {
+        fetchFolders();
+        onClose();
+        toast({
+          title: "Folder updated",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error("No data returned");
+      }
     } catch (error) {
       console.error("Error updating folder:", error);
+      toast({
+        title: "Error updating folder",
+        description: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
   const handleDeleteFolder = async (folderId) => {
     try {
-      const { error } = await supabase
-        .from("folders")
-        .delete()
-        .eq("id", folderId)
-        .eq("user_id", editingFolder.user_id);
+      const session = await supabase.auth.getSession();
+      const response = await fetch("/api/dashboard/delete-bookmark-folder", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.data.session.access_token}`,
+        },
+        body: JSON.stringify({ folderId }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "An error occurred while deleting the folder"
+        );
+      }
 
-      // Refresh folders list
       fetchFolders();
+      toast({
+        title: "Folder deleted",
+        description: "All bookmarks have been moved to Uncategorized",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error deleting folder:", error);
+      toast({
+        title: "Error deleting folder",
+        description: error.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 

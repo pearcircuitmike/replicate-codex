@@ -22,7 +22,6 @@ const LibraryView = () => {
 
   useEffect(() => {
     if (user && folderId) {
-      console.log("Fetching bookmarks for folder:", folderId);
       fetchBookmarks();
       fetchFolderName();
     }
@@ -30,7 +29,6 @@ const LibraryView = () => {
 
   const fetchBookmarks = async () => {
     try {
-      console.log("Fetching bookmarks...");
       const { data, error } = await supabase
         .from("bookmarks")
         .select("id, title, resource_type, folder_id")
@@ -39,7 +37,6 @@ const LibraryView = () => {
 
       if (error) throw error;
 
-      console.log("Fetched bookmarks:", data);
       setBookmarks(data || []);
     } catch (error) {
       console.error("Error fetching bookmarks:", error);
@@ -55,7 +52,6 @@ const LibraryView = () => {
 
   const fetchFolderName = async () => {
     try {
-      console.log("Fetching folder name...");
       const { data, error } = await supabase
         .from("folders")
         .select("name")
@@ -65,7 +61,6 @@ const LibraryView = () => {
 
       if (error) throw error;
 
-      console.log("Fetched folder name:", data.name);
       setFolderName(data.name);
     } catch (error) {
       console.error("Error fetching folder name:", error);
@@ -81,7 +76,6 @@ const LibraryView = () => {
 
   const removeBookmark = async (bookmarkId) => {
     try {
-      console.log("Removing bookmark:", bookmarkId);
       const { error } = await supabase
         .from("bookmarks")
         .delete()
@@ -120,7 +114,6 @@ const LibraryView = () => {
         ) : (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
             {bookmarks.map((bookmark) => {
-              console.log("Rendering bookmark:", bookmark);
               return (
                 <Box key={bookmark.id} p={4} borderWidth={1} borderRadius="md">
                   <Heading as="h4" size="sm" mb={2}>
