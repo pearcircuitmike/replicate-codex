@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Box,
   Tabs,
@@ -21,10 +21,28 @@ const LibraryPage = () => {
   const router = useRouter();
   const { folderId } = router.query;
   const { user } = useAuth();
-  const [bookmarks, setBookmarks] = useState([]);
-  const [resourceType, setResourceType] = useState("paper");
+  const [paperBookmarks, setPaperBookmarks] = useState([]);
+  const [modelBookmarks, setModelBookmarks] = useState([]);
   const [folderName, setFolderName] = useState("");
   const [loading, setLoading] = useState(false);
+  const resourceCache = useRef({});
+
+  const fetchResourceData = useCallback(async (id, type) => {
+    if (resourceCache.current[id]) {
+      return resourceCache.current[id];
+    }
+
+    const apiRoute =
+      type === "paper" ? "/api/fetch-paper-by-id" : "/api/fetch-model-by-id";
+    const response = await fetch(`${apiRoute}?id=${id}`);
+    if (!response.ok) {
+      console.error(`Failed to fetch resource data for ID: ${id}`);
+      return null;
+    }
+    const resourceData = await response.json();
+    resourceCache.current[id] = resourceData;
+    return resourceData;
+  }, []);
 
   const fetchBookmarkResources = useCallback(
     async (type) => {
@@ -38,7 +56,6 @@ const LibraryPage = () => {
       setLoading(true);
 
       try {
-        // 1. Fetch bookmarks
         const { data: bookmarksData, error: bookmarksError } = await supabase
           .from("bookmarks")
           .select("*")
@@ -49,50 +66,45 @@ const LibraryPage = () => {
         if (bookmarksError) throw bookmarksError;
 
         if (!bookmarksData || bookmarksData.length === 0) {
-          setBookmarks([]);
+          type === "paper" ? setPaperBookmarks([]) : setModelBookmarks([]);
           setLoading(false);
           return;
         }
 
-        // 2. Fetch corresponding resources
-        const resourcePromises = bookmarksData.map(async (bookmark) => {
-          const apiRoute =
-            type === "paper"
-              ? "/api/fetch-paper-by-id"
-              : "/api/fetch-model-by-id";
-          const response = await fetch(
-            `${apiRoute}?id=${bookmark.bookmarked_resource}`
-          );
-          if (!response.ok) {
-            console.error(
-              `Failed to fetch resource data for ID: ${bookmark.bookmarked_resource}`
-            );
-            return null;
-          }
-          const resourceData = await response.json();
-          return { ...bookmark, resourceData };
-        });
-
-        const resourcesData = await Promise.all(resourcePromises);
-        const validResourcesData = resourcesData.filter(
-          (resource) => resource !== null
+        const uniqueResourceIds = [
+          ...new Set(bookmarksData.map((b) => b.bookmarked_resource)),
+        ];
+        const resourcesData = await Promise.all(
+          uniqueResourceIds.map((id) => fetchResourceData(id, type))
         );
 
-        setBookmarks(validResourcesData);
+        const validResourcesData = bookmarksData
+          .map((bookmark) => ({
+            ...bookmark,
+            resourceData: resourcesData.find(
+              (r) => r && r.id === bookmark.bookmarked_resource
+            ),
+          }))
+          .filter((bookmark) => bookmark.resourceData !== undefined);
+
+        type === "paper"
+          ? setPaperBookmarks(validResourcesData)
+          : setModelBookmarks(validResourcesData);
       } catch (error) {
         console.error(`Error fetching ${type} bookmarks:`, error);
       } finally {
         setLoading(false);
       }
     },
-    [folderId, user]
+    [folderId, user, fetchResourceData]
   );
 
   useEffect(() => {
     if (folderId && user) {
-      fetchBookmarkResources(resourceType);
+      fetchBookmarkResources("paper");
+      fetchBookmarkResources("model");
     }
-  }, [folderId, user, fetchBookmarkResources, resourceType]);
+  }, [folderId, user, fetchBookmarkResources]);
 
   useEffect(() => {
     const fetchFolderName = async () => {
@@ -116,34 +128,35 @@ const LibraryPage = () => {
     fetchFolderName();
   }, [folderId, user]);
 
-  const handleTabChange = (index) => {
-    const newResourceType = index === 0 ? "paper" : "model";
-    setResourceType(newResourceType);
-    fetchBookmarkResources(newResourceType);
-  };
-
-  const renderCard = (bookmark) => {
-    const resource = bookmark.resourceData;
-    if (!resource) return null;
-
-    if (resourceType === "paper") {
+  const renderPaperCard = useCallback(
+    (bookmark) => {
+      const paper = bookmark.resourceData;
+      if (!paper) return null;
       return (
         <PaperCard
           key={bookmark.id}
-          paper={resource}
-          onBookmarkChange={() => fetchBookmarkResources(resourceType)}
+          paper={paper}
+          onBookmarkChange={() => fetchBookmarkResources("paper")}
         />
       );
-    } else {
+    },
+    [fetchBookmarkResources]
+  );
+
+  const renderModelCard = useCallback(
+    (bookmark) => {
+      const model = bookmark.resourceData;
+      if (!model) return null;
       return (
         <ModelCard
           key={bookmark.id}
-          model={resource}
-          onBookmarkChange={() => fetchBookmarkResources(resourceType)}
+          model={model}
+          onBookmarkChange={() => fetchBookmarkResources("model")}
         />
       );
-    }
-  };
+    },
+    [fetchBookmarkResources]
+  );
 
   return (
     <DashboardLayout>
@@ -151,7 +164,7 @@ const LibraryPage = () => {
         <Heading size="md" mb={4}>
           {folderName ? `Bookmarks in "${folderName}"` : "My Bookmarks"}
         </Heading>
-        <Tabs onChange={handleTabChange}>
+        <Tabs>
           <TabList>
             <Tab>Papers</Tab>
             <Tab>Models</Tab>
@@ -160,9 +173,9 @@ const LibraryPage = () => {
             <TabPanel>
               {loading ? (
                 <Text>Loading...</Text>
-              ) : bookmarks.length > 0 ? (
+              ) : paperBookmarks.length > 0 ? (
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-                  {bookmarks.map(renderCard)}
+                  {paperBookmarks.map(renderPaperCard)}
                 </SimpleGrid>
               ) : (
                 <Text>No paper bookmarks found in this folder.</Text>
@@ -171,9 +184,9 @@ const LibraryPage = () => {
             <TabPanel>
               {loading ? (
                 <Text>Loading...</Text>
-              ) : bookmarks.length > 0 ? (
+              ) : modelBookmarks.length > 0 ? (
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-                  {bookmarks.map(renderCard)}
+                  {modelBookmarks.map(renderModelCard)}
                 </SimpleGrid>
               ) : (
                 <Text>No model bookmarks found in this folder.</Text>
