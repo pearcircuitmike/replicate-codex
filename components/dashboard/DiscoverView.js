@@ -123,7 +123,7 @@ const DiscoverView = () => {
           <TabPanels>
             <TabPanel p={0}>
               <Feed
-                resourceType="papers"
+                resourceType="paper"
                 fetchParams={searchParams}
                 updateResultCount={updateResultCount}
                 isSearching={isSearching}
@@ -131,7 +131,7 @@ const DiscoverView = () => {
             </TabPanel>
             <TabPanel p={0}>
               <Feed
-                resourceType="models"
+                resourceType="model"
                 fetchParams={searchParams}
                 updateResultCount={updateResultCount}
                 isSearching={isSearching}

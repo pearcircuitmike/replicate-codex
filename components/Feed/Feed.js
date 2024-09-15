@@ -27,7 +27,7 @@ const Feed = ({
       setIsLoading(true);
 
       const apiRoute =
-        resourceType === "papers"
+        resourceType === "paper"
           ? "/api/discover/papers"
           : "/api/discover/models";
       const url = `${apiRoute}?${new URLSearchParams({
@@ -84,14 +84,14 @@ const Feed = ({
     return () => feedElement?.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  const ResourceCard = resourceType === "papers" ? PaperCard : ModelCard;
+  const ResourceCard = resourceType === "paper" ? PaperCard : ModelCard;
 
   if (error) return <Text color="red.500">{error}</Text>;
 
   return (
     <Box
       width="100%"
-      height={{ base: "calc(200vh - 250px)", md: "calc(200vh - 200px)" }} // Changed 100vh to 200vh
+      height={{ base: "calc(200vh - 250px)", md: "calc(200vh - 200px)" }}
       overflowY="auto"
       ref={feedRef}
       css={{
@@ -122,7 +122,7 @@ const Feed = ({
           {resources.map((resource) => (
             <ResourceCard
               key={resource.id}
-              {...(resourceType === "papers"
+              {...(resourceType === "paper"
                 ? { paper: resource }
                 : { model: resource })}
               onBookmarkChange={() => toggleBookmark(resource.id, resourceType)}
