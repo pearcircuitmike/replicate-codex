@@ -1,5 +1,3 @@
-// components/dashboard/BookmarkModal.js
-
 import React, { useState, useEffect } from "react";
 import {
   Modal,
@@ -20,7 +18,6 @@ import {
 } from "@chakra-ui/react";
 import { SketchPicker } from "react-color";
 import { useAuth } from "@/context/AuthContext";
-import supabase from "@/pages/api/utils/supabaseClient";
 import { useFolders } from "@/context/FoldersContext";
 
 const BookmarkModal = ({
@@ -32,29 +29,23 @@ const BookmarkModal = ({
   const [selectedFolderId, setSelectedFolderId] = useState("");
   const [creatingNewFolder, setCreatingNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
-  const [newFolderColor, setNewFolderColor] = useState("#A0AEC0"); // Default gray color
+  const [newFolderColor, setNewFolderColor] = useState("#A0AEC0");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const toast = useToast();
-  const { user, accessToken } = useAuth(); // Destructure accessToken
-  const { fetchFolders, folders, updateFolderCount } = useFolders();
+  const { user, accessToken } = useAuth();
+  const { fetchFolders, folders } = useFolders();
 
   useEffect(() => {
     if (isOpen && user) {
       fetchFoldersInternal();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, user]);
 
   const fetchFoldersInternal = async () => {
     try {
-      await fetchFolders(); // Fetch folders from context
-      // Automatically select "Uncategorized" if it's the only folder
-      if (
-        folders.length === 1 &&
-        folders[0].name.toLowerCase() === "uncategorized"
-      ) {
+      await fetchFolders();
+      if (folders.length > 0) {
         setSelectedFolderId(folders[0].id);
-      } else {
-        setSelectedFolderId(folders[0]?.id || "");
       }
     } catch (error) {
       console.error("Error fetching folders:", error);
@@ -68,6 +59,9 @@ const BookmarkModal = ({
   };
 
   const handleSave = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     try {
       let folderId = selectedFolderId;
 
@@ -79,17 +73,17 @@ const BookmarkModal = ({
             duration: 3000,
             isClosable: true,
           });
+          setIsSubmitting(false);
           return;
         }
 
-        // Create new folder
         const folderResponse = await fetch(
           "/api/dashboard/create-bookmark-folder",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
+              Authorization: `Bearer ${accessToken || ""}`,
             },
             body: JSON.stringify({
               name: newFolderName.trim(),
@@ -104,28 +98,14 @@ const BookmarkModal = ({
           throw new Error(folderData.error || "Failed to create new folder");
         }
 
-        const newFolder = folderData.folder;
-        folderId = newFolder.id;
-        console.log("New folder created:", newFolder);
-
-        // Optionally, show a toast
-        toast({
-          title: "Folder created",
-          description: `Folder "${newFolder.name}" has been created.`,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-
-        // No need to update folder count since it's a new folder with 0 bookmarks
+        folderId = folderData.folder.id;
       }
 
-      // Add bookmark to the selected folder
       const bookmarkResponse = await fetch("/api/dashboard/add-bookmark", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
+          Authorization: `Bearer ${accessToken || ""}`,
         },
         body: JSON.stringify({
           resourceId: itemToBookmark.resource_id,
@@ -141,14 +121,7 @@ const BookmarkModal = ({
         throw new Error(bookmarkData.error || "Failed to add bookmark");
       }
 
-      console.log("Bookmark added:", bookmarkData);
-
-      onBookmarkAdded(folderId); // Pass folderId to update counts
-
-      // Optionally, fetch folders again to ensure counts are updated
-      await fetchFolders();
-      console.log("fetchFolders called after adding bookmark");
-
+      onBookmarkAdded();
       onClose();
     } catch (error) {
       console.error("Error saving bookmark:", error);
@@ -159,6 +132,8 @@ const BookmarkModal = ({
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -215,7 +190,12 @@ const BookmarkModal = ({
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" onClick={handleSave}>
+          <Button
+            colorScheme="blue"
+            onClick={handleSave}
+            isLoading={isSubmitting}
+            isDisabled={isSubmitting}
+          >
             Save Bookmark
           </Button>
         </ModalFooter>

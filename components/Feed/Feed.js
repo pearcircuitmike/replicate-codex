@@ -1,4 +1,3 @@
-// components/Feed/Feed.js
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { VStack, Text, Spinner, Box, SimpleGrid } from "@chakra-ui/react";
 import PaperCard from "../PaperCard";
@@ -13,7 +12,7 @@ const Feed = ({
   isSearching,
 }) => {
   const { user } = useAuth();
-  const { isBookmarked, toggleBookmark } = useBookmarks();
+  const { isBookmarked, fetchBookmarks } = useBookmarks();
   const [resources, setResources] = useState([]);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -84,6 +83,10 @@ const Feed = ({
     return () => feedElement?.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
+  const handleBookmarkChange = useCallback(() => {
+    fetchBookmarks();
+  }, [fetchBookmarks]);
+
   const ResourceCard = resourceType === "paper" ? PaperCard : ModelCard;
 
   if (error) return <Text color="red.500">{error}</Text>;
@@ -107,11 +110,11 @@ const Feed = ({
       {isLoading && resources.length === 0 ? (
         <Box textAlign="center" py={4}>
           <Spinner size="xl" />
-          <Text mt={2}>Loading {resourceType}...</Text>
+          <Text mt={2}>Loading {resourceType}s...</Text>
         </Box>
       ) : resources.length === 0 ? (
         <Box textAlign="center" py={4}>
-          <Text>No {resourceType} found. Try adjusting your search.</Text>
+          <Text>No {resourceType}s found. Try adjusting your search.</Text>
         </Box>
       ) : (
         <SimpleGrid
@@ -125,7 +128,8 @@ const Feed = ({
               {...(resourceType === "paper"
                 ? { paper: resource }
                 : { model: resource })}
-              onBookmarkChange={() => toggleBookmark(resource.id, resourceType)}
+              onBookmarkChange={handleBookmarkChange}
+              isBookmarked={isBookmarked(resource.id, resourceType)}
             />
           ))}
         </SimpleGrid>
@@ -133,7 +137,7 @@ const Feed = ({
       {isLoading && resources.length > 0 && (
         <Box textAlign="center" py={4}>
           <Spinner />
-          <Text mt={2}>Loading more {resourceType}...</Text>
+          <Text mt={2}>Loading more {resourceType}s...</Text>
         </Box>
       )}
     </Box>

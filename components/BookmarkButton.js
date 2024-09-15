@@ -1,6 +1,4 @@
-// components/dashboard/BookmarkButton.js
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button, Icon, useDisclosure, useToast } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
@@ -16,7 +14,7 @@ const BookmarkButton = ({
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { user, accessToken } = useAuth(); // Destructure accessToken
+  const { user, accessToken } = useAuth();
   const {
     isOpen: isBookmarkModalOpen,
     onOpen: onBookmarkModalOpen,
@@ -28,18 +26,9 @@ const BookmarkButton = ({
     onClose: onLoginClose,
   } = useDisclosure();
   const toast = useToast();
-  const { fetchFolders, updateFolderCount, folders } = useFolders();
+  const { fetchFolders } = useFolders();
 
-  useEffect(() => {
-    if (user) {
-      checkBookmarkStatus();
-    } else {
-      setIsLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, resourceId, resourceType]);
-
-  const checkBookmarkStatus = async () => {
+  const checkBookmarkStatus = useCallback(async () => {
     if (!user) {
       setIsLoading(false);
       return;
@@ -49,17 +38,13 @@ const BookmarkButton = ({
         `/api/dashboard/check-bookmark-status?resourceId=${resourceId}&resourceType=${resourceType}`,
         {
           headers: {
-            Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
+            Authorization: `Bearer ${accessToken || ""}`,
           },
         }
       );
       if (!response.ok) throw new Error("Failed to check bookmark status");
       const data = await response.json();
       setIsBookmarked(data.isBookmarked);
-      console.log(
-        `Bookmark status for resource ${resourceId}:`,
-        data.isBookmarked
-      );
     } catch (error) {
       console.error("Error checking bookmark status:", error);
       toast({
@@ -71,77 +56,32 @@ const BookmarkButton = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, accessToken, resourceId, resourceType, toast]);
 
-  const toggleBookmark = async () => {
+  useEffect(() => {
+    checkBookmarkStatus();
+  }, [checkBookmarkStatus]);
+
+  const handleButtonClick = () => {
     if (!user) {
       onLoginOpen();
       return;
     }
-    if (isBookmarked) {
-      await removeBookmark();
-    } else {
-      await ensureUncategorizedFolderAndOpenModal();
-    }
-  };
-
-  const ensureUncategorizedFolderAndOpenModal = async () => {
-    try {
-      // Check if user has any folders
-      if (folders.length === 0) {
-        // Fetch or create "Uncategorized" folder
-        const { folder, error } = await fetchOrCreateUncategorizedFolder();
-        if (error) throw error;
-        console.log("Uncategorized folder ensured:", folder);
-      }
-      // Refresh folders to include the new "Uncategorized" folder
-      await fetchFolders();
-      // Open the bookmark modal
+    if (!isBookmarked) {
       onBookmarkModalOpen();
-    } catch (error) {
-      console.error("Error ensuring Uncategorized folder:", error);
-      toast({
-        title: "Error ensuring Uncategorized folder",
-        description: error.message || "An unexpected error occurred.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+    } else {
+      handleRemoveBookmark();
     }
   };
 
-  const fetchOrCreateUncategorizedFolder = async () => {
-    try {
-      const response = await fetch(
-        "/api/dashboard/get-or-create-uncategorized-folder",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
-          },
-        }
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to get or create folder");
-      }
-
-      return { folder: data.folder, error: null };
-    } catch (error) {
-      console.error("Error fetching or creating Uncategorized folder:", error);
-      return { folder: null, error };
-    }
-  };
-
-  const removeBookmark = async () => {
+  const handleRemoveBookmark = async () => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/dashboard/remove-bookmark", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
+          Authorization: `Bearer ${accessToken || ""}`,
         },
         body: JSON.stringify({
           resourceId,
@@ -151,7 +91,6 @@ const BookmarkButton = ({
 
       if (!response.ok) throw new Error("Failed to remove bookmark");
 
-      const data = await response.json();
       setIsBookmarked(false);
       if (onBookmarkChange) onBookmarkChange(resourceId);
       toast({
@@ -161,13 +100,7 @@ const BookmarkButton = ({
         isClosable: true,
       });
 
-      if (updateFolderCount && data.folderId) {
-        updateFolderCount(data.folderId, false);
-        console.log(`Decremented bookmark count for folder ${data.folderId}`);
-      }
-
-      await fetchFolders(); // Refresh folders after removal
-      console.log("fetchFolders called after removing bookmark");
+      await fetchFolders();
     } catch (error) {
       console.error("Error removing bookmark:", error);
       toast({
@@ -181,8 +114,7 @@ const BookmarkButton = ({
     }
   };
 
-  const handleBookmarkAdded = (folderId) => {
-    console.log(`Bookmark added to folder ${folderId}`);
+  const handleBookmarkAdded = useCallback(() => {
     setIsBookmarked(true);
     if (onBookmarkChange) onBookmarkChange(resourceId);
     toast({
@@ -191,21 +123,13 @@ const BookmarkButton = ({
       duration: 3000,
       isClosable: true,
     });
-    onBookmarkModalClose();
-
-    if (updateFolderCount) {
-      updateFolderCount(folderId, true);
-      console.log(`Incremented bookmark count for folder ${folderId}`);
-    }
-
-    fetchFolders(); // Refresh folders after addition
-    console.log("fetchFolders called after adding bookmark");
-  };
+    fetchFolders();
+  }, [onBookmarkChange, resourceId, toast, fetchFolders]);
 
   return (
     <>
       <Button
-        onClick={toggleBookmark}
+        onClick={handleButtonClick}
         isLoading={isLoading}
         leftIcon={
           <Icon
@@ -217,7 +141,7 @@ const BookmarkButton = ({
         w="100%"
         borderTopRadius="0"
         boxShadow="0"
-        isDisabled={isLoading} // Disable button while loading
+        isDisabled={isLoading}
       >
         {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
       </Button>

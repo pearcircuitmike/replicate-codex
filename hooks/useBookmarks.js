@@ -32,42 +32,13 @@ export const useBookmarks = () => {
     fetchBookmarks();
   }, [fetchBookmarks]);
 
-  const toggleBookmark = async (resourceId, resourceType) => {
-    if (!user) return;
-    const key = `${resourceType}-${resourceId}`;
-    const isCurrentlyBookmarked = bookmarks[key];
-
-    try {
-      if (isCurrentlyBookmarked) {
-        await supabase
-          .from("bookmarks")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("bookmarked_resource", resourceId)
-          .eq("resource_type", resourceType);
-      } else {
-        await supabase.from("bookmarks").insert({
-          user_id: user.id,
-          bookmarked_resource: resourceId,
-          resource_type: resourceType,
-        });
-      }
-      setBookmarks((prev) => ({
-        ...prev,
-        [key]: !isCurrentlyBookmarked,
-      }));
-    } catch (error) {
-      console.error("Error toggling bookmark:", error);
-    }
-  };
-
   const isBookmarked = (resourceId, resourceType) => {
     return !!bookmarks[`${resourceType}-${resourceId}`];
   };
 
   return {
     isBookmarked,
-    toggleBookmark,
+    fetchBookmarks,
     isLoading,
   };
 };
