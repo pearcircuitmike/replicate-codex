@@ -1,5 +1,5 @@
 // components/dashboard/FolderModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -24,26 +24,22 @@ const FolderModal = ({
   fetchFolders,
   editingFolder = null,
 }) => {
-  const [folderName, setFolderName] = useState(
-    editingFolder ? editingFolder.name : ""
-  );
-  const [folderColor, setFolderColor] = useState(
-    editingFolder ? editingFolder.color : "#000000"
-  );
+  const [folderName, setFolderName] = useState("");
+  const [folderColor, setFolderColor] = useState("#000000");
   const toast = useToast();
   const { user } = useAuth();
 
-  const handleSaveFolder = async () => {
-    if (!folderName.trim()) {
-      toast({
-        title: "Folder name is required.",
-        status: "warning",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
+  useEffect(() => {
+    if (editingFolder) {
+      setFolderName(editingFolder.name);
+      setFolderColor(editingFolder.color || "#000000");
+    } else {
+      setFolderName("");
+      setFolderColor("#000000");
     }
+  }, [editingFolder]);
 
+  const handleSaveFolder = async () => {
     if (!user) {
       toast({
         title: "Authentication error",
@@ -55,46 +51,57 @@ const FolderModal = ({
       return;
     }
 
-    try {
-      let folderData;
-      if (editingFolder) {
-        const { data, error } = await supabase
-          .from("folders")
-          .update({ name: folderName.trim(), color: folderColor })
-          .eq("id", editingFolder.id)
-          .eq("user_id", user.id)
-          .select()
-          .single();
+    if (!folderName.trim()) {
+      toast({
+        title: "Folder name is required.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
 
-        if (error) throw error;
-        folderData = data;
-      } else {
-        const { data, error } = await supabase
-          .from("folders")
-          .insert({
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+
+      const endpoint = editingFolder
+        ? "/api/dashboard/edit-bookmark-folder"
+        : "/api/dashboard/create-bookmark-folder";
+      const method = editingFolder ? "PUT" : "POST";
+      const body = editingFolder
+        ? {
+            folderId: editingFolder.id,
             name: folderName.trim(),
             color: folderColor,
-            user_id: user.id,
-          })
-          .select()
-          .single();
+          }
+        : { name: folderName.trim(), color: folderColor };
 
-        if (error) throw error;
-        folderData = data;
+      const response = await fetch(endpoint, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "An error occurred");
       }
 
+      const data = await response.json();
+
       toast({
-        title: `Folder ${editingFolder ? "updated" : "created"}.`,
+        title: `Folder ${editingFolder ? "updated" : "created"} successfully`,
         status: "success",
         duration: 3000,
         isClosable: true,
       });
 
-      setFolderName("");
-      setFolderColor("#000000");
       onClose();
-
-      // Fetch folders again to update the list
       fetchFolders();
     } catch (error) {
       console.error(

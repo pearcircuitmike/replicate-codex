@@ -22,15 +22,25 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Invalid or expired token" });
     }
 
-    const { data, error } = await supabase
+    const { data: folders, error: folderError } = await supabase
       .from("folders")
-      .select("*")
+      .select(
+        `
+        *,
+        bookmarks:bookmarks(count)
+      `
+      )
       .eq("user_id", user.id)
-      .order("name");
+      .order("position", { ascending: true });
 
-    if (error) throw error;
+    if (folderError) throw folderError;
 
-    res.status(200).json({ folders: data });
+    const foldersWithCount = folders.map((folder) => ({
+      ...folder,
+      bookmarkCount: folder.bookmarks[0].count,
+    }));
+
+    res.status(200).json({ folders: foldersWithCount });
   } catch (error) {
     console.error("Error fetching folders:", error);
     res.status(500).json({ error: "An error occurred while fetching folders" });

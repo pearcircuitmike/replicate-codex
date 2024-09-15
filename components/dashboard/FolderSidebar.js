@@ -1,78 +1,52 @@
-import React, { useState } from "react";
+// components/dashboard/FolderSidebar.js
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Flex,
   IconButton,
   Text,
   Button,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverBody,
-  Input,
-  PopoverFooter,
-  PopoverArrow,
-  PopoverCloseButton,
-  FormControl,
-  FormLabel,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/router";
+import FolderModal from "./FolderModal";
+import { useAuth } from "../../context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
-import { SketchPicker } from "react-color";
 
-const FolderSidebar = ({
-  folders,
-  setFolders,
-  onFolderModalOpen,
-  fetchFolders,
-}) => {
+const FolderSidebar = () => {
   const router = useRouter();
+  const [folders, setFolders] = useState([]);
   const [editingFolder, setEditingFolder] = useState(null);
-  const [folderName, setFolderName] = useState("");
-  const [folderColor, setFolderColor] = useState("#000000");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const { user } = useAuth();
 
-  const handleFolderClick = (folderId) => {
-    router.push(`/dashboard/library?folderId=${folderId}`);
-  };
+  const fetchFolders = async () => {
+    if (!user) return;
 
-  const handleEditFolder = (folder) => {
-    setEditingFolder(folder);
-    setFolderName(folder.name);
-    setFolderColor(folder.color || "#000000");
-    onOpen();
-  };
-
-  const handleSaveChanges = async () => {
     try {
-      const { data, error } = await supabase
-        .from("folders")
-        .update({ name: folderName.trim(), color: folderColor })
-        .eq("id", editingFolder.id)
-        .select();
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
 
-      if (error) throw error;
+      const response = await fetch("/api/dashboard/get-folders", {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+      });
 
-      if (data && data.length > 0) {
-        fetchFolders();
-        onClose();
-        toast({
-          title: "Folder updated",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      } else {
-        throw new Error("No data returned");
+      if (!response.ok) {
+        throw new Error("Failed to fetch folders");
       }
+
+      const data = await response.json();
+      setFolders(data.folders);
     } catch (error) {
-      console.error("Error updating folder:", error);
+      console.error("Error fetching folders:", error);
       toast({
-        title: "Error updating folder",
+        title: "Error fetching folders",
         description: error.message,
         status: "error",
         duration: 3000,
@@ -81,14 +55,34 @@ const FolderSidebar = ({
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      fetchFolders();
+    }
+  }, [user]);
+
+  const handleFolderClick = (folderId) => {
+    router.push(`/dashboard/library?folderId=${folderId}`);
+  };
+
+  const handleEditFolder = (folder) => {
+    setEditingFolder(folder);
+    onOpen();
+  };
+
   const handleDeleteFolder = async (folderId) => {
+    if (!user) return;
+
     try {
-      const session = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+
       const response = await fetch("/api/dashboard/delete-bookmark-folder", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.data.session.access_token}`,
+          Authorization: `Bearer ${sessionData.session.access_token}`,
         },
         body: JSON.stringify({ folderId }),
       });
@@ -119,6 +113,16 @@ const FolderSidebar = ({
       });
     }
   };
+
+  const handleModalClose = () => {
+    setEditingFolder(null);
+    onClose();
+    fetchFolders();
+  };
+
+  if (!user) {
+    return null; // or some loading state
+  }
 
   return (
     <>
@@ -182,43 +186,19 @@ const FolderSidebar = ({
       <Button
         variant="ghost"
         justifyContent="flex-start"
-        onClick={onFolderModalOpen}
+        onClick={onOpen}
         mt={4}
         mx={4}
       >
         New Folder +
       </Button>
 
-      {/* Edit Folder Modal */}
-      {editingFolder && (
-        <Popover isOpen={isOpen} onClose={onClose}>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverCloseButton />
-            <PopoverBody>
-              <FormControl>
-                <FormLabel>Folder Name</FormLabel>
-                <Input
-                  value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)}
-                />
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel>Folder Color</FormLabel>
-                <SketchPicker
-                  color={folderColor}
-                  onChangeComplete={(color) => setFolderColor(color.hex)}
-                />
-              </FormControl>
-            </PopoverBody>
-            <PopoverFooter>
-              <Button colorScheme="blue" onClick={handleSaveChanges}>
-                Save
-              </Button>
-            </PopoverFooter>
-          </PopoverContent>
-        </Popover>
-      )}
+      <FolderModal
+        isOpen={isOpen}
+        onClose={handleModalClose}
+        fetchFolders={fetchFolders}
+        editingFolder={editingFolder}
+      />
     </>
   );
 };
