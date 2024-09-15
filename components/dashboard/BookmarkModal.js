@@ -19,35 +19,45 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { SketchPicker } from "react-color";
-import supabase from "../../pages/api/utils/supabaseClient"; // Adjust the path as needed
-import { useAuth } from "../../context/AuthContext"; // Adjust the path as needed
+import { useAuth } from "@/context/AuthContext";
+import supabase from "@/pages/api/utils/supabaseClient";
 
-const BookmarkModal = ({ isOpen, onClose, itemToBookmark }) => {
-  const { user } = useAuth();
+const BookmarkModal = ({
+  isOpen,
+  onClose,
+  itemToBookmark,
+  onBookmarkAdded,
+  fetchFolders, // Accept fetchFolders as a prop
+}) => {
   const [folders, setFolders] = useState([]);
-  const [selectedFolderId, setSelectedFolderId] = useState("uncategorized");
+  const [selectedFolderId, setSelectedFolderId] = useState("");
   const [creatingNewFolder, setCreatingNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderColor, setNewFolderColor] = useState("#000000");
   const toast = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      fetchFolders();
+    if (isOpen && user) {
+      fetchFoldersInternal();
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, user]);
 
-  const fetchFolders = async () => {
+  const fetchFoldersInternal = async () => {
     try {
-      const { data, error } = await supabase
-        .from("folders")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("name", { ascending: true });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch("/api/dashboard/get-folders", {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch folders");
+      const data = await response.json();
+      const fetchedFolders = data.folders;
 
-      if (error) throw error;
-
-      setFolders(data);
+      setFolders(fetchedFolders);
+      setSelectedFolderId(fetchedFolders[0]?.id || "");
     } catch (error) {
       console.error("Error fetching folders:", error);
       toast({
@@ -61,6 +71,7 @@ const BookmarkModal = ({ isOpen, onClose, itemToBookmark }) => {
 
   const handleSave = async () => {
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
       let folderId = selectedFolderId;
 
       if (creatingNewFolder) {
@@ -75,76 +86,59 @@ const BookmarkModal = ({ isOpen, onClose, itemToBookmark }) => {
         }
 
         // Create new folder
-        const { data: newFolder, error: folderError } = await supabase
-          .from("folders")
-          .insert({
-            name: newFolderName.trim(),
-            color: newFolderColor,
-            user_id: user.id,
-          })
-          .select()
-          .single();
+        const folderResponse = await fetch(
+          "/api/dashboard/create-bookmark-folder",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${sessionData.session.access_token}`,
+            },
+            body: JSON.stringify({
+              name: newFolderName.trim(),
+              color: newFolderColor,
+            }),
+          }
+        );
 
-        if (folderError) throw folderError;
+        if (!folderResponse.ok) throw new Error("Failed to create new folder");
+        const newFolder = await folderResponse.json();
+        folderId = newFolder.folder.id;
 
-        folderId = newFolder.id;
-      } else if (folderId === "uncategorized") {
-        // Get or create 'Uncategorized' folder
-        const { data: uncategorizedFolder, error: uncategorizedError } =
-          await supabase
-            .from("folders")
-            .select("id")
-            .eq("user_id", user.id)
-            .eq("name", "Uncategorized")
-            .single();
-
-        if (uncategorizedError && uncategorizedError.code === "PGRST116") {
-          // 'Uncategorized' folder does not exist; create it
-          const { data: newUncategorizedFolder, error: createError } =
-            await supabase
-              .from("folders")
-              .insert({
-                name: "Uncategorized",
-                color: "#A0AEC0", // Default gray color
-                user_id: user.id,
-              })
-              .select()
-              .single();
-
-          if (createError) throw createError;
-
-          folderId = newUncategorizedFolder.id;
-        } else if (uncategorizedError) {
-          throw uncategorizedError;
-        } else {
-          folderId = uncategorizedFolder.id;
-        }
+        // Optionally, add the new folder to local state
+        setFolders((prevFolders) => [...prevFolders, newFolder.folder]);
       }
 
       // Add bookmark to the selected folder
-      const { error: bookmarkError } = await supabase.from("bookmarks").insert({
-        user_id: user.id,
-        folder_id: folderId,
-        resource_type: itemToBookmark.resource_type,
-        resource_id: itemToBookmark.resource_id,
-        title: itemToBookmark.title,
-        // Add any other necessary fields
+      const bookmarkResponse = await fetch("/api/dashboard/add-bookmark", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          resourceId: itemToBookmark.resource_id,
+          resourceType: itemToBookmark.resource_type,
+          folderId: folderId,
+          title: itemToBookmark.title,
+        }),
       });
 
-      if (bookmarkError) throw bookmarkError;
+      if (!bookmarkResponse.ok) throw new Error("Failed to add bookmark");
 
-      toast({
-        title: "Bookmark added.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      onBookmarkAdded(folderId); // Pass folderId to update counts
+
+      // Optionally, fetch folders again to ensure counts are updated
+      if (typeof fetchFolders === "function") {
+        fetchFolders();
+      }
 
       onClose();
     } catch (error) {
       console.error("Error saving bookmark:", error);
       toast({
         title: "Error saving bookmark",
+        description: error.message || "An unexpected error occurred",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -160,14 +154,13 @@ const BookmarkModal = ({ isOpen, onClose, itemToBookmark }) => {
         <ModalCloseButton />
         <ModalBody>
           <VStack spacing={4} align="stretch">
-            {!creatingNewFolder && (
+            {folders.length > 0 && (
               <FormControl>
                 <FormLabel>Select Folder</FormLabel>
                 <Select
                   value={selectedFolderId}
                   onChange={(e) => setSelectedFolderId(e.target.value)}
                 >
-                  <option value="uncategorized">Uncategorized</option>
                   {folders.map((folder) => (
                     <option key={folder.id} value={folder.id}>
                       {folder.name}

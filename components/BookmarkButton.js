@@ -1,42 +1,23 @@
-// components/BookmarkButton.js
+// components/dashboard/BookmarkButton.js
+
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Icon,
-  useDisclosure,
-  useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Select,
-  Input,
-  FormControl,
-  FormLabel,
-  Checkbox,
-  VStack,
-} from "@chakra-ui/react";
+import { Button, Icon, useDisclosure, useToast } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import LoginModal from "./LoginModal";
-import { SketchPicker } from "react-color";
+import BookmarkModal from "./dashboard/BookmarkModal";
 import supabase from "@/pages/api/utils/supabaseClient";
+
 const BookmarkButton = ({
   resourceId,
   resourceType,
   onBookmarkChange,
   title,
+  updateFolderCount,
+  fetchFolders,
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [folders, setFolders] = useState([]);
-  const [selectedFolderId, setSelectedFolderId] = useState("uncategorized");
-  const [creatingNewFolder, setCreatingNewFolder] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
-  const [newFolderColor, setNewFolderColor] = useState("#000000");
   const { user } = useAuth();
   const {
     isOpen: isBookmarkModalOpen,
@@ -52,36 +33,12 @@ const BookmarkButton = ({
 
   useEffect(() => {
     if (user) {
-      fetchFolders();
       checkBookmarkStatus();
     } else {
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, resourceId, resourceType]);
-
-  const fetchFolders = async () => {
-    if (!user) return;
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const response = await fetch("/api/dashboard/get-folders", {
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch folders");
-      const data = await response.json();
-      setFolders(data.folders || []);
-    } catch (error) {
-      console.error("Error fetching folders:", error);
-      toast({
-        title: "Error fetching folders",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      setFolders([]);
-    }
-  };
 
   const checkBookmarkStatus = async () => {
     if (!user) {
@@ -126,48 +83,6 @@ const BookmarkButton = ({
     }
   };
 
-  const addBookmark = async (folderId) => {
-    setIsLoading(true);
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const response = await fetch("/api/dashboard/add-bookmark", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionData.session.access_token}`,
-        },
-        body: JSON.stringify({
-          resourceId,
-          resourceType,
-          folderId,
-          title,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to add bookmark");
-
-      setIsBookmarked(true);
-      if (onBookmarkChange) onBookmarkChange(resourceId);
-      toast({
-        title: "Bookmark added",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-      onBookmarkModalClose();
-    } catch (error) {
-      console.error("Error adding bookmark:", error);
-      toast({
-        title: "Error adding bookmark",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const removeBookmark = async () => {
     setIsLoading(true);
     try {
@@ -186,6 +101,7 @@ const BookmarkButton = ({
 
       if (!response.ok) throw new Error("Failed to remove bookmark");
 
+      const data = await response.json();
       setIsBookmarked(false);
       if (onBookmarkChange) onBookmarkChange(resourceId);
       toast({
@@ -194,6 +110,14 @@ const BookmarkButton = ({
         duration: 3000,
         isClosable: true,
       });
+
+      if (updateFolderCount && data.folderId) {
+        updateFolderCount(data.folderId, false);
+      }
+
+      if (typeof fetchFolders === "function") {
+        fetchFolders(); // Refresh folders after removal
+      }
     } catch (error) {
       console.error("Error removing bookmark:", error);
       toast({
@@ -207,50 +131,23 @@ const BookmarkButton = ({
     }
   };
 
-  const handleSaveBookmark = async () => {
-    try {
-      let folderId = selectedFolderId;
+  const handleBookmarkAdded = (folderId) => {
+    setIsBookmarked(true);
+    if (onBookmarkChange) onBookmarkChange(resourceId);
+    toast({
+      title: "Bookmark added",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    onBookmarkModalClose();
 
-      if (creatingNewFolder) {
-        if (!newFolderName.trim()) {
-          toast({
-            title: "Folder name is required.",
-            status: "warning",
-            duration: 3000,
-            isClosable: true,
-          });
-          return;
-        }
+    if (updateFolderCount) {
+      updateFolderCount(folderId, true);
+    }
 
-        const { data: sessionData } = await supabase.auth.getSession();
-        const response = await fetch("/api/dashboard/create-bookmark-folder", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessionData.session.access_token}`,
-          },
-          body: JSON.stringify({
-            name: newFolderName.trim(),
-            color: newFolderColor,
-          }),
-        });
-
-        if (!response.ok) throw new Error("Failed to create new folder");
-
-        const newFolder = await response.json();
-        folderId = newFolder.folder.id;
-        setFolders([...folders, newFolder.folder]);
-      }
-
-      await addBookmark(folderId);
-    } catch (error) {
-      console.error("Error saving bookmark:", error);
-      toast({
-        title: "Error saving bookmark",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+    if (typeof fetchFolders === "function") {
+      fetchFolders(); // Refresh folders after addition
     }
   };
 
@@ -273,78 +170,17 @@ const BookmarkButton = ({
         {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
       </Button>
 
-      {/* Bookmark Modal */}
-      <Modal
+      <BookmarkModal
         isOpen={isBookmarkModalOpen}
         onClose={onBookmarkModalClose}
-        isCentered
-        size="md"
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add Bookmark</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <VStack spacing={4} align="stretch">
-              {!creatingNewFolder && (
-                <FormControl>
-                  <FormLabel>Select Folder</FormLabel>
-                  <Select
-                    value={selectedFolderId}
-                    onChange={(e) => setSelectedFolderId(e.target.value)}
-                  >
-                    <option value="uncategorized">Uncategorized</option>
-                    {folders.map((folder) => (
-                      <option key={folder.id} value={folder.id}>
-                        {folder.name}
-                      </option>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-
-              <Checkbox
-                isChecked={creatingNewFolder}
-                onChange={(e) => {
-                  setCreatingNewFolder(e.target.checked);
-                  if (e.target.checked) {
-                    setSelectedFolderId(null);
-                  } else {
-                    setSelectedFolderId("uncategorized");
-                  }
-                }}
-              >
-                Create new folder
-              </Checkbox>
-
-              {creatingNewFolder && (
-                <>
-                  <FormControl>
-                    <FormLabel>Folder Name</FormLabel>
-                    <Input
-                      value={newFolderName}
-                      onChange={(e) => setNewFolderName(e.target.value)}
-                      placeholder="Enter folder name"
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel>Folder Color</FormLabel>
-                    <SketchPicker
-                      color={newFolderColor}
-                      onChangeComplete={(color) => setNewFolderColor(color.hex)}
-                    />
-                  </FormControl>
-                </>
-              )}
-            </VStack>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" onClick={handleSaveBookmark}>
-              Save Bookmark
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        itemToBookmark={{
+          resource_id: resourceId,
+          resource_type: resourceType,
+          title: title,
+        }}
+        onBookmarkAdded={handleBookmarkAdded}
+        fetchFolders={fetchFolders} // Pass fetchFolders to BookmarkModal
+      />
 
       <LoginModal isOpen={isLoginOpen} onClose={onLoginClose} />
     </>

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+// components/dashboard/DashboardLayout.js
+
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Flex,
@@ -6,6 +8,7 @@ import {
   VStack,
   HStack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { FaSearch, FaUser, FaNewspaper } from "react-icons/fa";
@@ -25,16 +28,12 @@ const DashboardLayout = ({ children }) => {
   const { user } = useAuth();
   const [folders, setFolders] = useState([]);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const toast = useToast();
 
-  useEffect(() => {
-    if (user) {
-      fetchFolders();
-    }
-  }, [user]);
+  const fetchFolders = useCallback(async () => {
+    if (!user) return;
 
-  const fetchFolders = async () => {
     try {
-      // Fetch folders for the current user
       const { data: folderData, error: folderError } = await supabase
         .from("folders")
         .select("id, name, color, position")
@@ -43,7 +42,6 @@ const DashboardLayout = ({ children }) => {
 
       if (folderError) throw folderError;
 
-      // Fetch bookmark counts for each folder
       const foldersWithCounts = await Promise.all(
         folderData.map(async (folder) => {
           const { count, error: countError } = await supabase
@@ -64,8 +62,34 @@ const DashboardLayout = ({ children }) => {
       setFolders(foldersWithCounts);
     } catch (error) {
       console.error("Error fetching folders:", error);
+      toast({
+        title: "Error fetching folders",
+        description: error.message || "An unexpected error occurred.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
-  };
+  }, [user, toast]);
+
+  const updateFolderCount = useCallback((folderId, increment) => {
+    setFolders((prevFolders) =>
+      prevFolders.map((folder) =>
+        folder.id === folderId
+          ? {
+              ...folder,
+              bookmarkCount: folder.bookmarkCount + (increment ? 1 : -1),
+            }
+          : folder
+      )
+    );
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchFolders();
+    }
+  }, [user, fetchFolders]);
 
   const handleFolderModalOpen = () => {
     setIsFolderModalOpen(true);
@@ -73,6 +97,7 @@ const DashboardLayout = ({ children }) => {
 
   const handleFolderModalClose = () => {
     setIsFolderModalOpen(false);
+    fetchFolders();
   };
 
   const navItemsBeforeFolders = [
@@ -88,6 +113,14 @@ const DashboardLayout = ({ children }) => {
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
 
+  // Clone children and pass down necessary props
+  const childrenWithProps = React.Children.map(children, (child) => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, { updateFolderCount, fetchFolders });
+    }
+    return child;
+  });
+
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
       {isLargerThan768 && (
@@ -99,7 +132,6 @@ const DashboardLayout = ({ children }) => {
           borderRight="1px solid #e2e8f0"
         >
           <VStack spacing={2} align="stretch">
-            {/* Navigation items before folders */}
             {navItemsBeforeFolders.map((item) => (
               <NavItem
                 key={item.href}
@@ -109,20 +141,17 @@ const DashboardLayout = ({ children }) => {
                 isActive={router.pathname === item.href}
               />
             ))}
-            {/* "My Folders" label */}
             <Box px={4} py={2}>
               <Text fontSize="lg" fontWeight="bold">
                 My Folders
               </Text>
             </Box>
-            {/* Folder Sidebar */}
             <FolderSidebar
               folders={folders}
-              setFolders={setFolders}
               onFolderModalOpen={handleFolderModalOpen}
               fetchFolders={fetchFolders}
+              updateFolderCount={updateFolderCount}
             />
-            {/* Navigation items after folders */}
             {navItemsAfterFolders.map((item) => (
               <NavItem
                 key={item.href}
@@ -136,12 +165,10 @@ const DashboardLayout = ({ children }) => {
         </Box>
       )}
 
-      {/* Main content */}
       <Box flex={1} overflowY="auto">
-        {children}
+        {childrenWithProps}
       </Box>
 
-      {/* Right Sidebar */}
       {isLargerThan1024 && (
         <Box width="250px" bg="white" py={8} borderLeft="1px solid #e2e8f0">
           <TrendingTopics />
@@ -150,7 +177,6 @@ const DashboardLayout = ({ children }) => {
         </Box>
       )}
 
-      {/* Bottom navigation for mobile */}
       {!isLargerThan768 && (
         <Box
           position="fixed"
@@ -174,7 +200,6 @@ const DashboardLayout = ({ children }) => {
         </Box>
       )}
 
-      {/* Folder Modal */}
       <FolderModal
         isOpen={isFolderModalOpen}
         onClose={handleFolderModalClose}

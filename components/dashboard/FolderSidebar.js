@@ -1,10 +1,11 @@
 // components/dashboard/FolderSidebar.js
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import {
-  Box,
   Flex,
-  IconButton,
+  Box,
   Text,
+  IconButton,
   Button,
   useDisclosure,
   useToast,
@@ -15,51 +16,17 @@ import FolderModal from "./FolderModal";
 import { useAuth } from "../../context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
 
-const FolderSidebar = () => {
+const FolderSidebar = ({
+  folders,
+  onFolderModalOpen,
+  fetchFolders,
+  updateFolderCount,
+}) => {
   const router = useRouter();
-  const [folders, setFolders] = useState([]);
   const [editingFolder, setEditingFolder] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const { user } = useAuth();
-
-  const fetchFolders = async () => {
-    if (!user) return;
-
-    try {
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
-
-      const response = await fetch("/api/dashboard/get-folders", {
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch folders");
-      }
-
-      const data = await response.json();
-      setFolders(data.folders);
-    } catch (error) {
-      console.error("Error fetching folders:", error);
-      toast({
-        title: "Error fetching folders",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchFolders();
-    }
-  }, [user]);
 
   const handleFolderClick = (folderId) => {
     router.push(`/dashboard/library?folderId=${folderId}`);
@@ -186,7 +153,7 @@ const FolderSidebar = () => {
       <Button
         variant="ghost"
         justifyContent="flex-start"
-        onClick={onOpen}
+        onClick={onFolderModalOpen}
         mt={4}
         mx={4}
       >
