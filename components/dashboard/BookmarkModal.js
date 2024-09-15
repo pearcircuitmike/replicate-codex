@@ -36,7 +36,11 @@ const BookmarkModal = ({
   const [newFolderColor, setNewFolderColor] = useState("#000000");
   const toast = useToast();
   const { user } = useAuth();
-  const { fetchFolders, updateFolderCount } = useFolders();
+  const {
+    fetchFolders,
+    updateFolderCount,
+    folders: contextFolders,
+  } = useFolders();
 
   useEffect(() => {
     if (isOpen && user) {
@@ -47,18 +51,17 @@ const BookmarkModal = ({
 
   const fetchFoldersInternal = async () => {
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const response = await fetch("/api/dashboard/get-folders", {
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch folders");
-      const data = await response.json();
-      const fetchedFolders = data.folders;
-
-      setFolders(fetchedFolders);
-      setSelectedFolderId(fetchedFolders[0]?.id || "");
+      await fetchFolders(); // Fetch folders from context
+      setFolders(contextFolders);
+      // Automatically select "Uncategorized" if it's the only folder
+      if (
+        contextFolders.length === 1 &&
+        contextFolders[0].name === "Uncategorized"
+      ) {
+        setSelectedFolderId(contextFolders[0].id);
+      } else {
+        setSelectedFolderId(contextFolders[0]?.id || "");
+      }
     } catch (error) {
       console.error("Error fetching folders:", error);
       toast({
@@ -72,7 +75,6 @@ const BookmarkModal = ({
 
   const handleSave = async () => {
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
       let folderId = selectedFolderId;
 
       if (creatingNewFolder) {
@@ -87,6 +89,7 @@ const BookmarkModal = ({
         }
 
         // Create new folder
+        const { data: sessionData } = await supabase.auth.getSession();
         const folderResponse = await fetch(
           "/api/dashboard/create-bookmark-folder",
           {
@@ -102,16 +105,20 @@ const BookmarkModal = ({
           }
         );
 
-        if (!folderResponse.ok) throw new Error("Failed to create new folder");
+        if (!folderResponse.ok) {
+          const errorData = await folderResponse.json();
+          throw new Error(errorData.error || "Failed to create new folder");
+        }
         const newFolder = await folderResponse.json();
         folderId = newFolder.folder.id;
+        console.log("New folder created:", newFolder.folder);
 
-        // Update local folder list
-        setFolders((prevFolders) => [...prevFolders, newFolder.folder]);
-        updateFolderCount(folderId, 0); // Initialize count to 0 or appropriate value
+        // Update folder count context
+        updateFolderCount(folderId, false); // Initialize count
       }
 
       // Add bookmark to the selected folder
+      const { data: sessionData } = await supabase.auth.getSession();
       const bookmarkResponse = await fetch("/api/dashboard/add-bookmark", {
         method: "POST",
         headers: {
@@ -126,14 +133,19 @@ const BookmarkModal = ({
         }),
       });
 
-      if (!bookmarkResponse.ok) throw new Error("Failed to add bookmark");
+      if (!bookmarkResponse.ok) {
+        const errorData = await bookmarkResponse.json();
+        throw new Error(errorData.error || "Failed to add bookmark");
+      }
+
+      const bookmarkData = await bookmarkResponse.json();
+      console.log("Bookmark added:", bookmarkData);
 
       onBookmarkAdded(folderId); // Pass folderId to update counts
 
       // Optionally, fetch folders again to ensure counts are updated
-      if (typeof fetchFolders === "function") {
-        fetchFolders();
-      }
+      fetchFolders();
+      console.log("fetchFolders called after adding bookmark");
 
       onClose();
     } catch (error) {
