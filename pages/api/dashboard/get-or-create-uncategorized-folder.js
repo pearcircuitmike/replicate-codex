@@ -1,4 +1,5 @@
 // pages/api/dashboard/get-or-create-uncategorized-folder.js
+
 import supabase from "../utils/supabaseClient";
 
 export default async function handler(req, res) {
@@ -22,7 +23,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Invalid or expired token" });
     }
 
-    // Check if Uncategorized folder exists
+    // Check if "Uncategorized" folder exists
     const { data: existingFolder, error: fetchError } = await supabase
       .from("folders")
       .select("*")
@@ -31,6 +32,7 @@ export default async function handler(req, res) {
       .single();
 
     if (fetchError && fetchError.code !== "PGRST116") {
+      // PGRST116 is "No rows found"
       throw fetchError;
     }
 
@@ -38,7 +40,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ folder: existingFolder });
     }
 
-    // Create Uncategorized folder if it doesn't exist
+    // Create "Uncategorized" folder if it doesn't exist
     const { data: newFolder, error: createError } = await supabase
       .from("folders")
       .insert({

@@ -17,9 +17,8 @@ import {
 } from "@chakra-ui/react";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import RouteGuard from "@/components/RouteGuard";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AuthForm from "@/components/AuthForm";
-import { useState } from "react";
 import { usePageView } from "../hooks/usePageView";
 import Head from "next/head";
 import { FoldersProvider } from "@/context/FoldersContext";
@@ -33,8 +32,10 @@ function AppContent({ Component, pageProps }) {
   // Use the custom hook for page view tracking
   usePageView();
 
+  const [folders, setFolders] = useState([]);
+
   // Function to fetch folders
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     if (!user) {
       setFolders([]);
       return;
@@ -45,7 +46,7 @@ function AppContent({ Component, pageProps }) {
         .from("folders")
         .select("id, name, color, position")
         .eq("user_id", user.id)
-        .order("name", { ascending: true });
+        .order("position", { ascending: true });
 
       if (folderError) throw folderError;
 
@@ -67,6 +68,7 @@ function AppContent({ Component, pageProps }) {
       );
 
       setFolders(foldersWithCounts);
+      console.log("Fetched folders:", foldersWithCounts);
     } catch (error) {
       console.error("Error fetching folders:", error);
       toast({
@@ -77,10 +79,10 @@ function AppContent({ Component, pageProps }) {
         isClosable: true,
       });
     }
-  };
+  }, [user, toast]);
 
   // Function to update folder count
-  const updateFolderCount = (folderId, increment) => {
+  const updateFolderCount = useCallback((folderId, increment) => {
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
         folder.id === folderId
@@ -92,9 +94,7 @@ function AppContent({ Component, pageProps }) {
       )
     );
     console.log(`Updated folder ${folderId} count by ${increment ? 1 : -1}`);
-  };
-
-  const [folders, setFolders] = useState([]);
+  }, []);
 
   // Fetch folders when user changes
   useEffect(() => {
@@ -103,7 +103,7 @@ function AppContent({ Component, pageProps }) {
     } else {
       setFolders([]);
     }
-  }, [user]);
+  }, [user, fetchFolders]);
 
   // Open modal after 15 seconds for unauthenticated users
   useEffect(() => {
@@ -124,6 +124,7 @@ function AppContent({ Component, pageProps }) {
       <RouteGuard>
         <Box>
           <Layout>
+            {/* Analytics and Tracking Scripts */}
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`}
               strategy="afterInteractive"
@@ -159,7 +160,9 @@ function AppContent({ Component, pageProps }) {
               src="https://www.googletagmanager.com/gtag/js?id=AW-16682209532"
               strategy="afterInteractive"
             />
+            {/* Main Component */}
             <Component {...pageProps} loading={loading} />
+            {/* Authentication Modal */}
             <Modal isOpen={isOpen} onClose={onClose}>
               <ModalOverlay />
               <ModalContent p={2}>

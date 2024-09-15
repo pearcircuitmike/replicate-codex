@@ -1,4 +1,5 @@
 // pages/api/dashboard/create-bookmark-folder.js
+
 import supabase from "../utils/supabaseClient";
 
 export default async function handler(req, res) {
@@ -24,17 +25,39 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Invalid or expired token" });
     }
 
-    const { data, error } = await supabase
+    // Check if a folder with the same name already exists
+    const { data: existingFolder, error: fetchError } = await supabase
       .from("folders")
-      .insert({ name: name.trim(), color, user_id: user.id })
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("name", name)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      // PGRST116 is "No rows found"
+      throw fetchError;
+    }
+
+    if (existingFolder) {
+      return res
+        .status(400)
+        .json({ error: "Folder with this name already exists" });
+    }
+
+    // Create new folder
+    const { data: newFolder, error: createError } = await supabase
+      .from("folders")
+      .insert({
+        name: name.trim(),
+        color,
+        user_id: user.id,
+      })
       .select()
       .single();
 
-    if (error) throw error;
+    if (createError) throw createError;
 
-    res
-      .status(201)
-      .json({ message: "Folder created successfully", folder: data });
+    res.status(201).json({ folder: newFolder });
   } catch (error) {
     console.error("Error creating folder:", error);
     res

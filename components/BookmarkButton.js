@@ -6,7 +6,6 @@ import { FaBookmark } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import LoginModal from "./LoginModal";
 import BookmarkModal from "./dashboard/BookmarkModal";
-import supabase from "@/pages/api/utils/supabaseClient";
 import { useFolders } from "@/context/FoldersContext";
 
 const BookmarkButton = ({
@@ -17,7 +16,7 @@ const BookmarkButton = ({
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth(); // Destructure accessToken
   const {
     isOpen: isBookmarkModalOpen,
     onOpen: onBookmarkModalOpen,
@@ -46,12 +45,11 @@ const BookmarkButton = ({
       return;
     }
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
       const response = await fetch(
         `/api/dashboard/check-bookmark-status?resourceId=${resourceId}&resourceType=${resourceType}`,
         {
           headers: {
-            Authorization: `Bearer ${sessionData.session.access_token}`,
+            Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
           },
         }
       );
@@ -95,9 +93,9 @@ const BookmarkButton = ({
         const { folder, error } = await fetchOrCreateUncategorizedFolder();
         if (error) throw error;
         console.log("Uncategorized folder ensured:", folder);
-        // Update folder count context
-        updateFolderCount(folder.id, false); // Initialize count
       }
+      // Refresh folders to include the new "Uncategorized" folder
+      await fetchFolders();
       // Open the bookmark modal
       onBookmarkModalOpen();
     } catch (error) {
@@ -114,20 +112,21 @@ const BookmarkButton = ({
 
   const fetchOrCreateUncategorizedFolder = async () => {
     try {
-      const { data, error } = await fetch(
+      const response = await fetch(
         "/api/dashboard/get-or-create-uncategorized-folder",
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${
-              supabase.auth.session()?.access_token || ""
-            }`,
+            Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
           },
         }
-      ).then((res) => res.json());
+      );
+      const data = await response.json();
 
-      if (error)
-        throw new Error(error.error || "Failed to get or create folder");
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get or create folder");
+      }
+
       return { folder: data.folder, error: null };
     } catch (error) {
       console.error("Error fetching or creating Uncategorized folder:", error);
@@ -138,12 +137,11 @@ const BookmarkButton = ({
   const removeBookmark = async () => {
     setIsLoading(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
       const response = await fetch("/api/dashboard/remove-bookmark", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionData.session.access_token}`,
+          Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
         },
         body: JSON.stringify({
           resourceId,
@@ -168,7 +166,7 @@ const BookmarkButton = ({
         console.log(`Decremented bookmark count for folder ${data.folderId}`);
       }
 
-      fetchFolders(); // Refresh folders after removal
+      await fetchFolders(); // Refresh folders after removal
       console.log("fetchFolders called after removing bookmark");
     } catch (error) {
       console.error("Error removing bookmark:", error);
@@ -219,6 +217,7 @@ const BookmarkButton = ({
         w="100%"
         borderTopRadius="0"
         boxShadow="0"
+        isDisabled={isLoading} // Disable button while loading
       >
         {isBookmarked ? "Bookmarked" : "Add to bookmarks"}
       </Button>

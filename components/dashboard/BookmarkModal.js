@@ -29,18 +29,13 @@ const BookmarkModal = ({
   itemToBookmark,
   onBookmarkAdded,
 }) => {
-  const [folders, setFolders] = useState([]);
   const [selectedFolderId, setSelectedFolderId] = useState("");
   const [creatingNewFolder, setCreatingNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
-  const [newFolderColor, setNewFolderColor] = useState("#000000");
+  const [newFolderColor, setNewFolderColor] = useState("#A0AEC0"); // Default gray color
   const toast = useToast();
-  const { user } = useAuth();
-  const {
-    fetchFolders,
-    updateFolderCount,
-    folders: contextFolders,
-  } = useFolders();
+  const { user, accessToken } = useAuth(); // Destructure accessToken
+  const { fetchFolders, folders, updateFolderCount } = useFolders();
 
   useEffect(() => {
     if (isOpen && user) {
@@ -52,15 +47,14 @@ const BookmarkModal = ({
   const fetchFoldersInternal = async () => {
     try {
       await fetchFolders(); // Fetch folders from context
-      setFolders(contextFolders);
       // Automatically select "Uncategorized" if it's the only folder
       if (
-        contextFolders.length === 1 &&
-        contextFolders[0].name === "Uncategorized"
+        folders.length === 1 &&
+        folders[0].name.toLowerCase() === "uncategorized"
       ) {
-        setSelectedFolderId(contextFolders[0].id);
+        setSelectedFolderId(folders[0].id);
       } else {
-        setSelectedFolderId(contextFolders[0]?.id || "");
+        setSelectedFolderId(folders[0]?.id || "");
       }
     } catch (error) {
       console.error("Error fetching folders:", error);
@@ -89,14 +83,13 @@ const BookmarkModal = ({
         }
 
         // Create new folder
-        const { data: sessionData } = await supabase.auth.getSession();
         const folderResponse = await fetch(
           "/api/dashboard/create-bookmark-folder",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${sessionData.session.access_token}`,
+              Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
             },
             body: JSON.stringify({
               name: newFolderName.trim(),
@@ -105,25 +98,34 @@ const BookmarkModal = ({
           }
         );
 
-        if (!folderResponse.ok) {
-          const errorData = await folderResponse.json();
-          throw new Error(errorData.error || "Failed to create new folder");
-        }
-        const newFolder = await folderResponse.json();
-        folderId = newFolder.folder.id;
-        console.log("New folder created:", newFolder.folder);
+        const folderData = await folderResponse.json();
 
-        // Update folder count context
-        updateFolderCount(folderId, false); // Initialize count
+        if (!folderResponse.ok) {
+          throw new Error(folderData.error || "Failed to create new folder");
+        }
+
+        const newFolder = folderData.folder;
+        folderId = newFolder.id;
+        console.log("New folder created:", newFolder);
+
+        // Optionally, show a toast
+        toast({
+          title: "Folder created",
+          description: `Folder "${newFolder.name}" has been created.`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+
+        // No need to update folder count since it's a new folder with 0 bookmarks
       }
 
       // Add bookmark to the selected folder
-      const { data: sessionData } = await supabase.auth.getSession();
       const bookmarkResponse = await fetch("/api/dashboard/add-bookmark", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionData.session.access_token}`,
+          Authorization: `Bearer ${accessToken || ""}`, // Use accessToken from context
         },
         body: JSON.stringify({
           resourceId: itemToBookmark.resource_id,
@@ -133,18 +135,18 @@ const BookmarkModal = ({
         }),
       });
 
+      const bookmarkData = await bookmarkResponse.json();
+
       if (!bookmarkResponse.ok) {
-        const errorData = await bookmarkResponse.json();
-        throw new Error(errorData.error || "Failed to add bookmark");
+        throw new Error(bookmarkData.error || "Failed to add bookmark");
       }
 
-      const bookmarkData = await bookmarkResponse.json();
       console.log("Bookmark added:", bookmarkData);
 
       onBookmarkAdded(folderId); // Pass folderId to update counts
 
       // Optionally, fetch folders again to ensure counts are updated
-      fetchFolders();
+      await fetchFolders();
       console.log("fetchFolders called after adding bookmark");
 
       onClose();

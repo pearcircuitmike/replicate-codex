@@ -1,3 +1,5 @@
+// context/AuthContext.js
+
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "../pages/api/utils/supabaseClient";
 import { trackEvent } from "../pages/api/utils/analytics-util";
@@ -11,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     user: null,
     loading: true, // Start with loading true to indicate we're checking the session
     hasActiveSubscription: false,
+    accessToken: null, // Add accessToken to the state
   });
 
   const handleSession = async (session) => {
@@ -24,7 +27,12 @@ export const AuthProvider = ({ children }) => {
 
       if (profileError) {
         console.error("Error fetching profile data:", profileError);
-        setState({ user: null, loading: false, hasActiveSubscription: false });
+        setState({
+          user: null,
+          loading: false,
+          hasActiveSubscription: false,
+          accessToken: null,
+        });
         return;
       }
 
@@ -37,6 +45,7 @@ export const AuthProvider = ({ children }) => {
         user,
         loading: false,
         hasActiveSubscription,
+        accessToken: session.access_token, // Set the accessToken
       });
 
       trackEvent("login");
@@ -45,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         user: null,
         loading: false,
         hasActiveSubscription: false,
+        accessToken: null, // Reset the accessToken
       });
     }
   };
@@ -84,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         user: null,
         loading: false,
         hasActiveSubscription: false,
+        accessToken: null, // Reset the accessToken on logout
       });
     }
   };
@@ -116,7 +127,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        ...state,
+        ...state, // This now includes accessToken
         logout,
         handleSignInWithGoogle,
         handleSignInWithEmail,

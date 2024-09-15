@@ -1,4 +1,5 @@
 // pages/api/dashboard/get-folders.js
+
 import supabase from "../utils/supabaseClient";
 
 export default async function handler(req, res) {
@@ -22,12 +23,13 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Invalid or expired token" });
     }
 
+    // Fetch folders with bookmark counts using Supabase's COUNT functionality
     const { data: folders, error: folderError } = await supabase
       .from("folders")
       .select(
         `
         *,
-        bookmarks:bookmarks(count)
+        bookmark_count:bookmarks(count)
       `
       )
       .eq("user_id", user.id)
@@ -37,7 +39,7 @@ export default async function handler(req, res) {
 
     const foldersWithCount = folders.map((folder) => ({
       ...folder,
-      bookmarkCount: folder.bookmarks[0].count,
+      bookmarkCount: folder.bookmark_count?.count || 0,
     }));
 
     res.status(200).json({ folders: foldersWithCount });
