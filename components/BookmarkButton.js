@@ -1,5 +1,4 @@
 // components/BookmarkButton.js
-
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -21,11 +20,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
-import supabase from "../pages/api/utils/supabaseClient"; // Adjust the path as needed
-import { useAuth } from "../context/AuthContext"; // Adjust the path as needed
+import { useAuth } from "../context/AuthContext";
 import LoginModal from "./LoginModal";
 import { SketchPicker } from "react-color";
-
+import supabase from "@/pages/api/utils/supabaseClient";
 const BookmarkButton = ({
   resourceId,
   resourceType,
@@ -62,16 +60,17 @@ const BookmarkButton = ({
   }, [user, resourceId, resourceType]);
 
   const fetchFolders = async () => {
+    if (!user) return;
     try {
-      const { data, error } = await supabase
-        .from("folders")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("name");
-
-      if (error) throw error;
-
-      setFolders(data || []);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch("/api/dashboard/get-folders", {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch folders");
+      const data = await response.json();
+      setFolders(data.folders || []);
     } catch (error) {
       console.error("Error fetching folders:", error);
       toast({
@@ -85,18 +84,23 @@ const BookmarkButton = ({
   };
 
   const checkBookmarkStatus = async () => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
     try {
-      const { data, error } = await supabase
-        .from("bookmarks")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("bookmarked_resource", resourceId)
-        .eq("resource_type", resourceType)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      setIsBookmarked(!!data);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch(
+        `/api/dashboard/check-bookmark-status?resourceId=${resourceId}&resourceType=${resourceType}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionData.session.access_token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to check bookmark status");
+      const data = await response.json();
+      setIsBookmarked(data.isBookmarked);
     } catch (error) {
       console.error("Error checking bookmark status:", error);
       toast({
@@ -125,15 +129,22 @@ const BookmarkButton = ({
   const addBookmark = async (folderId) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.from("bookmarks").insert({
-        user_id: user.id,
-        bookmarked_resource: resourceId,
-        resource_type: resourceType,
-        folder_id: folderId,
-        title: title,
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch("/api/dashboard/add-bookmark", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          resourceId,
+          resourceType,
+          folderId,
+          title,
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error("Failed to add bookmark");
 
       setIsBookmarked(true);
       if (onBookmarkChange) onBookmarkChange(resourceId);
@@ -160,14 +171,20 @@ const BookmarkButton = ({
   const removeBookmark = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from("bookmarks")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("bookmarked_resource", resourceId)
-        .eq("resource_type", resourceType);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const response = await fetch("/api/dashboard/remove-bookmark", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          resourceId,
+          resourceType,
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error("Failed to remove bookmark");
 
       setIsBookmarked(false);
       if (onBookmarkChange) onBookmarkChange(resourceId);
@@ -205,54 +222,24 @@ const BookmarkButton = ({
           return;
         }
 
-        // Create new folder
-        const { data: newFolder, error: folderError } = await supabase
-          .from("folders")
-          .insert({
+        const { data: sessionData } = await supabase.auth.getSession();
+        const response = await fetch("/api/dashboard/create-bookmark-folder", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionData.session.access_token}`,
+          },
+          body: JSON.stringify({
             name: newFolderName.trim(),
             color: newFolderColor,
-            user_id: user.id,
-          })
-          .select()
-          .single();
+          }),
+        });
 
-        if (folderError) throw folderError;
+        if (!response.ok) throw new Error("Failed to create new folder");
 
-        folderId = newFolder.id;
-        // Refresh folders list
-        setFolders([...folders, newFolder]);
-      } else if (folderId === "uncategorized") {
-        // Get or create 'Uncategorized' folder
-        const { data: uncategorizedFolder, error: uncategorizedError } =
-          await supabase
-            .from("folders")
-            .select("id")
-            .eq("user_id", user.id)
-            .eq("name", "Uncategorized")
-            .single();
-
-        if (uncategorizedError && uncategorizedError.code === "PGRST116") {
-          // 'Uncategorized' folder does not exist; create it
-          const { data: newUncategorizedFolder, error: createError } =
-            await supabase
-              .from("folders")
-              .insert({
-                name: "Uncategorized",
-                color: "#A0AEC0", // Default gray color
-                user_id: user.id,
-              })
-              .select()
-              .single();
-
-          if (createError) throw createError;
-
-          folderId = newUncategorizedFolder.id;
-          setFolders([...folders, newUncategorizedFolder]);
-        } else if (uncategorizedError) {
-          throw uncategorizedError;
-        } else {
-          folderId = uncategorizedFolder.id;
-        }
+        const newFolder = await response.json();
+        folderId = newFolder.folder.id;
+        setFolders([...folders, newFolder.folder]);
       }
 
       await addBookmark(folderId);
