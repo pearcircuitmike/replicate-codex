@@ -21,13 +21,13 @@ import {
 import { SketchPicker } from "react-color";
 import { useAuth } from "@/context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
+import { useFolders } from "@/context/FoldersContext";
 
 const BookmarkModal = ({
   isOpen,
   onClose,
   itemToBookmark,
   onBookmarkAdded,
-  fetchFolders, // Accept fetchFolders as a prop
 }) => {
   const [folders, setFolders] = useState([]);
   const [selectedFolderId, setSelectedFolderId] = useState("");
@@ -36,6 +36,7 @@ const BookmarkModal = ({
   const [newFolderColor, setNewFolderColor] = useState("#000000");
   const toast = useToast();
   const { user } = useAuth();
+  const { fetchFolders, updateFolderCount } = useFolders();
 
   useEffect(() => {
     if (isOpen && user) {
@@ -105,8 +106,9 @@ const BookmarkModal = ({
         const newFolder = await folderResponse.json();
         folderId = newFolder.folder.id;
 
-        // Optionally, add the new folder to local state
+        // Update local folder list
         setFolders((prevFolders) => [...prevFolders, newFolder.folder]);
+        updateFolderCount(folderId, 0); // Initialize count to 0 or appropriate value
       }
 
       // Add bookmark to the selected folder

@@ -15,18 +15,15 @@ import { useRouter } from "next/router";
 import FolderModal from "./FolderModal";
 import { useAuth } from "../../context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
+import { useFolders } from "@/context/FoldersContext";
 
-const FolderSidebar = ({
-  folders,
-  onFolderModalOpen,
-  fetchFolders,
-  updateFolderCount,
-}) => {
+const FolderSidebar = ({ onFolderModalOpen }) => {
   const router = useRouter();
   const [editingFolder, setEditingFolder] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const { user } = useAuth();
+  const { folders, fetchFolders, updateFolderCount } = useFolders();
 
   const handleFolderClick = (folderId) => {
     router.push(`/dashboard/library?folderId=${folderId}`);

@@ -7,14 +7,13 @@ import { useAuth } from "@/context/AuthContext";
 import LoginModal from "./LoginModal";
 import BookmarkModal from "./dashboard/BookmarkModal";
 import supabase from "@/pages/api/utils/supabaseClient";
+import { useFolders } from "@/context/FoldersContext";
 
 const BookmarkButton = ({
   resourceId,
   resourceType,
   onBookmarkChange,
   title,
-  updateFolderCount,
-  fetchFolders,
 }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +29,7 @@ const BookmarkButton = ({
     onClose: onLoginClose,
   } = useDisclosure();
   const toast = useToast();
+  const { fetchFolders, updateFolderCount } = useFolders();
 
   useEffect(() => {
     if (user) {
@@ -115,9 +115,7 @@ const BookmarkButton = ({
         updateFolderCount(data.folderId, false);
       }
 
-      if (typeof fetchFolders === "function") {
-        fetchFolders(); // Refresh folders after removal
-      }
+      fetchFolders(); // Refresh folders after removal
     } catch (error) {
       console.error("Error removing bookmark:", error);
       toast({
@@ -146,9 +144,7 @@ const BookmarkButton = ({
       updateFolderCount(folderId, true);
     }
 
-    if (typeof fetchFolders === "function") {
-      fetchFolders(); // Refresh folders after addition
-    }
+    fetchFolders(); // Refresh folders after addition
   };
 
   return (
@@ -179,7 +175,6 @@ const BookmarkButton = ({
           title: title,
         }}
         onBookmarkAdded={handleBookmarkAdded}
-        fetchFolders={fetchFolders} // Pass fetchFolders to BookmarkModal
       />
 
       <LoginModal isOpen={isLoginOpen} onClose={onLoginClose} />

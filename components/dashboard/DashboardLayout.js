@@ -20,6 +20,7 @@ import { useAuth } from "../../context/AuthContext";
 import TrendingTopics from "../TrendingTopics";
 import TopViewedPapers from "../TopViewedPapers";
 import TopSearchQueries from "../TopSearchQueries";
+import { FoldersProvider } from "@/context/FoldersContext";
 
 const DashboardLayout = ({ children }) => {
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
@@ -30,6 +31,7 @@ const DashboardLayout = ({ children }) => {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const toast = useToast();
 
+  // Function to fetch folders
   const fetchFolders = useCallback(async () => {
     if (!user) return;
 
@@ -72,6 +74,7 @@ const DashboardLayout = ({ children }) => {
     }
   }, [user, toast]);
 
+  // Function to update folder count
   const updateFolderCount = useCallback((folderId, increment) => {
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
@@ -85,6 +88,7 @@ const DashboardLayout = ({ children }) => {
     );
   }, []);
 
+  // Fetch folders on mount and when user changes
   useEffect(() => {
     if (user) {
       fetchFolders();
@@ -113,99 +117,94 @@ const DashboardLayout = ({ children }) => {
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
 
-  // Clone children and pass down necessary props
-  const childrenWithProps = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, { updateFolderCount, fetchFolders });
-    }
-    return child;
-  });
-
   return (
-    <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
-      {isLargerThan768 && (
-        <Box
-          width="200px"
-          bg="white"
-          py={8}
-          overflowY="auto"
-          borderRight="1px solid #e2e8f0"
-        >
-          <VStack spacing={2} align="stretch">
-            {navItemsBeforeFolders.map((item) => (
-              <NavItem
-                key={item.href}
-                icon={item.icon}
-                label={item.label}
-                href={item.href}
-                isActive={router.pathname === item.href}
-              />
-            ))}
-            <Box px={4} py={2}>
-              <Text fontSize="lg" fontWeight="bold">
-                My Folders
-              </Text>
-            </Box>
-            <FolderSidebar
-              folders={folders}
-              onFolderModalOpen={handleFolderModalOpen}
-              fetchFolders={fetchFolders}
-              updateFolderCount={updateFolderCount}
-            />
-            {navItemsAfterFolders.map((item) => (
-              <NavItem
-                key={item.href}
-                icon={item.icon}
-                label={item.label}
-                href={item.href}
-                isActive={router.pathname === item.href}
-              />
-            ))}
-          </VStack>
+    <FoldersProvider
+      fetchFolders={fetchFolders}
+      updateFolderCount={updateFolderCount}
+      folders={folders}
+    >
+      <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
+        {isLargerThan768 && (
+          <Box
+            width="200px"
+            bg="white"
+            py={8}
+            overflowY="auto"
+            borderRight="1px solid #e2e8f0"
+          >
+            <VStack spacing={2} align="stretch">
+              {navItemsBeforeFolders.map((item) => (
+                <NavItem
+                  key={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  href={item.href}
+                  isActive={router.pathname === item.href}
+                />
+              ))}
+              <Box px={4} py={2}>
+                <Text fontSize="lg" fontWeight="bold">
+                  My Folders
+                </Text>
+              </Box>
+              <FolderSidebar onFolderModalOpen={handleFolderModalOpen} />
+              {navItemsAfterFolders.map((item) => (
+                <NavItem
+                  key={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  href={item.href}
+                  isActive={router.pathname === item.href}
+                />
+              ))}
+            </VStack>
+          </Box>
+        )}
+
+        <Box flex={1} overflowY="auto">
+          {children}
         </Box>
-      )}
 
-      <Box flex={1} overflowY="auto">
-        {childrenWithProps}
-      </Box>
+        {isLargerThan1024 && (
+          <Box width="250px" bg="white" py={8} borderLeft="1px solid #e2e8f0">
+            <TrendingTopics />
+            <TopViewedPapers />
+            <TopSearchQueries />
+          </Box>
+        )}
 
-      {isLargerThan1024 && (
-        <Box width="250px" bg="white" py={8} borderLeft="1px solid #e2e8f0">
-          <TrendingTopics />
-          <TopViewedPapers />
-          <TopSearchQueries />
-        </Box>
-      )}
+        {!isLargerThan768 && (
+          <Box
+            position="fixed"
+            bottom={0}
+            left={0}
+            right={0}
+            bg="white"
+            boxShadow="0 -2px 10px rgba(0, 0, 0, 0.05)"
+          >
+            <HStack justify="space-around" py={2}>
+              {navItemsBeforeFolders
+                .concat(navItemsAfterFolders)
+                .map((item) => (
+                  <NavItem
+                    key={item.href}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    isActive={router.pathname === item.href}
+                  />
+                ))}
+            </HStack>
+          </Box>
+        )}
 
-      {!isLargerThan768 && (
-        <Box
-          position="fixed"
-          bottom={0}
-          left={0}
-          right={0}
-          bg="white"
-          boxShadow="0 -2px 10px rgba(0, 0, 0, 0.05)"
-        >
-          <HStack justify="space-around" py={2}>
-            {navItemsBeforeFolders.concat(navItemsAfterFolders).map((item) => (
-              <NavItem
-                key={item.href}
-                icon={item.icon}
-                label={item.label}
-                href={item.href}
-                isActive={router.pathname === item.href}
-              />
-            ))}
-          </HStack>
-        </Box>
-      )}
-
-      <FolderModal
-        isOpen={isFolderModalOpen}
-        onClose={handleFolderModalClose}
-        fetchFolders={fetchFolders}
-      />
-    </Flex>
+        <FolderModal
+          isOpen={isFolderModalOpen}
+          onClose={handleFolderModalClose}
+          fetchFolders={fetchFolders}
+        />
+      </Flex>
+    </FoldersProvider>
   );
 };
 
