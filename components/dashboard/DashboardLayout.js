@@ -19,8 +19,6 @@ import TopViewedPapers from "../TopViewedPapers";
 import TopSearchQueries from "../TopSearchQueries";
 
 const DashboardLayout = ({ children }) => {
-  console.log("Rendering DashboardLayout");
-
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
   const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
@@ -29,15 +27,12 @@ const DashboardLayout = ({ children }) => {
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("DashboardLayout useEffect triggered");
-    console.log("User:", user);
     if (user) {
       fetchFolders();
     }
   }, [user]);
 
   const fetchFolders = async () => {
-    console.log("Fetching folders");
     try {
       // Fetch folders for the current user
       const { data: folderData, error: folderError } = await supabase
@@ -47,8 +42,6 @@ const DashboardLayout = ({ children }) => {
         .order("name", { ascending: true });
 
       if (folderError) throw folderError;
-
-      console.log("Folder data:", folderData);
 
       // Fetch bookmark counts for each folder
       const foldersWithCounts = await Promise.all(
@@ -68,7 +61,6 @@ const DashboardLayout = ({ children }) => {
         })
       );
 
-      console.log("Folders with counts:", foldersWithCounts);
       setFolders(foldersWithCounts);
     } catch (error) {
       console.error("Error fetching folders:", error);
@@ -76,12 +68,10 @@ const DashboardLayout = ({ children }) => {
   };
 
   const handleFolderModalOpen = () => {
-    console.log("Opening folder modal");
     setIsFolderModalOpen(true);
   };
 
   const handleFolderModalClose = () => {
-    console.log("Closing folder modal");
     setIsFolderModalOpen(false);
   };
 
@@ -97,8 +87,6 @@ const DashboardLayout = ({ children }) => {
   const navItemsAfterFolders = [
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
-
-  console.log("Current route:", router.pathname);
 
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
@@ -150,7 +138,6 @@ const DashboardLayout = ({ children }) => {
 
       {/* Main content */}
       <Box flex={1} overflowY="auto">
-        {console.log("Rendering children in DashboardLayout")}
         {children}
       </Box>
 

@@ -36,9 +36,6 @@ const LibraryPage = () => {
       }
 
       setLoading(true);
-      console.log(
-        `Fetching bookmarks for folderId: ${folderId}, resourceType: ${type}`
-      );
 
       try {
         // 1. Fetch bookmarks
@@ -51,10 +48,7 @@ const LibraryPage = () => {
 
         if (bookmarksError) throw bookmarksError;
 
-        console.log("Fetched bookmarks data:", bookmarksData);
-
         if (!bookmarksData || bookmarksData.length === 0) {
-          console.log(`No bookmarks found for resourceType: ${type}`);
           setBookmarks([]);
           setLoading(false);
           return;
@@ -96,7 +90,6 @@ const LibraryPage = () => {
 
   useEffect(() => {
     if (folderId && user) {
-      console.log("useEffect: folderId or user changed, fetching bookmarks.");
       fetchBookmarkResources(resourceType);
     }
   }, [folderId, user, fetchBookmarkResources, resourceType]);
