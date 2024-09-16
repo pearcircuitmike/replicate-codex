@@ -3,9 +3,11 @@ import {
   Input,
   Button,
   Box,
+  IconButton,
   useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
+import { FaSearch, FaTimes } from "react-icons/fa";
 import { trackEvent } from "../pages/api/utils/analytics-util";
 
 const SemanticSearchBar = ({
@@ -14,6 +16,7 @@ const SemanticSearchBar = ({
   onSearchSubmit,
   placeholder,
   resourceType,
+  selectedTimeRange,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
@@ -22,64 +25,26 @@ const SemanticSearchBar = ({
     setSearchValue(e.target.value);
   };
 
+  const handleClear = () => {
+    setSearchValue("");
+    onSearchSubmit([]);
+  };
+
   const handleSearch = async () => {
     setIsLoading(true);
     try {
-      // Step 1: Expand the query
-      const expansionResponse = await fetch("/api/search/query-expander", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchValue }),
-      });
-
-      if (!expansionResponse.ok) {
-        throw new Error("Failed to expand query");
-      }
-
-      const { expandedQuery } = await expansionResponse.json();
-      console.log("Expanded query:", expandedQuery);
-
-      // Step 2: Get embedding for the expanded query
-      const embeddingResponse = await fetch("/api/search/create-embedding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: expandedQuery.join(" ") }),
-      });
-
-      if (!embeddingResponse.ok) {
-        throw new Error("Failed to create embedding");
-      }
-
-      const { embedding } = await embeddingResponse.json();
-
-      // Step 3: Perform semantic search
-      const searchResponse = await fetch("/api/search/semantic-search-papers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          embedding,
-          similarityThreshold: 0.7,
-          matchCount: 10,
-        }),
-      });
-
-      if (!searchResponse.ok) {
-        throw new Error("Search failed");
-      }
-
-      const { data } = await searchResponse.json();
-      onSearchSubmit(data);
+      const trimmedValue = searchValue ? searchValue.trim() : "";
+      await onSearchSubmit(trimmedValue);
       trackEvent("semantic_search", {
         resource_type: resourceType,
-        query: searchValue,
-        expanded_query: expandedQuery,
+        query: trimmedValue,
+        time_range: selectedTimeRange,
       });
     } catch (error) {
       console.error("Error in semantic search:", error);
       toast({
         title: "Search failed",
         description:
-          error.message ||
           "There was an error processing your search. Please try again.",
         status: "error",
         duration: 5000,
@@ -99,28 +64,32 @@ const SemanticSearchBar = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
-    <Box
-      display="flex"
-      flexDirection={isMobile ? "column" : "row"}
-      alignItems="center"
-      width="100%"
-    >
+    <Box display="flex" alignItems="center" width="100%" position="relative">
       <Input
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        mb={isMobile ? 2 : 0}
-        flex={isMobile ? "none" : "1"}
-        mr={isMobile ? 0 : 2}
-        width={isMobile ? "100%" : "auto"}
+        flex="1"
+        mr={2}
+        borderRadius="md"
+        boxShadow="sm"
       />
+      {searchValue && (
+        <IconButton
+          icon={<FaTimes />}
+          onClick={handleClear}
+          aria-label="Clear search"
+          mr={2}
+          variant="ghost"
+        />
+      )}
       <Button
         colorScheme="blue"
         onClick={handleSearch}
-        width={isMobile ? "100%" : "auto"}
-        flexShrink={0}
         isLoading={isLoading}
+        leftIcon={<FaSearch />}
+        flexShrink={0}
       >
         Search
       </Button>

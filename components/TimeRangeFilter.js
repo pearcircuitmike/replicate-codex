@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -11,95 +11,63 @@ import {
 } from "@chakra-ui/react";
 import { FaCalendarAlt, FaCaretDown } from "react-icons/fa";
 
-const TimeRangeFilter = ({ initialTimeRange, onTimeRangeChange }) => {
-  const [isMobile] = useMediaQuery("(max-width: 768px)"); // Adjust the breakpoint as needed
-  const [selectedTimeRange, setSelectedTimeRange] = useState(
-    initialTimeRange || "thisWeek"
-  ); // Initialize with initialTimeRange prop or "thisWeek"
+const TimeRangeFilter = ({ selectedTimeRange, onTimeRangeChange }) => {
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
+  const [currentSelection, setCurrentSelection] = useState(selectedTimeRange);
 
-  const handleTimeRangeChange = (timeRange) => {
-    setSelectedTimeRange(timeRange);
+  useEffect(() => {
+    setCurrentSelection(selectedTimeRange);
+  }, [selectedTimeRange]);
+
+  const handleTimeRangeChangeInternal = (timeRange) => {
+    setCurrentSelection(timeRange);
     onTimeRangeChange(timeRange);
   };
+
+  const timeRanges = [
+    { label: "Today", value: "today" },
+    { label: "This Week", value: "thisWeek" },
+    { label: "This Month", value: "thisMonth" },
+    { label: "This Year", value: "thisYear" },
+    { label: "All Time", value: "allTime" },
+  ];
 
   return (
     <Box mb={6}>
       {isMobile ? (
         <Menu>
-          <MenuButton as={Button} rightIcon={<Icon as={FaCaretDown} />}>
+          <MenuButton as={Button} rightIcon={<FaCaretDown />}>
             <Icon as={FaCalendarAlt} mr={2} />
-            Filter by Date
+            {timeRanges.find((tr) => tr.value === currentSelection)?.label ||
+              "Filter by Date"}
           </MenuButton>
           <MenuList>
-            <MenuItem
-              onClick={() => handleTimeRangeChange("today")}
-              isActive={selectedTimeRange === "today"}
-            >
-              Today
-            </MenuItem>
-            <MenuItem
-              onClick={() => handleTimeRangeChange("thisWeek")}
-              isActive={selectedTimeRange === "thisWeek"}
-            >
-              This Week
-            </MenuItem>
-            <MenuItem
-              onClick={() => handleTimeRangeChange("thisMonth")}
-              isActive={selectedTimeRange === "thisMonth"}
-            >
-              This Month
-            </MenuItem>
-            <MenuItem
-              onClick={() => handleTimeRangeChange("thisYear")}
-              isActive={selectedTimeRange === "thisYear"}
-            >
-              This Year
-            </MenuItem>
-            <MenuItem
-              onClick={() => handleTimeRangeChange("allTime")}
-              isActive={selectedTimeRange === "allTime"}
-            >
-              All Time
-            </MenuItem>
+            {timeRanges.map((tr) => (
+              <MenuItem
+                key={tr.value}
+                onClick={() => handleTimeRangeChangeInternal(tr.value)}
+                isActive={currentSelection === tr.value}
+              >
+                {tr.label}
+              </MenuItem>
+            ))}
           </MenuList>
         </Menu>
       ) : (
-        <>
-          <Button
-            mr={2}
-            onClick={() => handleTimeRangeChange("today")}
-            isActive={selectedTimeRange === "today"}
-          >
-            Today
-          </Button>
-          <Button
-            mr={2}
-            onClick={() => handleTimeRangeChange("thisWeek")}
-            isActive={selectedTimeRange === "thisWeek"}
-          >
-            This Week
-          </Button>
-          <Button
-            mr={2}
-            onClick={() => handleTimeRangeChange("thisMonth")}
-            isActive={selectedTimeRange === "thisMonth"}
-          >
-            This Month
-          </Button>
-          <Button
-            mr={2}
-            onClick={() => handleTimeRangeChange("thisYear")}
-            isActive={selectedTimeRange === "thisYear"}
-          >
-            This Year
-          </Button>
-          <Button
-            onClick={() => handleTimeRangeChange("allTime")}
-            isActive={selectedTimeRange === "allTime"}
-          >
-            All Time
-          </Button>
-        </>
+        <Box display="flex" flexWrap="wrap">
+          {timeRanges.map((tr) => (
+            <Button
+              key={tr.value}
+              mr={2}
+              mb={2}
+              onClick={() => handleTimeRangeChangeInternal(tr.value)}
+              isActive={currentSelection === tr.value}
+              variant={currentSelection === tr.value ? "solid" : "outline"}
+            >
+              {tr.label}
+            </Button>
+          ))}
+        </Box>
       )}
     </Box>
   );

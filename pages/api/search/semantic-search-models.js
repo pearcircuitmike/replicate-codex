@@ -1,16 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 import { Configuration, OpenAIApi } from "openai";
 
+// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Initialize OpenAI client
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
+// Helper function to determine start date based on timeRange
 function getStartDate(timeRange) {
   const now = new Date();
   switch (timeRange) {
@@ -31,9 +34,10 @@ function getStartDate(timeRange) {
   }
 }
 
+// Create embedding using OpenAI
 async function createEmbedding(query) {
   const embeddingResponse = await openai.createEmbedding({
-    model: "text-embedding-ada-002",
+    model: "text-embedding-ada-002", // Ensure the model is correct
     input: query,
   });
   const [{ embedding }] = embeddingResponse.data.data;
@@ -50,41 +54,36 @@ export default async function handler(req, res) {
         timeRange = "allTime",
       } = req.body;
 
-      console.log("Received request body:", req.body);
-
       const trimmedQuery = query ? query.trim() : "";
       const isEmptyQuery = trimmedQuery === "";
 
+      // Determine the start date based on the time range
       const timeRangeStart = getStartDate(timeRange);
-      console.log("Time range start:", timeRangeStart);
 
       let results = [];
 
       if (isEmptyQuery) {
-        console.log("Handling empty query case");
-        const { data: papersData, error: papersError } = await supabase.rpc(
-          "search_papers",
+        // Handle empty query: return all models within the time range
+        const { data: modelsData, error: modelsError } = await supabase.rpc(
+          "search_models",
           {
-            query_embedding: null,
+            query_embedding: null, // Indicate empty query
             similarity_threshold: similarityThreshold,
             match_count: matchCount,
             time_range_start: timeRangeStart,
           }
         );
 
-        if (papersError) {
-          console.error("Error in empty query search:", papersError);
-          throw papersError;
-        }
+        if (modelsError) throw modelsError;
 
-        results = papersData || [];
+        results = modelsData || [];
       } else {
-        console.log("Handling non-empty query case");
+        // Create embedding for the query
         const embedding = await createEmbedding(trimmedQuery);
-        console.log("Created embedding for query");
 
-        const { data: papersData, error: papersError } = await supabase.rpc(
-          "search_papers",
+        // Perform semantic search for models
+        const { data: modelsData, error: modelsError } = await supabase.rpc(
+          "search_models",
           {
             query_embedding: embedding,
             similarity_threshold: similarityThreshold,
@@ -93,43 +92,40 @@ export default async function handler(req, res) {
           }
         );
 
-        if (papersError) {
-          console.error("Error in semantic search:", papersError);
-          throw papersError;
-        }
+        if (modelsError) throw modelsError;
 
-        results = papersData || [];
-        console.log("Semantic search results:", results.length);
+        results = modelsData || [];
 
+        // If not enough matches, perform fuzzy search on model names and descriptions
         if (results.length < matchCount) {
           const remaining = matchCount - results.length;
 
-          const { data: fuzzyPapers, error: fuzzyError } = await supabase
-            .from("arxivPapersData")
+          const { data: fuzzyModels, error: fuzzyError } = await supabase
+            .from("modelsData")
             .select("*")
-            .or(`arxivId.ilike.%${trimmedQuery}%,title.ilike.%${trimmedQuery}%`)
-            .gte("publishedDate", timeRangeStart)
+            .ilike("modelName", `%${trimmedQuery}%`)
+            .or(`description.ilike.%${trimmedQuery}%`)
+            .gte("lastUpdated", timeRangeStart)
             .order("totalScore", { ascending: false })
             .limit(remaining);
 
-          if (fuzzyError) {
-            console.error("Error in fuzzy search:", fuzzyError);
-            throw fuzzyError;
-          }
+          if (fuzzyError) throw fuzzyError;
 
-          const uniqueFuzzyPapers = fuzzyPapers.filter(
-            (fuzzy) => !results.some((paper) => paper.id === fuzzy.id)
+          // Filter out duplicates
+          const uniqueFuzzyModels = fuzzyModels.filter(
+            (fuzzy) => !results.some((model) => model.id === fuzzy.id)
           );
 
-          results = [...results, ...uniqueFuzzyPapers];
-          console.log("After fuzzy search, total results:", results.length);
+          results = [...results, ...uniqueFuzzyModels];
         }
       }
 
-      console.log("Returning results:", results.length);
       return res.status(200).json({ data: results.slice(0, matchCount) });
     } catch (error) {
-      console.error("Error in semantic search:", error);
+      console.error("Error in semantic search models:", {
+        message: error.message,
+        stack: error.stack,
+      });
       return res.status(500).json({
         error: "An error occurred during the search. Please try again later.",
         details: error.message,

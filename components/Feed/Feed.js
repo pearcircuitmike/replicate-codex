@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { VStack, Text, Spinner, Box, SimpleGrid } from "@chakra-ui/react";
-import PaperCard from "../PaperCard";
+import React, { useEffect, useState } from "react";
+import { Box, VStack, Spinner, SimpleGrid, Text } from "@chakra-ui/react";
+
 import ModelCard from "../ModelCard";
-import { useBookmarks } from "../../hooks/useBookmarks";
-import { useAuth } from "../../context/AuthContext";
+import PaperCard from "../PaperCard";
 
 const Feed = ({
   resourceType,
@@ -11,137 +10,82 @@ const Feed = ({
   updateResultCount,
   isSearching,
 }) => {
-  const { user } = useAuth();
-  const { isBookmarked, fetchBookmarks } = useBookmarks();
-  const [resources, setResources] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const feedRef = useRef();
 
-  const fetchResources = useCallback(
-    async (currentPage = 1, append = false) => {
-      if (!user) return;
+  useEffect(() => {
+    const fetchResults = async () => {
       setIsLoading(true);
-
-      const apiRoute =
-        resourceType === "paper"
-          ? "/api/discover/papers"
-          : "/api/discover/models";
-      const url = `${apiRoute}?${new URLSearchParams({
-        ...fetchParams,
-        page: currentPage,
-        pageSize: 10,
-        userId: user.id,
-      })}`;
-
       try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        let endpoint = "";
+        if (resourceType === "paper") {
+          endpoint = "/api/search/semantic-search-papers";
+        } else if (resourceType === "model") {
+          endpoint = "/api/search/semantic-search-models";
         }
-        const data = await response.json();
 
-        setResources((prevResources) =>
-          append ? [...prevResources, ...data.data] : data.data
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: fetchParams.searchValue,
+            similarityThreshold: 0.7,
+            matchCount: 20,
+            timeRange: fetchParams.timeRange,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Search failed");
+        }
+
+        const { data } = await response.json();
+        setResults(data);
+        updateResultCount(
+          resourceType === "paper" ? "papers" : "models",
+          data.length
         );
-        setTotalCount(data.totalCount);
-        updateResultCount(resourceType, data.totalCount);
-        setPage(currentPage);
       } catch (error) {
-        console.error(`Error fetching ${resourceType}:`, error);
-        setError(`Failed to load ${resourceType}. Please try again.`);
+        console.error("Error fetching feed results:", error);
+        setResults([]);
+        updateResultCount(resourceType === "paper" ? "papers" : "models", 0);
       } finally {
         setIsLoading(false);
       }
-    },
-    [resourceType, fetchParams, user, updateResultCount]
-  );
+    };
 
-  useEffect(() => {
-    setPage(1);
-    fetchResources(1, false);
-  }, [fetchParams, resourceType, fetchResources]);
-
-  const handleScroll = useCallback(() => {
-    if (feedRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = feedRef.current;
-      if (
-        scrollTop + clientHeight >= scrollHeight - 200 &&
-        !isLoading &&
-        resources.length < totalCount
-      ) {
-        fetchResources(page + 1, true);
-      }
+    if (!isSearching) {
+      fetchResults();
     }
-  }, [isLoading, resources.length, totalCount, page, fetchResources]);
+  }, [fetchParams, resourceType, updateResultCount, isSearching]);
 
-  useEffect(() => {
-    const feedElement = feedRef.current;
-    feedElement?.addEventListener("scroll", handleScroll, { passive: true });
-    return () => feedElement?.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  if (isLoading) {
+    return (
+      <Box textAlign="center" py={10}>
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
 
-  const handleBookmarkChange = useCallback(() => {
-    fetchBookmarks();
-  }, [fetchBookmarks]);
-
-  const ResourceCard = resourceType === "paper" ? PaperCard : ModelCard;
-
-  if (error) return <Text color="red.500">{error}</Text>;
+  if (results.length === 0) {
+    return (
+      <Box textAlign="center" py={10}>
+        <Text>No {resourceType === "paper" ? "papers" : "models"} found.</Text>
+      </Box>
+    );
+  }
 
   return (
-    <Box
-      width="100%"
-      height={{ base: "calc(200vh - 250px)", md: "calc(200vh - 200px)" }}
-      overflowY="auto"
-      ref={feedRef}
-      css={{
-        "&::-webkit-scrollbar": { width: "4px" },
-        "&::-webkit-scrollbar-track": { width: "6px" },
-        "&::-webkit-scrollbar-thumb": {
-          background: "gray.500",
-          borderRadius: "24px",
-        },
-        scrollBehavior: "smooth",
-      }}
-    >
-      {isLoading && resources.length === 0 ? (
-        <Box textAlign="center" py={4}>
-          <Spinner size="xl" />
-          <Text mt={2}>Loading {resourceType}s...</Text>
-        </Box>
-      ) : resources.length === 0 ? (
-        <Box textAlign="center" py={4}>
-          <Text>No {resourceType}s found. Try adjusting your search.</Text>
-        </Box>
-      ) : (
-        <SimpleGrid
-          columns={{ base: 1, md: 2, lg: 3, xl: 4 }}
-          spacing={6}
-          px={{ base: 2, md: 4 }}
-        >
-          {resources.map((resource) => (
-            <ResourceCard
-              key={resource.id}
-              {...(resourceType === "paper"
-                ? { paper: resource }
-                : { model: resource })}
-              onBookmarkChange={handleBookmarkChange}
-              isBookmarked={isBookmarked(resource.id, resourceType)}
-            />
-          ))}
-        </SimpleGrid>
+    <SimpleGrid columns={[1, 2, 3]} spacing={6}>
+      {results.map((item) =>
+        resourceType === "paper" ? (
+          <PaperCard key={item.id} paper={item} />
+        ) : (
+          <ModelCard key={item.id} model={item} />
+        )
       )}
-      {isLoading && resources.length > 0 && (
-        <Box textAlign="center" py={4}>
-          <Spinner />
-          <Text mt={2}>Loading more {resourceType}s...</Text>
-        </Box>
-      )}
-    </Box>
+    </SimpleGrid>
   );
 };
 
-export default React.memo(Feed);
+export default Feed;

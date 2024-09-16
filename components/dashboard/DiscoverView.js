@@ -9,12 +9,12 @@ import {
   TabPanels,
   TabPanel,
   VStack,
+  Spinner,
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Feed from "../Feed/Feed";
 import SemanticSearchBar from "../SemanticSearchBar";
-import TopSearchQueries from "../TopSearchQueries";
 import TimeRangeFilter from "../TimeRangeFilter";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
@@ -28,10 +28,10 @@ const DiscoverView = () => {
   });
   const [searchParams, setSearchParams] = useState({
     searchValue: "",
-    timeRange: "thisWeek",
+    timeRange: "allTime",
   });
+  const [searchResults, setSearchResults] = useState([]);
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
-  const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
 
   useEffect(() => {
@@ -42,29 +42,69 @@ const DiscoverView = () => {
   }, [router.query.q]);
 
   const handleSearch = useCallback(
-    (semanticSearchResults = null) => {
+    async (inputQuery = null) => {
       setIsSearching(true);
-      setSearchParams((prevParams) => ({
-        ...prevParams,
-        searchValue: searchInput,
-        timeRange: "allTime", // Set time range to "allTime" when performing a search
-      }));
-      router.push(
-        `/dashboard/discover?q=${encodeURIComponent(searchInput)}`,
-        undefined,
-        { shallow: true }
-      );
-      if (semanticSearchResults) {
-        console.log("Semantic search results:", semanticSearchResults);
+      const queryToSearch = inputQuery !== null ? inputQuery : searchInput;
+      const trimmedQuery =
+        typeof queryToSearch === "string" ? queryToSearch.trim() : "";
+
+      const requestBody = {
+        query: trimmedQuery,
+        similarityThreshold: 0.7,
+        matchCount: 20,
+        timeRange: searchParams.timeRange,
+      };
+
+      try {
+        const endpoint =
+          activeTab === 0
+            ? "/api/search/semantic-search-papers"
+            : "/api/search/semantic-search-models";
+
+        console.log("Sending request to:", endpoint);
+        console.log("Request body:", requestBody);
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Search failed with status: ${response.status}`);
+        }
+
+        const { data } = await response.json();
+        console.log("Received data:", data);
+
+        setSearchParams((prev) => ({
+          ...prev,
+          searchValue: trimmedQuery,
+        }));
+        router.push(
+          `/dashboard/discover?q=${encodeURIComponent(trimmedQuery)}`,
+          undefined,
+          { shallow: true }
+        );
+        updateResultCount(activeTab === 0 ? "papers" : "models", data.length);
+        setSearchResults(data);
+      } catch (error) {
+        console.error("Error in semantic search:", error);
+        // Optionally handle error state here
+      } finally {
+        setIsSearching(false);
       }
-      setTimeout(() => setIsSearching(false), 500);
     },
-    [searchInput, router]
+    [searchInput, router, searchParams.timeRange, activeTab]
   );
 
-  const handleTimeRangeChange = useCallback((timeRange) => {
-    setSearchParams((prevParams) => ({ ...prevParams, timeRange }));
-  }, []);
+  const handleTimeRangeChange = useCallback(
+    (timeRange) => {
+      setSearchParams((prevParams) => ({ ...prevParams, timeRange }));
+      handleSearch();
+    },
+    [handleSearch]
+  );
 
   const updateResultCount = useCallback((type, count) => {
     setResultCounts((prev) => ({ ...prev, [type]: count }));
@@ -92,7 +132,8 @@ const DiscoverView = () => {
             setSearchValue={setSearchInput}
             onSearchSubmit={handleSearch}
             placeholder="Search papers and models..."
-            resourceType="discover"
+            resourceType={activeTab === 0 ? "paper" : "model"}
+            selectedTimeRange={searchParams.timeRange}
           />
         </Box>
         <TimeRangeFilter
@@ -101,44 +142,55 @@ const DiscoverView = () => {
         />
       </Box>
       <Box flex={1} overflowY="auto">
-        <Tabs
-          index={activeTab}
-          onChange={(index) => setActiveTab(index)}
-          variant="enclosed-colored"
-        >
-          <TabList marginBottom={5}>
-            <Tab flex={1}>
-              Papers{" "}
-              {resultCounts.papers !== null
-                ? `(${formatLargeNumber(resultCounts.papers)})`
-                : ""}
-            </Tab>
-            <Tab flex={1}>
-              Models{" "}
-              {resultCounts.models !== null
-                ? `(${formatLargeNumber(resultCounts.models)})`
-                : ""}
-            </Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel p={0}>
-              <Feed
-                resourceType="paper"
-                fetchParams={searchParams}
-                updateResultCount={updateResultCount}
-                isSearching={isSearching}
-              />
-            </TabPanel>
-            <TabPanel p={0}>
-              <Feed
-                resourceType="model"
-                fetchParams={searchParams}
-                updateResultCount={updateResultCount}
-                isSearching={isSearching}
-              />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        {isSearching ? (
+          <Spinner size="xl" alignSelf="center" />
+        ) : resultCounts.papers === 0 && resultCounts.models === 0 ? (
+          <Text>
+            No results found. Please try a different query or adjust your
+            filters.
+          </Text>
+        ) : (
+          <Tabs
+            index={activeTab}
+            onChange={(index) => setActiveTab(index)}
+            variant="enclosed-colored"
+          >
+            <TabList marginBottom={5}>
+              <Tab flex={1}>
+                Papers{" "}
+                {resultCounts.papers !== null
+                  ? `(${formatLargeNumber(resultCounts.papers)})`
+                  : ""}
+              </Tab>
+              <Tab flex={1}>
+                Models{" "}
+                {resultCounts.models !== null
+                  ? `(${formatLargeNumber(resultCounts.models)})`
+                  : ""}
+              </Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel p={0}>
+                <Feed
+                  resourceType="paper"
+                  fetchParams={searchParams}
+                  updateResultCount={updateResultCount}
+                  isSearching={isSearching}
+                  searchResults={searchResults}
+                />
+              </TabPanel>
+              <TabPanel p={0}>
+                <Feed
+                  resourceType="model"
+                  fetchParams={searchParams}
+                  updateResultCount={updateResultCount}
+                  isSearching={isSearching}
+                  searchResults={searchResults}
+                />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        )}
       </Box>
     </VStack>
   );
