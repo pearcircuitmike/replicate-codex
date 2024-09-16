@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Container, Grid, Box, Text } from "@chakra-ui/react";
+import { Container, Grid, Box, Text, Spinner } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
@@ -44,7 +44,7 @@ const PapersIndexPage = ({
   initialSelectedTimeRange,
 }) => {
   const router = useRouter();
-  const [papers, setPapers] = useState(initialPapers);
+  const [papers, setPapers] = useState(initialPapers || []);
   const [searchValue, setSearchValue] = useState(initialSearch);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(totalPaperCount);
@@ -52,14 +52,12 @@ const PapersIndexPage = ({
   const [selectedTimeRange, setSelectedTimeRange] = useState(
     initialSelectedTimeRange
   );
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchPapers = async (semanticSearchResults = null) => {
-    if (semanticSearchResults) {
-      setPapers(semanticSearchResults);
-      setTotalCount(semanticSearchResults.length);
-    } else {
+  const fetchPapers = async () => {
+    setIsLoading(true);
+    try {
       const { startDate, endDate } = getDateRange(selectedTimeRange);
-
       const { data, totalCount } = await fetchPapersPaginated({
         platform: "arxiv",
         pageSize,
@@ -68,59 +66,78 @@ const PapersIndexPage = ({
         startDate,
         endDate,
       });
-      setPapers(data);
+      setPapers(data || []);
       setTotalCount(totalCount);
+    } catch (error) {
+      console.error("Error fetching papers:", error);
+      setPapers([]);
+      setTotalCount(0);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!searchValue) {
-      fetchPapers();
-    }
-  }, [currentPage, selectedTimeRange, searchValue]);
+    fetchPapers();
+  }, [currentPage, selectedTimeRange]);
 
-  const handleSearchSubmit = (semanticSearchResults) => {
+  const handleSearchSubmit = async (semanticSearchResults) => {
     setCurrentPage(1);
-    router.push({
-      pathname: "/papers",
-      query: {
-        search: searchValue,
-        selectedTimeRange,
-        page: 1,
+    router.push(
+      {
+        pathname: "/papers",
+        query: {
+          search: searchValue,
+          selectedTimeRange,
+          page: 1,
+        },
       },
-    });
-    fetchPapers(semanticSearchResults);
+      undefined,
+      { shallow: true }
+    );
+
+    if (
+      Array.isArray(semanticSearchResults) &&
+      semanticSearchResults.length > 0
+    ) {
+      setPapers(semanticSearchResults);
+      setTotalCount(semanticSearchResults.length);
+    } else {
+      await fetchPapers();
+    }
   };
 
   const handleTimeRangeChange = (newTimeRange) => {
     setSelectedTimeRange(newTimeRange);
     setCurrentPage(1);
-    router.push({
-      pathname: "/papers",
-      query: {
-        search: searchValue,
-        selectedTimeRange: newTimeRange,
-        page: 1,
+    router.push(
+      {
+        pathname: "/papers",
+        query: {
+          search: searchValue,
+          selectedTimeRange: newTimeRange,
+          page: 1,
+        },
       },
-    });
-    if (!searchValue) {
-      fetchPapers();
-    }
+      undefined,
+      { shallow: true }
+    );
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    router.push({
-      pathname: "/papers",
-      query: {
-        search: searchValue,
-        selectedTimeRange,
-        page: newPage,
+    router.push(
+      {
+        pathname: "/papers",
+        query: {
+          search: searchValue,
+          selectedTimeRange,
+          page: newPage,
+        },
       },
-    });
-    if (!searchValue) {
-      fetchPapers();
-    }
+      undefined,
+      { shallow: true }
+    );
   };
 
   return (
@@ -149,6 +166,7 @@ const PapersIndexPage = ({
           onSearchSubmit={handleSearchSubmit}
           setSearchValue={setSearchValue}
           resourceType="paper"
+          selectedTimeRange={selectedTimeRange}
         />
         <Box mt={2}>
           <TimeRangeFilter
@@ -156,7 +174,11 @@ const PapersIndexPage = ({
             onTimeRangeChange={handleTimeRangeChange}
           />
         </Box>
-        {papers.length === 0 ? (
+        {isLoading ? (
+          <Box textAlign="center" py={10}>
+            <Spinner size="xl" />
+          </Box>
+        ) : Array.isArray(papers) && papers.length === 0 ? (
           <Box mt={6}>
             <Text>
               No papers found. Please try a different search or time range.
@@ -173,9 +195,10 @@ const PapersIndexPage = ({
               }}
               gap={6}
             >
-              {papers.map((paper) => (
-                <PaperCard key={paper.id} paper={paper} />
-              ))}
+              {Array.isArray(papers) &&
+                papers.map((paper) => (
+                  <PaperCard key={paper.id} paper={paper} />
+                ))}
             </Grid>
             <Pagination
               totalCount={totalCount}
