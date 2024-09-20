@@ -1,48 +1,51 @@
+// CarbonAd.jsx
 import React, { useEffect, useRef } from "react";
-import { useRouter } from "next/router";
 
-const CarbonAds = () => {
-  const router = useRouter();
-  const carbonRef = useRef(null);
+let carbonAdScriptLoaded = false;
+let carbonAdContainer = null;
+
+const CarbonAd = () => {
+  const adRef = useRef(null);
 
   useEffect(() => {
-    // Function to load the Carbon ad
-    const loadCarbonAd = () => {
-      if (carbonRef.current && !carbonRef.current.firstChild) {
-        const script = document.createElement("script");
-        script.src =
-          "//cdn.carbonads.com/carbon.js?serve=CW7DV23J&placement=wwwaimodelsfyi";
-        script.id = "_carbonads_js";
-        script.async = true;
-        carbonRef.current.appendChild(script);
+    if (adRef.current) {
+      // If the ad container already exists, move it to the new location
+      if (carbonAdContainer) {
+        adRef.current.appendChild(carbonAdContainer);
+      } else {
+        // Create a new ad container
+        carbonAdContainer = document.createElement("div");
+        carbonAdContainer.id = "carbonads";
+
+        adRef.current.appendChild(carbonAdContainer);
+
+        if (!carbonAdScriptLoaded) {
+          // Load the Carbon Ads script
+          const script = document.createElement("script");
+          script.src =
+            "//cdn.carbonads.com/carbon.js?serve=CW7DV23J&placement=wwwaimodelsfyi";
+          script.id = "_carbonads_js";
+          script.async = true;
+          carbonAdContainer.appendChild(script);
+
+          carbonAdScriptLoaded = true;
+        }
       }
-    };
+    }
 
-    // Load the ad
-    loadCarbonAd();
-
-    // Refresh the ad on route change
-    const handleRouteChange = () => {
-      if (carbonRef.current) {
-        // Remove existing ad
-        carbonRef.current.innerHTML = "";
-        // Load new ad
-        loadCarbonAd();
-      }
-    };
-
-    router.events.on("routeChangeComplete", handleRouteChange);
-
-    // Cleanup function
+    // Cleanup function to prevent duplication
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
+      if (adRef.current && carbonAdContainer) {
+        adRef.current.removeChild(carbonAdContainer);
+      }
     };
-  }, [router]);
+  }, []);
 
   return (
     <>
-      <div ref={carbonRef} id="carbon-container" />
+      <div ref={adRef} id="carbon-container" />
       <style jsx global>{`
+        /* Your existing styles */
         #carbonads {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
             Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial,
@@ -105,4 +108,4 @@ const CarbonAds = () => {
   );
 };
 
-export default CarbonAds;
+export default CarbonAd;
