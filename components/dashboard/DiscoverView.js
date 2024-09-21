@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Heading,
@@ -19,7 +19,6 @@ import TimeRangeFilter from "../TimeRangeFilter";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const DiscoverView = () => {
-  const [searchInput, setSearchInput] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [resultCounts, setResultCounts] = useState({
@@ -27,88 +26,106 @@ const DiscoverView = () => {
     models: null,
   });
   const [searchParams, setSearchParams] = useState({
-    searchValue: "",
     timeRange: "allTime",
   });
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState({
+    papers: [],
+    models: [],
+  });
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
   const router = useRouter();
+  const latestSearchValueRef = useRef("");
 
-  useEffect(() => {
-    if (router.query.q) {
-      setSearchInput(router.query.q);
-      handleSearch(router.query.q);
+  const updateResultCount = (type, count) => {
+    setResultCounts((prev) => ({ ...prev, [type]: count }));
+  };
+
+  const handleSearch = async (value) => {
+    const trimmedQuery = value.trim();
+    latestSearchValueRef.current = trimmedQuery;
+
+    if (trimmedQuery === "") {
+      setSearchResults({ papers: [], models: [] });
+      updateResultCount("papers", 0);
+      updateResultCount("models", 0);
+      return;
     }
-  }, [router.query.q]);
 
-  const handleSearch = useCallback(
-    async (inputQuery = null) => {
-      setIsSearching(true);
-      const queryToSearch = inputQuery !== null ? inputQuery : searchInput;
-      const trimmedQuery =
-        typeof queryToSearch === "string" ? queryToSearch.trim() : "";
+    setIsSearching(true);
 
-      const requestBody = {
-        query: trimmedQuery,
-        similarityThreshold: 0.7,
-        matchCount: 20,
-        timeRange: searchParams.timeRange,
-      };
+    const requestBody = {
+      query: trimmedQuery,
+      similarityThreshold: 0.7,
+      matchCount: 20,
+      timeRange: searchParams.timeRange, // Always uses the latest timeRange
+    };
 
-      try {
-        const endpoint =
-          activeTab === 0
-            ? "/api/search/semantic-search-papers"
-            : "/api/search/semantic-search-models";
-
-        console.log("Sending request to:", endpoint);
-        console.log("Request body:", requestBody);
-
-        const response = await fetch(endpoint, {
+    try {
+      // Fetch both papers and models
+      const [papersResponse, modelsResponse] = await Promise.all([
+        fetch("/api/search/semantic-search-papers", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
-        });
+        }),
+        fetch("/api/search/semantic-search-models", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+        }),
+      ]);
 
-        if (!response.ok) {
-          throw new Error(`Search failed with status: ${response.status}`);
-        }
-
-        const { data } = await response.json();
-        console.log("Received data:", data);
-
-        setSearchParams((prev) => ({
-          ...prev,
-          searchValue: trimmedQuery,
-        }));
-        router.push(
-          `/dashboard/discover?q=${encodeURIComponent(trimmedQuery)}`,
-          undefined,
-          { shallow: true }
+      if (!papersResponse.ok || !modelsResponse.ok) {
+        throw new Error(
+          `Search failed with status: Papers ${papersResponse.status}, Models ${modelsResponse.status}`
         );
-        updateResultCount(activeTab === 0 ? "papers" : "models", data.length);
-        setSearchResults(data);
-      } catch (error) {
-        console.error("Error in semantic search:", error);
-        // Optionally handle error state here
-      } finally {
-        setIsSearching(false);
       }
-    },
-    [searchInput, router, searchParams.timeRange, activeTab]
-  );
 
-  const handleTimeRangeChange = useCallback(
-    (timeRange) => {
-      setSearchParams((prevParams) => ({ ...prevParams, timeRange }));
-      handleSearch();
-    },
-    [handleSearch]
-  );
+      const [papersData, modelsData] = await Promise.all([
+        papersResponse.json(),
+        modelsResponse.json(),
+      ]);
 
-  const updateResultCount = useCallback((type, count) => {
-    setResultCounts((prev) => ({ ...prev, [type]: count }));
-  }, []);
+      // Check if the search value has changed since the request was sent
+      if (trimmedQuery !== latestSearchValueRef.current) {
+        // Ignore outdated response
+        return;
+      }
+
+      updateResultCount("papers", papersData.data.length);
+      updateResultCount("models", modelsData.data.length);
+
+      setSearchResults({
+        papers: papersData.data,
+        models: modelsData.data,
+      });
+    } catch (error) {
+      console.error("Error in semantic search:", error);
+      // Optionally handle error state here
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleTimeRangeChange = (timeRange) => {
+    setSearchParams((prevParams) => ({ ...prevParams, timeRange }));
+  };
+
+  useEffect(() => {
+    if (latestSearchValueRef.current.trim() !== "") {
+      handleSearch(latestSearchValueRef.current);
+    }
+  }, [searchParams.timeRange]); // Retrigger search when timeRange changes
+
+  useEffect(() => {
+    // On initial mount, check if there's a query parameter
+    if (router.query.q) {
+      const initialQuery = router.query.q;
+      latestSearchValueRef.current = initialQuery;
+      handleSearch(initialQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   return (
     <VStack
@@ -128,12 +145,9 @@ const DiscoverView = () => {
         )}
         <Box mb={4}>
           <SemanticSearchBar
-            searchValue={searchInput}
-            setSearchValue={setSearchInput}
             onSearchSubmit={handleSearch}
             placeholder="Search papers and models..."
-            resourceType={activeTab === 0 ? "paper" : "model"}
-            selectedTimeRange={searchParams.timeRange}
+            initialSearchValue={router.query.q || ""}
           />
         </Box>
         <TimeRangeFilter
@@ -171,22 +185,10 @@ const DiscoverView = () => {
             </TabList>
             <TabPanels>
               <TabPanel p={0}>
-                <Feed
-                  resourceType="paper"
-                  fetchParams={searchParams}
-                  updateResultCount={updateResultCount}
-                  isSearching={isSearching}
-                  searchResults={searchResults}
-                />
+                <Feed resourceType="paper" results={searchResults.papers} />
               </TabPanel>
               <TabPanel p={0}>
-                <Feed
-                  resourceType="model"
-                  fetchParams={searchParams}
-                  updateResultCount={updateResultCount}
-                  isSearching={isSearching}
-                  searchResults={searchResults}
-                />
+                <Feed resourceType="model" results={searchResults.models} />
               </TabPanel>
             </TabPanels>
           </Tabs>

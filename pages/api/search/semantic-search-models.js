@@ -1,3 +1,5 @@
+// pages/api/search-models.js
+
 import { createClient } from "@supabase/supabase-js";
 import { Configuration, OpenAIApi } from "openai";
 
@@ -7,13 +9,17 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Initialize OpenAI client
+// Initialize OpenAI client with configuration
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-// Helper function to determine start date based on timeRange
+/**
+ * Helper function to determine the start date based on the timeRange.
+ * @param {string} timeRange - The selected time range.
+ * @returns {string} - ISO string of the start date.
+ */
 function getStartDate(timeRange) {
   const now = new Date();
   switch (timeRange) {
@@ -34,18 +40,40 @@ function getStartDate(timeRange) {
   }
 }
 
-// Create embedding using OpenAI
-async function createEmbedding(query) {
-  const embeddingResponse = await openai.createEmbedding({
-    model: "text-embedding-ada-002", // Ensure the model is correct
-    input: query,
-  });
+/**
+ * Function to create an embedding for the given query using OpenAI.
+ * @param {string} query - The search query.
+ * @param {AbortSignal} signal - The abort signal to cancel the request if needed.
+ * @returns {Array} - The embedding vector.
+ */
+async function createEmbedding(query, signal) {
+  const embeddingResponse = await openai.createEmbedding(
+    {
+      model: "text-embedding-ada-002", // Ensure the model name is correct
+      input: query,
+    },
+    { signal } // Pass the abort signal to allow cancellation
+  );
   const [{ embedding }] = embeddingResponse.data.data;
   return embedding;
 }
 
+/**
+ * API Route Handler for searching models.
+ * Supports semantic and fuzzy search with cancellation feature.
+ */
 export default async function handler(req, res) {
   if (req.method === "POST") {
+    // Initialize AbortController to handle cancellation
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    // Listen for client disconnects to abort ongoing operations
+    req.on("aborted", () => {
+      console.log("Request aborted by the client.");
+      controller.abort();
+    });
+
     try {
       const {
         query = "",
@@ -59,29 +87,38 @@ export default async function handler(req, res) {
 
       // Determine the start date based on the time range
       const timeRangeStart = getStartDate(timeRange);
+      console.log("Time range start:", timeRangeStart);
 
       let results = [];
 
       if (isEmptyQuery) {
-        // Handle empty query: return all models within the time range
+        console.log("Handling empty query case");
+
+        // Perform RPC call to Supabase function 'search_models' with null embedding
         const { data: modelsData, error: modelsError } = await supabase.rpc(
           "search_models",
           {
-            query_embedding: null, // Indicate empty query
+            query_embedding: null,
             similarity_threshold: similarityThreshold,
             match_count: matchCount,
             time_range_start: timeRangeStart,
           }
         );
 
-        if (modelsError) throw modelsError;
+        if (modelsError) {
+          console.error("Error in empty query search:", modelsError);
+          throw modelsError;
+        }
 
         results = modelsData || [];
       } else {
-        // Create embedding for the query
-        const embedding = await createEmbedding(trimmedQuery);
+        console.log("Handling non-empty query case");
 
-        // Perform semantic search for models
+        // Create embedding for the trimmed query with cancellation support
+        const embedding = await createEmbedding(trimmedQuery, signal);
+        console.log("Created embedding for query");
+
+        // Perform semantic search using the embedding
         const { data: modelsData, error: modelsError } = await supabase.rpc(
           "search_models",
           {
@@ -92,11 +129,15 @@ export default async function handler(req, res) {
           }
         );
 
-        if (modelsError) throw modelsError;
+        if (modelsError) {
+          console.error("Error in semantic search:", modelsError);
+          throw modelsError;
+        }
 
         results = modelsData || [];
+        console.log("Semantic search results:", results.length);
 
-        // If not enough matches, perform fuzzy search on model names and descriptions
+        // If not enough results, perform fuzzy search
         if (results.length < matchCount) {
           const remaining = matchCount - results.length;
 
@@ -109,29 +150,39 @@ export default async function handler(req, res) {
             .order("totalScore", { ascending: false })
             .limit(remaining);
 
-          if (fuzzyError) throw fuzzyError;
+          if (fuzzyError) {
+            console.error("Error in fuzzy search:", fuzzyError);
+            throw fuzzyError;
+          }
 
-          // Filter out duplicates
+          // Filter out duplicate entries
           const uniqueFuzzyModels = fuzzyModels.filter(
             (fuzzy) => !results.some((model) => model.id === fuzzy.id)
           );
 
           results = [...results, ...uniqueFuzzyModels];
+          console.log("After fuzzy search, total results:", results.length);
         }
       }
 
+      console.log("Returning results:", results.length);
       return res.status(200).json({ data: results.slice(0, matchCount) });
     } catch (error) {
-      console.error("Error in semantic search models:", {
-        message: error.message,
-        stack: error.stack,
-      });
+      if (error.name === "AbortError") {
+        console.warn("Search operation was aborted.");
+        return res.status(499).json({
+          error: "Client closed the request before completion.",
+        });
+      }
+
+      console.error("Error in semantic search models:", error);
       return res.status(500).json({
         error: "An error occurred during the search. Please try again later.",
         details: error.message,
       });
     }
   } else {
+    // Method not allowed
     res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }

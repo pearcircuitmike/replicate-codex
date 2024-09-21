@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import {
-  Container,
-  Grid,
-  Box,
-  Text,
-  Skeleton,
-  Center,
-  Spinner,
-} from "@chakra-ui/react";
+import { Container, Grid, Box, Text, Center, Skeleton } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import ModelCard from "../../components/ModelCard";
 import Pagination from "../../components/Pagination";
@@ -19,13 +11,13 @@ import TimeRangeFilter from "../../components/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
 import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json";
 
-export async function getStaticProps({ params }) {
-  const currentPage = parseInt(params?.page || "1", 10);
-  const selectedTimeRange = params?.selectedTimeRange || "thisWeek";
-  const selectedCategories = params?.selectedCategories
-    ? JSON.parse(params.selectedCategories)
+export async function getServerSideProps({ query }) {
+  const currentPage = parseInt(query.page || "1", 10);
+  const selectedTimeRange = query.selectedTimeRange || "thisWeek";
+  const selectedCategories = query.selectedCategories
+    ? JSON.parse(query.selectedCategories)
     : Object.keys(modelCategoryDescriptions);
-  const searchValue = params?.search || "";
+  const searchValue = query.search || "";
 
   const { startDate, endDate } = getDateRange(selectedTimeRange);
 
@@ -48,7 +40,6 @@ export async function getStaticProps({ params }) {
       initialPage: currentPage,
       initialSelectedTimeRange: selectedTimeRange,
     },
-    revalidate: false,
   };
 }
 
@@ -62,7 +53,7 @@ const ModelsIndexPage = ({
 }) => {
   const router = useRouter();
   const [models, setModels] = useState(initialModels || []);
-  const [searchValue, setSearchValue] = useState(initialSearch);
+  const [searchValue, setSearchValue] = useState(initialSearch || "");
   const [selectedCategories, setSelectedCategories] = useState(
     initialSelectedCategories
   );
@@ -99,101 +90,68 @@ const ModelsIndexPage = ({
     }
   };
 
-  useEffect(() => {
-    const { search, selectedCategories, selectedTimeRange, page } =
-      router.query;
-
-    setSearchValue(search || initialSearch);
-    setSelectedCategories(
-      selectedCategories
-        ? JSON.parse(selectedCategories)
-        : initialSelectedCategories
-    );
-    setSelectedTimeRange(selectedTimeRange || initialSelectedTimeRange);
-    setCurrentPage(parseInt(page || initialPage.toString(), 10));
-  }, [router.query]);
-
+  // Fetch models whenever relevant state changes
   useEffect(() => {
     fetchModels();
-  }, [currentPage, selectedCategories, selectedTimeRange]);
+  }, [searchValue, selectedCategories, selectedTimeRange, currentPage]);
 
-  const handleSearchSubmit = async (semanticSearchResults) => {
-    setCurrentPage(1);
-    router.push(
+  // Update URL query parameters when state changes
+  useEffect(() => {
+    router.replace(
       {
         pathname: "/models",
         query: {
           search: searchValue,
           selectedCategories: JSON.stringify(selectedCategories),
           selectedTimeRange,
-          page: 1,
+          page: currentPage,
         },
       },
       undefined,
       { shallow: true }
     );
+  }, [searchValue, selectedCategories, selectedTimeRange, currentPage]);
 
-    if (
-      Array.isArray(semanticSearchResults) &&
-      semanticSearchResults.length > 0
-    ) {
-      setModels(semanticSearchResults);
-      setTotalCount(semanticSearchResults.length);
-    } else {
-      await fetchModels();
-    }
+  const handleSearchSubmit = (value) => {
+    setSearchValue(value);
+    setCurrentPage(1);
   };
 
   const handleCategoryChange = (updatedCategories) => {
     setSelectedCategories(updatedCategories);
     setCurrentPage(1);
-    router.push(
-      {
-        pathname: "/models",
-        query: {
-          search: searchValue,
-          selectedCategories: JSON.stringify(updatedCategories),
-          selectedTimeRange,
-          page: 1,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
   };
 
   const handleTimeRangeChange = (newTimeRange) => {
     setSelectedTimeRange(newTimeRange);
     setCurrentPage(1);
-    router.push(
-      {
-        pathname: "/models",
-        query: {
-          search: searchValue,
-          selectedCategories: JSON.stringify(selectedCategories),
-          selectedTimeRange: newTimeRange,
-          page: 1,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    router.push(
-      {
-        pathname: "/models",
-        query: {
-          search: searchValue,
-          selectedCategories: JSON.stringify(selectedCategories),
-          selectedTimeRange,
-          page: newPage,
-        },
-      },
-      undefined,
-      { shallow: true }
+  };
+
+  // Function to render skeletons
+  const renderSkeletons = () => {
+    const skeletonArray = Array.from({ length: pageSize });
+    return (
+      <Grid
+        templateColumns={{
+          base: "repeat(1, 1fr)",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+          xl: "repeat(4, 1fr)",
+        }}
+        gap={6}
+      >
+        {skeletonArray.map((_, index) => (
+          <Box key={index} p={4} borderWidth="1px" borderRadius="md">
+            <Skeleton height="200px" mb={4} />
+            <Skeleton height="20px" mb={2} />
+            <Skeleton height="20px" width="80%" />
+          </Box>
+        ))}
+      </Grid>
     );
   };
 
@@ -217,11 +175,8 @@ const ModelsIndexPage = ({
         </Box>
         <SemanticSearchBar
           placeholder="Search by model name..."
-          searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
-          setSearchValue={setSearchValue}
-          resourceType="model"
-          selectedTimeRange={selectedTimeRange}
+          initialSearchValue={initialSearch}
         />
         <CategoryFilter
           categoryDescriptions={modelCategoryDescriptions}
@@ -233,32 +188,32 @@ const ModelsIndexPage = ({
           selectedTimeRange={selectedTimeRange}
           onTimeRangeChange={handleTimeRangeChange}
         />
-        {isLoading ? (
-          <Box textAlign="center" py={10}>
-            <Spinner size="xl" />
-          </Box>
-        ) : Array.isArray(models) && models.length === 0 ? (
+        {models.length === 0 && !isLoading ? (
           <Box mt={6}>
             <Text>
-              No models found. Please try a different search or category.
+              No models found. Please try a different search, category, or time
+              range.
             </Text>
           </Box>
         ) : (
           <>
-            <Grid
-              templateColumns={{
-                base: "repeat(1, 1fr)",
-                md: "repeat(2, 1fr)",
-                lg: "repeat(3, 1fr)",
-                xl: "repeat(4, 1fr)",
-              }}
-              gap={6}
-            >
-              {Array.isArray(models) &&
-                models.map((model) => (
+            {isLoading ? (
+              renderSkeletons()
+            ) : (
+              <Grid
+                templateColumns={{
+                  base: "repeat(1, 1fr)",
+                  md: "repeat(2, 1fr)",
+                  lg: "repeat(3, 1fr)",
+                  xl: "repeat(4, 1fr)",
+                }}
+                gap={6}
+              >
+                {models.map((model) => (
                   <ModelCard key={model.id} model={model} />
                 ))}
-            </Grid>
+              </Grid>
+            )}
             <Center my={5}>
               <Pagination
                 currentPage={currentPage}

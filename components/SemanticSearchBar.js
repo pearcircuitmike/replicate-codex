@@ -1,67 +1,48 @@
-import React, { useState } from "react";
-import {
-  Input,
-  Button,
-  Box,
-  IconButton,
-  useBreakpointValue,
-  useToast,
-} from "@chakra-ui/react";
-import { FaSearch, FaTimes } from "react-icons/fa";
-import { trackEvent } from "../pages/api/utils/analytics-util";
+// SemanticSearchBar.jsx
+
+import React, { useState, useEffect, useCallback } from "react";
+import { Input, Box, IconButton, useBreakpointValue } from "@chakra-ui/react";
+import { FaTimes } from "react-icons/fa";
+import PropTypes from "prop-types";
+import { debounce } from "lodash";
 
 const SemanticSearchBar = ({
-  searchValue,
-  setSearchValue,
   onSearchSubmit,
-  placeholder,
-  resourceType,
-  selectedTimeRange,
+  placeholder = "Search...",
+  initialSearchValue = "",
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const toast = useToast();
+  const [searchValue, setSearchValue] = useState(initialSearchValue);
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      onSearchSubmit(value);
+    }, 100),
+    [onSearchSubmit]
+  );
 
   const handleChange = (e) => {
-    setSearchValue(e.target.value);
+    const value = e.target.value;
+    setSearchValue(value);
+    debouncedSearch(value);
   };
 
   const handleClear = () => {
     setSearchValue("");
-    onSearchSubmit([]);
+    onSearchSubmit(""); // Clear the search results
   };
 
-  const handleSearch = async () => {
-    setIsLoading(true);
-    try {
-      const trimmedValue = searchValue ? searchValue.trim() : "";
-      await onSearchSubmit(trimmedValue);
-      trackEvent("semantic_search", {
-        resource_type: resourceType,
-        query: trimmedValue,
-        time_range: selectedTimeRange,
-      });
-    } catch (error) {
-      console.error("Error in semantic search:", error);
-      toast({
-        title: "Search failed",
-        description:
-          "There was an error processing your search. Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    // Update searchValue when initialSearchValue changes (only on initial load)
+    if (initialSearchValue) {
+      setSearchValue(initialSearchValue);
     }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  };
-
-  const isMobile = useBreakpointValue({ base: true, md: false });
+    // Cleanup debounced function on unmount
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [initialSearchValue, debouncedSearch]);
 
   return (
     <Box display="flex" alignItems="center" width="100%" position="relative">
@@ -69,11 +50,11 @@ const SemanticSearchBar = ({
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
-        onKeyDown={handleKeyDown}
         flex="1"
         mr={2}
         borderRadius="md"
         boxShadow="sm"
+        aria-label="Search input"
       />
       {searchValue && (
         <IconButton
@@ -84,17 +65,14 @@ const SemanticSearchBar = ({
           variant="ghost"
         />
       )}
-      <Button
-        colorScheme="blue"
-        onClick={handleSearch}
-        isLoading={isLoading}
-        leftIcon={<FaSearch />}
-        flexShrink={0}
-      >
-        Search
-      </Button>
     </Box>
   );
+};
+
+SemanticSearchBar.propTypes = {
+  onSearchSubmit: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+  initialSearchValue: PropTypes.string,
 };
 
 export default SemanticSearchBar;

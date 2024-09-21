@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Container, Grid, Box, Text, Spinner } from "@chakra-ui/react";
+import { Container, Grid, Box, Text, Center, Skeleton } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
 import PaperCard from "../../components/PaperCard";
 import Pagination from "../../components/Pagination";
@@ -45,7 +45,7 @@ const PapersIndexPage = ({
 }) => {
   const router = useRouter();
   const [papers, setPapers] = useState(initialPapers || []);
-  const [searchValue, setSearchValue] = useState(initialSearch);
+  const [searchValue, setSearchValue] = useState(initialSearch || "");
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(totalPaperCount);
   const pageSize = 12;
@@ -77,66 +77,63 @@ const PapersIndexPage = ({
     }
   };
 
+  // Fetch papers whenever relevant state changes
   useEffect(() => {
     fetchPapers();
-  }, [currentPage, selectedTimeRange]);
+  }, [searchValue, selectedTimeRange, currentPage]);
 
-  const handleSearchSubmit = async (semanticSearchResults) => {
-    setCurrentPage(1);
-    router.push(
+  // Update URL query parameters when state changes
+  useEffect(() => {
+    router.replace(
       {
         pathname: "/papers",
         query: {
           search: searchValue,
           selectedTimeRange,
-          page: 1,
+          page: currentPage,
         },
       },
       undefined,
       { shallow: true }
     );
+  }, [searchValue, selectedTimeRange, currentPage]);
 
-    if (
-      Array.isArray(semanticSearchResults) &&
-      semanticSearchResults.length > 0
-    ) {
-      setPapers(semanticSearchResults);
-      setTotalCount(semanticSearchResults.length);
-    } else {
-      await fetchPapers();
-    }
+  const handleSearchSubmit = (value) => {
+    setSearchValue(value);
+    setCurrentPage(1);
   };
 
   const handleTimeRangeChange = (newTimeRange) => {
     setSelectedTimeRange(newTimeRange);
     setCurrentPage(1);
-    router.push(
-      {
-        pathname: "/papers",
-        query: {
-          search: searchValue,
-          selectedTimeRange: newTimeRange,
-          page: 1,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    router.push(
-      {
-        pathname: "/papers",
-        query: {
-          search: searchValue,
-          selectedTimeRange,
-          page: newPage,
-        },
-      },
-      undefined,
-      { shallow: true }
+  };
+
+  // Function to render skeletons
+  const renderSkeletons = () => {
+    const skeletonArray = Array.from({ length: pageSize });
+    return (
+      <Grid
+        templateColumns={{
+          base: "repeat(1, 1fr)",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+          xl: "repeat(4, 1fr)",
+        }}
+        gap={6}
+      >
+        {skeletonArray.map((_, index) => (
+          <Box key={index} p={4} borderWidth="1px" borderRadius="md">
+            <Skeleton height="150px" mb={4} />
+            <Skeleton height="20px" mb={2} />
+            <Skeleton height="20px" width="80%" />
+            <Skeleton height="20px" width="60%" mt={2} />
+          </Box>
+        ))}
+      </Grid>
     );
   };
 
@@ -162,11 +159,8 @@ const PapersIndexPage = ({
 
         <SemanticSearchBar
           placeholder="Search papers by title or arXiv ID..."
-          searchValue={searchValue}
           onSearchSubmit={handleSearchSubmit}
-          setSearchValue={setSearchValue}
-          resourceType="paper"
-          selectedTimeRange={selectedTimeRange}
+          initialSearchValue={initialSearch}
         />
         <Box mt={2}>
           <TimeRangeFilter
@@ -174,11 +168,7 @@ const PapersIndexPage = ({
             onTimeRangeChange={handleTimeRangeChange}
           />
         </Box>
-        {isLoading ? (
-          <Box textAlign="center" py={10}>
-            <Spinner size="xl" />
-          </Box>
-        ) : Array.isArray(papers) && papers.length === 0 ? (
+        {papers.length === 0 && !isLoading ? (
           <Box mt={6}>
             <Text>
               No papers found. Please try a different search or time range.
@@ -186,26 +176,31 @@ const PapersIndexPage = ({
           </Box>
         ) : (
           <>
-            <Grid
-              templateColumns={{
-                base: "repeat(1, 1fr)",
-                md: "repeat(2, 1fr)",
-                lg: "repeat(3, 1fr)",
-                xl: "repeat(4, 1fr)",
-              }}
-              gap={6}
-            >
-              {Array.isArray(papers) &&
-                papers.map((paper) => (
+            {isLoading ? (
+              renderSkeletons()
+            ) : (
+              <Grid
+                templateColumns={{
+                  base: "repeat(1, 1fr)",
+                  md: "repeat(2, 1fr)",
+                  lg: "repeat(3, 1fr)",
+                  xl: "repeat(4, 1fr)",
+                }}
+                gap={6}
+              >
+                {papers.map((paper) => (
                   <PaperCard key={paper.id} paper={paper} />
                 ))}
-            </Grid>
-            <Pagination
-              totalCount={totalCount}
-              pageSize={pageSize}
-              currentPage={currentPage}
-              onPageChange={handlePageChange}
-            />
+              </Grid>
+            )}
+            <Center my={5}>
+              <Pagination
+                totalCount={totalCount}
+                pageSize={pageSize}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </Center>
           </>
         )}
       </Container>
