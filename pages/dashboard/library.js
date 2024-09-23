@@ -10,9 +10,9 @@ import {
   Text,
   Heading,
 } from "@chakra-ui/react";
-import DashboardLayout from "../../components/dashboard/DashboardLayout";
-import PaperCard from "../../components/PaperCard";
-import ModelCard from "../../components/ModelCard";
+import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
+import PaperCard from "../../components/Cards/PaperCard";
+import ModelCard from "../../components/Cards/ModelCard";
 import { useRouter } from "next/router";
 import supabase from "../api/utils/supabaseClient";
 import { useAuth } from "../../context/AuthContext";

@@ -23,13 +23,13 @@ import {
 import { useRouter } from "next/router";
 import { FaSearch, FaUser, FaNewspaper, FaFolder } from "react-icons/fa";
 import NavItem from "./NavItem";
-import FolderSidebar from "./FolderSidebar";
-import FolderModal from "./FolderModal";
+import FolderSidebar from "./Sidebar/FolderSidebar";
+import FolderModal from "../Modals/FolderModal";
 import supabase from "@/pages/api/utils/supabaseClient";
-import { useAuth } from "../../context/AuthContext";
-import TrendingTopics from "../TrendingTopics";
-import TopViewedPapers from "../TopViewedPapers";
-import TopSearchQueries from "../TopSearchQueries";
+import { useAuth } from "../../../context/AuthContext";
+import TrendingTopics from "../../TrendingTopics";
+import TopViewedPapers from "../../TopViewedPapers";
+import TopSearchQueries from "../../TopSearchQueries";
 import { FoldersProvider } from "@/context/FoldersContext";
 
 const DashboardLayout = ({ children }) => {

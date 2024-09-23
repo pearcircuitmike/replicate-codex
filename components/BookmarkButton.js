@@ -3,7 +3,7 @@ import { Button, Icon, useDisclosure, useToast } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import LoginModal from "./LoginModal";
-import BookmarkModal from "./dashboard/BookmarkModal";
+import BookmarkModal from "./Dashboard/Modals/BookmarkModal";
 import { useFolders } from "@/context/FoldersContext";
 
 const BookmarkButton = ({

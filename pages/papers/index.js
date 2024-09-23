@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Container, Grid, Box, Text, Center, Skeleton } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
-import PaperCard from "../../components/PaperCard";
+import PaperCard from "../../components/Cards/PaperCard";
 import Pagination from "../../components/Pagination";
 import { fetchPapersPaginated } from "../api/utils/fetchPapers";
-import SemanticSearchBar from "../../components/SemanticSearchBar";
-import TimeRangeFilter from "../../components/TimeRangeFilter";
+import SemanticSearchBar from "../../components/Common/SemanticSearchBar";
+import TimeRangeFilter from "../../components/Common/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
 
 export async function getServerSideProps({ query }) {

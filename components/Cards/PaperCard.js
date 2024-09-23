@@ -10,8 +10,8 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import EmojiWithGradient from "./EmojiWithGradient";
-import BookmarkButton from "./BookmarkButton";
+import EmojiWithGradient from "../EmojiWithGradient";
+import BookmarkButton from "../BookmarkButton";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const PaperCard = ({ paper, onBookmarkChange }) => {

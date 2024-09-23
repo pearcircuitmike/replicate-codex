@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { useAuth } from "../../context/AuthContext";
-import DashboardLayout from "../../components/dashboard/DashboardLayout";
-import DiscoverView from "../../components/dashboard/DiscoverView";
+import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
+import DiscoverView from "../../components/Dashboard/Views/DiscoverView";
 
 const DashboardPage = () => {
   const { user } = useAuth();

@@ -1,7 +1,7 @@
 // components/RelatedModels.js
 import React from "react";
 import { Box, Heading, SimpleGrid } from "@chakra-ui/react";
-import ModelCard from "./ModelCard";
+import ModelCard from "./Cards/ModelCard";
 
 const RelatedModels = ({ relatedModels }) => {
   if (!relatedModels || relatedModels.length === 0) {

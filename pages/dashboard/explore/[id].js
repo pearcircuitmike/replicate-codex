@@ -2,8 +2,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Box, Heading, Text, SimpleGrid, Spinner } from "@chakra-ui/react";
-import DashboardLayout from "../../../components/dashboard/DashboardLayout";
-import PaperCard from "../../../components/PaperCard";
+import DashboardLayout from "../../../components/Dashboard/Layout/DashboardLayout";
+import PaperCard from "../../../components/Cards/PaperCard";
 
 const ExplorePage = () => {
   const router = useRouter();

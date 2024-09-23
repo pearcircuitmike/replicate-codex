@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Heading, SimpleGrid, Text } from "@chakra-ui/react";
-import { useAuth } from "../../context/AuthContext";
-import PaperCard from "../PaperCard";
-import ModelCard from "../ModelCard";
+import { useAuth } from "../../../context/AuthContext";
+import PaperCard from "../../Cards/PaperCard";
+import ModelCard from "../../Cards/ModelCard";
 
 const UserBookmarks = ({ resourceType }) => {
   const { user } = useAuth();

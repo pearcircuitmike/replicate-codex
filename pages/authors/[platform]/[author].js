@@ -2,7 +2,7 @@ import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import MetaTags from "../../../components/MetaTags";
-import PaperCard from "../../../components/PaperCard";
+import PaperCard from "../../../components/Cards/PaperCard";
 import Pagination from "../../../components/Pagination";
 import { fetchPapersByAuthor } from "../../api/utils/fetchAuthors";
 

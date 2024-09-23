@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Container } from "@chakra-ui/react";
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLayout from "@/components/Dashboard/Layout/DashboardLayout";
 import WeeklySummary from "@/components/WeeklySummary";
 
 const WeeklyPaperSummaryPage = () => {

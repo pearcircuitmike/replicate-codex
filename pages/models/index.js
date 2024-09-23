@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Container, Grid, Box, Text, Center, Skeleton } from "@chakra-ui/react";
 import MetaTags from "../../components/MetaTags";
-import ModelCard from "../../components/ModelCard";
+import ModelCard from "../../components/Cards/ModelCard";
 import Pagination from "../../components/Pagination";
 import { fetchModelsPaginated } from "../api/utils/fetchModelsPaginated";
-import SemanticSearchBar from "../../components/SemanticSearchBar";
+import SemanticSearchBar from "../../components/Common/SemanticSearchBar";
 import CategoryFilter from "../../components/CategoryFilter";
-import TimeRangeFilter from "../../components/TimeRangeFilter";
+import TimeRangeFilter from "../../components/Common/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
 import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json";
 

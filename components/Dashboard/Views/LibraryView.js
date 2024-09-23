@@ -10,7 +10,7 @@ import {
 import supabase from "@/pages/api/utils/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
-import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import DashboardLayout from "../Dashboard/Layout/DashboardLayout";
 
 const LibraryView = () => {
   const { user } = useAuth();

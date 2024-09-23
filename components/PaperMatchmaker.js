@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { Configuration, OpenAIApi } from "openai";
 import { fetchPapersWithEmbeddings } from "../pages/api/utils/fetchPapersWithEmbeddings";
-import PaperCard from "./PaperCard";
+import PaperCard from "./Cards/PaperCard";
 
 const openAi = new OpenAIApi(
   new Configuration({ apiKey: process.env.NEXT_PUBLIC_OPENAI_CLIENT_KEY })

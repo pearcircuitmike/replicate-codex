@@ -11,11 +11,11 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import PreviewImage from "./PreviewImage";
-import EmojiWithGradient from "./EmojiWithGradient";
+import PreviewImage from "../PreviewImage";
+import EmojiWithGradient from "../EmojiWithGradient";
 import removeMd from "remove-markdown";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
-import BookmarkButton from "./BookmarkButton";
+import BookmarkButton from "../BookmarkButton";
 
 const ModelCard = ({ model, onBookmarkChange }) => {
   if (!model) {

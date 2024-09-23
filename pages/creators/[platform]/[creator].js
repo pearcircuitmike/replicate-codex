@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 import MetaTags from "../../../components/MetaTags";
-import ModelCard from "../../../components/ModelCard";
+import ModelCard from "../../../components/Cards/ModelCard";
 import { toTitleCase } from "@/pages/api/utils/toTitleCase";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";

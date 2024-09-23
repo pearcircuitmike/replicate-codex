@@ -1,7 +1,7 @@
 // components/RelatedPapers.js
 import React from "react";
 import { Box, Heading, SimpleGrid } from "@chakra-ui/react";
-import PaperCard from "./PaperCard";
+import PaperCard from "./Cards/PaperCard";
 
 const RelatedPapers = ({ relatedPapers }) => {
   if (!relatedPapers || relatedPapers.length === 0) {

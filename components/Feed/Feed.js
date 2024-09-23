@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Box, SimpleGrid, Text } from "@chakra-ui/react";
-import ModelCard from "../ModelCard";
-import PaperCard from "../PaperCard";
+import ModelCard from "../Cards/ModelCard";
+import PaperCard from "../Cards/PaperCard";
 
 const Feed = ({ resourceType, results }) => {
   if (!results) {

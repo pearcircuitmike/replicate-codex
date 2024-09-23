@@ -12,7 +12,7 @@ import { FaEdit } from "react-icons/fa";
 import { useRouter } from "next/router";
 import supabase from "../pages/api/utils/supabaseClient";
 import { useAuth } from "../context/AuthContext";
-import FolderModal from "./FolderModal";
+import FolderModal from "../../Modals/FolderModal";
 
 const DashboardSidebar = () => {
   const { user } = useAuth();

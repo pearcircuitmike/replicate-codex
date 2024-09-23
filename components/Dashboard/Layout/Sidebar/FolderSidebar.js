@@ -12,8 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/router";
-import FolderModal from "./FolderModal";
-import { useAuth } from "../../context/AuthContext";
+import FolderModal from "../../Modals/FolderModal";
+import { useAuth } from "../../../../context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { useFolders } from "@/context/FoldersContext";
 

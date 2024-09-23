@@ -13,9 +13,9 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import Feed from "../Feed/Feed";
-import SemanticSearchBar from "../SemanticSearchBar";
-import TimeRangeFilter from "../TimeRangeFilter";
+import Feed from "../../Feed/Feed";
+import SemanticSearchBar from "../../Common/SemanticSearchBar";
+import TimeRangeFilter from "../../Common/TimeRangeFilter";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const DiscoverView = () => {
