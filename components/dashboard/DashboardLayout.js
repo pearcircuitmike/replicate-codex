@@ -1,3 +1,5 @@
+// components/dashboard/DashboardLayout.js
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
@@ -7,9 +9,19 @@ import {
   HStack,
   Text,
   useToast,
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  Button,
+  List,
+  ListItem,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { FaSearch, FaUser, FaNewspaper } from "react-icons/fa";
+import { FaSearch, FaUser, FaNewspaper, FaFolder } from "react-icons/fa";
 import NavItem from "./NavItem";
 import FolderSidebar from "./FolderSidebar";
 import FolderModal from "./FolderModal";
@@ -27,6 +39,7 @@ const DashboardLayout = ({ children }) => {
   const { user } = useAuth();
   const [folders, setFolders] = useState([]);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [isFolderListModalOpen, setIsFolderListModalOpen] = useState(false); // New state for folder list modal
   const toast = useToast();
 
   // Function to fetch folders
@@ -102,6 +115,15 @@ const DashboardLayout = ({ children }) => {
     fetchFolders();
   };
 
+  // Handlers for Folder List Modal
+  const handleFolderListModalOpen = () => {
+    setIsFolderListModalOpen(true);
+  };
+
+  const handleFolderListModalClose = () => {
+    setIsFolderListModalOpen(false);
+  };
+
   const navItemsBeforeFolders = [
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
     {
@@ -122,6 +144,7 @@ const DashboardLayout = ({ children }) => {
       folders={folders}
     >
       <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
+        {/* Sidebar for larger screens */}
         {isLargerThan768 && (
           <Box
             width="200px"
@@ -159,10 +182,12 @@ const DashboardLayout = ({ children }) => {
           </Box>
         )}
 
+        {/* Main Content */}
         <Box flex={1} overflowY="auto">
           {children}
         </Box>
 
+        {/* Right Sidebar for larger screens */}
         {isLargerThan1024 && (
           <Box width="250px" bg="white" py={8} borderLeft="1px solid #e2e8f0">
             <TrendingTopics />
@@ -171,6 +196,7 @@ const DashboardLayout = ({ children }) => {
           </Box>
         )}
 
+        {/* Mobile Footer Navigation */}
         {!isLargerThan768 && (
           <Box
             position="fixed"
@@ -181,26 +207,100 @@ const DashboardLayout = ({ children }) => {
             boxShadow="0 -2px 10px rgba(0, 0, 0, 0.05)"
           >
             <HStack justify="space-around" py={2}>
-              {navItemsBeforeFolders
-                .concat(navItemsAfterFolders)
-                .map((item) => (
-                  <NavItem
-                    key={item.href}
-                    icon={item.icon}
-                    label={item.label}
-                    href={item.href}
-                    isActive={router.pathname === item.href}
-                  />
-                ))}
+              {navItemsBeforeFolders.map((item) => (
+                <NavItem
+                  key={item.label}
+                  icon={item.icon}
+                  label={item.label}
+                  href={item.href}
+                  isActive={router.pathname === item.href}
+                />
+              ))}
+
+              {/* Folder Icon in Footer as IconButton */}
+              <IconButton
+                aria-label="Folders"
+                icon={<FaFolder />}
+                variant="ghost"
+                size="lg"
+                onClick={handleFolderListModalOpen} // Open Folder List Modal
+                _hover={{ bg: "gray.100" }}
+                color={isFolderListModalOpen ? "blue.500" : "gray.500"} // Match color
+              />
+
+              {navItemsAfterFolders.map((item) => (
+                <NavItem
+                  key={item.label}
+                  icon={item.icon}
+                  label={item.label}
+                  href={item.href}
+                  isActive={router.pathname === item.href}
+                />
+              ))}
             </HStack>
           </Box>
         )}
 
+        {/* Folder Modal for Create/Edit */}
         <FolderModal
           isOpen={isFolderModalOpen}
           onClose={handleFolderModalClose}
           fetchFolders={fetchFolders}
         />
+
+        {/* Folder List Modal for Mobile */}
+        <Modal
+          isOpen={isFolderListModalOpen}
+          onClose={handleFolderListModalClose}
+          isCentered
+          size="md"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>My Folders</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {folders.length > 0 ? (
+                <List spacing={3}>
+                  {folders.map((folder) => (
+                    <ListItem key={folder.id}>
+                      <Button
+                        variant="ghost"
+                        width="100%"
+                        justifyContent="flex-start"
+                        onClick={() => {
+                          router.push(
+                            `/dashboard/library?folderId=${folder.id}`
+                          ); // Corrected URL
+                          handleFolderListModalClose();
+                        }}
+                        leftIcon={
+                          <FaFolder color={folder.color || "gray.500"} />
+                        }
+                        _hover={{ bg: "gray.100" }}
+                      >
+                        {folder.name} ({folder.bookmarkCount})
+                      </Button>
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Text>No folders available. Create one!</Text>
+              )}
+              <Button
+                mt={4}
+                colorScheme="blue"
+                width="100%"
+                onClick={() => {
+                  handleFolderListModalClose();
+                  handleFolderModalOpen(); // Open Create Folder Modal
+                }}
+              >
+                Create New Folder
+              </Button>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
       </Flex>
     </FoldersProvider>
   );
