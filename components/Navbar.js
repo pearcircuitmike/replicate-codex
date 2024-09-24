@@ -203,6 +203,7 @@ const Navbar = () => {
               )}
               {!user && (
                 <Button
+                  as="a"
                   href="/login"
                   colorScheme="blue"
                   m={isMobile ? "5px" : "10px"}
