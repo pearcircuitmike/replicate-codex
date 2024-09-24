@@ -1,10 +1,9 @@
-// SemanticSearchBar.jsx
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Input, Box, IconButton, useBreakpointValue } from "@chakra-ui/react";
 import { FaTimes } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { debounce } from "lodash";
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 
 const SemanticSearchBar = ({
   onSearchSubmit,
@@ -18,6 +17,7 @@ const SemanticSearchBar = ({
   const debouncedSearch = useCallback(
     debounce((value) => {
       onSearchSubmit(value);
+      trackEvent("semantic_search", { query: value }); // Track semantic search event
     }, 100),
     [onSearchSubmit]
   );
@@ -31,6 +31,7 @@ const SemanticSearchBar = ({
   const handleClear = () => {
     setSearchValue("");
     onSearchSubmit(""); // Clear the search results
+    trackEvent("semantic_search", { query: "" }); // Track clear search event
   };
 
   useEffect(() => {
