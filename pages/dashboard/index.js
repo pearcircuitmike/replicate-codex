@@ -3,6 +3,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { useAuth } from "../../context/AuthContext";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
 import DiscoverView from "../../components/Dashboard/Views/DiscoverView";
+import TrendingView from "@/components/Dashboard/Views/TrendingView";
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -19,7 +20,7 @@ const DashboardPage = () => {
 
   return (
     <DashboardLayout>
-      <DiscoverView />
+      <TrendingView />
     </DashboardLayout>
   );
 };

@@ -21,7 +21,13 @@ import {
   ListItem,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { FaSearch, FaUser, FaNewspaper, FaFolder } from "react-icons/fa";
+import {
+  FaSearch,
+  FaUser,
+  FaNewspaper,
+  FaFolder,
+  FaFire,
+} from "react-icons/fa";
 import NavItem from "./NavItem";
 import FolderSidebar from "./Sidebar/FolderSidebar";
 import FolderModal from "../Modals/FolderModal";
@@ -127,12 +133,16 @@ const DashboardLayout = ({ children }) => {
   const navItemsBeforeFolders = [
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
     {
+      icon: <FaFire />,
+      label: "Trending",
+      href: "/dashboard/trending",
+    },
+    {
       icon: <FaNewspaper />,
       label: "Weekly Digest",
       href: "/dashboard/weekly-paper-summary",
     },
   ];
-
   const navItemsAfterFolders = [
     { icon: <FaUser />, label: "Profile", href: "/account" },
   ];
