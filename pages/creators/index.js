@@ -12,8 +12,7 @@ import MetaTags from "../../components/MetaTags";
 import CreatorCard from "../../components/CreatorCard";
 import Pagination from "../../components/Pagination";
 import { fetchCreators } from "../api/utils/fetchCreatorsPaginated";
-import SearchBar from "../../components/SearchBar";
-
+import SearchBar from "@/components/Common/SearchBar";
 const ITEMS_PER_PAGE = 12;
 
 export async function getStaticProps() {

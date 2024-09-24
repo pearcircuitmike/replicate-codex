@@ -1,7 +1,6 @@
 import React from "react";
 import { Input, Button, Box, useBreakpointValue } from "@chakra-ui/react";
-import { trackEvent } from "../pages/api/utils/analytics-util";
-
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 const SearchBar = ({
   searchValue,
   setSearchValue,

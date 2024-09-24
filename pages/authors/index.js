@@ -12,7 +12,7 @@ import MetaTags from "../../components/MetaTags";
 import AuthorCard from "../../components/AuthorCard";
 import Pagination from "../../components/Pagination";
 import { fetchUniqueAuthors } from "../api/utils/fetchAuthors";
-import SearchBar from "../../components/SearchBar";
+import SearchBar from "@/components/Common/SearchBar";
 
 const ITEMS_PER_PAGE = 12;
 
