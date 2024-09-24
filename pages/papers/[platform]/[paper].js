@@ -105,7 +105,7 @@ export async function getStaticProps({ params }) {
   } else {
     return {
       props: { paper, relatedPapers, slug },
-      revalidate: 3600 * 2,
+      revalidate: 3600 * 24,
     };
   }
 }
