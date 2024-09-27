@@ -1,3 +1,5 @@
+// pages/index.js
+
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useMediaQuery } from "@chakra-ui/react";
 import {
@@ -6,32 +8,23 @@ import {
   Heading,
   Text,
   Box,
-  SimpleGrid,
-  Stack,
-  Icon,
   Center,
 } from "@chakra-ui/react";
 import { CheckCircleIcon } from "@chakra-ui/icons";
-
 import MetaTags from "../components/MetaTags.js";
 import AuthForm from "../components/AuthForm";
 import Testimonials from "../components/Testimonials";
-
-import {
-  fetchTrendingPapers,
-  fetchTrendingModels,
-  fetchTrendingCreators,
-  fetchTrendingAuthors,
-} from "./api/utils/fetchLandingPageData.js";
 
 // Lazy load the LandingPageTrending component
 const LandingPageTrending = lazy(() =>
   import("../components/LandingPageTrending")
 );
 
+// Function to get the start of the current week (Sunday)
 const getStartOfWeek = (date) => {
   const startOfWeek = new Date(date);
   startOfWeek.setDate(date.getDate() - date.getDay());
+  startOfWeek.setHours(0, 0, 0, 0); // Reset time to midnight
   return startOfWeek;
 };
 
@@ -47,25 +40,48 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const startDate = getStartOfWeek(new Date());
+      const startDate = getStartOfWeek(new Date()).toISOString();
 
-      fetchTrendingPapers("arxiv", startDate, 4).then((papers) => {
-        setTrendingData((prevData) => ({ ...prevData, papers }));
-      });
+      try {
+        // Fetch all data in parallel
+        const [papersRes, modelsRes, creatorsRes, authorsRes] =
+          await Promise.all([
+            fetch(
+              `/api/trending/papers?platform=arxiv&startDate=${startDate}&limit=4`
+            ),
+            fetch(`/api/trending/models?startDate=${startDate}&limit=4`),
+            fetch(`/api/trending/creators?limit=4`),
+            fetch(`/api/trending/authors?limit=4`),
+          ]);
 
-      fetchTrendingModels(startDate, 4).then((models) => {
-        setTrendingData((prevData) => ({ ...prevData, models }));
-      });
+        if (
+          !papersRes.ok ||
+          !modelsRes.ok ||
+          !creatorsRes.ok ||
+          !authorsRes.ok
+        ) {
+          throw new Error("Failed to fetch one or more trending data");
+        }
 
-      fetchTrendingCreators(startDate, 4).then((creators) => {
-        setTrendingData((prevData) => ({ ...prevData, creators }));
-      });
+        const [papers, models, creators, authors] = await Promise.all([
+          papersRes.json(),
+          modelsRes.json(),
+          creatorsRes.json(),
+          authorsRes.json(),
+        ]);
 
-      fetchTrendingAuthors(4).then((authors) => {
-        setTrendingData((prevData) => ({ ...prevData, authors }));
-      });
-
-      setIsLoading(false);
+        setTrendingData({
+          papers,
+          models,
+          creators,
+          authors,
+        });
+      } catch (error) {
+        console.error("Error fetching trending data:", error);
+        // Optionally, set error state here to display an error message to users
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     fetchData();
@@ -127,13 +143,14 @@ export default function Home() {
             <Heading as="h2" fontSize="4xl" mb={8} textAlign="center">
               How it works
             </Heading>
-            <SimpleGrid columns={[1, 1, 3]} spacing={8}>
+            <Box>
               <Box
                 px={6}
                 py={"40px"}
                 bg="white"
                 borderRadius="md"
                 boxShadow="md"
+                mb={8}
               >
                 <Heading as="h3" fontSize="2xl" mb={4}>
                   Discover AI breakthroughs
@@ -149,6 +166,7 @@ export default function Home() {
                 bg="white"
                 borderRadius="md"
                 boxShadow="md"
+                mb={8}
               >
                 <Heading as="h3" fontSize="2xl" mb={4}>
                   Skim summaries of each discovery
@@ -173,7 +191,7 @@ export default function Home() {
                   the breakthroughs.
                 </Text>
               </Box>
-            </SimpleGrid>
+            </Box>
           </Container>
         </Box>
 
@@ -183,29 +201,29 @@ export default function Home() {
               A subscription gets you...
             </Heading>
             <Box>
-              <Stack spacing={4}>
-                <Box display="flex" alignItems="center">
-                  <Icon as={CheckCircleIcon} color="green.500" mr={2} />
+              <Box spacing={4}>
+                <Box display="flex" alignItems="center" mb={4}>
+                  <Box as={CheckCircleIcon} color="green.500" mr={2} />
                   <Text fontSize="xl">
                     The most impactful AI content, personalized to your
                     interests and delivered to your inbox
                   </Text>
                 </Box>
-                <Box display="flex" alignItems="center">
-                  <Icon as={CheckCircleIcon} color="green.500" mr={2} />
+                <Box display="flex" alignItems="center" mb={4}>
+                  <Box as={CheckCircleIcon} color="green.500" mr={2} />
                   <Text fontSize="xl">
                     Guides to the top models, papers and tools - no PhD
                     required!
                   </Text>
                 </Box>
                 <Box display="flex" alignItems="center">
-                  <Icon as={CheckCircleIcon} color="green.500" mr={2} />
+                  <Box as={CheckCircleIcon} color="green.500" mr={2} />
                   <Text fontSize="xl">
                     Exclusive access to the Discord community with AI experts
                     and builders
                   </Text>
                 </Box>
-              </Stack>
+              </Box>
             </Box>
           </Container>
         </Box>
