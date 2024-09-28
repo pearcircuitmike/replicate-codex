@@ -1,21 +1,8 @@
+// components/LandingPageTrending.js
+
 import React from "react";
-import {
-  Box,
-  Heading,
-  Text,
-  VStack,
-  HStack,
-  Spacer,
-  Image,
-  Center,
-  Link,
-  SimpleGrid,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
-} from "@chakra-ui/react";
-import NextLink from "next/link";
-import EmojiWithGradient from "@/components/EmojiWithGradient";
+import { Box, Heading, VStack, SimpleGrid } from "@chakra-ui/react";
+import ResourceCard from "@/components/ResourceCard";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
 const LandingPageTrending = ({
@@ -25,18 +12,6 @@ const LandingPageTrending = ({
   trendingAuthors,
   isLoading,
 }) => {
-  const renderSkeletonCard = () => (
-    <Box p={4} borderWidth={1} borderRadius="md">
-      <HStack align="center">
-        <VStack align="start" spacing={1} flex={1}>
-          <Skeleton height="20px" width="80%" />
-          <SkeletonText mt={2} noOfLines={2} spacing={2} />
-        </VStack>
-        <SkeletonCircle size="80px" />
-      </HStack>
-    </Box>
-  );
-
   const renderSection = (title, items, renderItem) => (
     <Box>
       <Heading as="h2" size="md" mb={4}>
@@ -46,7 +21,7 @@ const LandingPageTrending = ({
         {isLoading
           ? Array.from({ length: 4 }).map((_, index) => (
               <React.Fragment key={index}>
-                {renderSkeletonCard()}
+                <ResourceCard isLoading />
               </React.Fragment>
             ))
           : items.map(renderItem)}
@@ -55,207 +30,58 @@ const LandingPageTrending = ({
   );
 
   const renderPaper = (paper) => (
-    <NextLink
+    <ResourceCard
       key={paper.id}
       href={`/papers/${encodeURIComponent(paper.platform)}/${encodeURIComponent(
         paper.slug
       )}`}
-      passHref
-    >
-      <Link _hover={{ textDecoration: "none" }}>
-        <Box
-          p={4}
-          borderWidth={1}
-          borderRadius="md"
-          _hover={{ boxShadow: "md" }}
-        >
-          <HStack align="center">
-            <VStack align="start" spacing={1}>
-              <Text
-                fontWeight="bold"
-                noOfLines={2}
-                overflow="hidden"
-                textOverflow="ellipsis"
-              >
-                {paper.title}
-              </Text>
-              <HStack mt={2}>
-                <Image
-                  src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
-                  alt="Total Score"
-                  boxSize="20px"
-                  mr={1}
-                />
-                <Text>{Math.floor(paper.totalScore)}</Text>
-              </HStack>
-            </VStack>
-            <Spacer />
-            <Center height="100%">
-              {paper.thumbnail ? (
-                <Image
-                  src={paper.thumbnail}
-                  alt={paper.title}
-                  height="80px"
-                  width="80px"
-                  objectFit="cover"
-                  borderRadius="md"
-                />
-              ) : (
-                <EmojiWithGradient
-                  title={paper.title || "Paper"}
-                  height="80px"
-                  width="80px"
-                  objectFit="cover"
-                />
-              )}
-            </Center>
-          </HStack>
-        </Box>
-      </Link>
-    </NextLink>
+      title={paper.title}
+      score={Math.floor(paper.totalScore)}
+      scoreLabel="Total Score"
+      imageSrc={paper.thumbnail}
+      placeholderTitle="Paper"
+    />
   );
 
-  const renderAuthor = (authorData, index) => (
-    <NextLink
-      key={index}
+  const renderAuthor = (authorData) => (
+    <ResourceCard
+      key={authorData.author}
       href={`/authors/${encodeURIComponent("arxiv")}/${encodeURIComponent(
         authorData.author
       )}`}
-      passHref
-    >
-      <Link _hover={{ textDecoration: "none" }}>
-        <Box
-          p={4}
-          borderWidth={1}
-          borderRadius="md"
-          _hover={{ boxShadow: "md" }}
-        >
-          <HStack align="center">
-            <VStack align="start" spacing={1}>
-              <Text fontWeight="bold">{authorData.author}</Text>
-              <Text fontSize="sm">Platform: arxiv</Text>
-              <HStack mt={2}>
-                <Image
-                  src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
-                  alt="Total Score"
-                  boxSize="20px"
-                  mr={1}
-                />
-                <Text>{formatLargeNumber(authorData.totalAuthorScore)}</Text>
-              </HStack>
-            </VStack>
-            <Spacer />
-            <Center height="100%">
-              <EmojiWithGradient
-                title={authorData.author || "Author"}
-                height="80px"
-                width="80px"
-                objectFit="cover"
-              />
-            </Center>
-          </HStack>
-        </Box>
-      </Link>
-    </NextLink>
+      title={authorData.author}
+      subtitle="Platform: arxiv"
+      score={formatLargeNumber(authorData.totalAuthorScore)}
+      scoreLabel="Author Score"
+      placeholderTitle="Author"
+    />
   );
 
   const renderModel = (model) => (
-    <NextLink
+    <ResourceCard
       key={model.id}
       href={`/models/${model.platform}/${encodeURIComponent(model.slug)}`}
-      passHref
-    >
-      <Link _hover={{ textDecoration: "none" }}>
-        <Box
-          p={4}
-          borderWidth={1}
-          borderRadius="md"
-          _hover={{ boxShadow: "md" }}
-        >
-          <HStack align="center">
-            <VStack align="start" spacing={1}>
-              <Text fontWeight="bold">{model.modelName}</Text>
-              <Text fontSize="sm">Creator: {model.creator}</Text>
-              <HStack mt={2}>
-                <Image
-                  src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
-                  alt="Total Score"
-                  boxSize="20px"
-                  mr={1}
-                />
-                <Text>{formatLargeNumber(Math.floor(model.totalScore))}</Text>
-              </HStack>
-            </VStack>
-            <Spacer />
-            <Center height="100%">
-              {model.example ? (
-                <Image
-                  src={model.example}
-                  alt={model.modelName}
-                  height="80px"
-                  width="80px"
-                  objectFit="cover"
-                  borderRadius="md"
-                />
-              ) : (
-                <EmojiWithGradient
-                  title={model.modelName || "Model"}
-                  height="80px"
-                  width="80px"
-                  objectFit="cover"
-                />
-              )}
-            </Center>
-          </HStack>
-        </Box>
-      </Link>
-    </NextLink>
+      title={model.modelName}
+      subtitle={`Creator: ${model.creator}`}
+      score={formatLargeNumber(Math.floor(model.totalScore))}
+      scoreLabel="Total Score"
+      imageSrc={model.example}
+      placeholderTitle="Model"
+    />
   );
 
   const renderCreator = (creator) => (
-    <NextLink
+    <ResourceCard
       key={creator.id}
       href={`/creators/${encodeURIComponent(
         creator.platform
       )}/${encodeURIComponent(creator.creator)}`}
-      passHref
-    >
-      <Link _hover={{ textDecoration: "none" }}>
-        <Box
-          p={4}
-          borderWidth={1}
-          borderRadius="md"
-          _hover={{ boxShadow: "md" }}
-        >
-          <HStack align="center">
-            <VStack align="start" spacing={1}>
-              <Text fontWeight="bold">{creator.creator}</Text>
-              <Text fontSize="sm">Platform: {creator.platform}</Text>
-              <HStack mt={2}>
-                <Image
-                  src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
-                  alt="Total Score"
-                  boxSize="20px"
-                  mr={1}
-                />
-                <Text>
-                  {formatLargeNumber(Math.floor(creator.totalCreatorScore))}
-                </Text>
-              </HStack>
-            </VStack>
-            <Spacer />
-            <Center height="100%">
-              <EmojiWithGradient
-                title={creator.creator || "Creator"}
-                height="80px"
-                width="80px"
-                objectFit="cover"
-              />
-            </Center>
-          </HStack>
-        </Box>
-      </Link>
-    </NextLink>
+      title={creator.creator}
+      subtitle={`Platform: ${creator.platform}`}
+      score={formatLargeNumber(Math.floor(creator.totalCreatorScore))}
+      scoreLabel="Creator Score"
+      placeholderTitle="Creator"
+    />
   );
 
   return (
