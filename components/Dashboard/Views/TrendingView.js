@@ -49,22 +49,22 @@ const TrendingView = () => {
           creators,
           authors,
         ] = await Promise.all([
-          fetch(`/api/dashboard/trending-topics?limit=5`).then((res) => {
+          fetch(`/api/dashboard/trending-topics?limit=4`).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch trending topics");
             return res.json();
           }),
-          fetch(`/api/dashboard/top-viewed-papers?limit=5`).then((res) => {
+          fetch(`/api/dashboard/top-viewed-papers?limit=4`).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch top viewed papers");
             return res.json();
           }),
-          fetch(`/api/dashboard/top-search-queries?limit=5`).then((res) => {
+          fetch(`/api/dashboard/top-search-queries?limit=4`).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch top search queries");
             return res.json();
           }),
           fetch(
             `/api/trending/papers?platform=arxiv&startDate=${encodeURIComponent(
               startDate.toISOString()
-            )}&limit=5`
+            )}&limit=4`
           ).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch trending papers");
             return res.json();
@@ -72,16 +72,16 @@ const TrendingView = () => {
           fetch(
             `/api/trending/models?startDate=${encodeURIComponent(
               startDate.toISOString()
-            )}&limit=5`
+            )}&limit=4`
           ).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch trending models");
             return res.json();
           }),
-          fetch(`/api/trending/creators?limit=5`).then((res) => {
+          fetch(`/api/trending/creators?limit=4`).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch trending creators");
             return res.json();
           }),
-          fetch(`/api/trending/authors?limit=5`).then((res) => {
+          fetch(`/api/trending/authors?limit=4`).then((res) => {
             if (!res.ok) throw new Error("Failed to fetch trending authors");
             return res.json();
           }),
