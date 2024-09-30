@@ -20,6 +20,9 @@ import {
   DrawerHeader,
   DrawerBody,
   useToast,
+  Tag,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
@@ -40,7 +43,7 @@ import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
-import CarbonAd from "../../../components/CarbonAd"; // Import the new CarbonAd component
+import CarbonAd from "../../../components/CarbonAd";
 
 import { useAuth } from "../../../context/AuthContext";
 
@@ -118,6 +121,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   const { user, hasActiveSubscription, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const [tasks, setTasks] = useState([]);
 
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -126,10 +130,26 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   });
 
   useEffect(() => {
+    const fetchTasks = async () => {
+      if (paper?.id) {
+        try {
+          const response = await axios.get(
+            `/api/papers/paper-tasks-from-id?paperId=${paper.id}`
+          );
+          setTasks(response.data.tasks);
+        } catch (error) {
+          console.error("Error fetching tasks:", error);
+        }
+      }
+    };
+
+    fetchTasks();
+  }, [paper]);
+
+  useEffect(() => {
     const fetchViewCounts = async () => {
       if (!paper?.slug || loading) return;
 
-      // Get session ID from local storage
       let sessionId = localStorage.getItem("sessionId");
       if (!sessionId) {
         sessionId = uuidv4();
@@ -211,6 +231,16 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           <Heading as="h1" size="xl" mb={5}>
             {paper.title}
           </Heading>
+
+          <Wrap spacing={2} mb={4}>
+            {tasks.map((task) => (
+              <WrapItem key={task.id}>
+                <Tag size="md" colorScheme="blue">
+                  {task.task}
+                </Tag>
+              </WrapItem>
+            ))}
+          </Wrap>
 
           <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
             <Text as="span">
@@ -294,7 +324,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             </Box>
           )}
 
-          {/* Conditionally render CarbonAd for unauthenticated users */}
           {!user && (
             <Box>
               <CarbonAd />
@@ -318,16 +347,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   </Box>
                 </Box>
               )}
-              {/*
-              <Box bg="gray.100" p={4} mb={6}>
-                <Heading as="h2" mb={2}>
-                  Abstract
-                </Heading>
-                <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
-                  {formattedAbstract}
-                </ReactMarkdown>
-              </Box>
-              */}
               <div>
                 <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
                   {paper.generatedSummary}
