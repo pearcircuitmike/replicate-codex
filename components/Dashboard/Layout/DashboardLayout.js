@@ -21,7 +21,6 @@ import {
 import { useRouter } from "next/router";
 import {
   FaSearch,
-  FaUser,
   FaNewspaper,
   FaFolder,
   FaFire,
@@ -144,9 +143,6 @@ const DashboardLayout = ({ children }) => {
       href: "/dashboard/weekly-paper-summary",
     },
   ];
-  const navItemsAfterFolders = [
-    { icon: <FaUser />, label: "Profile", href: "/account" },
-  ];
 
   return (
     <FoldersProvider
@@ -182,15 +178,6 @@ const DashboardLayout = ({ children }) => {
               <FolderSidebar onFolderModalOpen={handleFolderModalOpen} />
 
               <TaskSidebar />
-              {navItemsAfterFolders.map((item) => (
-                <NavItem
-                  key={item.href}
-                  icon={item.icon}
-                  label={item.label}
-                  href={item.href}
-                  isActive={router.pathname === item.href}
-                />
-              ))}
             </VStack>
           </Box>
         )}
@@ -238,15 +225,6 @@ const DashboardLayout = ({ children }) => {
                 _hover={{ bg: "gray.100" }}
                 color={isTaskListModalOpen ? "blue.500" : "gray.500"}
               />
-              {navItemsAfterFolders.map((item) => (
-                <NavItem
-                  key={item.label}
-                  icon={item.icon}
-                  label={item.label}
-                  href={item.href}
-                  isActive={router.pathname === item.href}
-                />
-              ))}
             </HStack>
           </Box>
         )}
