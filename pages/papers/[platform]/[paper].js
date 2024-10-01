@@ -20,7 +20,6 @@ import {
   DrawerHeader,
   DrawerBody,
   useToast,
-  Tag,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
@@ -44,6 +43,7 @@ import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
 import CarbonAd from "../../../components/CarbonAd";
+import TaskTag from "../../../components/TaskTag";
 
 import { useAuth } from "../../../context/AuthContext";
 
@@ -114,14 +114,14 @@ export async function getStaticProps({ params }) {
 }
 
 const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
+  const { user, accessToken, hasActiveSubscription, loading } = useAuth();
   const [adjacentPapers, setAdjacentPapers] = useState({
     prevSlug: null,
     nextSlug: null,
   });
-  const { user, hasActiveSubscription, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-  const [tasks, setTasks] = useState([]);
+  const [paperTasks, setPaperTasks] = useState([]);
 
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -130,21 +130,38 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   });
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      if (paper?.id) {
+    const fetchPaperTasks = async () => {
+      if (paper?.id && accessToken) {
         try {
-          const response = await axios.get(
-            `/api/papers/paper-tasks-from-id?paperId=${paper.id}`
-          );
-          setTasks(response.data.tasks);
+          const response = await axios.get(`/api/tasks/get-followed-tasks`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              paperId: paper.id,
+            },
+          });
+
+          if (!response.data || !response.data.tasks) {
+            throw new Error("Failed to fetch paper tasks");
+          }
+
+          setPaperTasks(response.data.tasks);
         } catch (error) {
-          console.error("Error fetching tasks:", error);
+          console.error("Error fetching paper tasks:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch paper tasks",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
         }
       }
     };
 
-    fetchTasks();
-  }, [paper]);
+    fetchPaperTasks();
+  }, [paper, accessToken, toast]);
 
   useEffect(() => {
     const fetchViewCounts = async () => {
@@ -233,11 +250,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           </Heading>
 
           <Wrap spacing={2} mb={4}>
-            {tasks.map((task) => (
+            {paperTasks.map((task) => (
               <WrapItem key={task.id}>
-                <Tag size="md" colorScheme="blue">
-                  {task.task}
-                </Tag>
+                <TaskTag task={task} initialIsFollowed={task.isFollowed} />
               </WrapItem>
             ))}
           </Wrap>
@@ -254,6 +269,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 <Text as="span" textDecoration="underline">
                   arXiv:{paper.arxivId}
                 </Text>
+                <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
               </Link>{" "}
               - Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
               by{" "}
