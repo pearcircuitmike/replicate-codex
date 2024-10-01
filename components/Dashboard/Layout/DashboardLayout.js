@@ -1,5 +1,3 @@
-// components/dashboard/DashboardLayout.js
-
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
@@ -27,28 +25,26 @@ import {
   FaNewspaper,
   FaFolder,
   FaFire,
+  FaTasks,
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 import FolderSidebar from "./Sidebar/FolderSidebar";
+import TaskSidebar from "./Sidebar/TaskSidebar";
 import FolderModal from "../Modals/FolderModal";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { useAuth } from "../../../context/AuthContext";
-import TrendingTopics from "../../TrendingTopics";
-import TopViewedPapers from "../../TopViewedPapers";
-import TopSearchQueries from "../../TopSearchQueries";
 import { FoldersProvider } from "@/context/FoldersContext";
 
 const DashboardLayout = ({ children }) => {
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
-  const [isLargerThan1024] = useMediaQuery("(min-width: 1024px)");
   const router = useRouter();
   const { user } = useAuth();
   const [folders, setFolders] = useState([]);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
-  const [isFolderListModalOpen, setIsFolderListModalOpen] = useState(false); // New state for folder list modal
+  const [isFolderListModalOpen, setIsFolderListModalOpen] = useState(false);
+  const [isTaskListModalOpen, setIsTaskListModalOpen] = useState(false);
   const toast = useToast();
 
-  // Function to fetch folders
   const fetchFolders = useCallback(async () => {
     if (!user) return;
 
@@ -91,7 +87,6 @@ const DashboardLayout = ({ children }) => {
     }
   }, [user, toast]);
 
-  // Function to update folder count
   const updateFolderCount = useCallback((folderId, increment) => {
     setFolders((prevFolders) =>
       prevFolders.map((folder) =>
@@ -105,7 +100,6 @@ const DashboardLayout = ({ children }) => {
     );
   }, []);
 
-  // Fetch folders on mount and when user changes
   useEffect(() => {
     if (user) {
       fetchFolders();
@@ -121,13 +115,20 @@ const DashboardLayout = ({ children }) => {
     fetchFolders();
   };
 
-  // Handlers for Folder List Modal
   const handleFolderListModalOpen = () => {
     setIsFolderListModalOpen(true);
   };
 
   const handleFolderListModalClose = () => {
     setIsFolderListModalOpen(false);
+  };
+
+  const handleTaskListModalOpen = () => {
+    setIsTaskListModalOpen(true);
+  };
+
+  const handleTaskListModalClose = () => {
+    setIsTaskListModalOpen(false);
   };
 
   const navItemsBeforeFolders = [
@@ -157,7 +158,7 @@ const DashboardLayout = ({ children }) => {
         {/* Sidebar for larger screens */}
         {isLargerThan768 && (
           <Box
-            width="200px"
+            width="370px"
             bg="white"
             py={8}
             overflowY="auto"
@@ -179,6 +180,8 @@ const DashboardLayout = ({ children }) => {
                 </Text>
               </Box>
               <FolderSidebar onFolderModalOpen={handleFolderModalOpen} />
+
+              <TaskSidebar />
               {navItemsAfterFolders.map((item) => (
                 <NavItem
                   key={item.href}
@@ -196,15 +199,6 @@ const DashboardLayout = ({ children }) => {
         <Box flex={1} overflowY="auto">
           {children}
         </Box>
-
-        {/* Right Sidebar for larger screens */}
-        {isLargerThan1024 && (
-          <Box width="250px" bg="white" py={8} borderLeft="1px solid #e2e8f0">
-            <TrendingTopics />
-            <TopViewedPapers />
-            <TopSearchQueries />
-          </Box>
-        )}
 
         {/* Mobile Footer Navigation */}
         {!isLargerThan768 && (
@@ -226,18 +220,24 @@ const DashboardLayout = ({ children }) => {
                   isActive={router.pathname === item.href}
                 />
               ))}
-
-              {/* Folder Icon in Footer as IconButton */}
               <IconButton
                 aria-label="Folders"
                 icon={<FaFolder />}
                 variant="ghost"
                 size="lg"
-                onClick={handleFolderListModalOpen} // Open Folder List Modal
+                onClick={handleFolderListModalOpen}
                 _hover={{ bg: "gray.100" }}
-                color={isFolderListModalOpen ? "blue.500" : "gray.500"} // Match color
+                color={isFolderListModalOpen ? "blue.500" : "gray.500"}
               />
-
+              <IconButton
+                aria-label="Tasks"
+                icon={<FaTasks />}
+                variant="ghost"
+                size="lg"
+                onClick={handleTaskListModalOpen}
+                _hover={{ bg: "gray.100" }}
+                color={isTaskListModalOpen ? "blue.500" : "gray.500"}
+              />
               {navItemsAfterFolders.map((item) => (
                 <NavItem
                   key={item.label}
@@ -281,7 +281,7 @@ const DashboardLayout = ({ children }) => {
                         onClick={() => {
                           router.push(
                             `/dashboard/library?folderId=${folder.id}`
-                          ); // Corrected URL
+                          );
                           handleFolderListModalClose();
                         }}
                         leftIcon={
@@ -303,11 +303,28 @@ const DashboardLayout = ({ children }) => {
                 width="100%"
                 onClick={() => {
                   handleFolderListModalClose();
-                  handleFolderModalOpen(); // Open Create Folder Modal
+                  handleFolderModalOpen();
                 }}
               >
                 Create New Folder
               </Button>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        {/* Task List Modal for Mobile */}
+        <Modal
+          isOpen={isTaskListModalOpen}
+          onClose={handleTaskListModalClose}
+          isCentered
+          size="md"
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Tasks</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <TaskSidebar />
             </ModalBody>
           </ModalContent>
         </Modal>
