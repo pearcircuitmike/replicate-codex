@@ -326,7 +326,7 @@ export default function Home() {
                 <Flex alignItems="center" mb={4}>
                   <Icon as={CheckCircleIcon} color="green.500" mr={2} />
                   <Text fontSize="xl">
-                    See what's popular with other researchers
+                    See what&apos;s popular with other researchers
                   </Text>
                 </Flex>
                 <Flex alignItems="center" mb={4}>
