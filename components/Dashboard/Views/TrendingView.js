@@ -26,17 +26,12 @@ const TrendingView = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
-  // Helper function to get the start of the week
-  const getStartOfWeek = (date) => {
-    const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - date.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-    return startOfWeek;
-  };
-
   useEffect(() => {
     async function fetchData() {
-      const startDate = getStartOfWeek(new Date());
+      // Use the current date, set to midnight UTC
+      const startDate = new Date();
+      startDate.setUTCHours(0, 0, 0, 0);
+      console.log(startDate.toISOString());
 
       try {
         const [

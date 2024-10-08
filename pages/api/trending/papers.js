@@ -27,6 +27,9 @@ export default async function handler(req, res) {
   const endDate = new Date(start.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   try {
+    console.log("Start Date:", start.toISOString());
+    console.log("End Date:", endDate.toISOString());
+
     const { data, error } = await supabase
       .from(`${platform}PapersData`)
       .select("id, slug, totalScore, title, platform, thumbnail")
