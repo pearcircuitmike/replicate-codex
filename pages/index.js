@@ -177,7 +177,7 @@ export default function Home() {
             <Flex direction="column" gap={8}>
               {/* Discover AI breakthroughs */}
               <Flex
-                direction={isMobile ? "column" : "row"} // Stack on mobile
+                direction={isMobile ? "column" : "row"}
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -205,7 +205,7 @@ export default function Home() {
 
               {/* Skim summaries of each discovery */}
               <Flex
-                direction={isMobile ? "column" : "row"} // Stack on mobile
+                direction={isMobile ? "column" : "row"}
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -232,7 +232,7 @@ export default function Home() {
 
               {/* Meet helpful experts and friends */}
               <Flex
-                direction={isMobile ? "column" : "row"} // Stack on mobile
+                direction={isMobile ? "column" : "row"}
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -262,7 +262,7 @@ export default function Home() {
 
               {/* Subscription section with special formatting */}
               <Flex
-                direction={isMobile ? "column" : "row"} // Stack on mobile
+                direction={isMobile ? "column" : "row"}
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}

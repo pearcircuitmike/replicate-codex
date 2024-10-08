@@ -6,13 +6,13 @@ import "slick-carousel/slick/slick-theme.css";
 
 const Testimonials = () => {
   const settings = {
-    dots: true, // Show navigation dots
-    infinite: true, // Loop the slider
-    speed: 1000, // Transition speed
-    slidesToShow: 1, // Show one slide at a time
-    slidesToScroll: 1, // Scroll one slide at a time
-    autoplay: true, // Enable automatic scrolling
-    autoplaySpeed: 5000, // Autoplay every 5 seconds
+    dots: true,
+    infinite: true,
+    speed: 1000,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 5000,
   };
 
   const testimonialsData = [
@@ -82,7 +82,7 @@ const Testimonials = () => {
               justifyContent="space-between"
             >
               <Text fontSize="md" textAlign="center" mb={4} color="gray.600">
-                "{testimonial.text}"
+                &ldquo;{testimonial.text}&rdquo;
               </Text>
               <Flex alignItems="center" justifyContent="center" width="100%">
                 <Avatar
