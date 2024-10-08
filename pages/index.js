@@ -1,5 +1,3 @@
-// pages/index.js
-
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useMediaQuery } from "@chakra-ui/react";
 import {
@@ -212,12 +210,8 @@ export default function Home() {
                 <Box display="flex" alignItems="center" mb={4}>
                   <Box as={CheckCircleIcon} color="green.500" mr={2} />
                   <Text fontSize="xl">
-<<<<<<< Updated upstream
                     Guides to the top models, papers and tools - no PhD
                     required!
-=======
-                    See what&apos;s popular with other researchers
->>>>>>> Stashed changes
                   </Text>
                 </Box>
                 <Box display="flex" alignItems="center">
