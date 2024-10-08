@@ -17,9 +17,10 @@ import Feed from "../../Feed/Feed";
 import SemanticSearchBar from "../../Common/SemanticSearchBar";
 import TimeRangeFilter from "../../Common/TimeRangeFilter";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
+import { trackEvent } from "@/pages/api/utils/analytics-util"; // Track events like search
 
 const DiscoverView = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(0); // 0 for Papers, 1 for Models
   const [isSearching, setIsSearching] = useState(false);
   const [resultCounts, setResultCounts] = useState({
     papers: null,
@@ -91,6 +92,12 @@ const DiscoverView = () => {
         // Ignore outdated response
         return;
       }
+
+      // Track the search event
+      trackEvent("semantic_search", {
+        query: trimmedQuery,
+        resource_type: activeTab === 0 ? "paper" : "model",
+      });
 
       updateResultCount("papers", papersData.data.length);
       updateResultCount("models", modelsData.data.length);

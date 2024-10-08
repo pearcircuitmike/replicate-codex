@@ -23,14 +23,6 @@ const LandingPageTrending = lazy(() =>
   import("../components/LandingPageTrending")
 );
 
-// Function to get the start of the current week (Sunday)
-const getStartOfWeek = (date) => {
-  const startOfWeek = new Date(date);
-  startOfWeek.setDate(date.getDate() - date.getDay());
-  startOfWeek.setHours(0, 0, 0, 0); // Reset time to midnight
-  return startOfWeek;
-};
-
 // Counter component to handle the counting effect with commas
 const Counter = ({ start, end }) => {
   const [count, setCount] = useState(start);
@@ -92,14 +84,17 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const startDate = getStartOfWeek(new Date()).toISOString();
+      // Use the current date, set to midnight UTC
+      const startDate = new Date();
+      startDate.setUTCHours(0, 0, 0, 0);
+      const startDateString = startDate.toISOString();
 
       try {
         const [papersRes, modelsRes] = await Promise.all([
           fetch(
-            `/api/trending/papers?platform=arxiv&startDate=${startDate}&limit=8`
+            `/api/trending/papers?platform=arxiv&startDate=${startDateString}&limit=8`
           ),
-          fetch(`/api/trending/models?startDate=${startDate}&limit=8`),
+          fetch(`/api/trending/models?startDate=${startDateString}&limit=8`),
         ]);
 
         if (!papersRes.ok || !modelsRes.ok) {

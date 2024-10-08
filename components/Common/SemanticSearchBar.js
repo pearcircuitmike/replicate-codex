@@ -9,6 +9,7 @@ const SemanticSearchBar = ({
   onSearchSubmit,
   placeholder = "Search...",
   initialSearchValue = "",
+  resourceType, // Added resourceType as a prop
 }) => {
   const [searchValue, setSearchValue] = useState(initialSearchValue);
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -17,9 +18,12 @@ const SemanticSearchBar = ({
   const debouncedSearch = useCallback(
     debounce((value) => {
       onSearchSubmit(value);
-      trackEvent("semantic_search", { query: value }); // Track semantic search event
+      trackEvent("semantic_search", {
+        resource_type: resourceType,
+        query: value,
+      }); // Track semantic search with resourceType
     }, 100),
-    [onSearchSubmit]
+    [onSearchSubmit, resourceType]
   );
 
   const handleChange = (e) => {
@@ -31,7 +35,7 @@ const SemanticSearchBar = ({
   const handleClear = () => {
     setSearchValue("");
     onSearchSubmit(""); // Clear the search results
-    trackEvent("semantic_search", { query: "" }); // Track clear search event
+    trackEvent("semantic_search", { resource_type: resourceType, query: "" }); // Track clear search event with resourceType
   };
 
   useEffect(() => {
@@ -74,6 +78,7 @@ SemanticSearchBar.propTypes = {
   onSearchSubmit: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   initialSearchValue: PropTypes.string,
+  resourceType: PropTypes.string.isRequired, // Define resourceType as required
 };
 
 export default SemanticSearchBar;
