@@ -10,6 +10,7 @@ import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/Common/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
 import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json";
+import { trackEvent } from "../api/utils/analytics-util"; // Import event tracking utility
 
 export async function getServerSideProps({ query }) {
   const currentPage = parseInt(query.page || "1", 10);
@@ -115,6 +116,10 @@ const ModelsIndexPage = ({
   const handleSearchSubmit = (value) => {
     setSearchValue(value);
     setCurrentPage(1);
+    trackEvent("semantic_search", {
+      query: value,
+      resource_type: "model", // Track search for models
+    });
   };
 
   const handleCategoryChange = (updatedCategories) => {
@@ -177,6 +182,7 @@ const ModelsIndexPage = ({
           placeholder="Search by model name..."
           onSearchSubmit={handleSearchSubmit}
           initialSearchValue={initialSearch}
+          resourceType="model" // Ensure the resourceType is passed
         />
         <CategoryFilter
           categoryDescriptions={modelCategoryDescriptions}

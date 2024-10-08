@@ -9,45 +9,52 @@ const SemanticSearchBar = ({
   onSearchSubmit,
   placeholder = "Search...",
   initialSearchValue = "",
-  resourceType, // Added resourceType as a prop
+  resourceType,
 }) => {
   const [searchValue, setSearchValue] = useState(initialSearchValue);
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
+  // Debounce search submission (e.g., to the backend)
+  const debouncedSearchSubmit = useCallback(
     debounce((value) => {
-      onSearchSubmit(value);
+      onSearchSubmit(value); // Submit the search after debouncing
+    }, 300), // Adjust debounce delay as needed
+    [onSearchSubmit]
+  );
+
+  // Debounce event tracking for search (separate from search submission)
+  const debouncedTrackEvent = useCallback(
+    debounce((value) => {
       trackEvent("semantic_search", {
         resource_type: resourceType,
         query: value,
       }); // Track semantic search with resourceType
-    }, 100),
-    [onSearchSubmit, resourceType]
+    }, 500), // Adjust debounce delay as needed for tracking
+    [resourceType]
   );
 
   const handleChange = (e) => {
     const value = e.target.value;
     setSearchValue(value);
-    debouncedSearch(value);
+    debouncedSearchSubmit(value); // Trigger debounced search submit
+    debouncedTrackEvent(value); // Trigger debounced event tracking
   };
 
   const handleClear = () => {
     setSearchValue("");
     onSearchSubmit(""); // Clear the search results
-    trackEvent("semantic_search", { resource_type: resourceType, query: "" }); // Track clear search event with resourceType
+    trackEvent("semantic_search", { resource_type: resourceType, query: "" }); // Track clear search event
   };
 
   useEffect(() => {
-    // Update searchValue when initialSearchValue changes (only on initial load)
     if (initialSearchValue) {
       setSearchValue(initialSearchValue);
     }
-    // Cleanup debounced function on unmount
     return () => {
-      debouncedSearch.cancel();
+      debouncedSearchSubmit.cancel();
+      debouncedTrackEvent.cancel();
     };
-  }, [initialSearchValue, debouncedSearch]);
+  }, [initialSearchValue, debouncedSearchSubmit, debouncedTrackEvent]);
 
   return (
     <Box display="flex" alignItems="center" width="100%" position="relative">

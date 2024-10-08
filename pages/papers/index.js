@@ -161,6 +161,7 @@ const PapersIndexPage = ({
           placeholder="Search papers by title or arXiv ID..."
           onSearchSubmit={handleSearchSubmit}
           initialSearchValue={initialSearch}
+          resourceType="paper" // Pass resourceType to SemanticSearchBar
         />
         <Box mt={2}>
           <TimeRangeFilter
