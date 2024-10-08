@@ -3,6 +3,7 @@ import { Box, Text, SimpleGrid, Avatar } from "@chakra-ui/react";
 
 const Testimonials = () => {
   return (
+<<<<<<< Updated upstream
     <SimpleGrid columns={[1, 2, 2, 4]} spacing={8}>
       <Box bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
         <Box p={6}>
@@ -22,6 +23,23 @@ const Testimonials = () => {
               <Text fontWeight="bold">Philip P.</Text>
               <Text fontSize="sm" color="gray.500">
                 AI Founder
+=======
+    <Box maxWidth="400px" margin="0 auto">
+      <Slider {...settings}>
+        {testimonialsData.map((testimonial, index) => (
+          <Box key={index} p={2}>
+            <Flex
+              direction="column"
+              alignItems="center"
+              bg="white"
+              borderRadius="md"
+              boxShadow="md"
+              p={6}
+              justifyContent="space-between"
+            >
+              <Text fontSize="md" textAlign="center" mb={4} color="gray.600">
+                &quot;{testimonial.text}&quot;
+>>>>>>> Stashed changes
               </Text>
             </Box>
           </Box>
