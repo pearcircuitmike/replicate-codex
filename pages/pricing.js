@@ -11,7 +11,8 @@ import {
   Container,
   HStack,
   keyframes,
-  Image,
+  Flex,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useAuth } from "../context/AuthContext";
@@ -29,6 +30,7 @@ const PricingPage = () => {
   const [isYearly, setIsYearly] = useState(false);
   const price = isYearly ? 8 : 9;
   const billingPeriod = isYearly ? "mo" : "month";
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const handleSubscription = () => {
     const stripeUrl = isYearly
@@ -38,7 +40,6 @@ const PricingPage = () => {
     const url = new URL(stripeUrl);
     url.searchParams.append("client_reference_id", user.id);
 
-    // Track the subscription event
     trackEvent("subscription_initiated", {
       plan_type: isYearly ? "yearly" : "monthly",
       price: price,
@@ -48,52 +49,49 @@ const PricingPage = () => {
     window.location.href = url.toString();
   };
 
-  return (
-    <Box my={4}>
-      <Box textAlign="center" mb={6}>
-        <Heading size="xl" mb={6}>
-          Complete signup to access your dashboard
-        </Heading>
+  const PricingContent = () => (
+    <Box width="100%" maxW="500px" mx="auto">
+      <Heading size="xl" mb={6} textAlign="center">
+        Complete signup to access your dashboard
+      </Heading>
 
-        <HStack justify="center" mb={4}>
-          <Button
-            onClick={() => setIsYearly(false)}
-            bg={!isYearly ? "white" : "gray.100"}
-            color={!isYearly ? "gray.800" : "gray.500"}
-            border="1px solid"
-            borderColor={!isYearly ? "gray.200" : "transparent"}
-            _hover={{ bg: !isYearly ? "white" : "gray.200" }}
-            borderRadius="md"
-            px={6}
-            py={2}
-            fontWeight={!isYearly ? "semibold" : "normal"}
-          >
-            🔥 Monthly (Most Popular)
-          </Button>
-          <Button
-            onClick={() => setIsYearly(true)}
-            bg={isYearly ? "white" : "gray.100"}
-            color={isYearly ? "gray.800" : "gray.500"}
-            border="1px solid"
-            borderColor={isYearly ? "gray.200" : "transparent"}
-            _hover={{ bg: isYearly ? "white" : "gray.200" }}
-            borderRadius="md"
-            px={6}
-            py={2}
-            fontWeight={isYearly ? "semibold" : "normal"}
-          >
-            Yearly
-          </Button>
-        </HStack>
-      </Box>
+      <HStack justify="center" mb={4}>
+        <Button
+          onClick={() => setIsYearly(false)}
+          bg={!isYearly ? "white" : "gray.100"}
+          color={!isYearly ? "gray.800" : "gray.500"}
+          border="1px solid"
+          borderColor={!isYearly ? "gray.200" : "transparent"}
+          _hover={{ bg: !isYearly ? "white" : "gray.200" }}
+          borderRadius="md"
+          px={6}
+          py={2}
+          fontWeight={!isYearly ? "semibold" : "normal"}
+        >
+          🔥 Monthly (Most Popular)
+        </Button>
+        <Button
+          onClick={() => setIsYearly(true)}
+          bg={isYearly ? "white" : "gray.100"}
+          color={isYearly ? "gray.800" : "gray.500"}
+          border="1px solid"
+          borderColor={isYearly ? "gray.200" : "transparent"}
+          _hover={{ bg: isYearly ? "white" : "gray.200" }}
+          borderRadius="md"
+          px={6}
+          py={2}
+          fontWeight={isYearly ? "semibold" : "normal"}
+        >
+          Yearly
+        </Button>
+      </HStack>
+
       <Box
         as={Link}
         onClick={handleSubscription}
         cursor="pointer"
         _hover={{ textDecoration: "none" }}
         display="block"
-        maxW="md"
-        mx="auto"
       >
         <Box
           p={6}
@@ -140,7 +138,7 @@ const PricingPage = () => {
           >
             Start 7-day free trial
           </Button>
-          <List spacing={4} textAlign="left" mt={8}>
+          <List spacing={4} textAlign="left" mt={8} mx={4}>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
               Bookmark resources for easy reference
@@ -172,18 +170,49 @@ const PricingPage = () => {
           </List>
         </Box>
       </Box>
-      <Box p={4}>
-        <Heading as="h2" fontSize="3xl" mt="50px" mb={4} textAlign="center">
-          What our subscribers say
-        </Heading>
-        <Testimonials />
-      </Box>
-      <Box mt={"150px"} textAlign="center">
+    </Box>
+  );
+
+  return (
+    <Container
+      maxW="container.xl"
+      h="100vh"
+      py={8}
+      display="flex"
+      flexDirection="column"
+    >
+      <Flex
+        flex="1"
+        direction={isMobile ? "column" : "row"}
+        justify="center"
+        align="center"
+        spacing={8}
+      >
+        <Box
+          width={isMobile ? "100%" : "50%"}
+          pr={isMobile ? 0 : 4}
+          mb={isMobile ? 8 : 0}
+        >
+          <PricingContent />
+        </Box>
+        <Box
+          width={isMobile ? "100%" : "50%"}
+          pl={isMobile ? 0 : 4}
+          maxW="500px"
+          mx="auto"
+        >
+          <Heading as="h2" fontSize="3xl" mb={4} textAlign="center">
+            What our subscribers say
+          </Heading>
+          <Testimonials />
+        </Box>
+      </Flex>
+      <Box mt={10} textAlign="center">
         <Link as={NextLink} href="/">
           Back to Home
         </Link>
       </Box>
-    </Box>
+    </Container>
   );
 };
 

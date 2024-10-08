@@ -1,23 +1,28 @@
 // components/LandingPageTrending.js
 
 import React from "react";
-import { Box, Heading, VStack, SimpleGrid } from "@chakra-ui/react";
+import { Box, Heading, HStack } from "@chakra-ui/react";
 import ResourceCard from "@/components/ResourceCard";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
-const LandingPageTrending = ({
-  trendingModels,
-  trendingPapers,
-  trendingCreators,
-  trendingAuthors,
-  isLoading,
-}) => {
+const LandingPageTrending = ({ trendingModels, trendingPapers, isLoading }) => {
   const renderSection = (title, items, renderItem) => (
-    <Box>
+    <Box mb={8}>
       <Heading as="h2" size="md" mb={4}>
         {title}
       </Heading>
-      <VStack spacing={4} align="stretch">
+      <HStack
+        spacing={4}
+        overflowX="auto"
+        pb={2}
+        css={{
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+        }}
+      >
         {isLoading
           ? Array.from({ length: 4 }).map((_, index) => (
               <React.Fragment key={index}>
@@ -25,7 +30,7 @@ const LandingPageTrending = ({
               </React.Fragment>
             ))
           : items.map(renderItem)}
-      </VStack>
+      </HStack>
     </Box>
   );
 
@@ -43,20 +48,6 @@ const LandingPageTrending = ({
     />
   );
 
-  const renderAuthor = (authorData) => (
-    <ResourceCard
-      key={authorData.author}
-      href={`/authors/${encodeURIComponent("arxiv")}/${encodeURIComponent(
-        authorData.author
-      )}`}
-      title={authorData.author}
-      subtitle="Platform: arxiv"
-      score={formatLargeNumber(authorData.totalAuthorScore)}
-      scoreLabel="Author Score"
-      placeholderTitle="Author"
-    />
-  );
-
   const renderModel = (model) => (
     <ResourceCard
       key={model.id}
@@ -70,28 +61,10 @@ const LandingPageTrending = ({
     />
   );
 
-  const renderCreator = (creator) => (
-    <ResourceCard
-      key={creator.id}
-      href={`/creators/${encodeURIComponent(
-        creator.platform
-      )}/${encodeURIComponent(creator.creator)}`}
-      title={creator.creator}
-      subtitle={`Platform: ${creator.platform}`}
-      score={formatLargeNumber(Math.floor(creator.totalCreatorScore))}
-      scoreLabel="Creator Score"
-      placeholderTitle="Creator"
-    />
-  );
-
   return (
     <Box px={"5vw"} color="gray.700">
-      <SimpleGrid columns={[1, 2, 2, 4]} spacing={8}>
-        {renderSection("Breakout papers", trendingPapers, renderPaper)}
-        {renderSection("Star researchers", trendingAuthors, renderAuthor)}
-        {renderSection("Trending models", trendingModels, renderModel)}
-        {renderSection("Top builders", trendingCreators, renderCreator)}
-      </SimpleGrid>
+      {renderSection("Breakout papers", trendingPapers, renderPaper)}
+      {renderSection("Trending models", trendingModels, renderModel)}
     </Box>
   );
 };

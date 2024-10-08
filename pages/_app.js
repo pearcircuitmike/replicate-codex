@@ -110,7 +110,7 @@ function AppContent({ Component, pageProps }) {
     if (!user) {
       const timer = setTimeout(() => {
         onOpen();
-      }, 15000); // Open the modal after 15 seconds if the user is not authenticated
+      }, 1200000); // Open the modal after 1200 seconds if the user is not authenticated
       return () => clearTimeout(timer);
     }
   }, [user, onOpen]);
