@@ -5,10 +5,9 @@ import {
   Box,
   Heading,
   Text,
-  SimpleGrid,
+  HStack,
   useMediaQuery,
   Spinner,
-  VStack,
 } from "@chakra-ui/react";
 import ResourceCard from "@/components/ResourceCard";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
@@ -107,123 +106,165 @@ const TrendingView = () => {
     fetchData();
   }, []);
 
-  // Configuration for each trending section
+  // Helper function to render each section
+  const renderSection = (title, description, items, renderItem) => (
+    <Box mb={8}>
+      <Heading as="h2" size="md" mb={4}>
+        {title}
+      </Heading>
+      <Text color="gray.500" mb={4} fontSize="sm">
+        {description}
+      </Text>
+      <HStack
+        spacing={4}
+        overflowX="auto"
+        pb={2}
+        css={{
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+        }}
+      >
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <ResourceCard key={index} isLoading />
+          ))
+        ) : items.length > 0 ? (
+          items.map(renderItem)
+        ) : (
+          <Text>No data available.</Text>
+        )}
+      </HStack>
+    </Box>
+  );
+
+  // Define sections with their respective render functions
   const sections = [
     {
       title: "📈 Top Research Areas",
       description: "Explore the most active research areas today.",
       data: trendingData.trendingTopics,
-      isLoading,
-      renderCard: (topic) => ({
-        href: `/dashboard/explore/${topic.id}`,
-        title: topic.topic_name,
-        description: topic.keywords.slice(0, 3).join(", "),
-        subtitle: undefined,
-        score: undefined,
-        scoreLabel: "Score",
-        imageSrc: undefined,
-        placeholderTitle: "Topic",
-      }),
+      renderItem: (topic) => (
+        <ResourceCard
+          key={topic.id}
+          href={`/dashboard/explore/${topic.id}`}
+          title={topic.topic_name}
+          description={topic.keywords.slice(0, 3).join(", ")}
+          placeholderTitle="Topic"
+          isLoading={isLoading}
+        />
+      ),
     },
     {
       title: "🏆 Most Read Papers",
       description: "Check out the most read papers of the day.",
       data: trendingData.topViewedPapers,
-      isLoading,
-      renderCard: (paper) => ({
-        href: `/papers/arxiv/${paper.slug}`,
-        title: paper.title,
-        description: undefined,
-        subtitle: `${paper.view_count} views`,
-        score: undefined,
-        scoreLabel: "Views",
-        imageSrc: undefined,
-        placeholderTitle: "Paper",
-      }),
+      renderItem: (paper) => (
+        <ResourceCard
+          key={paper.id}
+          href={`/papers/arxiv/${paper.slug}`}
+          title={paper.title}
+          subtitle={`${paper.view_count} views`}
+          score={paper.view_count}
+          scoreLabel="Views"
+          placeholderTitle="Paper"
+          isLoading={isLoading}
+        />
+      ),
     },
     {
       title: "🔍 Top Searches",
       description: "See what the community is searching for.",
       data: trendingData.topSearchQueries,
-      isLoading,
-      renderCard: (query) => ({
-        href: `/dashboard/discover?q=${encodeURIComponent(query.search_query)}`,
-        title: query.search_query,
-        description: undefined,
-        subtitle: `Type: ${query.resource_type}`,
-        score: undefined,
-        scoreLabel: "Searches",
-        imageSrc: undefined,
-        placeholderTitle: "Search Query",
-      }),
+      renderItem: (query) => (
+        <ResourceCard
+          key={query.id || query.uuid || query.search_query}
+          href={`/dashboard/discover?q=${encodeURIComponent(
+            query.search_query
+          )}`}
+          title={query.search_query}
+          subtitle={`Type: ${query.resource_type}`}
+          score={query.search_count}
+          scoreLabel="Searches"
+          placeholderTitle="Search Query"
+          isLoading={isLoading}
+        />
+      ),
     },
     {
       title: "📄 Breakout Papers",
       description: "Discover breakthrough papers.",
       data: trendingData.papers,
-      isLoading,
-      renderCard: (paper) => ({
-        href: `/papers/${encodeURIComponent(
-          paper.platform
-        )}/${encodeURIComponent(paper.slug)}`,
-        title: paper.title,
-        description: undefined,
-        subtitle: undefined,
-        score: Math.floor(paper.totalScore),
-        scoreLabel: "Total Score",
-        imageSrc: paper.thumbnail,
-        placeholderTitle: "Paper",
-      }),
-    },
-    {
-      title: "👩‍🔬 Star Researchers",
-      description: "Meet the top researchers leading.",
-      data: trendingData.authors,
-      isLoading,
-      renderCard: (author) => ({
-        href: `/authors/arxiv/${encodeURIComponent(author.author)}`,
-        title: author.author,
-        description: undefined,
-        subtitle: "Platform: arxiv",
-        score: formatLargeNumber(author.totalAuthorScore),
-        scoreLabel: "Author Score",
-        imageSrc: undefined,
-        placeholderTitle: "Author",
-      }),
-    },
-    {
-      title: "🤖 Trending Models",
-      description: "Explore trending AI models in the industry.",
-      data: trendingData.models,
-      isLoading,
-      renderCard: (model) => ({
-        href: `/models/${model.platform}/${encodeURIComponent(model.slug)}`,
-        title: model.modelName,
-        description: undefined,
-        subtitle: `Creator: ${model.creator}`,
-        score: formatLargeNumber(Math.floor(model.totalScore)),
-        scoreLabel: "Total Score",
-        imageSrc: model.example,
-        placeholderTitle: "Model",
-      }),
+      renderItem: (paper) => (
+        <ResourceCard
+          key={paper.id}
+          href={`/papers/${encodeURIComponent(
+            paper.platform
+          )}/${encodeURIComponent(paper.slug)}`}
+          title={paper.title}
+          score={Math.floor(paper.totalScore)}
+          scoreLabel="Total Score"
+          imageSrc={paper.thumbnail}
+          placeholderTitle="Paper"
+          isLoading={isLoading}
+        />
+      ),
     },
     {
       title: "👷‍♂️ Top Builders",
       description: "Learn about the top model creators.",
       data: trendingData.creators,
-      isLoading,
-      renderCard: (creator) => ({
-        href: `/creators/${encodeURIComponent(
-          creator.platform
-        )}/${encodeURIComponent(creator.creator)}`,
-        title: creator.creator,
-        description: undefined,
-        subtitle: `Platform: ${creator.platform}`,
-        score: formatLargeNumber(Math.floor(creator.totalCreatorScore)),
-        scoreLabel: "Creator Score",
-        imageSrc: undefined,
-        placeholderTitle: "Creator",
-      }),
+      renderItem: (creator) => (
+        <ResourceCard
+          key={creator.id || creator.uuid || creator.creator}
+          href={`/creators/${encodeURIComponent(
+            creator.platform
+          )}/${encodeURIComponent(creator.creator)}`}
+          title={creator.creator}
+          subtitle={`Platform: ${creator.platform}`}
+          score={formatLargeNumber(Math.floor(creator.totalCreatorScore))}
+          scoreLabel="Creator Score"
+          placeholderTitle="Creator"
+          isLoading={isLoading}
+        />
+      ),
+    },
+    {
+      title: "👩‍🔬 Star Researchers",
+      description: "Meet the top researchers leading.",
+      data: trendingData.authors,
+      renderItem: (author) => (
+        <ResourceCard
+          key={author.id || author.uuid || author.author}
+          href={`/authors/arxiv/${encodeURIComponent(author.author)}`}
+          title={author.author}
+          subtitle="Platform: arxiv"
+          score={formatLargeNumber(author.totalAuthorScore)}
+          scoreLabel="Author Score"
+          placeholderTitle="Author"
+          isLoading={isLoading}
+        />
+      ),
+    },
+    {
+      title: "🤖 Trending Models",
+      description: "Explore trending AI models in the industry.",
+      data: trendingData.models,
+      renderItem: (model) => (
+        <ResourceCard
+          key={model.id}
+          href={`/models/${model.platform}/${encodeURIComponent(model.slug)}`}
+          title={model.modelName}
+          subtitle={`Creator: ${model.creator}`}
+          score={formatLargeNumber(Math.floor(model.totalScore))}
+          scoreLabel="Total Score"
+          imageSrc={model.example}
+          placeholderTitle="Model"
+          isLoading={isLoading}
+        />
+      ),
     },
   ];
 
@@ -243,47 +284,17 @@ const TrendingView = () => {
         </Text>
       )}
 
-      {isLoading ? (
+      {isLoading && trendingData.trendingTopics.length === 0 ? (
         <Spinner size="xl" alignSelf="center" />
       ) : (
-        <SimpleGrid
-          columns={{ base: 1, sm: 1, md: 2, lg: 4 }}
-          spacing={6}
-          mb={6}
-        >
-          {sections.map((section, index) => (
-            <Box key={index}>
-              {/* Section Header */}
-              <Heading as="h2" size="md" mt={6}>
-                {section.title}
-              </Heading>
-              {/* Section Description */}
-              <Text color="gray.500" mb={4} fontSize="sm">
-                {section.description}
-              </Text>
-              {/* Resource Cards */}
-              <VStack spacing={4} align="stretch">
-                {section.data.length > 0 ? (
-                  section.data.map((item, idx) => (
-                    <ResourceCard
-                      key={
-                        item.id ||
-                        item.uuid ||
-                        item.author ||
-                        item.slug ||
-                        `${section.title}-${index}-${idx}`
-                      }
-                      {...section.renderCard(item)}
-                      isLoading={section.isLoading}
-                    />
-                  ))
-                ) : (
-                  <Text>No data available.</Text>
-                )}
-              </VStack>
-            </Box>
-          ))}
-        </SimpleGrid>
+        sections.map((section, index) =>
+          renderSection(
+            section.title,
+            section.description,
+            section.data,
+            section.renderItem
+          )
+        )
       )}
     </Box>
   );
