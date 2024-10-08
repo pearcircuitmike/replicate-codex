@@ -182,6 +182,7 @@ export default function Home() {
             <Flex direction="column" gap={8}>
               {/* Discover AI breakthroughs */}
               <Flex
+                direction={isMobile ? "column" : "row"} // Stack on mobile
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -190,16 +191,16 @@ export default function Home() {
                 borderRadius="md"
                 boxShadow="md"
               >
-                <Box>
-                  <Heading as="h3" fontSize="2xl" mb={4}>
+                <Box mb={isMobile ? 4 : 0}>
+                  <Heading as="h3" fontSize={isMobile ? "xl" : "2xl"} mb={4}>
                     Discover AI breakthroughs
                   </Heading>
-                  <Text fontSize="lg">
+                  <Text fontSize={isMobile ? "md" : "lg"}>
                     Our listening algorithm identifies the AI developments with
                     the biggest impact.
                   </Text>
                 </Box>
-                <Box textAlign="right">
+                <Box textAlign={isMobile ? "center" : "right"}>
                   <Stat>
                     <Counter start={0} end={3485} />
                     <StatLabel>Papers and models released this week</StatLabel>
@@ -209,6 +210,7 @@ export default function Home() {
 
               {/* Skim summaries of each discovery */}
               <Flex
+                direction={isMobile ? "column" : "row"} // Stack on mobile
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -217,15 +219,15 @@ export default function Home() {
                 borderRadius="md"
                 boxShadow="md"
               >
-                <Box>
-                  <Heading as="h3" fontSize="2xl" mb={4}>
+                <Box mb={isMobile ? 4 : 0}>
+                  <Heading as="h3" fontSize={isMobile ? "xl" : "2xl"} mb={4}>
                     Skim summaries of each discovery
                   </Heading>
-                  <Text fontSize="lg">
+                  <Text fontSize={isMobile ? "md" : "lg"}>
                     We translate models and papers into short, clear guides.
                   </Text>
                 </Box>
-                <Box textAlign="right">
+                <Box textAlign={isMobile ? "center" : "right"}>
                   <Stat>
                     <Counter start={0} end={3283} />
                     <StatLabel>Summaries created</StatLabel>
@@ -235,6 +237,7 @@ export default function Home() {
 
               {/* Meet helpful experts and friends */}
               <Flex
+                direction={isMobile ? "column" : "row"} // Stack on mobile
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -243,16 +246,16 @@ export default function Home() {
                 borderRadius="md"
                 boxShadow="md"
               >
-                <Box>
-                  <Heading as="h3" fontSize="2xl" mb={4}>
+                <Box mb={isMobile ? 4 : 0}>
+                  <Heading as="h3" fontSize={isMobile ? "xl" : "2xl"} mb={4}>
                     Meet helpful experts and friends
                   </Heading>
-                  <Text fontSize="lg">
+                  <Text fontSize={isMobile ? "md" : "lg"}>
                     Join the Discord to chat with the creators and builders
                     behind the breakthroughs.
                   </Text>
                 </Box>
-                <Box textAlign="right">
+                <Box textAlign={isMobile ? "center" : "right"}>
                   <Stat>
                     <Counter start={0} end={2117} />
                     <StatLabel>
@@ -264,6 +267,7 @@ export default function Home() {
 
               {/* Subscription section with special formatting */}
               <Flex
+                direction={isMobile ? "column" : "row"} // Stack on mobile
                 justifyContent="space-between"
                 alignItems="center"
                 px={6}
@@ -272,15 +276,20 @@ export default function Home() {
                 borderRadius="md"
                 boxShadow="md"
               >
-                <Box>
-                  <Heading as="h3" fontSize="2xl" mb={4} color="black">
+                <Box mb={isMobile ? 4 : 0}>
+                  <Heading
+                    as="h3"
+                    fontSize={isMobile ? "xl" : "2xl"}
+                    mb={4}
+                    color="black"
+                  >
                     Subscribe now for personalized insights
                   </Heading>
-                  <Text fontSize="lg" color="black">
+                  <Text fontSize={isMobile ? "md" : "lg"} color="black">
                     Get exclusive access to our AI community and more!
                   </Text>
                 </Box>
-                <Box textAlign="right">
+                <Box textAlign={isMobile ? "center" : "right"}>
                   <Stat>
                     <Counter start={0} end={312} />
                     <StatLabel color="black">
