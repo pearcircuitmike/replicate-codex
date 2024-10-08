@@ -225,7 +225,7 @@ export default function Home() {
                 <Box textAlign={isMobile ? "center" : "right"}>
                   <Stat>
                     <Counter start={0} end={3283} />
-                    <StatLabel>Summaries created</StatLabel>
+                    <StatLabel>Summaries created this week</StatLabel>
                   </Stat>
                 </Box>
               </Flex>
@@ -286,9 +286,9 @@ export default function Home() {
                 </Box>
                 <Box textAlign={isMobile ? "center" : "right"}>
                   <Stat>
-                    <Counter start={0} end={312} />
+                    <Counter start={0} end={497} />
                     <StatLabel color="black">
-                      Other people subscribed today
+                      People signed up this week
                     </StatLabel>
                   </Stat>
                 </Box>
