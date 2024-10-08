@@ -7,7 +7,11 @@ import {
   Wrap,
   WrapItem,
   useToast,
+  Collapse,
+  IconButton,
+  HStack,
 } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons"; // Update to use the correct icons
 import { useAuth } from "@/context/AuthContext";
 import TaskTag from "@/components/TaskTag";
 import supabase from "@/pages/api/utils/supabaseClient";
@@ -15,6 +19,7 @@ import supabase from "@/pages/api/utils/supabaseClient";
 const TaskSidebar = () => {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [openCategory, setOpenCategory] = useState(null); // Track which category is open
   const { user } = useAuth();
   const toast = useToast();
 
@@ -67,14 +72,12 @@ const TaskSidebar = () => {
   }, [user]);
 
   const handleTaskToggle = async (taskId, newFollowStatus) => {
-    // Update local state immediately for responsive UI
     setTasks((currentTasks) =>
       currentTasks.map((task) =>
         task.id === taskId ? { ...task, isFollowed: newFollowStatus } : task
       )
     );
 
-    // Then update the database
     try {
       if (newFollowStatus) {
         await supabase
@@ -95,7 +98,6 @@ const TaskSidebar = () => {
         duration: 3000,
         isClosable: true,
       });
-      // Revert the local state change if the database update failed
       fetchTasks();
     }
   };
@@ -111,6 +113,14 @@ const TaskSidebar = () => {
     return grouped;
   };
 
+  const toggleCategory = (category) => {
+    if (openCategory === category) {
+      setOpenCategory(null); // Close category if it's already open
+    } else {
+      setOpenCategory(category); // Open the clicked category and close others
+    }
+  };
+
   if (isLoading) {
     return (
       <Box textAlign="center" py={4}>
@@ -123,25 +133,43 @@ const TaskSidebar = () => {
 
   return (
     <VStack align="stretch" spacing={4} px={4}>
-      <Text fontSize="lg" fontWeight="bold">
+      <Text fontSize="sm" color="gray.500">
         Tasks
       </Text>
       {Object.keys(groupedTasks).map((category) => (
         <Box key={category}>
-          <Text fontSize="md" fontWeight="semibold" mb={2}>
-            {category}
-          </Text>
-          <Wrap spacing={2}>
-            {groupedTasks[category].map((task) => (
-              <WrapItem key={task.id}>
-                <TaskTag
-                  task={task}
-                  initialIsFollowed={task.isFollowed}
-                  onToggle={(newStatus) => handleTaskToggle(task.id, newStatus)}
-                />
-              </WrapItem>
-            ))}
-          </Wrap>
+          <HStack justify="space-between" align="top">
+            <Text ml={5} fontSize="sm" color="gray.600">
+              {category}
+            </Text>
+            <IconButton
+              icon={
+                openCategory === category ? (
+                  <ChevronUpIcon />
+                ) : (
+                  <ChevronDownIcon />
+                )
+              }
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleCategory(category)}
+            />
+          </HStack>
+          <Collapse in={openCategory === category}>
+            <Wrap spacing={2} ml={5}>
+              {groupedTasks[category].map((task) => (
+                <WrapItem key={task.id}>
+                  <TaskTag
+                    task={task}
+                    initialIsFollowed={task.isFollowed}
+                    onToggle={(newStatus) =>
+                      handleTaskToggle(task.id, newStatus)
+                    }
+                  />
+                </WrapItem>
+              ))}
+            </Wrap>
+          </Collapse>
         </Box>
       ))}
     </VStack>

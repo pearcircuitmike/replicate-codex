@@ -147,15 +147,19 @@ const FolderSidebar = ({ onFolderModalOpen }) => {
           )}
         </Flex>
       ))}
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        onClick={onFolderModalOpen}
-        mt={4}
-        mx={4}
-      >
-        New Folder +
-      </Button>
+      <Box>
+        <Button
+          colorScheme="blue"
+          size="xs"
+          variant="outline"
+          justifyContent="flex-start"
+          onClick={onFolderModalOpen}
+          ml={8}
+          mb={5}
+        >
+          New Folder +
+        </Button>
+      </Box>
 
       <FolderModal
         isOpen={isOpen}

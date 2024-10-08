@@ -154,8 +154,7 @@ const DashboardLayout = ({ children }) => {
         {/* Sidebar for larger screens */}
         {isLargerThan768 && (
           <Box
-            width="370px"
-            bg="white"
+            width="300px"
             py={8}
             overflowY="auto"
             borderRight="1px solid #e2e8f0"
@@ -171,7 +170,7 @@ const DashboardLayout = ({ children }) => {
                 />
               ))}
               <Box px={4} py={2}>
-                <Text fontSize="lg" fontWeight="bold">
+                <Text mt={8} fontSize="sm" color="gray.500">
                   My Folders
                 </Text>
               </Box>
