@@ -1,4 +1,3 @@
-// pages/api/dashboard/top-viewed-papers.js
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -17,9 +16,33 @@ export default async function handler(req, res) {
 
       if (error) throw error;
 
-      res.status(200).json(data);
+      // Fetch the generatedSummary and thumbnail from arxivPapersData for each paper
+      const paperIds = data.map((paper) => paper.uuid);
+      const { data: summaryData, error: summaryError } = await supabase
+        .from("arxivPapersData")
+        .select("id, generatedSummary, thumbnail")
+        .in("id", paperIds);
+
+      if (summaryError) throw summaryError;
+
+      // Merge the summaries and thumbnails with the original data
+      const enrichedData = data.map((paper) => {
+        const matchedSummary = summaryData.find(
+          (summary) => summary.id === paper.uuid
+        );
+        return {
+          ...paper,
+          generatedSummary: matchedSummary?.generatedSummary || null,
+          thumbnail: matchedSummary?.thumbnail || null, // Include the thumbnail
+        };
+      });
+
+      res.status(200).json(enrichedData);
     } catch (error) {
-      console.error("Error fetching top viewed papers:", error);
+      console.error(
+        "Error fetching top viewed papers with summaries and thumbnails:",
+        error
+      );
       res
         .status(500)
         .json({ error: "An error occurred while fetching top viewed papers" });

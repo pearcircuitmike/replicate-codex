@@ -1,5 +1,3 @@
-// components/Dashboard/Views/TrendingView.js
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -11,6 +9,28 @@ import {
 } from "@chakra-ui/react";
 import ResourceCard from "@/components/ResourceCard";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
+
+// Helper to clean and truncate summaries
+const cleanAndTruncateSummary = (summary, type) => {
+  if (!summary) return "No description provided";
+
+  if (type === "model") {
+    summary = summary.replace("## Model overview", "").trim();
+    summary = summary.replace("## Model Overview", "").trim();
+  } else if (type === "paper") {
+    summary = summary.replace("## Overview", "").replace(/-/g, "").trim();
+    summary = summary.replace("## Overview - ", "").replace(/-/g, "").trim();
+  }
+
+  const maxLines = 3;
+  const lines = summary.split("\n").filter(Boolean);
+
+  if (lines.length > maxLines) {
+    return lines.slice(0, maxLines).join(" ") + "...";
+  }
+
+  return lines.join(" ");
+};
 
 const TrendingView = () => {
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
@@ -28,10 +48,8 @@ const TrendingView = () => {
 
   useEffect(() => {
     async function fetchData() {
-      // Use the current date, set to midnight UTC
       const startDate = new Date();
       startDate.setUTCHours(0, 0, 0, 0);
-      console.log(startDate.toISOString());
 
       try {
         const [
@@ -104,7 +122,7 @@ const TrendingView = () => {
   // Helper function to render each section
   const renderSection = (title, description, items, renderItem) => (
     <Box mb={8}>
-      <Heading as="h2" size="md" mb={4}>
+      <Heading as="h2" size="md">
         {title}
       </Heading>
       <Text color="gray.500" mb={4} fontSize="sm">
@@ -113,7 +131,7 @@ const TrendingView = () => {
       <HStack
         spacing={4}
         overflowX="auto"
-        pb={2}
+        py={2}
         css={{
           "&::-webkit-scrollbar": {
             display: "none",
@@ -135,42 +153,148 @@ const TrendingView = () => {
     </Box>
   );
 
-  // Define sections with their respective render functions
+  // Define sections with the updated order
   const sections = [
     {
-      title: "📈 Top Research Areas",
-      description: "Explore the most active research areas today.",
+      title: "Top scoring papers",
+      description: "Papers with the biggest impact on the community",
+      data: trendingData.papers,
+      renderItem: (paper) => {
+        const blurb = cleanAndTruncateSummary(paper.generatedSummary, "paper");
+        return (
+          <ResourceCard
+            key={paper.id}
+            href={`/papers/${encodeURIComponent(
+              paper.platform
+            )}/${encodeURIComponent(paper.slug)}`}
+            title={paper.title}
+            score={Math.floor(paper.totalScore)}
+            scoreLabel="Total Score"
+            imageSrc={paper.thumbnail}
+            blurb={blurb}
+            placeholderTitle="Paper"
+            isLoading={isLoading}
+          />
+        );
+      },
+    },
+    {
+      title: "Most read papers",
+      description: "Papers with the most reads in the last day",
+      data: trendingData.topViewedPapers,
+      renderItem: (paper) => {
+        const blurb = cleanAndTruncateSummary(paper.generatedSummary, "paper");
+        return (
+          <ResourceCard
+            key={paper.id}
+            href={`/papers/arxiv/${paper.slug}`}
+            title={paper.title}
+            subtitle={`${paper.view_count} views`}
+            score={paper.view_count}
+            blurb={blurb}
+            imageSrc={paper.thumbnail}
+            scoreLabel="Views"
+            placeholderTitle="Paper"
+            isLoading={isLoading}
+          />
+        );
+      },
+    },
+    {
+      title: "Popular collections",
+      description:
+        "Explore collections of the top research topics on the site today",
       data: trendingData.trendingTopics,
       renderItem: (topic) => (
         <ResourceCard
           key={topic.id}
           href={`/dashboard/explore/${topic.id}`}
           title={topic.topic_name}
-          description={topic.keywords.slice(0, 3).join(", ")}
+          blurb={
+            `Explore papers related to the following topics: ` +
+            topic.keywords.slice(0, 3).join(", ")
+          }
           placeholderTitle="Topic"
+          isCollection={true}
           isLoading={isLoading}
         />
       ),
     },
     {
-      title: "🏆 Most Read Papers",
-      description: "Check out the most read papers of the day.",
-      data: trendingData.topViewedPapers,
-      renderItem: (paper) => (
+      title: "Top authors",
+      description: "Authors with the most impactful research",
+      data: trendingData.authors,
+      renderItem: (author) => (
         <ResourceCard
-          key={paper.id}
-          href={`/papers/arxiv/${paper.slug}`}
-          title={paper.title}
-          subtitle={`${paper.view_count} views`}
-          score={paper.view_count}
-          scoreLabel="Views"
-          placeholderTitle="Paper"
+          key={author.id || author.uuid || author.author}
+          href={`/authors/arxiv/${encodeURIComponent(author.author)}`}
+          title={author.author}
+          subtitle="Platform: arxiv"
+          score={formatLargeNumber(author.totalAuthorScore)}
+          scoreLabel="Author Score"
+          blurb="Click to see papers by this author"
+          placeholderTitle="Author"
           isLoading={isLoading}
         />
       ),
     },
     {
-      title: "🔍 Top Searches",
+      title: "Top models",
+      description: "The highest scoring AI models",
+      data: trendingData.models,
+      renderItem: (model) => {
+        const creator = [
+          {
+            name: model.creator,
+            link: `/creators/${encodeURIComponent(
+              model.platform
+            )}/${encodeURIComponent(model.creator)}`,
+          },
+        ];
+        const blurb = cleanAndTruncateSummary(model.generatedSummary, "model");
+
+        return (
+          <ResourceCard
+            key={model.id}
+            href={`/models/${model.platform}/${encodeURIComponent(model.slug)}`}
+            title={model.modelName}
+            score={formatLargeNumber(Math.floor(model.totalScore))}
+            scoreLabel="Total Score"
+            imageSrc={model.example}
+            blurb={
+              model.generatedSummary
+                ? blurb
+                : "No description available for this model. Click to learn more!"
+            }
+            owners={creator}
+            placeholderTitle="Model"
+            isLoading={isLoading}
+          />
+        );
+      },
+    },
+    {
+      title: "Top maintainers",
+      description: "The people behind the top models in the community",
+      data: trendingData.creators,
+      renderItem: (creator) => (
+        <ResourceCard
+          key={creator.id || creator.uuid || creator.creator}
+          href={`/creators/${encodeURIComponent(
+            creator.platform
+          )}/${encodeURIComponent(creator.creator)}`}
+          title={creator.creator}
+          blurb={`Click to learn more about ${creator.creator}`}
+          subtitle={`Platform: ${creator.platform}`}
+          score={formatLargeNumber(Math.floor(creator.totalCreatorScore))}
+          scoreLabel="Creator Score"
+          placeholderTitle="Creator"
+          isLoading={isLoading}
+        />
+      ),
+    },
+    {
+      title: "Top searches",
       description: "See what the community is searching for.",
       data: trendingData.topSearchQueries,
       renderItem: (query) => (
@@ -183,80 +307,9 @@ const TrendingView = () => {
           subtitle={`Type: ${query.resource_type}`}
           score={query.search_count}
           scoreLabel="Searches"
+          blurb="Click to view this search"
           placeholderTitle="Search Query"
-          isLoading={isLoading}
-        />
-      ),
-    },
-    {
-      title: "📄 Breakout Papers",
-      description: "Discover breakthrough papers.",
-      data: trendingData.papers,
-      renderItem: (paper) => (
-        <ResourceCard
-          key={paper.id}
-          href={`/papers/${encodeURIComponent(
-            paper.platform
-          )}/${encodeURIComponent(paper.slug)}`}
-          title={paper.title}
-          score={Math.floor(paper.totalScore)}
-          scoreLabel="Total Score"
-          imageSrc={paper.thumbnail}
-          placeholderTitle="Paper"
-          isLoading={isLoading}
-        />
-      ),
-    },
-    {
-      title: "👷‍♂️ Top Builders",
-      description: "Learn about the top model creators.",
-      data: trendingData.creators,
-      renderItem: (creator) => (
-        <ResourceCard
-          key={creator.id || creator.uuid || creator.creator}
-          href={`/creators/${encodeURIComponent(
-            creator.platform
-          )}/${encodeURIComponent(creator.creator)}`}
-          title={creator.creator}
-          subtitle={`Platform: ${creator.platform}`}
-          score={formatLargeNumber(Math.floor(creator.totalCreatorScore))}
-          scoreLabel="Creator Score"
-          placeholderTitle="Creator"
-          isLoading={isLoading}
-        />
-      ),
-    },
-    {
-      title: "👩‍🔬 Star Researchers",
-      description: "Meet the top researchers leading.",
-      data: trendingData.authors,
-      renderItem: (author) => (
-        <ResourceCard
-          key={author.id || author.uuid || author.author}
-          href={`/authors/arxiv/${encodeURIComponent(author.author)}`}
-          title={author.author}
-          subtitle="Platform: arxiv"
-          score={formatLargeNumber(author.totalAuthorScore)}
-          scoreLabel="Author Score"
-          placeholderTitle="Author"
-          isLoading={isLoading}
-        />
-      ),
-    },
-    {
-      title: "🤖 Trending Models",
-      description: "Explore trending AI models in the industry.",
-      data: trendingData.models,
-      renderItem: (model) => (
-        <ResourceCard
-          key={model.id}
-          href={`/models/${model.platform}/${encodeURIComponent(model.slug)}`}
-          title={model.modelName}
-          subtitle={`Creator: ${model.creator}`}
-          score={formatLargeNumber(Math.floor(model.totalScore))}
-          scoreLabel="Total Score"
-          imageSrc={model.example}
-          placeholderTitle="Model"
+          isCollection={true}
           isLoading={isLoading}
         />
       ),
@@ -264,14 +317,10 @@ const TrendingView = () => {
   ];
 
   return (
-    <Box px={"5vw"} color="gray.700" py={isLargerThan480 ? 4 : 2}>
-      <Heading as="h1" size="lg" mb={4}>
+    <Box px={"2vw"} color="gray.700" py={isLargerThan480 ? 4 : 2}>
+      <Heading as="h1" size="xl" mb={8}>
         Trending
       </Heading>
-      <Text mb={6}>
-        Discover the hottest topics, papers, models, and creators making waves
-        in AI today.
-      </Text>
 
       {hasError && (
         <Text color="red.500" mb={4}>

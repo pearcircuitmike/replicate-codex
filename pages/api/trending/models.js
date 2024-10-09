@@ -25,7 +25,9 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from("modelsData")
-      .select("id, slug, creator, modelName, totalScore, platform, example")
+      .select(
+        "id, slug, creator, modelName, totalScore, platform, generatedSummary, example"
+      )
       .order("totalScore", { ascending: false })
       .lte("indexedDate", start.toISOString())
       .gte("indexedDate", endDate.toISOString())

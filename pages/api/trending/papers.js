@@ -32,7 +32,9 @@ export default async function handler(req, res) {
 
     const { data, error } = await supabase
       .from(`${platform}PapersData`)
-      .select("id, slug, totalScore, title, platform, thumbnail")
+      .select(
+        "id, slug, totalScore, title, platform, generatedSummary, thumbnail, authors"
+      )
       .order("totalScore", { ascending: false })
       .lte("indexedDate", start.toISOString())
       .gte("indexedDate", endDate.toISOString())
