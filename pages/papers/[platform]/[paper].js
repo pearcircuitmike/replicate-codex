@@ -209,6 +209,43 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     onOpen();
   };
 
+  const renderContent = (content) => {
+    const overviewStart = content.indexOf("## Overview");
+    const overviewEnd = content.indexOf("## Plain English Explanation");
+
+    if (overviewStart !== -1 && overviewEnd !== -1) {
+      const overview = content.slice(overviewStart, overviewEnd);
+      const restOfContent =
+        content.slice(0, overviewStart) + content.slice(overviewEnd);
+
+      return {
+        overview: (
+          <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
+            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+              {overview}
+            </ReactMarkdown>
+          </Box>
+        ),
+        restOfContent: (
+          <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+            {restOfContent}
+          </ReactMarkdown>
+        ),
+      };
+    }
+
+    return {
+      overview: null,
+      restOfContent: (
+        <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+          {content}
+        </ReactMarkdown>
+      ),
+    };
+  };
+
+  const { overview, restOfContent } = renderContent(paper.generatedSummary);
+
   return (
     <>
       <MetaTags
@@ -219,7 +256,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         description={paper.abstract}
       />
 
-      <Container maxW="container.md" py="12">
+      <Container maxW="container.md" pt="12">
         <Box>
           <Heading as="h1" size="xl" mb={5}>
             {paper.title}
@@ -280,42 +317,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             )}
           </Box>
 
-          <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
-            <SocialScore paper={paper} />
-            <Box w={["100%", "auto"]}>
-              <BookmarkButton
-                resourceType="paper"
-                resourceId={paper.id}
-                leftIcon={<FaBookmark />}
-                w={["100%", "140px"]}
-              >
-                Bookmark
-              </BookmarkButton>
-            </Box>
-            <Box w={["100%", "auto"]}>
-              <NoteButton
-                paperId={paper.id}
-                onClick={handleAddNoteClick}
-                w={["100%", "auto"]}
-              />
-            </Box>
-          </Stack>
-
-          {paper.thumbnail ? (
-            <Image
-              src={paper.thumbnail}
-              alt={paper.title}
-              my={6}
-              objectFit="cover"
-              w="100%"
-              h="350px"
-            />
-          ) : (
-            <Box my={6}>
-              <EmojiWithGradient title={paper.title} height="350px" />
-            </Box>
-          )}
-
           {!user && (
             <Box>
               <CarbonAd />
@@ -339,11 +340,25 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   </Box>
                 </Box>
               )}
-              <div>
-                <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
-                  {paper.generatedSummary}
-                </ReactMarkdown>
-              </div>
+              {overview}
+
+              {paper.thumbnail ? (
+                <Image
+                  src={paper.thumbnail}
+                  alt={paper.title}
+                  my={6}
+                  objectFit="cover"
+                  w="100%"
+                  h="350px"
+                  boxShadow="xs"
+                  rounded="md"
+                />
+              ) : (
+                <Box my={6}>
+                  <EmojiWithGradient title={paper.title} height="350px" />
+                </Box>
+              )}
+              {restOfContent}
               <br />
               <hr />
               <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
@@ -366,6 +381,26 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             </Container>
           )}
         </Box>
+        <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
+          <SocialScore paper={paper} />
+          <Box w={["100%", "auto"]}>
+            <BookmarkButton
+              resourceType="paper"
+              resourceId={paper.id}
+              leftIcon={<FaBookmark />}
+              w={["100%", "140px"]}
+            >
+              Bookmark
+            </BookmarkButton>
+          </Box>
+          <Box w={["100%", "auto"]}>
+            <NoteButton
+              paperId={paper.id}
+              onClick={handleAddNoteClick}
+              w={["100%", "auto"]}
+            />
+          </Box>
+        </Stack>
       </Container>
 
       <Container maxW="container.xl" py="12">
