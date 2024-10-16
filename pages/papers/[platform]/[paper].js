@@ -30,13 +30,11 @@ import MetaTags from "../../../components/MetaTags";
 import {
   fetchPaperDataBySlug,
   fetchPapersPaginated,
-  fetchAdjacentPapers,
 } from "../../api/utils/fetchPapers";
 import fetchRelatedPapers from "../../api/utils/fetchRelatedPapers";
 import RelatedPapers from "../../../components/RelatedPapers";
 import EmojiWithGradient from "../../../components/EmojiWithGradient";
 import SocialScore from "../../../components/SocialScore";
-import PaperNavigationButtons from "../../../components/PaperNavigationButtons";
 import customTheme from "../../../components/MarkdownTheme";
 import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
@@ -115,10 +113,6 @@ export async function getStaticProps({ params }) {
 
 const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   const { user, accessToken, hasActiveSubscription, loading } = useAuth();
-  const [adjacentPapers, setAdjacentPapers] = useState({
-    prevSlug: null,
-    nextSlug: null,
-  });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [paperTasks, setPaperTasks] = useState([]);
@@ -201,24 +195,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
     fetchViewCounts();
   }, [paper?.slug, hasActiveSubscription, loading, toast]);
-
-  useEffect(() => {
-    const fetchAdjacent = async () => {
-      if (paper?.slug) {
-        try {
-          const { prevSlug, nextSlug } = await fetchAdjacentPapers(
-            paper.slug,
-            paper.platform
-          );
-          setAdjacentPapers({ prevSlug, nextSlug });
-        } catch (error) {
-          console.error("Error fetching adjacent papers:", error);
-          setAdjacentPapers({ prevSlug: null, nextSlug: null });
-        }
-      }
-    };
-    fetchAdjacent();
-  }, [paper]);
 
   const formatLinks = (text) => {
     const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -389,13 +365,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </Center>
             </Container>
           )}
-        </Box>
-        <Box mt="8">
-          <PaperNavigationButtons
-            prevSlug={adjacentPapers.prevSlug}
-            nextSlug={adjacentPapers.nextSlug}
-            platform={paper.platform}
-          />
         </Box>
       </Container>
 
