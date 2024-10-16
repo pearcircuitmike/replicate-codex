@@ -210,6 +210,13 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   };
 
   const renderContent = (content) => {
+    if (!content) {
+      return {
+        overview: null,
+        restOfContent: null,
+      };
+    }
+
     const overviewStart = content.indexOf("## Overview");
     const overviewEnd = content.indexOf("## Plain English Explanation");
 
