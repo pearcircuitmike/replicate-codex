@@ -389,7 +389,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           )}
         </Box>
         <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
-          <SocialScore paper={paper} />
+          <SocialScore resource={paper} />
           <Box w={["100%", "auto"]}>
             <BookmarkButton
               resourceType="paper"

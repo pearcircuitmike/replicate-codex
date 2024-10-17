@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Image, Text, Tooltip } from "@chakra-ui/react";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
-const SocialScore = ({ paper }) => {
+const SocialScore = ({ resource }) => {
   return (
     <Tooltip label="Calculated based on factors such as likes, downloads, etc">
       <Flex alignItems="center" cursor="default">
@@ -12,7 +12,7 @@ const SocialScore = ({ paper }) => {
           mr={1}
         />
         <Text fontSize="md">
-          {formatLargeNumber(Math.floor(paper.totalScore))}
+          {formatLargeNumber(Math.floor(resource.totalScore))}
         </Text>
       </Flex>
     </Tooltip>
