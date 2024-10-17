@@ -135,7 +135,7 @@ const DashboardLayout = ({ children }) => {
     {
       icon: <FaFire />,
       label: "Trending",
-      href: "/dashboard/trending",
+      href: "/dashboard",
     },
     {
       icon: <FaNewspaper />,

@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Heading,
-  Text,
-  HStack,
-  useMediaQuery,
-  Spinner,
-} from "@chakra-ui/react";
+// components/Dashboard/Views/TrendingView.js
+
+import React from "react";
+import { Box, Heading, Text, HStack, useMediaQuery } from "@chakra-ui/react";
 import ResourceCard from "@/components/ResourceCard";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 
@@ -32,96 +27,23 @@ const cleanAndTruncateSummary = (summary, type) => {
   return lines.join(" ");
 };
 
-const TrendingView = () => {
+const TrendingView = ({ trendingData = {}, hasError = false }) => {
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
-  const [trendingData, setTrendingData] = useState({
-    trendingTopics: [],
-    topViewedPapers: [],
-    topSearchQueries: [],
-    papers: [],
-    models: [],
-    creators: [],
-    authors: [],
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    async function fetchData() {
-      const startDate = new Date();
-      startDate.setUTCHours(0, 0, 0, 0);
-
-      try {
-        const [
-          trendingTopics,
-          topViewedPapers,
-          topSearchQueries,
-          papers,
-          models,
-          creators,
-          authors,
-        ] = await Promise.all([
-          fetch(`/api/dashboard/trending-topics?limit=12`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch trending topics");
-            return res.json();
-          }),
-          fetch(`/api/dashboard/top-viewed-papers?limit=12`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch top viewed papers");
-            return res.json();
-          }),
-          fetch(`/api/dashboard/top-search-queries?limit=12`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch top search queries");
-            return res.json();
-          }),
-          fetch(
-            `/api/trending/papers?platform=arxiv&startDate=${encodeURIComponent(
-              startDate.toISOString()
-            )}&limit=12`
-          ).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch trending papers");
-            return res.json();
-          }),
-          fetch(
-            `/api/trending/models?startDate=${encodeURIComponent(
-              startDate.toISOString()
-            )}&limit=12`
-          ).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch trending models");
-            return res.json();
-          }),
-          fetch(`/api/trending/creators?limit=12`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch trending creators");
-            return res.json();
-          }),
-          fetch(`/api/trending/authors?limit=12`).then((res) => {
-            if (!res.ok) throw new Error("Failed to fetch trending authors");
-            return res.json();
-          }),
-        ]);
-
-        setTrendingData({
-          trendingTopics,
-          topViewedPapers,
-          topSearchQueries,
-          papers,
-          models,
-          creators,
-          authors,
-        });
-      } catch (error) {
-        console.error("Error fetching trending data:", error);
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchData();
-  }, []);
+  // Use default empty arrays to prevent errors
+  const {
+    papers = [],
+    topViewedPapers = [],
+    trendingTopics = [],
+    authors = [],
+    models = [],
+    creators = [],
+    topSearchQueries = [],
+  } = trendingData;
 
   // Helper function to render each section
   const renderSection = (title, description, items, renderItem) => (
-    <Box mb={8}>
+    <Box mb={8} key={title}>
       <Heading as="h2" size="md">
         {title}
       </Heading>
@@ -140,11 +62,7 @@ const TrendingView = () => {
           "scrollbar-width": "none",
         }}
       >
-        {isLoading ? (
-          Array.from({ length: 4 }).map((_, index) => (
-            <ResourceCard key={index} isLoading />
-          ))
-        ) : items.length > 0 ? (
+        {items.length > 0 ? (
           items.map(renderItem)
         ) : (
           <Text>No data available.</Text>
@@ -158,7 +76,7 @@ const TrendingView = () => {
     {
       title: "Top scoring papers",
       description: "Papers with the biggest impact on the community",
-      data: trendingData.papers,
+      data: papers,
       renderItem: (paper) => {
         const blurb = cleanAndTruncateSummary(paper.generatedSummary, "paper");
         return (
@@ -173,7 +91,7 @@ const TrendingView = () => {
             imageSrc={paper.thumbnail}
             blurb={blurb}
             placeholderTitle="Paper"
-            isLoading={isLoading}
+            isLoading={false}
           />
         );
       },
@@ -181,7 +99,7 @@ const TrendingView = () => {
     {
       title: "Most read papers",
       description: "Papers with the most reads in the last day",
-      data: trendingData.topViewedPapers,
+      data: topViewedPapers,
       renderItem: (paper) => {
         const blurb = cleanAndTruncateSummary(paper.generatedSummary, "paper");
         return (
@@ -195,7 +113,7 @@ const TrendingView = () => {
             imageSrc={paper.thumbnail}
             scoreLabel="Views"
             placeholderTitle="Paper"
-            isLoading={isLoading}
+            isLoading={false}
           />
         );
       },
@@ -204,7 +122,7 @@ const TrendingView = () => {
       title: "Popular collections",
       description:
         "Explore collections of the top research topics on the site today",
-      data: trendingData.trendingTopics,
+      data: trendingTopics,
       renderItem: (topic) => (
         <ResourceCard
           key={topic.id}
@@ -216,14 +134,14 @@ const TrendingView = () => {
           }
           placeholderTitle="Topic"
           isCollection={true}
-          isLoading={isLoading}
+          isLoading={false}
         />
       ),
     },
     {
       title: "Top authors",
       description: "Authors with the most impactful research",
-      data: trendingData.authors,
+      data: authors,
       renderItem: (author) => (
         <ResourceCard
           key={author.id || author.uuid || author.author}
@@ -234,14 +152,14 @@ const TrendingView = () => {
           scoreLabel="Author Score"
           blurb="Click to see papers by this author"
           placeholderTitle="Author"
-          isLoading={isLoading}
+          isLoading={false}
         />
       ),
     },
     {
       title: "Top models",
       description: "The highest scoring AI models",
-      data: trendingData.models,
+      data: models,
       renderItem: (model) => {
         const creator = [
           {
@@ -268,7 +186,7 @@ const TrendingView = () => {
             }
             owners={creator}
             placeholderTitle="Model"
-            isLoading={isLoading}
+            isLoading={false}
           />
         );
       },
@@ -276,7 +194,7 @@ const TrendingView = () => {
     {
       title: "Top maintainers",
       description: "The people behind the top models in the community",
-      data: trendingData.creators,
+      data: creators,
       renderItem: (creator) => (
         <ResourceCard
           key={creator.id || creator.uuid || creator.creator}
@@ -289,14 +207,14 @@ const TrendingView = () => {
           score={formatLargeNumber(Math.floor(creator.totalCreatorScore))}
           scoreLabel="Creator Score"
           placeholderTitle="Creator"
-          isLoading={isLoading}
+          isLoading={false}
         />
       ),
     },
     {
       title: "Top searches",
       description: "See what the community is searching for.",
-      data: trendingData.topSearchQueries,
+      data: topSearchQueries,
       renderItem: (query) => (
         <ResourceCard
           key={query.id || query.uuid || query.search_query}
@@ -310,7 +228,7 @@ const TrendingView = () => {
           blurb="Click to view this search"
           placeholderTitle="Search Query"
           isCollection={true}
-          isLoading={isLoading}
+          isLoading={false}
         />
       ),
     },
@@ -328,16 +246,12 @@ const TrendingView = () => {
         </Text>
       )}
 
-      {isLoading && trendingData.trendingTopics.length === 0 ? (
-        <Spinner size="xl" alignSelf="center" />
-      ) : (
-        sections.map((section, index) =>
-          renderSection(
-            section.title,
-            section.description,
-            section.data,
-            section.renderItem
-          )
+      {sections.map((section) =>
+        renderSection(
+          section.title,
+          section.description,
+          section.data,
+          section.renderItem
         )
       )}
     </Box>
