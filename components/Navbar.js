@@ -54,9 +54,7 @@ const Navbar = () => {
               <Link href="/authors" aria-label="Researchers">
                 Researchers
               </Link>
-              <Link href="/tools" aria-label="Tools">
-                Tools
-              </Link>
+
               <Link href="https://notes.aimodels.fyi" aria-label="Notes">
                 Notes
               </Link>
@@ -167,9 +165,7 @@ const Navbar = () => {
               <Link href="/authors" aria-label="Researchers" legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>Researchers</span>
               </Link>
-              <Link href="/tools" aria-label="Tools" legacyBehavior>
-                <span onClick={() => changeDisplay("none")}>Tools</span>
-              </Link>
+
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
