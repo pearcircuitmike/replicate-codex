@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         .from("top_search_queries")
         .select("uuid, search_query, resource_type, search_count")
         .order("search_count", { ascending: false })
-        .limit(4);
+        .limit(12);
 
       if (error) throw error;
 

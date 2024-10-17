@@ -12,7 +12,7 @@ export default async function handler(req, res) {
         .from("top_paper_views")
         .select("uuid, title, slug, view_count")
         .order("view_count", { ascending: false })
-        .limit(4);
+        .limit(12);
 
       if (error) throw error;
 
