@@ -36,9 +36,10 @@ export default async function handler(req, res) {
         .json({ error: "No top items found for this user's followed tasks" });
     }
 
+    // todo - generalize from paper to "resource"
     const result = topTaskItems.map((task) => ({
       followedTaskId: task.followed_task_id,
-      topItems: [task.top_item_1, task.top_item_2, task.top_item_3].filter(
+      topItems: [task.top_paper_1, task.top_paper_2, task.top_paper_3].filter(
         Boolean
       ),
     }));
