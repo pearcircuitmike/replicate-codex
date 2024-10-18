@@ -30,7 +30,7 @@ export async function getStaticProps() {
   const startDate = new Date();
   startDate.setUTCHours(0, 0, 0, 0);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_BASE_URL;
 
   try {
     const [
