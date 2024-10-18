@@ -21,7 +21,9 @@ export default async function handler(req, res) {
     // Fetch top items from the materialized view based on user ID
     const { data: topTaskItems, error: fetchError } = await supabase
       .from("user_followed_tasks_with_top_papers")
-      .select("*")
+      .select(
+        "followed_task_id, task_name, top_paper_1, top_paper_2, top_paper_3"
+      )
       .eq("user_id", userId)
       .order("followed_task_id", { ascending: true });
 
@@ -36,9 +38,9 @@ export default async function handler(req, res) {
         .json({ error: "No top items found for this user's followed tasks" });
     }
 
-    // todo - generalize from paper to "resource"
     const result = topTaskItems.map((task) => ({
       followedTaskId: task.followed_task_id,
+      taskName: task.task_name, // Include task name in the response
       topItems: [task.top_paper_1, task.top_paper_2, task.top_paper_3].filter(
         Boolean
       ),
