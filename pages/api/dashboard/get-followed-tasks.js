@@ -1,5 +1,3 @@
-// pages/api/dashboard/get-user-top-task-papers.js
-
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -20,36 +18,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch top papers from the materialized view based on user ID
-    const { data: topTaskPapers, error: fetchError } = await supabase
+    // Fetch top items from the materialized view based on user ID
+    const { data: topTaskItems, error: fetchError } = await supabase
       .from("user_followed_tasks_with_top_papers")
       .select("*")
       .eq("user_id", userId)
       .order("followed_task_id", { ascending: true });
 
     if (fetchError) {
-      console.error("Error fetching top task papers:", fetchError);
+      console.error("Error fetching top task items:", fetchError);
       return res.status(500).json({ error: "Internal server error" });
     }
 
-    if (!topTaskPapers || topTaskPapers.length === 0) {
+    if (!topTaskItems || topTaskItems.length === 0) {
       return res
         .status(404)
-        .json({ error: "No top task papers found for this user" });
+        .json({ error: "No top items found for this user's followed tasks" });
     }
 
-    const result = topTaskPapers.map((task) => ({
+    const result = topTaskItems.map((task) => ({
       followedTaskId: task.followed_task_id,
-      topPapers: [task.top_paper_1, task.top_paper_2, task.top_paper_3].filter(
+      topItems: [task.top_item_1, task.top_item_2, task.top_item_3].filter(
         Boolean
       ),
     }));
 
-    res.status(200).json({ topTaskPapers: result });
+    res.status(200).json({ topTaskItems: result });
   } catch (error) {
-    console.error("Error fetching top task papers:", error);
+    console.error("Error fetching top task items:", error);
     res
       .status(500)
-      .json({ error: "An error occurred while fetching top papers" });
+      .json({ error: "An error occurred while fetching top items" });
   }
 }

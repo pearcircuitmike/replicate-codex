@@ -1,5 +1,3 @@
-// components/Dashboard/Views/UserTopTaskPapersView.js
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -15,29 +13,29 @@ import {
 } from "@chakra-ui/react";
 import { useAuth } from "../../../context/AuthContext";
 
-const UserTopTaskPapersView = () => {
+const FollowedTasksComponent = () => {
   const { user } = useAuth();
-  const [topTaskPapers, setTopTaskPapers] = useState([]);
+  const [topTaskItems, setTopTaskItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    const fetchTopTaskPapers = async () => {
+    const fetchTopTaskItems = async () => {
       if (user) {
         try {
           setIsLoading(true);
           const response = await fetch(
-            `/api/dashboard/get-user-top-task-papers?userId=${user.id}`
+            `/api/dashboard/get-followed-tasks?userId=${user.id}`
           );
 
           if (!response.ok) {
-            throw new Error("Failed to fetch top task papers.");
+            throw new Error("Failed to fetch top task items.");
           }
 
           const data = await response.json();
-          setTopTaskPapers(data.topTaskPapers);
+          setTopTaskItems(data.topTaskItems);
         } catch (error) {
-          console.error("Error fetching top task papers:", error);
+          console.error("Error fetching top task items:", error);
           setHasError(true);
         } finally {
           setIsLoading(false);
@@ -45,13 +43,13 @@ const UserTopTaskPapersView = () => {
       }
     };
 
-    fetchTopTaskPapers();
+    fetchTopTaskItems();
   }, [user]);
 
   return (
     <Box px={"2vw"} color="gray.700" py={4}>
       <Heading as="h1" size="xl" mb={8}>
-        Top Papers for Your Followed Tasks
+        Top Items for Your Followed Tasks
       </Heading>
 
       {isLoading && <Spinner size="lg" />}
@@ -62,27 +60,27 @@ const UserTopTaskPapersView = () => {
         </Text>
       )}
 
-      {!isLoading && !hasError && topTaskPapers.length === 0 && (
-        <Text>No top papers found for your followed tasks.</Text>
+      {!isLoading && !hasError && topTaskItems.length === 0 && (
+        <Text>No top items found for your followed tasks.</Text>
       )}
 
-      {!isLoading && !hasError && topTaskPapers.length > 0 && (
+      {!isLoading && !hasError && topTaskItems.length > 0 && (
         <Table variant="simple">
           <Thead>
             <Tr>
               <Th>Task ID</Th>
-              <Th>Top Paper 1</Th>
-              <Th>Top Paper 2</Th>
-              <Th>Top Paper 3</Th>
+              <Th>Top Item 1</Th>
+              <Th>Top Item 2</Th>
+              <Th>Top Item 3</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {topTaskPapers.map((task) => (
+            {topTaskItems.map((task) => (
               <Tr key={task.followedTaskId}>
                 <Td>{task.followedTaskId}</Td>
-                <Td>{task.topPapers[0] || "N/A"}</Td>
-                <Td>{task.topPapers[1] || "N/A"}</Td>
-                <Td>{task.topPapers[2] || "N/A"}</Td>
+                <Td>{task.topItems[0] || "N/A"}</Td>
+                <Td>{task.topItems[1] || "N/A"}</Td>
+                <Td>{task.topItems[2] || "N/A"}</Td>
               </Tr>
             ))}
           </Tbody>
@@ -92,4 +90,4 @@ const UserTopTaskPapersView = () => {
   );
 };
 
-export default UserTopTaskPapersView;
+export default FollowedTasksComponent;
