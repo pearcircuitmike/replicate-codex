@@ -24,7 +24,8 @@ import {
   FaNewspaper,
   FaFolder,
   FaFire,
-  FaTasks,
+  FaClipboardList,
+  FaTasks, // Added the FaTasks icon
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 import FolderSidebar from "./Sidebar/FolderSidebar";
@@ -142,6 +143,11 @@ const DashboardLayout = ({ children }) => {
       label: "Weekly Digest",
       href: "/dashboard/weekly-paper-summary",
     },
+    {
+      icon: <FaClipboardList />, // Corrected icon for Followed Tasks
+      label: "Followed Tasks",
+      href: "/dashboard/followed-tasks",
+    },
   ];
 
   return (
@@ -175,8 +181,7 @@ const DashboardLayout = ({ children }) => {
                 </Text>
               </Box>
               <FolderSidebar onFolderModalOpen={handleFolderModalOpen} />
-
-              <TaskSidebar />
+              <TaskSidebar /> {/* Restored Task Sidebar */}
             </VStack>
           </Box>
         )}
@@ -217,7 +222,7 @@ const DashboardLayout = ({ children }) => {
               />
               <IconButton
                 aria-label="Tasks"
-                icon={<FaTasks />}
+                icon={<FaTasks />} // Replaced the icon to avoid duplication
                 variant="ghost"
                 size="lg"
                 onClick={handleTaskListModalOpen}

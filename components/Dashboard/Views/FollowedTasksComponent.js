@@ -138,9 +138,13 @@ const FollowedTasksComponent = () => {
 
   return (
     <Box px={"2vw"} color="gray.700" py={isLargerThan480 ? 4 : 2}>
-      <Heading as="h1" size="xl" mb={8}>
+      <Heading as="h1" size="xl" mb={4}>
         Top Items for Your Followed Tasks
       </Heading>
+      <Text mb={8}>
+        This page shows the top papers published in the last 7 days for the
+        tasks you are following.
+      </Text>
 
       {isLoading && <Spinner size="lg" />}
 
