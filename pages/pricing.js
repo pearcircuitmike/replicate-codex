@@ -28,7 +28,7 @@ const shine = keyframes`
 const PricingPage = () => {
   const { user } = useAuth();
   const [isYearly, setIsYearly] = useState(false);
-  const price = isYearly ? 10.81 : 12;
+  const price = isYearly ? 8 : 9;
   const billingPeriod = isYearly ? "mo" : "month";
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -111,7 +111,7 @@ const PricingPage = () => {
           </Text>
           {isYearly && (
             <Text fontSize="sm" mb={4} color="gray.500">
-              (2 months free, billed yearly $129)
+              (2 months free, billed yearly $97)
             </Text>
           )}
           <Button
