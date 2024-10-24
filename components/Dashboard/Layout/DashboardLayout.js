@@ -140,11 +140,16 @@ const DashboardLayout = ({ children }) => {
     },
     {
       icon: <FaNewspaper />,
-      label: "Weekly Digest",
-      href: "/dashboard/weekly-paper-summary",
+      label: "Weekly Papers Digest",
+      href: "/dashboard/weekly-papers-summary",
     },
     {
-      icon: <FaClipboardList />, // Corrected icon for Followed Tasks
+      icon: <FaNewspaper />,
+      label: "Weekly Models Digest",
+      href: "/dashboard/weekly-models-summary",
+    },
+    {
+      icon: <FaClipboardList />,
       label: "Followed Tasks",
       href: "/dashboard/followed-tasks",
     },
