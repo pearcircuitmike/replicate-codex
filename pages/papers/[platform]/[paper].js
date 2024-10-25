@@ -44,6 +44,7 @@ import CarbonAd from "../../../components/CarbonAd";
 import TaskTag from "../../../components/TaskTag";
 
 import { useAuth } from "../../../context/AuthContext";
+import TwitterFollowButton from "@/components/TwitterFollowButton";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -412,14 +413,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
       <Container maxW="container.xl" py="12">
         <Box mt={8} textAlign="center">
-          <Button
-            as="a"
-            href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
-            colorScheme="green"
-            borderRadius="full"
-          >
-            Follow @aimodelsfyi on 𝕏 →
-          </Button>
+          <TwitterFollowButton />
         </Box>
 
         <RelatedPapers relatedPapers={relatedPapers} />
