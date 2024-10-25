@@ -1,3 +1,4 @@
+// /pages/api/tasks/get-followed-tasks.js
 import supabase from "../utils/supabaseClient";
 
 export default async function handler(req, res) {
@@ -8,20 +9,7 @@ export default async function handler(req, res) {
   const { paperId } = req.query;
   const token = req.headers.authorization?.split(" ")[1];
 
-  if (!token) {
-    return res.status(401).json({ error: "Missing authorization token" });
-  }
-
   try {
-    // Retrieve user from the token
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return res.status(401).json({ error: "Invalid or expired token" });
-    }
-
     // Fetch task_ids associated with the paper
     const { data: paper, error: paperError } = await supabase
       .from("arxivPapersData")
@@ -47,7 +35,31 @@ export default async function handler(req, res) {
       throw tasksError;
     }
 
-    // Fetch followed tasks for the user
+    // If no auth token, return tasks without follow status
+    if (!token) {
+      const tasksWithoutFollowStatus = tasks.map((task) => ({
+        ...task,
+        isFollowed: false,
+      }));
+      return res.status(200).json({ tasks: tasksWithoutFollowStatus });
+    }
+
+    // If auth token present, verify user and get follow status
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      // Return tasks without follow status if token is invalid
+      const tasksWithoutFollowStatus = tasks.map((task) => ({
+        ...task,
+        isFollowed: false,
+      }));
+      return res.status(200).json({ tasks: tasksWithoutFollowStatus });
+    }
+
+    // Fetch followed tasks for the authenticated user
     const { data: followedTasks, error: followError } = await supabase
       .from("followed_tasks")
       .select("task_id")

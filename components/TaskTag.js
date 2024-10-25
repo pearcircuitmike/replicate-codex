@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const TaskTag = ({ task, initialIsFollowed }) => {
   const [isFollowed, setIsFollowed] = useState(initialIsFollowed);
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
   const toast = useToast();
 
   useEffect(() => {
@@ -13,10 +13,10 @@ const TaskTag = ({ task, initialIsFollowed }) => {
   }, [initialIsFollowed]);
 
   const toggleFollow = async () => {
-    if (!accessToken) {
+    if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to follow tasks.",
+        title: "Sign in required",
+        description: "Please sign in to follow tasks",
         status: "warning",
         duration: 3000,
         isClosable: true,
@@ -67,7 +67,13 @@ const TaskTag = ({ task, initialIsFollowed }) => {
 
   return (
     <Tooltip
-      label={isFollowed ? "Unfollow topic" : "Click to follow topic"}
+      label={
+        user
+          ? isFollowed
+            ? "Unfollow topic"
+            : "Click to follow topic"
+          : "Sign in to follow topic"
+      }
       aria-label="Follow/Unfollow tooltip"
       hasArrow
     >
@@ -81,8 +87,7 @@ const TaskTag = ({ task, initialIsFollowed }) => {
         color={isFollowed ? "green.400" : "gray.600"}
         boxShadow="sm"
         px="5px"
-        _hover={{ boxShadow: "md" }}
-        cursor="pointer"
+        _hover={{ boxShadow: "md", cursor: "pointer" }}
         onClick={toggleFollow}
       >
         {task.task}

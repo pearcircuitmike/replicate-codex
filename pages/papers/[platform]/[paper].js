@@ -126,12 +126,15 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
   useEffect(() => {
     const fetchPaperTasks = async () => {
-      if (paper?.id && accessToken) {
+      if (paper?.id) {
         try {
+          const headers = {};
+          if (accessToken) {
+            headers.Authorization = `Bearer ${accessToken}`;
+          }
+
           const response = await axios.get(`/api/tasks/get-followed-tasks`, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+            headers,
             params: {
               paperId: paper.id,
             },
