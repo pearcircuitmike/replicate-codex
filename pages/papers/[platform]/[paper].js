@@ -281,55 +281,55 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             ))}
           </Wrap>
 
-          <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
-            <Text as="span">
-              Read original:{" "}
-              <Link
-                href={`https://arxiv.org/abs/${paper.arxivId}`}
-                isExternal
-                _hover={{ color: "blackAlpha.900" }}
-                color="black.500"
-              >
-                <Text as="span" textDecoration="underline">
-                  arXiv:{paper.arxivId}
-                </Text>
-                <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
-              </Link>{" "}
-              - Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
-              by{" "}
-            </Text>
-            {paper.authors && paper.authors.length > 0 ? (
-              <>
-                {paper.authors.slice(0, 10).map((author, index) => (
-                  <React.Fragment key={index}>
-                    <Link
-                      href={`/authors/${encodeURIComponent(
-                        paper.platform
-                      )}/${encodeURIComponent(author)}`}
-                      _hover={{ color: "blackAlpha.900" }}
-                    >
-                      {author}
-                    </Link>
-                    {index < 9 && index < paper.authors.length - 1 && (
-                      <Text as="span">, </Text>
-                    )}
-                  </React.Fragment>
-                ))}
-                {paper.authors.length > 10 && (
-                  <Text as="span">
-                    {" "}
-                    and {paper.authors.length - 10}{" "}
-                    {paper.authors.length - 10 === 1 ? "other" : "others"}
-                  </Text>
-                )}
-              </>
-            ) : (
-              <Text as="span">Unknown authors</Text>
-            )}
-          </Box>
-
           {viewCounts.canViewFullArticle || hasActiveSubscription ? (
             <>
+              <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
+                <Text as="span">
+                  Read original:{" "}
+                  <Link
+                    href={`https://arxiv.org/abs/${paper.arxivId}`}
+                    isExternal
+                    _hover={{ color: "blackAlpha.900" }}
+                    color="black.500"
+                  >
+                    <Text as="span" textDecoration="underline">
+                      arXiv:{paper.arxivId}
+                    </Text>
+                    <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
+                  </Link>{" "}
+                  - Published{" "}
+                  {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
+                </Text>
+                {paper.authors && paper.authors.length > 0 ? (
+                  <>
+                    {paper.authors.slice(0, 10).map((author, index) => (
+                      <React.Fragment key={index}>
+                        <Link
+                          href={`/authors/${encodeURIComponent(
+                            paper.platform
+                          )}/${encodeURIComponent(author)}`}
+                          _hover={{ color: "blackAlpha.900" }}
+                        >
+                          {author}
+                        </Link>
+                        {index < 9 && index < paper.authors.length - 1 && (
+                          <Text as="span">, </Text>
+                        )}
+                      </React.Fragment>
+                    ))}
+                    {paper.authors.length > 10 && (
+                      <Text as="span">
+                        {" "}
+                        and {paper.authors.length - 10}{" "}
+                        {paper.authors.length - 10 === 1 ? "other" : "others"}
+                      </Text>
+                    )}
+                  </>
+                ) : (
+                  <Text as="span">Unknown authors</Text>
+                )}
+              </Box>
+
               {!user && (
                 <Box>
                   <Text align="center" fontWeight={"bold"} mt={10}>
