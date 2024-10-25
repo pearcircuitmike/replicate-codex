@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Box,
-  VStack,
+  Stack,
   Heading,
   Text,
   List,
@@ -53,10 +53,10 @@ const LimitMessage = () => {
   ];
 
   return (
-    <Container maxW="container.md" py={8}>
-      <VStack spacing={8} width="full">
+    <Container maxW="container.md">
+      <Stack spacing={8} py={8}>
         {/* Main Heading */}
-        <Box textAlign="center" width="full">
+        <Box textAlign="center">
           <Heading
             size="lg"
             mb={3}
@@ -64,14 +64,13 @@ const LimitMessage = () => {
           >
             Keep Reading AI Papers
           </Heading>
-          <Text fontSize="lg" color="gray.600" maxW="md" mx="auto">
+          <Text fontSize="lg" color="gray.600">
             Join thousands of AI researchers who get unlimited paper summaries
           </Text>
         </Box>
 
         {/* Value Proposition */}
         <Box
-          width="xl"
           bg={bgColor}
           borderRadius="xl"
           borderWidth={1}
@@ -79,7 +78,7 @@ const LimitMessage = () => {
           boxShadow="lg"
           overflow="hidden"
         >
-          <List width="full" spacing={0} p={4} divider={<Divider />}>
+          <List spacing={0} p={4} divider={<Divider />}>
             {features.map((feature, index) => (
               <FeatureItem key={index} {...feature} />
             ))}
@@ -87,7 +86,7 @@ const LimitMessage = () => {
 
           {/* Auth Form Section */}
           <Box bg={highlightBg} p={8}>
-            <VStack spacing={6}>
+            <Stack spacing={6}>
               <Box textAlign="center">
                 <Text fontSize="lg" fontWeight="bold" color="gray.900" mb={1}>
                   Try it for free for 7 days
@@ -98,19 +97,15 @@ const LimitMessage = () => {
               </Box>
 
               <AuthForm isUpgradeFlow={true} />
-            </VStack>
+            </Stack>
           </Box>
         </Box>
 
         {/* Social Proof */}
-        <Box width="full" pt={8} pb={4}>
-          <VStack spacing={6}>
-            <Box maxW="xl" mx="auto">
-              <Testimonials />
-            </Box>
-          </VStack>
+        <Box pt={8} pb={4}>
+          <Testimonials />
         </Box>
-      </VStack>
+      </Stack>
     </Container>
   );
 };
