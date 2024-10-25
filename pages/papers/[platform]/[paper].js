@@ -328,12 +328,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             )}
           </Box>
 
-          {!user && (
-            <Box>
-              <CarbonAd />
-            </Box>
-          )}
-
           {viewCounts.canViewFullArticle || hasActiveSubscription ? (
             <>
               {!user && (
