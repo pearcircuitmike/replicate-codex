@@ -40,11 +40,11 @@ import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
-import CarbonAd from "../../../components/CarbonAd";
 import TaskTag from "../../../components/TaskTag";
 
 import { useAuth } from "../../../context/AuthContext";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
+import LimitMessage from "@/components/LimitMessage";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -373,17 +373,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </Text>
             </>
           ) : (
-            <Container maxW="container.md">
-              <Box mt={8}>
-                <Text fontWeight="bold" fontSize="lg" align="center">
-                  You reached the limit of 5 free paper summaries for the month.
-                  Become a paid subscriber to get unlimited access.
-                </Text>
-              </Box>
-              <Center my={"20px"}>
-                <AuthForm />
-              </Center>
-            </Container>
+            <LimitMessage />
           )}
         </Box>
         <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
