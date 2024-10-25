@@ -18,7 +18,7 @@ import {
 import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
-export default function AuthForm() {
+export default function AuthForm({ isUpgradeFlow = false }) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
@@ -46,6 +46,31 @@ export default function AuthForm() {
     onClose();
   };
 
+  const copyVariants = {
+    default: {
+      button: "Go to my dashboard →",
+      loadingText: "Sending magic link...",
+      googleText: "Sign in with Google",
+      existingAccount: "If you already have an account, we'll log you in",
+      modalHeader: "Check your inbox",
+      modalBody:
+        "A magic link has been sent to your email. Click the link to log in.",
+      emailPlaceholder: "Type your email...",
+    },
+    upgrade: {
+      button: "Start Free Trial →",
+      loadingText: "Setting up your trial...",
+      googleText: "Continue with Google",
+      existingAccount: "Have an account? We'll apply the trial to it",
+      modalHeader: "Check your inbox to start your trial",
+      modalBody:
+        "We've sent you a magic link. Click it to activate your 7-day free trial.",
+      emailPlaceholder: "Enter your work email...",
+    },
+  };
+
+  const copy = isUpgradeFlow ? copyVariants.upgrade : copyVariants.default;
+
   return (
     <>
       <Box
@@ -67,7 +92,7 @@ export default function AuthForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Type your email..."
+              placeholder={copy.emailPlaceholder}
             />
             {emailSent && (
               <Text fontWeight="bold" color="red.500" mt={2}>
@@ -77,15 +102,26 @@ export default function AuthForm() {
           </FormControl>
           <Button
             type="submit"
-            bgGradient="linear(to-tr, #3182CE,#38A169)"
-            _hover={{ bgGradient: "linear(to-tr, #2B6CB0,#2F855A)" }}
-            _active={{ bgGradient: "linear(to-tr, #2C5282,#276749)" }}
+            bg={isUpgradeFlow ? "green.400" : ""}
+            bgGradient={!isUpgradeFlow ? "linear(to-tr, #3182CE,#38A169)" : ""}
+            _hover={{
+              bgGradient: !isUpgradeFlow
+                ? "linear(to-tr, #2B6CB0,#2F855A)"
+                : "",
+              bg: isUpgradeFlow ? "green.500" : "",
+            }}
+            _active={{
+              bgGradient: !isUpgradeFlow
+                ? "linear(to-tr, #2C5282,#276749)"
+                : "",
+              bg: isUpgradeFlow ? "green.600" : "",
+            }}
             color="white"
             isLoading={loading}
-            loadingText="Sending magic link..."
+            loadingText={copy.loadingText}
             width="100%"
           >
-            Go to my dashboard →
+            {copy.button}
           </Button>
           <Box position="relative" width="100%">
             <Text
@@ -120,13 +156,13 @@ export default function AuthForm() {
             onClick={signInWithGoogle}
             isLoading={loading}
             width="100%"
-            loadingText="Signing in..."
+            loadingText={copy.loadingText}
             color="black.500"
           >
-            <Text fontSize="sm">Sign in with Google</Text>
+            <Text fontSize="sm">{copy.googleText}</Text>
           </Button>
           <Text fontSize="xs" color="gray.500">
-            If you already have an account, we&apos;ll log you in
+            {copy.existingAccount}
           </Text>
         </VStack>
       </Box>
@@ -134,12 +170,11 @@ export default function AuthForm() {
       <Modal isOpen={isOpen} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Check your inbox</ModalHeader>
+          <ModalHeader>{copy.modalHeader}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Text fontSize="lg" mb={4}>
-              A magic link has been sent to your email. Click the link to log
-              in.
+              {copy.modalBody}
             </Text>
             <Button colorScheme="blue" onClick={closeModal}>
               Close
