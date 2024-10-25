@@ -371,40 +371,44 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 inaccuracies - check out the links to read the original source
                 documents!
               </Text>
+
+              <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
+                <SocialScore resource={paper} />
+                <Box w={["100%", "auto"]}>
+                  <BookmarkButton
+                    resourceType="paper"
+                    resourceId={paper.id}
+                    leftIcon={<FaBookmark />}
+                    w={["100%", "140px"]}
+                  >
+                    Bookmark
+                  </BookmarkButton>
+                </Box>
+                <Box w={["100%", "auto"]}>
+                  <NoteButton
+                    paperId={paper.id}
+                    onClick={handleAddNoteClick}
+                    w={["100%", "auto"]}
+                  />
+                </Box>
+              </Stack>
             </>
           ) : (
             <LimitMessage />
           )}
         </Box>
-        <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
-          <SocialScore resource={paper} />
-          <Box w={["100%", "auto"]}>
-            <BookmarkButton
-              resourceType="paper"
-              resourceId={paper.id}
-              leftIcon={<FaBookmark />}
-              w={["100%", "140px"]}
-            >
-              Bookmark
-            </BookmarkButton>
-          </Box>
-          <Box w={["100%", "auto"]}>
-            <NoteButton
-              paperId={paper.id}
-              onClick={handleAddNoteClick}
-              w={["100%", "auto"]}
-            />
-          </Box>
-        </Stack>
       </Container>
 
-      <Container maxW="container.xl" py="12">
-        <Box mt={8} textAlign="center">
-          <TwitterFollowButton />
-        </Box>
-
-        <RelatedPapers relatedPapers={relatedPapers} />
-      </Container>
+      {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
+        <>
+          <Container maxW="container.xl" py="12">
+            <Box mt={8} textAlign="center">
+              <TwitterFollowButton />
+            </Box>
+            <RelatedPapers relatedPapers={relatedPapers} />
+          </Container>
+        </>
+      )}
 
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
         <DrawerOverlay />
