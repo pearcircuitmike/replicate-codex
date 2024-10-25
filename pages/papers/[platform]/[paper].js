@@ -280,134 +280,133 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </WrapItem>
             ))}
           </Wrap>
-
-          {viewCounts.canViewFullArticle || hasActiveSubscription ? (
-            <>
-              <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
-                <Text as="span">
-                  Read original:{" "}
-                  <Link
-                    href={`https://arxiv.org/abs/${paper.arxivId}`}
-                    isExternal
-                    _hover={{ color: "blackAlpha.900" }}
-                    color="black.500"
-                  >
-                    <Text as="span" textDecoration="underline">
-                      arXiv:{paper.arxivId}
-                    </Text>
-                    <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
-                  </Link>{" "}
-                  - Published{" "}
-                  {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
-                </Text>
-                {paper.authors && paper.authors.length > 0 ? (
-                  <>
-                    {paper.authors.slice(0, 10).map((author, index) => (
-                      <React.Fragment key={index}>
-                        <Link
-                          href={`/authors/${encodeURIComponent(
-                            paper.platform
-                          )}/${encodeURIComponent(author)}`}
-                          _hover={{ color: "blackAlpha.900" }}
-                        >
-                          {author}
-                        </Link>
-                        {index < 9 && index < paper.authors.length - 1 && (
-                          <Text as="span">, </Text>
-                        )}
-                      </React.Fragment>
-                    ))}
-                    {paper.authors.length > 10 && (
-                      <Text as="span">
-                        {" "}
-                        and {paper.authors.length - 10}{" "}
-                        {paper.authors.length - 10 === 1 ? "other" : "others"}
-                      </Text>
-                    )}
-                  </>
-                ) : (
-                  <Text as="span">Unknown authors</Text>
-                )}
-              </Box>
-
-              {!user && (
-                <Box>
-                  <Text align="center" fontWeight={"bold"} mt={10}>
-                    Sign in to get full access
-                  </Text>
-                  <Box
-                    mb={10}
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    <AuthForm />
-                  </Box>
-                </Box>
-              )}
-              {overview}
-
-              {paper.thumbnail ? (
-                <Image
-                  src={paper.thumbnail}
-                  alt={paper.title}
-                  my={6}
-                  objectFit="cover"
-                  w="100%"
-                  h="350px"
-                  boxShadow="xs"
-                  rounded="md"
-                />
-              ) : (
-                <Box my={6}>
-                  <EmojiWithGradient title={paper.title} height="350px" />
-                </Box>
-              )}
-              {restOfContent}
-              <br />
-              <hr />
-              <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
-                This summary was produced with help from an AI and may contain
-                inaccuracies - check out the links to read the original source
-                documents!
-              </Text>
-
-              <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
-                <SocialScore resource={paper} />
-                <Box w={["100%", "auto"]}>
-                  <BookmarkButton
-                    resourceType="paper"
-                    resourceId={paper.id}
-                    leftIcon={<FaBookmark />}
-                    w={["100%", "140px"]}
-                  >
-                    Bookmark
-                  </BookmarkButton>
-                </Box>
-                <Box w={["100%", "auto"]}>
-                  <NoteButton
-                    paperId={paper.id}
-                    onClick={handleAddNoteClick}
-                    w={["100%", "auto"]}
-                  />
-                </Box>
-              </Stack>
-            </>
-          ) : (
-            <LimitMessage />
-          )}
         </Box>
       </Container>
 
-      {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
-        <>
-          <Container maxW="container.xl" py="12">
-            <Box mt={8} textAlign="center">
-              <TwitterFollowButton />
+      {/* Break out for limit message */}
+      {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
+        <LimitMessage />
+      ) : (
+        <Container maxW="container.md">
+          <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
+            <Text as="span">
+              Read original:{" "}
+              <Link
+                href={`https://arxiv.org/abs/${paper.arxivId}`}
+                isExternal
+                _hover={{ color: "blackAlpha.900" }}
+                color="black.500"
+              >
+                <Text as="span" textDecoration="underline">
+                  arXiv:{paper.arxivId}
+                </Text>
+                <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
+              </Link>{" "}
+              - Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
+              by{" "}
+            </Text>
+            {paper.authors && paper.authors.length > 0 ? (
+              <>
+                {paper.authors.slice(0, 10).map((author, index) => (
+                  <React.Fragment key={index}>
+                    <Link
+                      href={`/authors/${encodeURIComponent(
+                        paper.platform
+                      )}/${encodeURIComponent(author)}`}
+                      _hover={{ color: "blackAlpha.900" }}
+                    >
+                      {author}
+                    </Link>
+                    {index < 9 && index < paper.authors.length - 1 && (
+                      <Text as="span">, </Text>
+                    )}
+                  </React.Fragment>
+                ))}
+                {paper.authors.length > 10 && (
+                  <Text as="span">
+                    {" "}
+                    and {paper.authors.length - 10}{" "}
+                    {paper.authors.length - 10 === 1 ? "other" : "others"}
+                  </Text>
+                )}
+              </>
+            ) : (
+              <Text as="span">Unknown authors</Text>
+            )}
+          </Box>
+
+          {!user && (
+            <Box>
+              <Text align="center" fontWeight={"bold"} mt={10}>
+                Sign in to get full access
+              </Text>
+              <Box
+                mb={10}
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <AuthForm />
+              </Box>
             </Box>
-            <RelatedPapers relatedPapers={relatedPapers} />
-          </Container>
-        </>
+          )}
+          {overview}
+
+          {paper.thumbnail ? (
+            <Image
+              src={paper.thumbnail}
+              alt={paper.title}
+              my={6}
+              objectFit="cover"
+              w="100%"
+              h="350px"
+              boxShadow="xs"
+              rounded="md"
+            />
+          ) : (
+            <Box my={6}>
+              <EmojiWithGradient title={paper.title} height="350px" />
+            </Box>
+          )}
+          {restOfContent}
+          <br />
+          <hr />
+          <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
+            This summary was produced with help from an AI and may contain
+            inaccuracies - check out the links to read the original source
+            documents!
+          </Text>
+
+          <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
+            <SocialScore resource={paper} />
+            <Box w={["100%", "auto"]}>
+              <BookmarkButton
+                resourceType="paper"
+                resourceId={paper.id}
+                leftIcon={<FaBookmark />}
+                w={["100%", "140px"]}
+              >
+                Bookmark
+              </BookmarkButton>
+            </Box>
+            <Box w={["100%", "auto"]}>
+              <NoteButton
+                paperId={paper.id}
+                onClick={handleAddNoteClick}
+                w={["100%", "auto"]}
+              />
+            </Box>
+          </Stack>
+        </Container>
+      )}
+
+      {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
+        <Container maxW="container.xl" py="12">
+          <Box mt={8} textAlign="center">
+            <TwitterFollowButton />
+          </Box>
+          <RelatedPapers relatedPapers={relatedPapers} />
+        </Container>
       )}
 
       <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
