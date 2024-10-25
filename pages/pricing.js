@@ -38,12 +38,13 @@ const PricingPage = () => {
       : process.env.NEXT_PUBLIC_STRIPE_MONTHLY_URL;
 
     const url = new URL(stripeUrl);
-    url.searchParams.append("client_reference_id", user.id);
+    const clientId = user?.id || "null";
+    url.searchParams.append("client_reference_id", clientId);
 
     trackEvent("subscription_initiated", {
       plan_type: isYearly ? "yearly" : "monthly",
       price: price,
-      user_id: user.id,
+      user_id: user?.id,
     });
 
     window.location.href = url.toString();
