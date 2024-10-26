@@ -85,7 +85,7 @@ const LimitMessage = () => {
           </List>
 
           {/* Auth Form Section */}
-          <Box bg={highlightBg} p={8}>
+          <Box bg={highlightBg} p={8} justifyContent="center">
             <Stack spacing={6}>
               <Box textAlign="center">
                 <Text fontSize="lg" fontWeight="bold" color="gray.900" mb={1}>
@@ -95,8 +95,9 @@ const LimitMessage = () => {
                   $9/month after trial • Cancel any time
                 </Text>
               </Box>
-
-              <AuthForm isUpgradeFlow={true} />
+              <Box display="flex" justifyContent="center">
+                <AuthForm isUpgradeFlow={true} />
+              </Box>
             </Stack>
           </Box>
         </Box>
