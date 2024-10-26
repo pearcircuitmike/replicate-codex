@@ -102,19 +102,19 @@ export default function AuthForm({ isUpgradeFlow = false }) {
           </FormControl>
           <Button
             type="submit"
-            bg={isUpgradeFlow ? "green.400" : ""}
+            bg={isUpgradeFlow ? "green.500" : ""}
             bgGradient={!isUpgradeFlow ? "linear(to-tr, #3182CE,#38A169)" : ""}
             _hover={{
               bgGradient: !isUpgradeFlow
                 ? "linear(to-tr, #2B6CB0,#2F855A)"
                 : "",
-              bg: isUpgradeFlow ? "green.500" : "",
+              bg: isUpgradeFlow ? "green.600" : "",
             }}
             _active={{
               bgGradient: !isUpgradeFlow
                 ? "linear(to-tr, #2C5282,#276749)"
                 : "",
-              bg: isUpgradeFlow ? "green.600" : "",
+              bg: isUpgradeFlow ? "green.700" : "",
             }}
             color="white"
             isLoading={loading}
