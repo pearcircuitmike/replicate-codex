@@ -71,7 +71,7 @@ const LimitMessage = () => {
           p={4}
         >
           <AlertTitle mb={1} fontSize="lg">
-            You've reached your limit of free summaries this month
+            You&apos;ve reached your limit of free summaries this month
           </AlertTitle>
           <AlertDescription>
             Upgrade now to continue accessing paper summaries
