@@ -9,8 +9,6 @@ import {
   Link,
   Image,
   Icon,
-  Button,
-  Center,
   Stack,
   useDisclosure,
   Drawer,
@@ -41,7 +39,7 @@ import AuthForm from "../../../components/AuthForm";
 import PaperNotes from "../../../components/notes/PaperNotes";
 import NoteButton from "../../../components/NoteButton";
 import TaskTag from "../../../components/TaskTag";
-
+import ShareButton from "../../../components/ShareButton";
 import { useAuth } from "../../../context/AuthContext";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
 import LimitMessage from "@/components/LimitMessage";
@@ -229,12 +227,26 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       const restOfContent =
         content.slice(0, overviewStart) + content.slice(overviewEnd);
 
+      const paperUrl = `https://aimodels.fyi/papers/${paper.platform}/${paper.slug}`;
+
       return {
         overview: (
           <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
             <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
               {overview}
             </ReactMarkdown>
+            <Box mt={4} textAlign="right">
+              <ShareButton
+                url={paperUrl}
+                title={
+                  `Interesting paper I found on @aimodelsfyi... ` +
+                  paper.title +
+                  `\n\n`
+                }
+                hashtags={["AI", "ML"]}
+                buttonText="Share on 𝕏"
+              />
+            </Box>
           </Box>
         ),
         restOfContent: (
@@ -283,7 +295,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         </Box>
       </Container>
 
-      {/* Break out for limit message */}
       {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
         <LimitMessage />
       ) : (
@@ -350,7 +361,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </Box>
             </Box>
           )}
-          {overview}
 
           {paper.thumbnail ? (
             <Image
@@ -368,6 +378,8 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <EmojiWithGradient title={paper.title} height="350px" />
             </Box>
           )}
+
+          {overview}
           {restOfContent}
           <br />
           <hr />

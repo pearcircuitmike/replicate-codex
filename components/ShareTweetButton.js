@@ -12,7 +12,7 @@ export default function ShareTweetButton() {
 
   return (
     <Button onClick={shareOnTwitter} m={1}>
-      Share on Twitter
+      Share on 𝕏
     </Button>
   );
 }
