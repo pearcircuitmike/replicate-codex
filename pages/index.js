@@ -148,9 +148,9 @@ export default function Home() {
               matter
             </Heading>
             <Text fontSize={isMobile ? "md" : "lg"} color={"gray.600"}>
-              Devs release thousands of AI papers, models, and tools daily. Only
-              a few will be revolutionary. We scan repos, journals, and social
-              media to bring them to you in bite-sized recaps.
+              Thousands of AI papers, models, and tools are released daily. We
+              scan repos, journals, and social media to bring you the ones that
+              matter.
             </Text>
           </VStack>
         </main>
