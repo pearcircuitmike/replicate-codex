@@ -8,7 +8,7 @@ const Footer = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Link href="/privacy" passHref>
           <Text fontSize="sm" mr={4}>
-            Privacy Policy
+            Our Privacy Policy
           </Text>
         </Link>
         <Link href="/tos" passHref>
