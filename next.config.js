@@ -8,6 +8,9 @@ const urlMap = JSON.parse(
 );
 
 const nextConfig = {
+  experimental: {
+    ppr: true,
+  },
   reactStrictMode: true,
 
   async redirects() {
