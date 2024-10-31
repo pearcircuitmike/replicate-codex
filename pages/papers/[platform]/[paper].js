@@ -43,6 +43,7 @@ import ShareButton from "../../../components/ShareButton";
 import { useAuth } from "../../../context/AuthContext";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
 import LimitMessage from "@/components/LimitMessage";
+import AuthSlideTray from "@/components/AuthSlideTray";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -121,6 +122,13 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     uniqueResources: [],
     canViewFullArticle: true,
   });
+
+  // Track component mount status to prevent server-side rendering issues
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchPaperTasks = async () => {
@@ -346,20 +354,16 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             )}
           </Box>
 
-          {!user && (
-            <Box>
-              <Text align="center" fontWeight={"bold"} mt={10}>
-                Sign in to get full access
-              </Text>
-              <Box
-                mb={10}
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-              >
+          {/* Render AuthSlideTray only after component has mounted and user is not authenticated */}
+          {isMounted && !user && (
+            <AuthSlideTray>
+              <Box>
+                <Text align="center" fontWeight="bold" mb={4}>
+                  Sign in to get full access
+                </Text>
                 <AuthForm />
               </Box>
-            </Box>
+            </AuthSlideTray>
           )}
 
           {paper.thumbnail ? (

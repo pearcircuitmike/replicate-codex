@@ -1,9 +1,18 @@
 import React from "react";
-import { TwitterShareButton } from "react-share";
+import dynamic from "next/dynamic";
 import { Button } from "@chakra-ui/react";
+
+// Dynamically import TwitterShareButton with no SSR to prevent server-client mismatch
+const TwitterShareButton = dynamic(
+  () => import("react-share").then((mod) => mod.TwitterShareButton),
+  { ssr: false }
+);
 
 const ShareButton = (props) => {
   const { buttonText = "Share on 𝕏", ...shareProps } = props;
+
+  // Prevent server-side rendering for this component by returning null during SSR
+  if (typeof window === "undefined") return null;
 
   return (
     <TwitterShareButton {...shareProps}>
