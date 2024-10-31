@@ -1,4 +1,3 @@
-// ModelPage.jsx
 import { useState, useEffect } from "react";
 import {
   Container,
@@ -14,6 +13,7 @@ import {
   Stack,
   Center,
 } from "@chakra-ui/react";
+import AuthSlideTray from "@/components/AuthSlideTray";
 import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
 
 import MetaTags from "../../../components/MetaTags";
@@ -61,8 +61,12 @@ export async function getStaticProps({ params }) {
 
 export default function ModelPage({ model, relatedModels, slug }) {
   const { user, accessToken, hasActiveSubscription, loading } = useAuth();
-
   const [creatorData, setCreatorData] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchCreatorData = async () => {
@@ -81,7 +85,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
   }, [model.creator, model.platform]);
 
   if (!model) {
-    return <div>Loading...</div>; // or any other fallback UI
+    return <div>Loading...</div>;
   }
 
   return (
@@ -158,29 +162,21 @@ export default function ModelPage({ model, relatedModels, slug }) {
             <EmojiWithGradient title={model?.modelName} />
           )}
 
-          {/* Render CarbonAd for all users */}
-
           <Box my={5}>
             <CarbonAd />
           </Box>
 
-          <Container maxW="container.md">
-            {!user && (
+          {/* AuthSlideTray integration */}
+          {isMounted && !user && (
+            <AuthSlideTray>
               <Box>
-                <Text align="center" fontWeight={"bold"} mt={10}>
+                <Text align="center" fontWeight="bold" mb={4}>
                   Sign in to get full access
                 </Text>
-                <Box
-                  mb={10}
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <AuthForm />
-                </Box>
+                <AuthForm />
               </Box>
-            )}
-          </Container>
+            </AuthSlideTray>
+          )}
 
           <ModelOverview model={model} />
 
