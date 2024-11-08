@@ -40,6 +40,7 @@ const BookmarkButton = ({
           headers: {
             Authorization: `Bearer ${accessToken || ""}`,
           },
+          cache: "no-store", // Prevent caching
         }
       );
       if (!response.ok) throw new Error("Failed to check bookmark status");
