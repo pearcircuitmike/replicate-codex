@@ -354,7 +354,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             )}
           </Box>
 
-          {/* Render AuthSlideTray only after component has mounted and user is not authenticated */}
+          {/* Render AuthSlideTray only after component has mounted and user is not authenticated*/}
           {isMounted && !user && (
             <AuthSlideTray>
               <Box>
@@ -365,7 +365,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </Box>
             </AuthSlideTray>
           )}
-
           {paper.thumbnail ? (
             <Image
               src={paper.thumbnail}
@@ -382,7 +381,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <EmojiWithGradient title={paper.title} height="350px" />
             </Box>
           )}
-
           {overview}
           {restOfContent}
           <br />
@@ -392,7 +390,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             inaccuracies - check out the links to read the original source
             documents!
           </Text>
-
           <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
             <SocialScore resource={paper} />
             <Box w={["100%", "auto"]}>
