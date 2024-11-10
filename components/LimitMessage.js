@@ -122,7 +122,7 @@ const LimitMessage = () => {
                 </Text>
               </Box>
               <Box display="flex" justifyContent="center">
-                <AuthForm isUpgradeFlow={true} />
+                <AuthForm isUpgradeFlow={true} signupSource="limit-message" />
               </Box>
             </Stack>
           </Box>

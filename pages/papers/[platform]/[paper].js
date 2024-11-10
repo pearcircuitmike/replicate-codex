@@ -361,7 +361,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 <Text align="center" fontWeight="bold" mb={4}>
                   Sign in to get full access
                 </Text>
-                <AuthForm />
+                <AuthForm signupSource="paper-slideup-tray" />
               </Box>
             </AuthSlideTray>
           )}

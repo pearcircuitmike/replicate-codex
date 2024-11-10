@@ -169,7 +169,7 @@ function AppContent({ Component, pageProps }) {
                 <ModalHeader>Create an account for full access</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                  <AuthForm />
+                  <AuthForm signupSource="app-popup" />
                 </ModalBody>
               </ModalContent>
             </Modal>

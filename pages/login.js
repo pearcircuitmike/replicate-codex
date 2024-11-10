@@ -10,7 +10,7 @@ export default function LoginPage() {
           Sign in or sign up
         </Heading>
         <Center h="50vh">
-          <AuthForm />
+          <AuthForm signupSource="login-page" />
         </Center>
       </VStack>
     </Container>

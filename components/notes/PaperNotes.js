@@ -163,7 +163,7 @@ const PaperNotes = ({ paperId }) => {
           <ModalHeader>Create an account for full access</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <AuthForm />
+            <AuthForm signupSource="paper-notes" />
           </ModalBody>
         </ModalContent>
       </Modal>

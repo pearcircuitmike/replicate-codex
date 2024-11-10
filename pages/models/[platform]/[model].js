@@ -173,7 +173,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
                 <Text align="center" fontWeight="bold" mb={4}>
                   Sign in to get full access
                 </Text>
-                <AuthForm />
+                <AuthForm signupSource="model-slideup-tray" />
               </Box>
             </AuthSlideTray>
           )}

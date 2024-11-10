@@ -20,7 +20,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function AuthForm({
   isUpgradeFlow = false,
-  signupSource = "default3",
+  signupSource = "default",
 }) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
