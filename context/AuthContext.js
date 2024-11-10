@@ -1,7 +1,5 @@
-// context/AuthContext.js
-
 import { createContext, useContext, useEffect, useState } from "react";
-import supabase from "../pages/api/utils/supabaseClient";
+import supabase from "@/pages/api/utils/supabaseClient";
 import { trackEvent } from "../pages/api/utils/analytics-util";
 
 const AuthContext = createContext();
@@ -11,9 +9,9 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({
     user: null,
-    loading: true, // Start with loading true to indicate we're checking the session
+    loading: true,
     hasActiveSubscription: false,
-    accessToken: null, // Add accessToken to the state
+    accessToken: null,
   });
 
   const handleSession = async (session) => {
@@ -45,8 +43,37 @@ export const AuthProvider = ({ children }) => {
         user,
         loading: false,
         hasActiveSubscription,
-        accessToken: session.access_token, // Set the accessToken
+        accessToken: session.access_token,
       });
+
+      // Update signup source if it exists in localStorage
+      const signupSource = localStorage.getItem("signupSource");
+      if (signupSource) {
+        try {
+          const response = await fetch("./api/update-signup-source", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              signupSource: signupSource || "unknown",
+            }),
+          });
+
+          if (response.ok) {
+            console.log("Signup source updated successfully");
+            // Only remove if update was successful
+            localStorage.removeItem("signupSource");
+          } else {
+            const errorData = await response.json();
+            console.error("Failed to update signup source:", errorData);
+          }
+        } catch (err) {
+          console.error("Error calling update-signup-source API:", err);
+        }
+      }
 
       trackEvent("login");
     } else {
@@ -54,7 +81,7 @@ export const AuthProvider = ({ children }) => {
         user: null,
         loading: false,
         hasActiveSubscription: false,
-        accessToken: null, // Reset the accessToken
+        accessToken: null,
       });
     }
   };
@@ -94,7 +121,7 @@ export const AuthProvider = ({ children }) => {
         user: null,
         loading: false,
         hasActiveSubscription: false,
-        accessToken: null, // Reset the accessToken on logout
+        accessToken: null,
       });
     }
   };
@@ -127,7 +154,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        ...state, // This now includes accessToken
+        ...state,
         logout,
         handleSignInWithGoogle,
         handleSignInWithEmail,

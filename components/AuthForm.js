@@ -18,7 +18,10 @@ import {
 import { FaGoogle } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
-export default function AuthForm({ isUpgradeFlow = false }) {
+export default function AuthForm({
+  isUpgradeFlow = false,
+  signupSource = "default",
+}) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
@@ -27,6 +30,8 @@ export default function AuthForm({ isUpgradeFlow = false }) {
 
   const signInWithGoogle = async () => {
     setLoading(true);
+    localStorage.setItem("signupSource", signupSource);
+
     await handleSignInWithGoogle();
     setLoading(false);
   };
@@ -34,6 +39,8 @@ export default function AuthForm({ isUpgradeFlow = false }) {
   const signInWithEmail = async (e) => {
     e.preventDefault();
     setLoading(true);
+    localStorage.setItem("signupSource", signupSource);
+
     const { data, error } = await handleSignInWithEmail(email);
     if (!error) {
       setEmailSent(true);
