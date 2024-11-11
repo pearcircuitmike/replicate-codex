@@ -255,8 +255,8 @@ const TopicSelectionPage = () => {
             Choose topics to follow
           </Heading>
           <Text color="gray.600">
-            Select the topics you're interested in to personalize your
-            experience
+            Get a weekly email summarizing the top AI developments in each topic
+            you follow
           </Text>
         </Box>
 
