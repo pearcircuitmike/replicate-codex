@@ -118,7 +118,7 @@ export default function RoleSelectionPage() {
 
   const updateRolesInDb = async (newRoles) => {
     try {
-      const response = await fetch("/api/update-roles", {
+      const response = await fetch("/api/onboarding/update-roles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
