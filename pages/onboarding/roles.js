@@ -173,11 +173,65 @@ export default function RoleSelectionPage() {
       return;
     }
 
-    router.push("/dashboard");
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/onboarding/complete-roles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update onboarding status");
+      }
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error updating roles:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update role selection. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSkip = () => {
-    router.push("/dashboard");
+  const handleSkip = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/onboarding/complete-roles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update onboarding status");
+      }
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error updating onboarding status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to skip onboarding. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!user) {

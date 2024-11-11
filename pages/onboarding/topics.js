@@ -156,7 +156,7 @@ const TopicSelectionPage = () => {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const selectedTasks = tasks.filter((task) => task.isFollowed);
 
     if (selectedTasks.length === 0) {
@@ -170,11 +170,59 @@ const TopicSelectionPage = () => {
       return;
     }
 
-    router.push("/onboarding/roles");
+    try {
+      const response = await fetch("/api/onboarding/complete-topics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update onboarding status");
+      }
+
+      router.push("/onboarding/roles");
+    } catch (error) {
+      console.error("Error updating onboarding status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update onboarding status. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
-  const handleSkip = () => {
-    router.push("/onboarding/roles");
+  const handleSkip = async () => {
+    try {
+      const response = await fetch("/api/onboarding/complete-topics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update onboarding status");
+      }
+
+      router.push("/onboarding/roles");
+    } catch (error) {
+      console.error("Error updating onboarding status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to skip onboarding. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const groupTasksByCategory = (tasks) => {

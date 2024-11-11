@@ -53,7 +53,7 @@ const PricingPage = () => {
   const PricingContent = () => (
     <Box width="100%" maxW="500px" mx="auto">
       <Heading size="xl" mb={6} textAlign="center">
-        Complete signup to access your dashboard
+        Finish setting up your account
       </Heading>
 
       <HStack justify="center" mb={4}>

@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
       const signupSource = localStorage.getItem("signupSource");
       if (signupSource) {
         try {
-          const response = await fetch("./api/update-signup-source", {
+          const response = await fetch("/api/onboarding/update-signup-source", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
