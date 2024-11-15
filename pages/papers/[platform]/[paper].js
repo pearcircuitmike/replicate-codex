@@ -286,7 +286,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   fontStyle="italic"
                   mb={5}
                 >
-                  Key graphic from the paper "{paper.title}."{" "}
+                  Key graphic from the paper &quot;{paper.title}.&quot;{" "}
                   <Link
                     href={`https://arxiv.org/abs/${paper.arxivId}`}
                     isExternal
