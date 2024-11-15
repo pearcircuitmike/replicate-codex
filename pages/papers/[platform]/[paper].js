@@ -44,6 +44,7 @@ import { useAuth } from "../../../context/AuthContext";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
 import LimitMessage from "@/components/LimitMessage";
 import AuthSlideTray from "@/components/AuthSlideTray";
+import SideNavigation from "@/components/SideNavigation";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -123,7 +124,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     canViewFullArticle: true,
   });
 
-  // Track component mount status to prevent server-side rendering issues
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -240,7 +240,17 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       return {
         overview: (
           <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
-            <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+            <ReactMarkdown
+              components={ChakraUIRenderer({
+                ...customTheme,
+                h2: (props) => {
+                  const id = props.children[0]
+                    .toLowerCase()
+                    .replace(/[^a-zA-Z0-9]+/g, "-");
+                  return <Heading {...props} id={id} />;
+                },
+              })}
+            >
               {overview}
             </ReactMarkdown>
             <Box mt={4} textAlign="right">
@@ -258,7 +268,17 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           </Box>
         ),
         restOfContent: (
-          <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+          <ReactMarkdown
+            components={ChakraUIRenderer({
+              ...customTheme,
+              h2: (props) => {
+                const id = props.children[0]
+                  .toLowerCase()
+                  .replace(/[^a-zA-Z0-9]+/g, "-");
+                return <Heading {...props} id={id} />;
+              },
+            })}
+          >
             {restOfContent}
           </ReactMarkdown>
         ),
@@ -268,7 +288,17 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     return {
       overview: null,
       restOfContent: (
-        <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
+        <ReactMarkdown
+          components={ChakraUIRenderer({
+            ...customTheme,
+            h2: (props) => {
+              const id = props.children[0]
+                .toLowerCase()
+                .replace(/[^a-zA-Z0-9]+/g, "-");
+              return <Heading {...props} id={id} />;
+            },
+          })}
+        >
           {content}
         </ReactMarkdown>
       ),
@@ -286,6 +316,8 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         title={`${paper.title} | AI Research Paper Details`}
         description={paper.abstract}
       />
+
+      <SideNavigation markdownContent={paper.generatedSummary} />
 
       <Container maxW="container.md" pt="12">
         <Box>
@@ -354,7 +386,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             )}
           </Box>
 
-          {/* Render AuthSlideTray only after component has mounted and user is not authenticated*/}
           {isMounted && !user && (
             <AuthSlideTray>
               <Box>
