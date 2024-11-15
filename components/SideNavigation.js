@@ -75,7 +75,7 @@ const SideNavigation = ({ markdownContent = "" }) => {
       as="nav"
       position="fixed"
       right="8"
-      top="32"
+      top="25%"
       width="52"
       display={display}
       zIndex="10"
