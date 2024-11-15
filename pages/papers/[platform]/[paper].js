@@ -7,7 +7,6 @@ import {
   Text,
   Heading,
   Link,
-  Image,
   Icon,
   Stack,
   useDisclosure,
@@ -20,6 +19,7 @@ import {
   useToast,
   Wrap,
   WrapItem,
+  Image,
 } from "@chakra-ui/react";
 import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
@@ -31,7 +31,6 @@ import {
 } from "../../api/utils/fetchPapers";
 import fetchRelatedPapers from "../../api/utils/fetchRelatedPapers";
 import RelatedPapers from "../../../components/RelatedPapers";
-import EmojiWithGradient from "../../../components/EmojiWithGradient";
 import SocialScore from "../../../components/SocialScore";
 import customTheme from "../../../components/MarkdownTheme";
 import BookmarkButton from "../../../components/BookmarkButton";
@@ -45,6 +44,7 @@ import TwitterFollowButton from "@/components/TwitterFollowButton";
 import LimitMessage from "@/components/LimitMessage";
 import AuthSlideTray from "@/components/AuthSlideTray";
 import SideNavigation from "@/components/SideNavigation";
+import PaperHero from "@/components/PaperHero";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -239,33 +239,67 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
       return {
         overview: (
-          <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
-            <ReactMarkdown
-              components={ChakraUIRenderer({
-                ...customTheme,
-                h2: (props) => {
-                  const id = props.children[0]
-                    .toLowerCase()
-                    .replace(/[^a-zA-Z0-9]+/g, "-");
-                  return <Heading {...props} id={id} />;
-                },
-              })}
-            >
-              {overview}
-            </ReactMarkdown>
-            <Box mt={4} textAlign="right">
-              <ShareButton
-                url={paperUrl}
-                title={
-                  `Interesting paper I found on @aimodelsfyi... ` +
-                  paper.title +
-                  `\n\n`
-                }
-                hashtags={["AI", "ML"]}
-                buttonText="Share on 𝕏"
-              />
+          <>
+            <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
+              <ReactMarkdown
+                components={ChakraUIRenderer({
+                  ...customTheme,
+                  h2: (props) => {
+                    const id = props.children[0]
+                      .toLowerCase()
+                      .replace(/[^a-zA-Z0-9]+/g, "-");
+                    return <Heading {...props} id={id} />;
+                  },
+                })}
+              >
+                {overview}
+              </ReactMarkdown>
+              <Box mt={4} textAlign="right">
+                <ShareButton
+                  url={paperUrl}
+                  title={
+                    `Interesting paper I found on @aimodelsfyi... ` +
+                    paper.title +
+                    `\n\n`
+                  }
+                  hashtags={["AI", "ML"]}
+                  buttonText="Share on 𝕏"
+                />
+              </Box>
             </Box>
-          </Box>
+            {paper.thumbnail && (
+              <>
+                <Image
+                  src={paper.thumbnail}
+                  alt={paper.title}
+                  my={6}
+                  objectFit="cover"
+                  w="100%"
+                  h="350px"
+                  boxShadow="xs"
+                  rounded="md"
+                />
+                <Text
+                  fontSize="sm"
+                  textAlign="center"
+                  color="gray.500"
+                  fontStyle="italic"
+                  mb={5}
+                >
+                  Key graphic from the paper "{paper.title}."{" "}
+                  <Link
+                    href={`https://arxiv.org/abs/${paper.arxivId}`}
+                    isExternal
+                    color="blue.500"
+                    textDecoration="underline"
+                  >
+                    Click here to view original
+                  </Link>
+                  .
+                </Text>
+              </>
+            )}
+          </>
         ),
         restOfContent: (
           <ReactMarkdown
@@ -319,8 +353,8 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
       <SideNavigation markdownContent={paper.generatedSummary} />
 
-      <Container maxW="container.md" pt="12">
-        <Box>
+      <PaperHero paper={paper}>
+        <Box color="white">
           <Heading as="h1" size="xl" mb={5}>
             {paper.title}
           </Heading>
@@ -332,21 +366,15 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </WrapItem>
             ))}
           </Wrap>
-        </Box>
-      </Container>
 
-      {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
-        <LimitMessage />
-      ) : (
-        <Container maxW="container.md">
-          <Box fontSize="sm" mb={4} px="0.5px" color="gray.500">
+          <Box fontSize="sm" mb={4} px="0.5px" color="gray.300">
             <Text as="span">
               Read original:{" "}
               <Link
                 href={`https://arxiv.org/abs/${paper.arxivId}`}
                 isExternal
-                _hover={{ color: "blackAlpha.900" }}
-                color="black.500"
+                _hover={{ color: "white" }}
+                color="gray.300"
               >
                 <Text as="span" textDecoration="underline">
                   arXiv:{paper.arxivId}
@@ -364,7 +392,8 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                       href={`/authors/${encodeURIComponent(
                         paper.platform
                       )}/${encodeURIComponent(author)}`}
-                      _hover={{ color: "blackAlpha.900" }}
+                      _hover={{ color: "white" }}
+                      color="gray.300"
                     >
                       {author}
                     </Link>
@@ -385,7 +414,13 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <Text as="span">Unknown authors</Text>
             )}
           </Box>
+        </Box>
+      </PaperHero>
 
+      {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
+        <LimitMessage />
+      ) : (
+        <Container maxW="container.md">
           {isMounted && !user && (
             <AuthSlideTray>
               <Box>
@@ -396,22 +431,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               </Box>
             </AuthSlideTray>
           )}
-          {paper.thumbnail ? (
-            <Image
-              src={paper.thumbnail}
-              alt={paper.title}
-              my={6}
-              objectFit="cover"
-              w="100%"
-              h="350px"
-              boxShadow="xs"
-              rounded="md"
-            />
-          ) : (
-            <Box my={6}>
-              <EmojiWithGradient title={paper.title} height="350px" />
-            </Box>
-          )}
+
           {overview}
           {restOfContent}
           <br />

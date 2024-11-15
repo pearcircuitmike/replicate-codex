@@ -4,7 +4,6 @@ import { Box, Button, VStack, useBreakpointValue } from "@chakra-ui/react";
 const extractSections = (markdownContent) => {
   if (!markdownContent) return [];
 
-  // Match all headers starting with ## (h2 headers)
   const headerRegex = /^## (.*$)/gm;
   const matches = [...markdownContent.matchAll(headerRegex)];
 
@@ -12,7 +11,6 @@ const extractSections = (markdownContent) => {
     .map((match, index) => ({
       id: match[1].toLowerCase().replace(/[^a-zA-Z0-9]+/g, "-"),
       title: match[1],
-      // Store the original index to maintain order
       index,
     }))
     .sort((a, b) => a.index - b.index);
@@ -21,8 +19,6 @@ const extractSections = (markdownContent) => {
 const SideNavigation = ({ markdownContent = "" }) => {
   const [activeSection, setActiveSection] = useState("");
   const [sections, setSections] = useState([]);
-
-  // Only show on desktop
   const display = useBreakpointValue({ base: "none", xl: "block" });
 
   useEffect(() => {
@@ -32,32 +28,43 @@ const SideNavigation = ({ markdownContent = "" }) => {
   useEffect(() => {
     if (sections.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+    const updateActiveSection = () => {
+      const elements = sections.map(({ id }) => document.getElementById(id));
+      let currentSection = null;
+      let minDistance = Infinity;
+
+      elements.forEach((element) => {
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const distance = Math.abs(rect.top);
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentSection = element.id;
           }
-        });
-      },
-      {
-        rootMargin: "-20% 0px -80% 0px",
+        }
+      });
+
+      if (currentSection) {
+        setActiveSection(currentSection);
       }
-    );
+    };
 
-    // Observe all section elements
-    sections.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
+    // Initial check
+    updateActiveSection();
 
-    return () => observer.disconnect();
+    // Add scroll listener
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+    };
   }, [sections]);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+      setActiveSection(sectionId);
     }
   };
 
@@ -69,9 +76,14 @@ const SideNavigation = ({ markdownContent = "" }) => {
       position="fixed"
       right="8"
       top="32"
-      width="48"
+      width="52"
       display={display}
       zIndex="10"
+      background="white"
+      rounded="5px"
+      py={3}
+      px={1}
+      boxShadow="sm"
     >
       <VStack spacing={2} align="stretch">
         {sections.map(({ id, title }) => (
