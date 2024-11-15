@@ -45,6 +45,7 @@ import LimitMessage from "@/components/LimitMessage";
 import AuthSlideTray from "@/components/AuthSlideTray";
 import SideNavigation from "@/components/SideNavigation";
 import PaperHero from "@/components/PaperHero";
+import BackToTop from "@/components/BackToTop";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -352,6 +353,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       />
 
       <SideNavigation markdownContent={paper.generatedSummary} />
+      <BackToTop />
 
       <PaperHero paper={paper}>
         <Box color="white">

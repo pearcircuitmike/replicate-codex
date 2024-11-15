@@ -57,7 +57,7 @@ const LimitMessage = () => {
   ];
 
   return (
-    <Container maxW="container.md">
+    <Container maxW="container.md" backgroundColor="white" rounded={"5px"}>
       <Stack spacing={8} py={8}>
         {/* Limit Message */}
         <Alert
