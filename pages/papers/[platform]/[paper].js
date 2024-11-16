@@ -47,6 +47,7 @@ import SideNavigation from "@/components/SideNavigation";
 import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
 import PDFViewer from "@/components/PDFViewer";
+import AudioPlayer from "@/components/AudioPlayer";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -242,6 +243,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       return {
         overview: (
           <>
+            <Box mb={3}>
+              <AudioPlayer text={paper.generatedSummary} />
+            </Box>
             <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
               <ReactMarkdown
                 components={ChakraUIRenderer({
@@ -269,6 +273,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 />
               </Box>
             </Box>
+
             {paper.thumbnail && (
               <>
                 <Image
@@ -423,6 +428,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           )}
 
           {overview}
+
           {restOfContent}
           {paper.pdfUrl && (
             <Box my={6}>
