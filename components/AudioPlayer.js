@@ -10,25 +10,15 @@ import {
   SliderFilledTrack,
   SliderThumb,
 } from "@chakra-ui/react";
-import { FaPlay, FaPause, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
+import { FaPlay, FaPause } from "react-icons/fa";
 
 const AudioPlayer = ({ text }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(() => {
-    // Try to get saved volume from localStorage, default to 1
-    const savedVolume = localStorage.getItem("audioPlayerVolume");
-    return savedVolume ? parseFloat(savedVolume) : 1;
-  });
-  const [isVolumeSliderVisible, setIsVolumeSliderVisible] = useState(false);
   const router = useRouter();
 
-  // Save volume to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem("audioPlayerVolume", volume.toString());
-  }, [volume]);
-
+  // Handle route changes
   useEffect(() => {
     const handleRouteChange = () => {
       window.speechSynthesis.cancel();
@@ -43,6 +33,7 @@ const AudioPlayer = ({ text }) => {
     };
   }, [router]);
 
+  // Handle page visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -64,6 +55,7 @@ const AudioPlayer = ({ text }) => {
     const estimatedDuration = (wordCount / 150) * 60;
     setDuration(estimatedDuration);
 
+    // Cleanup on unmount
     return () => {
       window.speechSynthesis.cancel();
     };
@@ -100,7 +92,7 @@ const AudioPlayer = ({ text }) => {
 
     utterance.rate = 1;
     utterance.pitch = 1;
-    utterance.volume = volume;
+    utterance.volume = 1;
     utterance.lang = "en-GB";
 
     utterance.onstart = () => console.log("Speech started");
@@ -122,8 +114,10 @@ const AudioPlayer = ({ text }) => {
   };
 
   const cleanAndSpeak = (textToSpeak) => {
+    // First, split the text into sections by headers
     const sections = textToSpeak.split(/(?=##\s)/);
 
+    // Process each section
     const processedText = sections
       .map((section) => {
         if (section.startsWith("##")) {
@@ -179,25 +173,6 @@ const AudioPlayer = ({ text }) => {
     }
   };
 
-  const handleVolumeChange = (newVolume) => {
-    setVolume(newVolume);
-    if (isPlaying) {
-      // Restart speech with new volume
-      const words = text.split(" ");
-      const position = Math.floor((currentTime / duration) * words.length);
-      const remainingText = words.slice(position).join(" ");
-      cleanAndSpeak(remainingText);
-    }
-  };
-
-  const toggleMute = () => {
-    if (volume > 0) {
-      setVolume(0);
-    } else {
-      setVolume(1);
-    }
-  };
-
   return (
     <Box bg="gray.100" p={4} borderRadius="md" width="100%">
       <HStack spacing={4}>
@@ -231,49 +206,6 @@ const AudioPlayer = ({ text }) => {
               {formatTime(duration)}
             </Box>
           </HStack>
-        </Box>
-
-        <Box
-          position="relative"
-          onMouseEnter={() => setIsVolumeSliderVisible(true)}
-          onMouseLeave={() => setIsVolumeSliderVisible(false)}
-        >
-          <IconButton
-            aria-label={volume === 0 ? "Unmute" : "Mute"}
-            icon={<Icon as={volume === 0 ? FaVolumeMute : FaVolumeUp} />}
-            onClick={toggleMute}
-            size="sm"
-          />
-          {isVolumeSliderVisible && (
-            <Box
-              position="absolute"
-              bottom="100%"
-              left="50%"
-              transform="translateX(-50%)"
-              mb={2}
-              bg="white"
-              p={3}
-              borderRadius="md"
-              boxShadow="md"
-              width="100px"
-            >
-              <Slider
-                aria-label="Volume"
-                value={volume}
-                min={0}
-                max={1}
-                step={0.01}
-                onChange={handleVolumeChange}
-                orientation="vertical"
-                minH="100px"
-              >
-                <SliderTrack>
-                  <SliderFilledTrack />
-                </SliderTrack>
-                <SliderThumb />
-              </Slider>
-            </Box>
-          )}
         </Box>
       </HStack>
     </Box>
