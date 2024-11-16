@@ -36,7 +36,7 @@ const AuthSlideTray = ({ children }) => {
           (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
           100;
 
-        if (scrollPercentage >= 10) {
+        if (scrollPercentage >= 50) {
           setTrayShown();
           onOpen();
         }
