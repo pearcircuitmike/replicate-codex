@@ -47,7 +47,7 @@ import SideNavigation from "@/components/SideNavigation";
 import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
 import PDFViewer from "@/components/PDFViewer";
-import AudioPlayer from "@/components/AudioPlayer";
+//import AudioPlayer from "@/components/AudioPlayer";
 import ImageLightbox from "@/components/ImageLightbox";
 
 export async function getStaticPaths() {
@@ -244,9 +244,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       return {
         overview: (
           <>
-            <Box mb={3}>
+            {/*  <Box mb={3}>
               <AudioPlayer text={paper.generatedSummary} />
-            </Box>
+            </Box>*/}
             <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
               <ReactMarkdown
                 components={ChakraUIRenderer({
