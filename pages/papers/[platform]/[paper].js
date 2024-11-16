@@ -48,6 +48,7 @@ import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
 import PDFViewer from "@/components/PDFViewer";
 import AudioPlayer from "@/components/AudioPlayer";
+import ImageLightbox from "@/components/ImageLightbox";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -273,19 +274,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 />
               </Box>
             </Box>
-
             {paper.thumbnail && (
               <>
-                <Image
-                  src={paper.thumbnail}
-                  alt={paper.title}
-                  my={6}
-                  objectFit="cover"
-                  w="100%"
-                  h="350px"
-                  boxShadow="xs"
-                  rounded="md"
-                />
+                <ImageLightbox src={paper.thumbnail} alt={paper.title} />
                 <Text
                   fontSize="sm"
                   textAlign="center"

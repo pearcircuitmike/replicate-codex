@@ -33,6 +33,7 @@ import AuthForm from "../../../components/AuthForm";
 import CarbonAd from "@/components/CarbonAd";
 import SocialScore from "../../../components/SocialScore";
 import { useAuth } from "../../../context/AuthContext";
+import ImageLightbox from "@/components/ImageLightbox";
 
 export async function getStaticPaths({ numPages = 100 }) {
   const { data: models } = await supabase
@@ -147,17 +148,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
           </Box>
 
           {model?.example ? (
-            <Image
-              src={model?.example}
-              id={model?.id}
-              alt={model?.name}
-              my={6}
-              objectFit="cover"
-              w="100%"
-              h="350px"
-              boxShadow="xs"
-              rounded="md"
-            />
+            <ImageLightbox src={model.example} alt={model.modelName} />
           ) : (
             <EmojiWithGradient title={model?.modelName} />
           )}
