@@ -426,7 +426,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           {restOfContent}
           {paper.pdfUrl && (
             <Box my={6}>
-              <Heading as={"h2"} mb={5}>
+              <Heading as="h2" id="full-paper" mb={5}>
                 Full paper
               </Heading>
               <PDFViewer url={paper.pdfUrl} />

@@ -4,16 +4,28 @@ import { Box, Button, VStack, useBreakpointValue } from "@chakra-ui/react";
 const extractSections = (markdownContent) => {
   if (!markdownContent) return [];
 
+  // Extract headers from markdown content
   const headerRegex = /^## (.*$)/gm;
   const matches = [...markdownContent.matchAll(headerRegex)];
 
-  return matches
-    .map((match, index) => ({
-      id: match[1].toLowerCase().replace(/[^a-zA-Z0-9]+/g, "-"),
-      title: match[1],
-      index,
-    }))
-    .sort((a, b) => a.index - b.index);
+  // Create sections from markdown headers
+  const markdownSections = matches.map((match, index) => ({
+    id: match[1].toLowerCase().replace(/[^a-zA-Z0-9]+/g, "-"),
+    title: match[1],
+    index,
+  }));
+
+  // Add "Full paper" section
+  const fullPaperSection = {
+    id: "full-paper",
+    title: "Full Paper",
+    index: markdownSections.length, // Put it at the end
+  };
+
+  // Combine markdown sections with full paper section
+  return [...markdownSections, fullPaperSection].sort(
+    (a, b) => a.index - b.index
+  );
 };
 
 const SideNavigation = ({ markdownContent = "" }) => {
@@ -52,7 +64,7 @@ const SideNavigation = ({ markdownContent = "" }) => {
     // Initial check
     updateActiveSection();
 
-    // Add scroll listener
+    // Add scroll listener with passive flag for better performance
     window.addEventListener("scroll", updateActiveSection, { passive: true });
 
     return () => {
