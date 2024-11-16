@@ -40,6 +40,10 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
 
   return (
     <Box
+      as={Link}
+      href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
+        slug
+      )}`}
       w="100%"
       h="100%"
       borderWidth="1px"
@@ -51,50 +55,49 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       rounded="md"
       bg="white"
       overflow="hidden"
+      transition="transform 0.2s ease, box-shadow 0.2s ease"
+      _hover={{
+        transform: "translateY(-5px)",
+        boxShadow: "lg",
+      }}
+      cursor="pointer"
     >
-      <Link
-        href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
-          slug
-        )}`}
-        passHref
-      >
-        <Box h="250px" overflow="hidden" position="relative">
-          {thumbnail ? (
+      <Box h="250px" overflow="hidden" position="relative">
+        {thumbnail ? (
+          <Image
+            src={thumbnail}
+            alt={title}
+            objectFit="cover"
+            w="100%"
+            h="100%"
+            loading="lazy"
+          />
+        ) : (
+          <EmojiWithGradient title={title} />
+        )}
+        <Tooltip label="Calculated based on factors such as likes, downloads, etc">
+          <Flex
+            position="absolute"
+            bottom="10px"
+            right="10px"
+            bg="white"
+            borderRadius="md"
+            p="4px 8px"
+            alignItems="center"
+            boxShadow="md"
+          >
             <Image
-              src={thumbnail}
-              alt={title}
-              objectFit="cover"
-              w="100%"
-              h="100%"
-              loading="lazy"
+              src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
+              alt="Total Score"
+              boxSize="16px"
+              mr={1}
             />
-          ) : (
-            <EmojiWithGradient title={title} />
-          )}
-          <Tooltip label="Calculated based on factors such as likes, downloads, etc">
-            <Flex
-              position="absolute"
-              bottom="10px"
-              right="10px"
-              bg="white"
-              borderRadius="md"
-              p="4px 8px"
-              alignItems="center"
-              boxShadow="md"
-            >
-              <Image
-                src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
-                alt="Total Score"
-                boxSize="16px"
-                mr={1}
-              />
-              <Text fontSize="sm" fontWeight="bold">
-                {formatLargeNumber(Math.floor(totalScore))}
-              </Text>
-            </Flex>
-          </Tooltip>
-        </Box>
-      </Link>
+            <Text fontSize="sm" fontWeight="bold">
+              {formatLargeNumber(Math.floor(totalScore))}
+            </Text>
+          </Flex>
+        </Tooltip>
+      </Box>
       <Box p="15px">
         <Heading
           as="h3"
@@ -120,19 +123,11 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           as="span"
           fontSize="sm"
           color="blue.500"
-          textDecoration="underline"
           _hover={{
-            textDecoration: "none",
             color: "blue.700",
           }}
         >
-          <Link
-            href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
-              slug
-            )}`}
-          >
-            Read more
-          </Link>
+          Read more
         </Text>
       </Box>
       <Flex
@@ -145,12 +140,6 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       >
         <Text fontSize="sm">{formattedDate}</Text>
       </Flex>
-
-      <BookmarkButton
-        resourceType="paper"
-        resourceId={id}
-        onBookmarkChange={onBookmarkChange}
-      />
     </Box>
   );
 };
