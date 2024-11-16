@@ -1,4 +1,6 @@
 // pages/api/pdf-proxy.js
+
+// NOTE: This route is only needed on local dev due to CORS - it is not needed in production.
 export default async function handler(req, res) {
   const { url } = req.query;
 

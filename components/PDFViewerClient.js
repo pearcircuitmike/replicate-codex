@@ -36,10 +36,11 @@ const PDFViewerClient = ({ url }) => {
         setLoading(true);
         setError(null);
 
-        const pdfUrl =
-          process.env.NEXT_PUBLIC_USE_PDF_PROXY === "true"
-            ? `/api/pdf-proxy?url=${encodeURIComponent(url)}`
-            : url;
+        const pdfUrl = url.includes("arxiv.org")
+          ? `https://pdf-proxy.mike-465.workers.dev/?url=${encodeURIComponent(
+              url
+            )}`
+          : url;
 
         const pdfjsLib = window.pdfjsLib;
         pdfjsLib.GlobalWorkerOptions.workerSrc =
