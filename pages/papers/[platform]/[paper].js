@@ -420,9 +420,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             <AuthSlideTray>
               <Box>
                 <Text align="center" fontWeight="bold" mb={4}>
-                  Sign in to get full access
+                  Get summaries like this in your inbox
                 </Text>
-                <AuthForm signupSource="paper-slideup-tray" />
+                <AuthForm signupSource="paper-slideup-tray" isUpgradeFlow />
               </Box>
             </AuthSlideTray>
           )}
