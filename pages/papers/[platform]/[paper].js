@@ -46,6 +46,7 @@ import AuthSlideTray from "@/components/AuthSlideTray";
 import SideNavigation from "@/components/SideNavigation";
 import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
+import PDFViewer from "@/components/PDFViewer";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -371,20 +372,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
           <Box fontSize="sm" mb={4} px="0.5px" color="gray.300">
             <Text as="span">
-              Read original:{" "}
-              <Link
-                href={`https://arxiv.org/abs/${paper.arxivId}`}
-                isExternal
-                _hover={{ color: "white" }}
-                color="gray.300"
-              >
-                <Text as="span" textDecoration="underline">
-                  arXiv:{paper.arxivId}
-                </Text>
-                <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
-              </Link>{" "}
-              - Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
-              by{" "}
+              Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
             </Text>
             {paper.authors && paper.authors.length > 0 ? (
               <>
@@ -436,8 +424,30 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
 
           {overview}
           {restOfContent}
+          {paper.pdfUrl && (
+            <Box my={6}>
+              <Heading as={"h2"} mb={5}>
+                Full paper
+              </Heading>
+              <PDFViewer url={paper.pdfUrl} />
+              <Text mt={5}>
+                Read original:{" "}
+                <Link
+                  href={`https://arxiv.org/abs/${paper.arxivId}`}
+                  isExternal
+                  color="blue.500"
+                >
+                  <Text as="span" textDecoration="underline">
+                    arXiv:{paper.arxivId}
+                  </Text>
+                  <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
+                </Link>
+              </Text>
+            </Box>
+          )}
           <br />
           <hr />
+
           <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
             This summary was produced with help from an AI and may contain
             inaccuracies - check out the links to read the original source
