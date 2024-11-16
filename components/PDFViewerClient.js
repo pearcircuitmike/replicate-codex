@@ -36,13 +36,16 @@ const PDFViewerClient = ({ url }) => {
         setLoading(true);
         setError(null);
 
-        const proxyUrl = `/api/pdf-proxy?url=${encodeURIComponent(url)}`;
+        const pdfUrl =
+          process.env.NEXT_PUBLIC_USE_PDF_PROXY === "true"
+            ? `/api/pdf-proxy?url=${encodeURIComponent(url)}`
+            : url;
 
         const pdfjsLib = window.pdfjsLib;
         pdfjsLib.GlobalWorkerOptions.workerSrc =
           "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-        const loadingTask = pdfjsLib.getDocument(proxyUrl);
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
 
         if (!isSubscribed) return;
@@ -98,7 +101,6 @@ const PDFViewerClient = ({ url }) => {
   }, [url, scriptLoaded]);
 
   const handleModalClick = (e) => {
-    // Prevent click when clicking navigation arrows
     if (e.target === e.currentTarget) {
       setIsZoomed(!isZoomed);
     }
