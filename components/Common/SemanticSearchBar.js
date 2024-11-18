@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Input, Box, IconButton, useBreakpointValue } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Input, Box, IconButton, Button } from "@chakra-ui/react";
 import { FaTimes } from "react-icons/fa";
 import PropTypes from "prop-types";
-import { debounce } from "lodash";
 import { trackEvent } from "@/pages/api/utils/analytics-util";
 
 const SemanticSearchBar = ({
@@ -12,49 +11,39 @@ const SemanticSearchBar = ({
   resourceType,
 }) => {
   const [searchValue, setSearchValue] = useState(initialSearchValue);
-  const isMobile = useBreakpointValue({ base: true, md: false });
 
-  // Debounce search submission (e.g., to the backend)
-  const debouncedSearchSubmit = useCallback(
-    debounce((value) => {
-      onSearchSubmit(value); // Submit the search after debouncing
-    }, 300), // Adjust debounce delay as needed
-    [onSearchSubmit]
-  );
-
-  // Debounce event tracking for search (separate from search submission)
-  const debouncedTrackEvent = useCallback(
-    debounce((value) => {
-      trackEvent("semantic_search", {
-        resource_type: resourceType,
-        query: value,
-      }); // Track semantic search with resourceType
-    }, 500), // Adjust debounce delay as needed for tracking
-    [resourceType]
-  );
+  const handleSubmit = () => {
+    onSearchSubmit(searchValue);
+    trackEvent("semantic_search", {
+      resource_type: resourceType,
+      query: searchValue,
+    });
+  };
 
   const handleChange = (e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    debouncedSearchSubmit(value); // Trigger debounced search submit
-    debouncedTrackEvent(value); // Trigger debounced event tracking
+    setSearchValue(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
   };
 
   const handleClear = () => {
     setSearchValue("");
-    onSearchSubmit(""); // Clear the search results
-    trackEvent("semantic_search", { resource_type: resourceType, query: "" }); // Track clear search event
+    onSearchSubmit("");
+    trackEvent("semantic_search", {
+      resource_type: resourceType,
+      query: "",
+    });
   };
 
   useEffect(() => {
     if (initialSearchValue) {
       setSearchValue(initialSearchValue);
     }
-    return () => {
-      debouncedSearchSubmit.cancel();
-      debouncedTrackEvent.cancel();
-    };
-  }, [initialSearchValue, debouncedSearchSubmit, debouncedTrackEvent]);
+  }, [initialSearchValue]);
 
   return (
     <Box display="flex" alignItems="center" width="100%" position="relative">
@@ -62,6 +51,7 @@ const SemanticSearchBar = ({
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
+        onKeyPress={handleKeyPress}
         flex="1"
         mr={2}
         borderRadius="md"
@@ -77,6 +67,9 @@ const SemanticSearchBar = ({
           variant="ghost"
         />
       )}
+      <Button onClick={handleSubmit} colorScheme="blue">
+        Search
+      </Button>
     </Box>
   );
 };
@@ -85,7 +78,7 @@ SemanticSearchBar.propTypes = {
   onSearchSubmit: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   initialSearchValue: PropTypes.string,
-  resourceType: PropTypes.string.isRequired, // Define resourceType as required
+  resourceType: PropTypes.string.isRequired,
 };
 
 export default SemanticSearchBar;
