@@ -282,18 +282,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   textAlign="center"
                   color="gray.500"
                   fontStyle="italic"
-                  mb={5}
+                  my={4}
                 >
-                  Key graphic from the paper &quot;{paper.title}.&quot;{" "}
-                  <Link
-                    href={`https://arxiv.org/abs/${paper.arxivId}`}
-                    isExternal
-                    color="blue.500"
-                    textDecoration="underline"
-                  >
-                    Click here to view original
-                  </Link>
-                  .
+                  Key graphic from the paper &quot;{paper.title}.&quot;
                 </Text>
               </>
             )}
