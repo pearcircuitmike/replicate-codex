@@ -4,7 +4,7 @@ import supabase from "./supabaseClient";
 const fetchRelatedPapers = async (
   paperEmbedding,
   similarityThreshold = 0.75,
-  matchCount = 4
+  matchCount = 5
 ) => {
   const { data: relatedPapers, error } = await supabase.rpc("search_papers", {
     query_embedding: paperEmbedding,

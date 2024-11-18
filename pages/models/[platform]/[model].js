@@ -5,11 +5,8 @@ import {
   Text,
   Heading,
   Link,
-  Image,
   Button,
   Flex,
-  Tag,
-  Tooltip,
   Stack,
   Center,
 } from "@chakra-ui/react";
@@ -19,7 +16,7 @@ import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
 import MetaTags from "../../../components/MetaTags";
 import { fetchModelDataBySlug } from "../../api/utils/modelsData";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
-import ModelDetailsTable from "../../../components/modelDetailsPage/ModelDetailsTable";
+import ModelDetailsButtons from "@/components/modelDetailsPage/ModelDetailsButtons";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
 import PreviewImage from "@/components/PreviewImage";
@@ -96,9 +93,9 @@ export default function ModelPage({ model, relatedModels, slug }) {
         socialPreviewTitle={kebabToTitleCase(model.modelName)}
         socialPreviewSubtitle={`How to use ${kebabToTitleCase(
           model.creator
-        )}'s ${kebabToTitleCase(model.modelName)} model for
-          ${model.tags}
-         processing on ${kebabToTitleCase(model.platform)}.`}
+        )}'s ${kebabToTitleCase(model.modelName)} model on ${kebabToTitleCase(
+          model.platform
+        )}.`}
         title={`${kebabToTitleCase(model.modelName)} by ${kebabToTitleCase(
           model.creator
         )} | AI model details`}
@@ -106,9 +103,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
           model.modelName
         )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
           model.platform
-        )}. Overview, ${
-          model.tags
-        } alternatives, schema, use cases, limitations.`}
+        )}. Overview, schema, use cases, limitations.`}
       />
       <Container maxW="container.md" py="12">
         <Box mb="4">
@@ -117,35 +112,30 @@ export default function ModelPage({ model, relatedModels, slug }) {
               {model.modelName}
             </Link>
           </Heading>
-          <Text fontSize="sm" mb={4} px="0.5px" color="gray.500">
-            Maintainer:{" "}
-            <Link
-              href={`/creators/${encodeURIComponent(
-                model.platform
-              )}/${encodeURIComponent(model.creator)}`}
-              _hover={{ color: "blackAlpha.900" }}
-              color="black.500"
-            >
-              {model.creator}
-            </Link>{" "}
-            - Last updated {new Date(model.lastUpdated).toLocaleDateString()}
-          </Text>
-
-          <Box my={4}>
-            {model.tags && (
+          <Flex
+            fontSize="sm"
+            mb={1}
+            px="0.5px"
+            color="gray.500"
+            alignItems="center"
+            gap={2}
+          >
+            <Text>
+              Maintainer:{" "}
               <Link
-                href={`/models?selectedTag=${encodeURIComponent(model.tags)}`}
+                href={`/creators/${encodeURIComponent(
+                  model.platform
+                )}/${encodeURIComponent(model.creator)}`}
+                _hover={{ color: "blackAlpha.900" }}
+                color="black.500"
               >
-                <Tag size="md" colorScheme="blue">
-                  {model.tags}
-                </Tag>
-              </Link>
-            )}
-          </Box>
+                {model.creator}
+              </Link>{" "}
+              - Last updated {new Date(model.lastUpdated).toLocaleDateString()}
+            </Text>
+          </Flex>
 
-          <Box my="8">
-            <ModelDetailsTable model={model} creator={creatorData} />
-          </Box>
+          <ModelDetailsButtons model={model} creator={creatorData} />
 
           {model?.example ? (
             <ImageLightbox src={model.example} alt={model.modelName} />
@@ -157,7 +147,6 @@ export default function ModelPage({ model, relatedModels, slug }) {
             <CarbonAd />
           </Box>
 
-          {/* AuthSlideTray integration */}
           {isMounted && !user && (
             <AuthSlideTray>
               <Box>

@@ -8,13 +8,16 @@ const RelatedPapers = ({ relatedPapers }) => {
     return null;
   }
 
+  // Skip first paper (index 0) since it's the original paper being viewed
+  const displayPapers = relatedPapers.slice(1, 5);
+
   return (
     <Box mt={8}>
       <Heading as="h2" size="lg" mb={4}>
         Related Papers
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={4}>
-        {relatedPapers.map((relatedPaper) => (
+        {displayPapers.map((relatedPaper) => (
           <PaperCard key={relatedPaper.id} paper={relatedPaper} />
         ))}
       </SimpleGrid>
