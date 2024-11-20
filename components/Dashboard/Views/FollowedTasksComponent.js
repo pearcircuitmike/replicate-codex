@@ -35,7 +35,7 @@ const cleanAndTruncateSummary = (summary) => {
 const EmptyState = () => (
   <VStack spacing={4} py={8}>
     <Text fontSize="lg" color="gray.600">
-      You haven't followed any tasks yet
+      You haven&apos;t followed any tasks yet
     </Text>
     <Link href="/topics" passHref></Link>
   </VStack>
