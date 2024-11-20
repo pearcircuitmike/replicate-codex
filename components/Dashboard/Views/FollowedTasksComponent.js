@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Heading,
@@ -6,94 +6,132 @@ import {
   Spinner,
   HStack,
   useMediaQuery,
+  VStack,
+  Button,
 } from "@chakra-ui/react";
 import ResourceCard from "@/components/ResourceCard";
 import { useAuth } from "../../../context/AuthContext";
+import Link from "next/link";
 
-// Helper to clean and truncate summaries
-const cleanAndTruncateSummary = (summary, type) => {
+const cleanAndTruncateSummary = (summary) => {
   if (!summary) return "No description provided";
 
-  if (type === "model") {
-    summary = summary.replace("## Model overview", "").trim();
-    summary = summary.replace("## Model Overview", "").trim();
-  } else if (type === "paper") {
-    summary = summary.replace("## Overview", "").replace(/-/g, "").trim();
-    summary = summary.replace("## Overview - ", "").replace(/-/g, "").trim();
-  }
+  // Remove common headers and dashes
+  summary = summary
+    .replace(/## Overview.*?-/g, "")
+    .replace(/## Model [Oo]verview/g, "")
+    .replace(/-/g, "")
+    .trim();
 
+  // Take first 3 non-empty lines
   const maxLines = 3;
   const lines = summary.split("\n").filter(Boolean);
 
-  if (lines.length > maxLines) {
-    return lines.slice(0, maxLines).join(" ") + "...";
-  }
-
-  return lines.join(" ");
+  return lines.length > maxLines
+    ? lines.slice(0, maxLines).join(" ") + "..."
+    : lines.join(" ");
 };
+
+const EmptyState = () => (
+  <VStack spacing={4} py={8}>
+    <Text fontSize="lg" color="gray.600">
+      You haven't followed any tasks yet
+    </Text>
+    <Link href="/topics" passHref></Link>
+  </VStack>
+);
 
 const FollowedTasksComponent = () => {
   const { user } = useAuth();
-  const [topTaskItems, setTopTaskItems] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [isLargerThan480] = useMediaQuery("(min-width: 480px)");
 
-  useEffect(() => {
-    const fetchTopTaskItems = async () => {
-      if (user) {
-        try {
-          setIsLoading(true);
-          const response = await fetch(
-            `/api/dashboard/get-followed-tasks?userId=${user.id}`
-          );
+  const fetchTasks = useCallback(async () => {
+    if (!user) return;
 
-          if (!response.ok) {
-            throw new Error("Failed to fetch top task items.");
-          }
+    try {
+      setIsLoading(true);
+      setIsError(false);
 
-          const data = await response.json();
+      const response = await fetch(
+        `/api/dashboard/get-followed-tasks?userId=${user.id}`
+      );
 
-          const tasksWithPaperDetails = await Promise.all(
-            data.topTaskItems.map(async (task) => {
-              const detailedItems = await Promise.all(
-                task.topItems.map(async (paperId) => {
-                  const paperResponse = await fetch(
-                    `/api/fetch-paper-by-id?id=${paperId}`
-                  );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to fetch tasks");
+      }
 
-                  if (!paperResponse.ok) {
-                    console.error(`Failed to fetch paper with ID: ${paperId}`);
-                    return null;
-                  }
+      const { tasks: fetchedTasks } = await response.json();
 
-                  const paperData = await paperResponse.json();
-                  return paperData;
-                })
-              );
+      // Fetch paper details for each task's top papers
+      const tasksWithPaperDetails = await Promise.all(
+        fetchedTasks.map(async (task) => {
+          const detailedPapers = await Promise.all(
+            task.topPapers.map(async (paperId) => {
+              if (!paperId) return null;
 
-              return {
-                ...task,
-                topItems: detailedItems.filter((item) => item !== null),
-              };
+              try {
+                const paperResponse = await fetch(
+                  `/api/fetch-paper-by-id?id=${paperId}`
+                );
+
+                if (!paperResponse.ok) {
+                  console.error(`Failed to fetch paper with ID: ${paperId}`);
+                  return null;
+                }
+
+                return await paperResponse.json();
+              } catch (error) {
+                console.error(`Error fetching paper ${paperId}:`, error);
+                return null;
+              }
             })
           );
 
-          setTopTaskItems(tasksWithPaperDetails);
-        } catch (error) {
-          console.error("Error fetching top task items:", error);
-          setHasError(true);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
+          return {
+            ...task,
+            topPapers: detailedPapers.filter(Boolean),
+          };
+        })
+      );
 
-    fetchTopTaskItems();
+      setTasks(tasksWithPaperDetails);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
   }, [user]);
 
-  const renderSection = (taskName, items) => (
-    <Box mb={8} key={taskName}>
+  // Initial load
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  // Listen for task follow/unfollow events
+  useEffect(() => {
+    const handleTaskUpdate = () => {
+      fetchTasks();
+    };
+
+    window.addEventListener("taskFollowUpdated", handleTaskUpdate);
+
+    return () => {
+      window.removeEventListener("taskFollowUpdated", handleTaskUpdate);
+    };
+  }, [fetchTasks]);
+
+  const renderTaskSection = (taskName, papers) => (
+    <Box
+      mb={8}
+      key={taskName}
+      opacity={1}
+      transition="opacity 0.3s ease-in-out"
+    >
       <Heading as="h2" size="md">
         {taskName}
       </Heading>
@@ -102,66 +140,60 @@ const FollowedTasksComponent = () => {
         overflowX="auto"
         py={2}
         css={{
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
+          "&::-webkit-scrollbar": { display: "none" },
           "-ms-overflow-style": "none",
           "scrollbar-width": "none",
         }}
       >
-        {items.length > 0 ? (
-          items.map((paper) => {
-            const blurb = cleanAndTruncateSummary(
-              paper.generatedSummary,
-              "paper"
-            );
-            return (
-              <ResourceCard
-                key={paper.id}
-                href={`/papers/arxiv/${encodeURIComponent(paper.slug)}`}
-                title={paper.title}
-                blurb={blurb}
-                imageSrc={paper.thumbnail}
-                score={Math.floor(paper.totalScore)}
-                scoreLabel="Total Score"
-                placeholderTitle="Paper"
-                isLoading={false}
-              />
-            );
-          })
+        {papers.length > 0 ? (
+          papers.map((paper) => (
+            <ResourceCard
+              key={paper.id}
+              href={`/papers/arxiv/${encodeURIComponent(paper.slug)}`}
+              title={paper.title}
+              blurb={cleanAndTruncateSummary(paper.generatedSummary)}
+              imageSrc={paper.thumbnail}
+              score={Math.floor(paper.totalScore)}
+              scoreLabel="Total Score"
+              placeholderTitle="Paper"
+              isLoading={false}
+            />
+          ))
         ) : (
-          <Text>No top items available.</Text>
+          <Text color="gray.500">No recent papers for this task.</Text>
         )}
       </HStack>
     </Box>
   );
 
   return (
-    <Box px={"2vw"} color="gray.700" py={isLargerThan480 ? 4 : 2}>
+    <Box px={"2vw"} color="gray.700" py={isLargerThan480 ? 4 : 2} minH="60vh">
       <Heading as="h1" size="xl" mb={4}>
-        Top Items for Your Followed Tasks
+        Top Papers for Your Followed Tasks
       </Heading>
-      <Text mb={8}>
-        This page shows the top papers published in the last 7 days for the
-        tasks you are following.
+      <Text mb={8} color="gray.600">
+        Top papers published in the last 7 days for your followed tasks.
       </Text>
 
-      {isLoading && <Spinner size="lg" />}
-
-      {hasError && (
-        <Text color="red.500" mb={4}>
-          Failed to load data. Please try again later.
-        </Text>
+      {isLoading ? (
+        <Box textAlign="center" py={8}>
+          <Spinner size="lg" color="blue.500" />
+        </Box>
+      ) : isError ? (
+        <Box p={4} bg="red.50" color="red.600" borderRadius="md" mb={4}>
+          <Text>
+            Unable to load tasks. Please try again later or refresh the page.
+          </Text>
+        </Box>
+      ) : tasks.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <Box>
+          {tasks.map((task) =>
+            renderTaskSection(task.taskName, task.topPapers)
+          )}
+        </Box>
       )}
-
-      {!isLoading && !hasError && topTaskItems.length === 0 && (
-        <Text>No top items found for your followed tasks.</Text>
-      )}
-
-      {!isLoading &&
-        !hasError &&
-        topTaskItems.length > 0 &&
-        topTaskItems.map((task) => renderSection(task.taskName, task.topItems))}
     </Box>
   );
 };

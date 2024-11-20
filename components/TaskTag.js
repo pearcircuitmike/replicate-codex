@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const TaskTag = ({ task, initialIsFollowed }) => {
   const [isFollowed, setIsFollowed] = useState(initialIsFollowed);
+  const [isLoading, setIsLoading] = useState(false);
   const { accessToken, user } = useAuth();
   const toast = useToast();
 
@@ -24,14 +25,18 @@ const TaskTag = ({ task, initialIsFollowed }) => {
       return;
     }
 
+    if (isLoading) return;
+
+    setIsLoading(true);
+    const wasFollowed = isFollowed;
+
     try {
-      const endpoint = isFollowed
+      const endpoint = wasFollowed
         ? "/api/tasks/remove-followed-task"
         : "/api/tasks/add-followed-task";
-      const method = isFollowed ? "DELETE" : "POST";
 
       const response = await fetch(endpoint, {
-        method: method,
+        method: wasFollowed ? "DELETE" : "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -39,29 +44,35 @@ const TaskTag = ({ task, initialIsFollowed }) => {
         body: JSON.stringify({ taskId: task.id }),
       });
 
-      if (response.ok) {
-        setIsFollowed(!isFollowed);
-        toast({
-          title: isFollowed ? "Task unfollowed" : "Task followed",
-          description: isFollowed
-            ? "You will no longer receive updates for this task."
-            : "You will now receive updates for this task.",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      } else {
-        throw new Error("Failed to update task follow status");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to update task follow status");
       }
+
+      setIsFollowed(!wasFollowed);
+      toast({
+        title: wasFollowed ? "Task unfollowed" : "Task followed",
+        description: wasFollowed
+          ? "You will no longer receive updates for this task."
+          : "You will now receive updates for this task.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error("Error toggling follow status:", error);
       toast({
         title: "Error",
-        description: "Failed to update task follow status. Please try again.",
+        description:
+          error.message ||
+          "Failed to update task follow status. Please try again.",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,6 +100,8 @@ const TaskTag = ({ task, initialIsFollowed }) => {
         px="5px"
         _hover={{ boxShadow: "md", cursor: "pointer" }}
         onClick={toggleFollow}
+        opacity={isLoading ? 0.7 : 1}
+        pointerEvents={isLoading ? "none" : "auto"}
       >
         {task.task}
         <BellIcon

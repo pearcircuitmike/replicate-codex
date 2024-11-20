@@ -1,3 +1,4 @@
+// /pages/api/dashboard/get-followed-tasks.js
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -18,9 +19,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch top items from the materialized view based on user ID
-    const { data: topTaskItems, error: fetchError } = await supabase
-      .from("user_followed_tasks_with_top_papers")
+    const { data: userTasks, error: fetchError } = await supabase
+      .from("live_user_tasks_with_top_papers")
       .select(
         "followed_task_id, task_name, top_paper_1, top_paper_2, top_paper_3"
       )
@@ -28,29 +28,24 @@ export default async function handler(req, res) {
       .order("followed_task_id", { ascending: true });
 
     if (fetchError) {
-      console.error("Error fetching top task items:", fetchError);
+      console.error("Error fetching user tasks:", fetchError);
       return res.status(500).json({ error: "Internal server error" });
     }
 
-    if (!topTaskItems || topTaskItems.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No top items found for this user's followed tasks" });
-    }
-
-    const result = topTaskItems.map((task) => ({
-      followedTaskId: task.followed_task_id,
-      taskName: task.task_name, // Include task name in the response
-      topItems: [task.top_paper_1, task.top_paper_2, task.top_paper_3].filter(
-        Boolean
-      ),
-    }));
-
-    res.status(200).json({ topTaskItems: result });
+    // Return empty array if no tasks found (not an error condition)
+    res.status(200).json({
+      tasks: (userTasks || []).map((task) => ({
+        followedTaskId: task.followed_task_id,
+        taskName: task.task_name,
+        topPapers: [
+          task.top_paper_1,
+          task.top_paper_2,
+          task.top_paper_3,
+        ].filter(Boolean),
+      })),
+    });
   } catch (error) {
-    console.error("Error fetching top task items:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while fetching top items" });
+    console.error("Error in task fetch handler:", error);
+    res.status(500).json({ error: "An error occurred while fetching tasks" });
   }
 }
