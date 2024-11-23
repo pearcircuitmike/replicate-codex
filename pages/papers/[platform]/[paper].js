@@ -19,7 +19,6 @@ import {
   useToast,
   Wrap,
   WrapItem,
-  Image,
 } from "@chakra-ui/react";
 import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
@@ -47,8 +46,9 @@ import SideNavigation from "@/components/SideNavigation";
 import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
 import PDFViewer from "@/components/PDFViewer";
-//import AudioPlayer from "@/components/AudioPlayer";
 import ImageLightbox from "@/components/ImageLightbox";
+import PaperFigures from "@/components/PaperFigures";
+import PaperTables from "@/components/PaperTables";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -121,13 +121,11 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   const [paperTasks, setPaperTasks] = useState([]);
-
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
     uniqueResources: [],
     canViewFullArticle: true,
   });
-
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -169,7 +167,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     };
 
     fetchPaperTasks();
-  }, [paper, accessToken, toast]);
+  }, [paper?.id, accessToken, toast]);
 
   useEffect(() => {
     const fetchViewCounts = async () => {
@@ -210,15 +208,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     fetchViewCounts();
   }, [paper?.slug, hasActiveSubscription, loading, toast]);
 
-  const formatLinks = (text) => {
-    const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    return text.replace(urlRegex, (match, linkText, linkUrl) => {
-      return `[${linkText}](${linkUrl})`;
-    });
-  };
-
-  const formattedAbstract = formatLinks(paper.abstract);
-
   const handleAddNoteClick = () => {
     onOpen();
   };
@@ -238,15 +227,11 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       const overview = content.slice(overviewStart, overviewEnd);
       const restOfContent =
         content.slice(0, overviewStart) + content.slice(overviewEnd);
-
       const paperUrl = `https://aimodels.fyi/papers/${paper.platform}/${paper.slug}`;
 
       return {
         overview: (
           <>
-            {/*  <Box mb={3}>
-              <AudioPlayer text={paper.generatedSummary} />
-            </Box>*/}
             <Box boxShadow="xs" p="6" rounded="md" bg="gray.50" mb={6}>
               <ReactMarkdown
                 components={ChakraUIRenderer({
@@ -264,30 +249,12 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <Box mt={4} textAlign="right">
                 <ShareButton
                   url={paperUrl}
-                  title={
-                    `Interesting paper I found on @aimodelsfyi... ` +
-                    paper.title +
-                    `\n\n`
-                  }
+                  title={`Interesting paper I found on @aimodelsfyi... ${paper.title}\n\n`}
                   hashtags={["AI", "ML"]}
                   buttonText="Share on 𝕏"
                 />
               </Box>
             </Box>
-            {paper.thumbnail && (
-              <>
-                <ImageLightbox src={paper.thumbnail} alt={paper.title} />
-                <Text
-                  fontSize="sm"
-                  textAlign="center"
-                  color="gray.500"
-                  fontStyle="italic"
-                  my={4}
-                >
-                  Key graphic from the paper &quot;{paper.title}.&quot;
-                </Text>
-              </>
-            )}
           </>
         ),
         restOfContent: (
@@ -311,17 +278,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     return {
       overview: null,
       restOfContent: (
-        <ReactMarkdown
-          components={ChakraUIRenderer({
-            ...customTheme,
-            h2: (props) => {
-              const id = props.children[0]
-                .toLowerCase()
-                .replace(/[^a-zA-Z0-9]+/g, "-");
-              return <Heading {...props} id={id} />;
-            },
-          })}
-        >
+        <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
           {content}
         </ReactMarkdown>
       ),
@@ -397,71 +354,88 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
         <LimitMessage />
       ) : (
-        <Container maxW="container.md">
-          {isMounted && !user && (
-            <AuthSlideTray>
-              <Box>
-                <Text align="center" fontWeight="bold" mb={4}>
-                  Get summaries like this in your inbox
-                </Text>
-                <AuthForm signupSource="paper-slideup-tray" isUpgradeFlow />
-              </Box>
-            </AuthSlideTray>
-          )}
-
-          {overview}
-
-          {restOfContent}
-          {paper.pdfUrl && (
-            <Box my={6}>
-              <Heading as="h2" id="full-paper" mb={5}>
-                Full paper
-              </Heading>
-              <PDFViewer url={paper.pdfUrl} />
-              <Text mt={5}>
-                Read original:{" "}
-                <Link
-                  href={`https://arxiv.org/abs/${paper.arxivId}`}
-                  isExternal
-                  color="blue.500"
-                >
-                  <Text as="span" textDecoration="underline">
-                    arXiv:{paper.arxivId}
+        <>
+          <Container maxW="container.md">
+            {isMounted && !user && (
+              <AuthSlideTray>
+                <Box>
+                  <Text align="center" fontWeight="bold" mb={4}>
+                    Get summaries like this in your inbox
                   </Text>
-                  <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
-                </Link>
-              </Text>
-            </Box>
-          )}
-          <br />
-          <hr />
+                  <AuthForm signupSource="paper-slideup-tray" isUpgradeFlow />
+                </Box>
+              </AuthSlideTray>
+            )}
 
-          <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
-            This summary was produced with help from an AI and may contain
-            inaccuracies - check out the links to read the original source
-            documents!
-          </Text>
-          <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
-            <SocialScore resource={paper} />
-            <Box w={["100%", "auto"]}>
-              <BookmarkButton
-                resourceType="paper"
-                resourceId={paper.id}
-                leftIcon={<FaBookmark />}
-                w={["100%", "140px"]}
-              >
-                Bookmark
-              </BookmarkButton>
-            </Box>
-            <Box w={["100%", "auto"]}>
-              <NoteButton
-                paperId={paper.id}
-                onClick={handleAddNoteClick}
-                w={["100%", "auto"]}
+            {overview}
+
+            {paper.paperGraphics && paper.paperGraphics.length > 0 && (
+              <PaperFigures
+                figures={paper.paperGraphics}
+                title="Paper Figures"
               />
-            </Box>
-          </Stack>
-        </Container>
+            )}
+
+            {paper.paperTables && paper.paperTables.length > 0 && (
+              <Box my={6}>
+                <PaperTables tables={paper.paperTables} />
+              </Box>
+            )}
+
+            {restOfContent}
+
+            {paper.pdfUrl && (
+              <Box my={6}>
+                <Heading as="h2" id="full-paper" mb={5}>
+                  Full paper
+                </Heading>
+                <PDFViewer url={paper.pdfUrl} />
+                <Text mt={5}>
+                  Read original:{" "}
+                  <Link
+                    href={`https://arxiv.org/abs/${paper.arxivId}`}
+                    isExternal
+                    color="blue.500"
+                  >
+                    <Text as="span" textDecoration="underline">
+                      arXiv:{paper.arxivId}
+                    </Text>
+                    <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
+                  </Link>
+                </Text>
+              </Box>
+            )}
+            <br />
+            <hr />
+
+            <Text mt={3} color="gray.500" fontStyle="italic">
+              This summary was produced with help from an AI and may contain
+              inaccuracies - check out the links to read the original source
+              documents!
+            </Text>
+
+            <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
+              <SocialScore resource={paper} />
+              <Box w={["100%", "auto"]}>
+                <BookmarkButton
+                  resourceType="paper"
+                  resourceId={paper.id}
+                  leftIcon={<FaBookmark />}
+                  w={["100%", "140px"]}
+                >
+                  Bookmark
+                </BookmarkButton>
+              </Box>
+              <Box w={["100%", "auto"]}>
+                <NoteButton
+                  paperId={paper.id}
+                  onClick={handleAddNoteClick}
+                  w={["100%", "auto"]}
+                />
+              </Box>
+            </Stack>
+          </Container>
+        </>
       )}
 
       {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
