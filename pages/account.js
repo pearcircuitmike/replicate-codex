@@ -1,7 +1,9 @@
+// pages/Account.js
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { Box, Heading, Text, Button, VStack, Link } from "@chakra-ui/react";
 import supabase from "./api/utils/supabaseClient";
+import DigestPreferences from "../components/DigestPreferences";
 
 const Account = () => {
   const { user, logout } = useAuth();
@@ -15,6 +17,15 @@ const Account = () => {
         Welcome to your account page. Here you can manage your subscription, get
         support, and provide feedback.
       </Text>
+
+      {/* Digest Preferences Section */}
+      <Box mb={8}>
+        <Heading as="h2" size="lg" mb={4}>
+          Digest Preferences
+        </Heading>
+        <DigestPreferences user={user} />
+      </Box>
+
       <VStack spacing={6} align="stretch">
         <Box>
           <Button colorScheme="blue" onClick={logout}>
