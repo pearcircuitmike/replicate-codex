@@ -8,31 +8,42 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
-import supabase from "@/pages/api/utils/supabaseClient";
 
 const DigestPreferences = () => {
-  const { accessToken } = useAuth();
-  const [papersPreference, setPapersPreference] = useState("weekly");
-  const [modelsPreference, setModelsPreference] = useState("weekly");
+  const { user, accessToken } = useAuth();
+  const [papersFrequency, setPapersFrequency] = useState("weekly");
+  const [modelsFrequency, setModelsFrequency] = useState("weekly");
   const toast = useToast();
 
   useEffect(() => {
     const fetchPreferences = async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("papers_digest_preference, models_digest_preference")
-        .single();
+      if (!user) return;
 
-      if (data) {
-        setPapersPreference(data.papers_digest_preference);
-        setModelsPreference(data.models_digest_preference);
+      try {
+        const response = await fetch("/api/preferences", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPapersFrequency(data.papers_frequency || "weekly");
+          setModelsFrequency(data.models_frequency || "weekly");
+        } else {
+          const errorData = await response.json();
+          console.error("Error fetching preferences:", errorData.error);
+        }
+      } catch (error) {
+        console.error("Error fetching preferences:", error.message);
       }
     };
 
     fetchPreferences();
-  }, []);
+  }, [user, accessToken]);
 
-  const handlePreferenceChange = async (type, value) => {
+  const handlePreferenceChange = async (field, value) => {
     try {
       const response = await fetch("/api/preferences", {
         method: "POST",
@@ -40,13 +51,10 @@ const DigestPreferences = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          [type]: value,
-        }),
+        body: JSON.stringify({ field, value }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         toast({
           title: "Preferences updated",
@@ -54,11 +62,10 @@ const DigestPreferences = () => {
           duration: 3000,
           isClosable: true,
         });
-
-        if (type === "papers_digest_preference") {
-          setPapersPreference(value);
+        if (field === "papers_frequency") {
+          setPapersFrequency(value);
         } else {
-          setModelsPreference(value);
+          setModelsFrequency(value);
         }
       } else {
         throw new Error(data.error);
@@ -74,15 +81,17 @@ const DigestPreferences = () => {
     }
   };
 
+  if (!user) return null;
+
   return (
     <Box p={4}>
       <VStack spacing={4} align="stretch">
         <FormControl>
           <FormLabel>Papers Digest Frequency</FormLabel>
           <Select
-            value={papersPreference}
+            value={papersFrequency}
             onChange={(e) =>
-              handlePreferenceChange("papers_digest_preference", e.target.value)
+              handlePreferenceChange("papers_frequency", e.target.value)
             }
           >
             <option value="daily">Daily</option>
@@ -91,13 +100,12 @@ const DigestPreferences = () => {
             <option value="none">None</option>
           </Select>
         </FormControl>
-
         <FormControl>
           <FormLabel>Models Digest Frequency</FormLabel>
           <Select
-            value={modelsPreference}
+            value={modelsFrequency}
             onChange={(e) =>
-              handlePreferenceChange("models_digest_preference", e.target.value)
+              handlePreferenceChange("models_frequency", e.target.value)
             }
           >
             <option value="daily">Daily</option>
