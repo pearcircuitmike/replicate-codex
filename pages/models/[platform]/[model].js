@@ -193,7 +193,8 @@ export default function ModelPage({ model, relatedModels, slug }) {
             <CarbonAd />
           </Box>
 
-          {isMounted && !user && (
+          {/* KEEP THIS COMMENT
+           {isMounted && !user && (
             <AuthSlideTray>
               <Box>
                 <Text align="center" fontWeight="bold" mb={4}>
@@ -202,7 +203,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
                 <AuthForm signupSource="model-slideup-tray" isUpgradeFlow />
               </Box>
             </AuthSlideTray>
-          )}
+          )}*/}
 
           {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
             <LimitMessage />

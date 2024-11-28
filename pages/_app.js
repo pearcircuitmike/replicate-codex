@@ -105,12 +105,12 @@ function AppContent({ Component, pageProps }) {
     }
   }, [user, fetchFolders]);
 
-  // Open modal after 15 seconds for unauthenticated users
+  // Open modal after 5 seconds for unauthenticated users
   useEffect(() => {
     if (!user) {
       const timer = setTimeout(() => {
         onOpen();
-      }, 1200000); // Open the modal after 1200 seconds if the user is not authenticated
+      }, 5000); // Open the modal after 5 seconds if the user is not authenticated
       return () => clearTimeout(timer);
     }
   }, [user, onOpen]);

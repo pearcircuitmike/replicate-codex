@@ -356,6 +356,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       ) : (
         <>
           <Container maxW="container.md">
+            {/* KEEP THIS COMMENT
             {isMounted && !user && (
               <AuthSlideTray>
                 <Box>
@@ -365,7 +366,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   <AuthForm signupSource="paper-slideup-tray" isUpgradeFlow />
                 </Box>
               </AuthSlideTray>
-            )}
+            )}*/}
 
             {overview}
 
