@@ -41,12 +41,10 @@ import ShareButton from "../../../components/ShareButton";
 import { useAuth } from "../../../context/AuthContext";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
 import LimitMessage from "@/components/LimitMessage";
-import AuthSlideTray from "@/components/AuthSlideTray";
 import SideNavigation from "@/components/SideNavigation";
 import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
 import PDFViewer from "@/components/PDFViewer";
-import ImageLightbox from "@/components/ImageLightbox";
 import PaperFigures from "@/components/PaperFigures";
 import PaperTables from "@/components/PaperTables";
 
@@ -356,19 +354,18 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       ) : (
         <>
           <Container maxW="container.md">
-            {/* KEEP THIS COMMENT
-            {isMounted && !user && (
-              <AuthSlideTray>
-                <Box>
-                  <Text align="center" fontWeight="bold" mb={4}>
-                    Get summaries like this in your inbox
-                  </Text>
-                  <AuthForm signupSource="paper-slideup-tray" isUpgradeFlow />
-                </Box>
-              </AuthSlideTray>
-            )}*/}
-
             {overview}
+
+            {/* Embedded AuthForm */}
+            {isMounted && !user && (
+              <Box my={6} align="center">
+                <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
+                  Create an account for full access
+                </Text>
+
+                <AuthForm signupSource="auth-form-embed" />
+              </Box>
+            )}
 
             {paper.paperGraphics && paper.paperGraphics.length > 0 && (
               <PaperFigures

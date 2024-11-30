@@ -7,14 +7,11 @@ import {
   Text,
   Heading,
   Link,
-  Button,
   Flex,
   Stack,
   useToast,
-  Center,
 } from "@chakra-ui/react";
-import AuthSlideTray from "@/components/AuthSlideTray";
-import { FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
+import { FaBookmark } from "react-icons/fa";
 
 import MetaTags from "../../../components/MetaTags";
 import { fetchModelDataBySlug } from "../../api/utils/modelsData";
@@ -22,12 +19,10 @@ import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import ModelDetailsButtons from "@/components/modelDetailsPage/ModelDetailsButtons";
 import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
 import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
-import PreviewImage from "@/components/PreviewImage";
 import supabase from "@/pages/api/utils/supabaseClient";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
 import RelatedModels from "../../../components/RelatedModels";
 import fetchRelatedModels from "../../api/utils/fetchRelatedModels";
-import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
 import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
 import CarbonAd from "@/components/CarbonAd";
@@ -193,23 +188,21 @@ export default function ModelPage({ model, relatedModels, slug }) {
             <CarbonAd />
           </Box>
 
-          {/* KEEP THIS COMMENT
-           {isMounted && !user && (
-            <AuthSlideTray>
-              <Box>
-                <Text align="center" fontWeight="bold" mb={4}>
-                  Get summaries like this in your inbox
-                </Text>
-                <AuthForm signupSource="model-slideup-tray" isUpgradeFlow />
-              </Box>
-            </AuthSlideTray>
-          )}*/}
-
           {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
             <LimitMessage />
           ) : (
             <>
               <ModelOverview model={model} />
+
+              {/* Embedded AuthForm - Added exactly as in reference */}
+              {isMounted && !user && (
+                <Box my={6} align="center">
+                  <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
+                    Create an account for full access
+                  </Text>
+                  <AuthForm signupSource="auth-form-embed" />
+                </Box>
+              )}
 
               <hr />
               <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
