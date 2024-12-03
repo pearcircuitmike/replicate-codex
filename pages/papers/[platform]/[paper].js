@@ -42,11 +42,11 @@ import { useAuth } from "../../../context/AuthContext";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
 import LimitMessage from "@/components/LimitMessage";
 import SideNavigation from "@/components/SideNavigation";
-import PaperHero from "@/components/PaperHero";
 import BackToTop from "@/components/BackToTop";
 import PDFViewer from "@/components/PDFViewer";
 import PaperFigures from "@/components/PaperFigures";
 import PaperTables from "@/components/PaperTables";
+import PaperVote from "@/components/PaperVote";
 
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
@@ -298,71 +298,90 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       <SideNavigation markdownContent={paper.generatedSummary} />
       <BackToTop />
 
-      <PaperHero paper={paper}>
-        <Box color="white">
-          <Heading as="h1" size="xl" mb={5}>
-            {paper.title}
-          </Heading>
+      <Container maxW="container.md" mt={8}>
+        <Box position="relative" mb={8}>
+          {/* Desktop vote button */}
+          <Box
+            position="absolute"
+            top="0"
+            left="-16"
+            display={{ base: "none", md: "block" }}
+          >
+            <PaperVote paperId={paper.id} />
+          </Box>
 
-          <Wrap spacing={2} mb={4}>
-            {paperTasks.map((task) => (
-              <WrapItem key={task.id}>
-                <TaskTag task={task} initialIsFollowed={task.isFollowed} />
-              </WrapItem>
-            ))}
-          </Wrap>
+          {/* Mobile vote button */}
+          <Box
+            position="absolute"
+            top="0"
+            right="0"
+            display={{ base: "block", md: "none" }}
+          >
+            <PaperVote paperId={paper.id} variant="compact" size="sm" />
+          </Box>
 
-          <Box fontSize="sm" mb={4} px="0.5px" color="gray.300">
-            <Text as="span">
-              Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
-            </Text>
-            {paper.authors && paper.authors.length > 0 ? (
-              <>
-                {paper.authors.slice(0, 10).map((author, index) => (
-                  <React.Fragment key={index}>
-                    <Link
-                      href={`/authors/${encodeURIComponent(
-                        paper.platform
-                      )}/${encodeURIComponent(author)}`}
-                      _hover={{ color: "white" }}
-                      color="gray.300"
-                    >
-                      {author}
-                    </Link>
-                    {index < 9 && index < paper.authors.length - 1 && (
-                      <Text as="span">, </Text>
-                    )}
-                  </React.Fragment>
-                ))}
-                {paper.authors.length > 10 && (
-                  <Text as="span">
-                    {" "}
-                    and {paper.authors.length - 10}{" "}
-                    {paper.authors.length - 10 === 1 ? "other" : "others"}
-                  </Text>
-                )}
-              </>
-            ) : (
-              <Text as="span">Unknown authors</Text>
-            )}
+          <Box>
+            <Heading as="h1" size="xl" mb={5}>
+              {paper.title}
+            </Heading>
+
+            <Wrap spacing={2} mb={4}>
+              {paperTasks.map((task) => (
+                <WrapItem key={task.id}>
+                  <TaskTag task={task} initialIsFollowed={task.isFollowed} />
+                </WrapItem>
+              ))}
+            </Wrap>
+
+            <Box fontSize="sm" mb={4} color="gray.600">
+              <Text as="span">
+                Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
+                by{" "}
+              </Text>
+              {paper.authors && paper.authors.length > 0 ? (
+                <>
+                  {paper.authors.slice(0, 10).map((author, index) => (
+                    <React.Fragment key={index}>
+                      <Link
+                        href={`/authors/${encodeURIComponent(
+                          paper.platform
+                        )}/${encodeURIComponent(author)}`}
+                        color="blue.500"
+                        _hover={{ textDecoration: "underline" }}
+                      >
+                        {author}
+                      </Link>
+                      {index < 9 && index < paper.authors.length - 1 && (
+                        <Text as="span">, </Text>
+                      )}
+                    </React.Fragment>
+                  ))}
+                  {paper.authors.length > 10 && (
+                    <Text as="span">
+                      {" "}
+                      and {paper.authors.length - 10}{" "}
+                      {paper.authors.length - 10 === 1 ? "other" : "others"}
+                    </Text>
+                  )}
+                </>
+              ) : (
+                <Text as="span">Unknown authors</Text>
+              )}
+            </Box>
           </Box>
         </Box>
-      </PaperHero>
 
-      {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
-        <LimitMessage />
-      ) : (
-        <>
-          <Container maxW="container.md">
+        {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
+          <LimitMessage />
+        ) : (
+          <>
             {overview}
 
-            {/* Embedded AuthForm */}
             {isMounted && !user && (
               <Box my={6} align="center">
                 <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
                   Create an account for full access
                 </Text>
-
                 <AuthForm signupSource="auth-form-embed" />
               </Box>
             )}
@@ -432,9 +451,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 />
               </Box>
             </Stack>
-          </Container>
-        </>
-      )}
+          </>
+        )}
+      </Container>
 
       {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
         <Container maxW="container.xl" py="12">
