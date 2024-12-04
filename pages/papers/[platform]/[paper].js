@@ -380,9 +380,9 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             {isMounted && !user && (
               <Box my={6} align="center">
                 <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
-                  Create an account for full access
+                  Set alerts for papers like this one
                 </Text>
-                <AuthForm signupSource="auth-form-embed" />
+                <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
               </Box>
             )}
 

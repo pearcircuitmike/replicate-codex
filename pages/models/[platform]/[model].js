@@ -25,7 +25,6 @@ import RelatedModels from "../../../components/RelatedModels";
 import fetchRelatedModels from "../../api/utils/fetchRelatedModels";
 import BookmarkButton from "../../../components/BookmarkButton";
 import AuthForm from "../../../components/AuthForm";
-import CarbonAd from "@/components/CarbonAd";
 import SocialScore from "../../../components/SocialScore";
 import LimitMessage from "@/components/LimitMessage";
 import { useAuth } from "../../../context/AuthContext";
@@ -184,25 +183,21 @@ export default function ModelPage({ model, relatedModels, slug }) {
             <EmojiWithGradient title={model?.modelName} />
           )}
 
-          <Box my={5}>
-            <CarbonAd />
-          </Box>
-
           {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
             <LimitMessage />
           ) : (
             <>
-              <ModelOverview model={model} />
-
               {/* Embedded AuthForm - Added exactly as in reference */}
               {isMounted && !user && (
                 <Box my={6} align="center">
                   <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
-                    Create an account for full access
+                    Get notified when new models like this one come out!
                   </Text>
-                  <AuthForm signupSource="auth-form-embed" />
+                  <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
                 </Box>
               )}
+
+              <ModelOverview model={model} />
 
               <hr />
               <Text mt={3} color={"gray.500"} fontStyle={"italic"}>

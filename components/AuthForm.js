@@ -72,7 +72,7 @@ export default function AuthForm({
       modalHeader: "Check your inbox to start your trial",
       modalBody:
         "We've sent you a magic link. Click it to activate your 7-day free trial.",
-      emailPlaceholder: "Enter your work email...",
+      emailPlaceholder: "Enter your email...",
     },
   };
 
