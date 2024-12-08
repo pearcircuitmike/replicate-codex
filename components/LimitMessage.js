@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { FaLightbulb, FaFire, FaDiscord } from "react-icons/fa";
 import AuthForm from "./AuthForm";
-import Testimonials from "./Testimonials";
+import Testimonials from "./homepage/Testimonials";
 
 const FeatureItem = ({ icon, title, description }) => (
   <ListItem display="flex" alignItems="start" gap={3} p={4}>
