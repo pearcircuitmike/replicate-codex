@@ -75,7 +75,20 @@ export default function Home() {
         </Suspense>
       </Box>
 
-      <StatsSection />
+      <StatsSection
+        weeklyPapersCount={
+          trendingData.papers.length + trendingData.models.length
+        }
+        weeklySummariesCount={trendingData.papers.length}
+        weeklySignups={trendingData.models.length}
+        uniquePapersCount={
+          new Set([
+            ...trendingData.papers.map((p) => p.id),
+            ...trendingData.models.map((m) => m.id),
+          ]).size
+        }
+      />
+
       <BenefitsSection />
 
       <Box bg="gray.100" py={16} px={8}>
