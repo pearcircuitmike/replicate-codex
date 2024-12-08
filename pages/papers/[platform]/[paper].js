@@ -16,7 +16,6 @@ import {
   DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
-  useToast,
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
@@ -117,7 +116,6 @@ export async function getStaticProps({ params }) {
 const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
   const { user, accessToken, hasActiveSubscription, loading } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
   const [paperTasks, setPaperTasks] = useState([]);
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -153,19 +151,12 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           setPaperTasks(response.data.tasks);
         } catch (error) {
           console.error("Error fetching paper tasks:", error);
-          toast({
-            title: "Error",
-            description: "Failed to fetch paper tasks",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
         }
       }
     };
 
     fetchPaperTasks();
-  }, [paper?.id, accessToken, toast]);
+  }, [paper?.id, accessToken]);
 
   useEffect(() => {
     const fetchViewCounts = async () => {
@@ -191,20 +182,11 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         setViewCounts(data);
       } catch (error) {
         console.error("Error fetching view counts:", error);
-        if (!hasActiveSubscription) {
-          toast({
-            title: "Error",
-            description: "Failed to fetch article view information",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
-        }
       }
     };
 
     fetchViewCounts();
-  }, [paper?.slug, hasActiveSubscription, loading, toast]);
+  }, [paper?.slug, hasActiveSubscription, loading]);
 
   const handleAddNoteClick = () => {
     onOpen();
