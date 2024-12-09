@@ -1,10 +1,11 @@
 import React, { useState, useEffect, Suspense } from "react";
-import { Box, Container, Heading } from "@chakra-ui/react";
+import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import MetaTags from "../components/MetaTags";
 import HeroSection from "../components/homepage/HeroSection";
 import StatsSection from "../components/homepage/StatsSection";
 import BenefitsSection from "../components/homepage/BenefitsSection";
 import Testimonials from "../components/homepage/Testimonials";
+import AuthForm from "@/components/AuthForm";
 
 // Lazy load the LandingPageTrending component
 const LandingPageTrending = React.lazy(() =>
@@ -14,6 +15,7 @@ const LandingPageTrending = React.lazy(() =>
 export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [trendingData, setTrendingData] = useState({ models: [], papers: [] });
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function Home() {
         setIsLoading(false);
       }
     }
+
     fetchTrendingData();
   }, []);
 
@@ -65,6 +68,15 @@ export default function Home() {
 
       <HeroSection isMobile={isMobile} />
 
+      <StatsSection />
+      <Container my={3} align="center">
+        <Heading mb={3} as="h3" size="md">
+          Set your first alert!
+        </Heading>
+        <AuthForm isUpgradeFlow />{" "}
+      </Container>
+
+      {/*
       <Box py={16} width="100%">
         <Suspense fallback={<Box>Loading trending content...</Box>}>
           <LandingPageTrending
@@ -73,25 +85,11 @@ export default function Home() {
             isLoading={isLoading}
           />
         </Suspense>
-      </Box>
+      </Box> 
 
-      <StatsSection
-        weeklyPapersCount={
-          trendingData.papers.length + trendingData.models.length
-        }
-        weeklySummariesCount={trendingData.papers.length}
-        weeklySignups={trendingData.models.length}
-        uniquePapersCount={
-          new Set([
-            ...trendingData.papers.map((p) => p.id),
-            ...trendingData.models.map((m) => m.id),
-          ]).size
-        }
-      />
+      <BenefitsSection /> */}
 
-      <BenefitsSection />
-
-      <Box bg="gray.100" py={16} px={8}>
+      <Box bg="gray.100" my={16} py={16} px={8}>
         <Container maxW="8xl">
           <Heading as="h2" fontSize="4xl" mb={8} textAlign="center">
             What our users say
