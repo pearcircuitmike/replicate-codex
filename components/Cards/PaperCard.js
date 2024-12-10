@@ -19,7 +19,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     id,
     title,
     authors,
-    abstract,
+    generatedSummary, // Changed from abstract to generatedSummary
     publishedDate,
     indexedDate,
     thumbnail,
@@ -27,6 +27,30 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     slug,
     totalScore,
   } = paper;
+
+  // Move cleanAndTruncateSummary inside the component
+  const cleanAndTruncateSummary = (summary) => {
+    if (!summary) return "No description provided";
+
+    // Remove common headers like ## Overview and ## Model Overview
+    summary = summary
+      .replace(/##\s*Overview.*?(\n|$)/gi, "")
+      .replace(/##\s*Model\s*Overview.*?(\n|$)/gi, "");
+
+    // Remove all Markdown syntax (e.g., `**bold**`, `*italic*`, `- lists`, etc.)
+    summary = summary.replace(/(\*|_|`|~|#|\[.*?\]\(.*?\)|-|\>|\!.*?)/g, "");
+
+    // Remove excess whitespace and trim
+    summary = summary.replace(/\s+/g, " ").trim();
+
+    // Take first 3 non-empty lines
+    const maxLines = 3;
+    const lines = summary.split("\n").filter(Boolean);
+
+    return lines.length > maxLines
+      ? lines.slice(0, maxLines).join(" ") + "..."
+      : lines.join(" ");
+  };
 
   const isNew = React.useMemo(() => {
     const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
@@ -117,7 +141,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           {authors.join(", ")}
         </Text>
         <Text fontSize="sm" noOfLines={4}>
-          {abstract || "No abstract available."}
+          {cleanAndTruncateSummary(generatedSummary) || "No summary available."}
         </Text>
         <Text
           as="span"

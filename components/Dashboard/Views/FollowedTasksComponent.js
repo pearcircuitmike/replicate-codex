@@ -4,40 +4,23 @@ import {
   Heading,
   Text,
   Spinner,
-  HStack,
-  useMediaQuery,
   VStack,
-  Button,
+  useMediaQuery,
 } from "@chakra-ui/react";
-import ResourceCard from "@/components/ResourceCard";
+import PaperCard from "@/components/Cards/PaperCard";
 import { useAuth } from "../../../context/AuthContext";
 import Link from "next/link";
-
-const cleanAndTruncateSummary = (summary) => {
-  if (!summary) return "No description provided";
-
-  // Remove common headers and dashes
-  summary = summary
-    .replace(/## Overview.*?-/g, "")
-    .replace(/## Model [Oo]verview/g, "")
-    .replace(/-/g, "")
-    .trim();
-
-  // Take first 3 non-empty lines
-  const maxLines = 3;
-  const lines = summary.split("\n").filter(Boolean);
-
-  return lines.length > maxLines
-    ? lines.slice(0, maxLines).join(" ") + "..."
-    : lines.join(" ");
-};
 
 const EmptyState = () => (
   <VStack spacing={4} py={8}>
     <Text fontSize="lg" color="gray.600">
-      You haven&apos;t followed any tasks yet
+      You haven&apos;t followed any tasks yet.
     </Text>
-    <Link href="/topics" passHref></Link>
+    <Link href="/topics" passHref>
+      <Text color="blue.500" as="u">
+        Discover topics to follow
+      </Text>
+    </Link>
   </VStack>
 );
 
@@ -66,7 +49,6 @@ const FollowedTasksComponent = () => {
 
       const { tasks: fetchedTasks } = await response.json();
 
-      // Fetch paper details for each task's top papers
       const tasksWithPaperDetails = await Promise.all(
         fetchedTasks.map(async (task) => {
           const detailedPapers = await Promise.all(
@@ -107,12 +89,10 @@ const FollowedTasksComponent = () => {
     }
   }, [user]);
 
-  // Initial load
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
 
-  // Listen for task follow/unfollow events
   useEffect(() => {
     const handleTaskUpdate = () => {
       fetchTasks();
@@ -126,19 +106,16 @@ const FollowedTasksComponent = () => {
   }, [fetchTasks]);
 
   const renderTaskSection = (taskName, papers) => (
-    <Box
-      mb={8}
-      key={taskName}
-      opacity={1}
-      transition="opacity 0.3s ease-in-out"
-    >
-      <Heading as="h2" size="md">
+    <Box mb={8} key={taskName}>
+      <Heading as="h2" size="md" mb={4}>
         {taskName}
       </Heading>
-      <HStack
-        spacing={4}
+      <Box
         overflowX="auto"
+        display="flex"
+        gap={4}
         py={2}
+        px={2}
         css={{
           "&::-webkit-scrollbar": { display: "none" },
           "-ms-overflow-style": "none",
@@ -147,22 +124,33 @@ const FollowedTasksComponent = () => {
       >
         {papers.length > 0 ? (
           papers.map((paper) => (
-            <ResourceCard
+            <Box
               key={paper.id}
-              href={`/papers/arxiv/${encodeURIComponent(paper.slug)}`}
-              title={paper.title}
-              blurb={cleanAndTruncateSummary(paper.generatedSummary)}
-              imageSrc={paper.thumbnail}
-              score={Math.floor(paper.totalScore)}
-              scoreLabel="Total Score"
-              placeholderTitle="Paper"
-              isLoading={false}
-            />
+              flex="0 0 auto"
+              width="300px" // Fixed width for all cards
+              maxWidth="300px"
+            >
+              <PaperCard
+                paper={{
+                  id: paper.id,
+                  title: paper.title,
+                  authors: paper.authors || [],
+                  generatedSummary: paper.generatedSummary, // Pass directly to PaperCard
+                  publishedDate:
+                    paper.publishedDate || new Date().toISOString(),
+                  indexedDate: paper.indexedDate || new Date().toISOString(),
+                  thumbnail: paper.thumbnail,
+                  platform: "arxiv",
+                  slug: paper.slug,
+                  totalScore: paper.totalScore || 0,
+                }}
+              />
+            </Box>
           ))
         ) : (
           <Text color="gray.500">No recent papers for this task.</Text>
         )}
-      </HStack>
+      </Box>
     </Box>
   );
 
