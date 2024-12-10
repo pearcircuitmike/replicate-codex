@@ -116,7 +116,7 @@ const StatsSection = () => {
                 title="You follow topics"
                 description="Set alerts for topics you care about."
                 stat={weeklySignups}
-                statDescription="alerts set"
+                statDescription="researchers set alerts this week"
               />
               <StatBox
                 title="You read the TLDR"
