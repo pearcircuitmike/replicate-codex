@@ -373,7 +373,7 @@ const TopicSelectionPage = () => {
             What research areas interest you?
           </Heading>
           <Text color="gray.600" fontSize="lg" mb={6}>
-            We'll create a personalized feed of the latest breakthroughs
+            We&apos;ll create a personalized feed of the latest breakthroughs
           </Text>
 
           {/* Selected Topics Row */}

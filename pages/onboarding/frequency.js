@@ -109,7 +109,7 @@ const FrequencyPage = () => {
             How often would you like updates?
           </Heading>
           <Text color="gray.600" fontSize="lg">
-            Choose how frequently you'd like to receive research updates
+            Choose how frequently you&apos;d like to receive research updates
           </Text>
         </Box>
 
