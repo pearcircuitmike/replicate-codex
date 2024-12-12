@@ -79,23 +79,6 @@ export default async function handler(req) {
             boxSizing: "border-box",
           }}
         >
-          <span style={{ position: "absolute", top: "40px", left: "40px" }}>
-            <img
-              src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/robot-face.png"
-              alt="Logo"
-              style={{ width: "30px", height: "30px" }}
-            />
-            <span
-              style={{
-                fontSize: "25px",
-                fontWeight: "normal",
-
-                paddingLeft: "10px",
-              }}
-            >
-              AImodels.fyi
-            </span>
-          </span>
           <div
             style={{
               display: "flex",
@@ -109,7 +92,6 @@ export default async function handler(req) {
               style={{
                 fontSize: "45px",
                 fontWeight: "normal",
-
                 marginBottom: "10px",
                 marginTop: "20px",
               }}
@@ -120,7 +102,6 @@ export default async function handler(req) {
               style={{
                 fontSize: "25px",
                 fontWeight: "normal",
-
                 color: "#718096",
               }}
             >
@@ -131,8 +112,8 @@ export default async function handler(req) {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end", // Ensures that the content is aligned to the end of the parent
-              alignItems: "center", // Vertically center the content within the parent
+              justifyContent: "flex-end",
+              alignItems: "center",
               width: "460px",
             }}
           >
@@ -140,8 +121,8 @@ export default async function handler(req) {
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center", // Center vertically in the flex container
-                  justifyContent: "flex-end", // align horizontally in the flex container
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                   height: "504px",
                   width: "504px",
                   borderRadius: "0px 20px 20px 0px",
@@ -167,8 +148,8 @@ export default async function handler(req) {
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center", // Center vertically in the flex container
-                  justifyContent: "flex-end", // align horizontally in the flex container
+                  alignItems: "center",
+                  justifyContent: "flex-end",
                   height: "504px",
                   width: "504px",
                   borderRadius: "0px 20px 20px 0px",
