@@ -4,50 +4,42 @@ export const config = {
   runtime: "edge",
 };
 
-// Fallback image URL
-const DEFAULT_IMAGE_URL =
-  "https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg";
-
-// Implement caching using Edge Runtime
 export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
     const imageUrl = searchParams.get("image");
 
-    // Generate cache key from parameters
-    const cacheKey = JSON.stringify({
-      title: searchParams.get("title"),
-      subtitle: searchParams.get("subtitle"),
-      image: imageUrl,
-    });
-
-    // Check cache first
-    const cache = caches.default;
-    const cachedResponse = await cache.match(cacheKey);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-
-    // Function to truncate text
-    const truncateWithEllipsis = (text, maxLength) =>
-      text?.length > maxLength
+    // Function to truncate text with ellipsis
+    const truncateWithEllipsis = (text, maxLength) => {
+      return text.length > maxLength
         ? text.slice(0, maxLength - 3) + "..."
-        : text || "";
+        : text;
+    };
 
-    // Truncate with smaller maximum lengths
+    // Truncate title and subtitle with ellipsis if they exceed certain lengths
     const title = truncateWithEllipsis(
       searchParams.get("title") || "AImodels.fyi",
-      40
+      45
     );
     const subtitle = truncateWithEllipsis(
       searchParams.get("subtitle") ||
         "The all-in-one place for AI research, models, tools, and more!",
-      100
+      150
     );
 
-    // Simplified gradient generation with fewer colors
+    // Function to generate a gradient based on the title
     const generateGradient = (title) => {
-      const colors = ["#ff6347", "#9c27b0", "#2196f3", "#009688"];
+      const colors = [
+        "#ff6347", // tomato
+        "#e91e63", // pink
+        "#9c27b0", // purple
+        "#673ab7", // deep purple
+        "#3f51b5", // indigo
+        "#2196f3", // blue
+        "#03a9f4", // light blue
+        "#00bcd4", // cyan
+        "#009688", // teal
+      ];
       const hash = title
         .split("")
         .reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -56,65 +48,9 @@ export default async function handler(req) {
       return `linear-gradient(to right, ${color1}, ${color2})`;
     };
 
-    // Optimize image loading
-    let imageElement;
-    if (imageUrl && imageUrl !== "null") {
-      try {
-        // Add timeout to image fetch
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const gradientBg = generateGradient(title);
 
-        const response = await fetch(imageUrl, {
-          signal: controller.signal,
-          headers: {
-            Accept: "image/webp,image/avif,image/jpeg", // Prefer efficient formats
-          },
-        });
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          imageElement = (
-            <img
-              src={imageUrl}
-              width="504"
-              height="504"
-              style={{
-                objectFit: "cover",
-                backgroundColor: "white",
-                borderRadius: "0px 20px 20px 0px",
-              }}
-            />
-          );
-        } else {
-          throw new Error("Image fetch failed");
-        }
-      } catch {
-        imageElement = (
-          <img
-            src={DEFAULT_IMAGE_URL}
-            style={{
-              objectFit: "cover",
-              width: "100%",
-              height: "100%",
-              borderRadius: "0px 20px 20px 0px",
-            }}
-          />
-        );
-      }
-    } else {
-      imageElement = (
-        <img
-          src={DEFAULT_IMAGE_URL}
-          style={{
-            objectFit: "cover",
-            width: "100%",
-            height: "100%",
-            borderRadius: "0px 20px 20px 0px",
-          }}
-        />
-      );
-    }
-
+    // Define the content to be displayed
     const content = (
       <div
         style={{
@@ -122,7 +58,7 @@ export default async function handler(req) {
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
-          background: generateGradient(title),
+          background: gradientBg,
           minHeight: "100vh",
           width: "100%",
         }}
@@ -136,10 +72,30 @@ export default async function handler(req) {
             borderRadius: "20px",
             height: "80vh",
             width: "1100px",
-            padding: "0 0 0 40px",
+            paddingLeft: "40px",
+            paddingTop: "0px",
+            paddingBottom: "0px",
+            paddingRight: "0px",
             boxSizing: "border-box",
           }}
         >
+          <span style={{ position: "absolute", top: "40px", left: "40px" }}>
+            <img
+              src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/robot-face.png"
+              alt="Logo"
+              style={{ width: "30px", height: "30px" }}
+            />
+            <span
+              style={{
+                fontSize: "25px",
+                fontWeight: "normal",
+
+                paddingLeft: "10px",
+              }}
+            >
+              AImodels.fyi
+            </span>
+          </span>
           <div
             style={{
               display: "flex",
@@ -153,6 +109,7 @@ export default async function handler(req) {
               style={{
                 fontSize: "45px",
                 fontWeight: "normal",
+
                 marginBottom: "10px",
                 marginTop: "20px",
               }}
@@ -163,6 +120,7 @@ export default async function handler(req) {
               style={{
                 fontSize: "25px",
                 fontWeight: "normal",
+
                 color: "#718096",
               }}
             >
@@ -173,42 +131,70 @@ export default async function handler(req) {
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
+              justifyContent: "flex-end", // Ensures that the content is aligned to the end of the parent
+              alignItems: "center", // Vertically center the content within the parent
               width: "460px",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                height: "504px",
-                width: "504px",
-                borderRadius: "0px 20px 20px 0px",
-              }}
-            >
-              {imageElement}
-            </div>
+            {imageUrl && imageUrl !== "null" ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center", // Center vertically in the flex container
+                  justifyContent: "flex-end", // align horizontally in the flex container
+                  height: "504px",
+                  width: "504px",
+                  borderRadius: "0px 20px 20px 0px",
+                }}
+              >
+                <img
+                  src={imageUrl}
+                  width="504"
+                  height="504"
+                  style={{
+                    objectFit: "cover",
+                    backgroundColor: "white",
+                    borderRadius: "0px 20px 20px 0px",
+                  }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg";
+                  }}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center", // Center vertically in the flex container
+                  justifyContent: "flex-end", // align horizontally in the flex container
+                  height: "504px",
+                  width: "504px",
+                  borderRadius: "0px 20px 20px 0px",
+                }}
+              >
+                <img
+                  src="https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg"
+                  style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "0px 20px 20px 0px",
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
     );
 
-    // Generate image response
-    const imageResponse = new ImageResponse(content, {
+    // Return the image response
+    return new ImageResponse(content, {
       width: 1200,
       height: 630,
-      // Enable compression
-      compress: true,
     });
-
-    // Cache the response for 24 hours
-    const response = new Response(imageResponse.body, imageResponse);
-    response.headers.set("Cache-Control", "public, max-age=86400");
-    await cache.put(cacheKey, response.clone());
-
-    return response;
   } catch (e) {
     console.error(`Error generating image: ${e.message}`);
     return new Response(`Failed to generate the image: ${e.message}`, {
