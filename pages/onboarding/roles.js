@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   VStack,
   Text,
@@ -9,9 +9,12 @@ import {
   Button,
   Heading,
   Spinner,
+  Progress,
+  Flex,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 const RoleCard = ({
   role,
@@ -24,11 +27,9 @@ const RoleCard = ({
   <Box
     onClick={onSelect}
     cursor={isUpdating ? "wait" : "pointer"}
-    borderWidth="1px"
-    borderRadius="lg"
+    borderWidth="2px"
+    borderRadius="xl"
     overflow="hidden"
-    w="full"
-    h="40"
     display="flex"
     flexDirection="column"
     alignItems="center"
@@ -38,11 +39,12 @@ const RoleCard = ({
     borderColor={isSelected ? "blue.500" : "gray.200"}
     _hover={{
       borderColor: "blue.500",
-      transform: isUpdating ? "none" : "scale(1.02)",
+      transform: isUpdating ? "none" : "translateY(-2px)",
       shadow: "md",
     }}
     opacity={isUpdating ? 0.7 : 1}
     p={6}
+    h="full"
   >
     <Text fontSize="3xl" mb={3}>
       {icon}
@@ -109,9 +111,10 @@ const roles = [
 ];
 
 export default function RoleSelectionPage() {
-  const [selectedRoles, setSelectedRoles] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [updatingRole, setUpdatingRole] = React.useState(null);
+  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [loadingRoles, setLoadingRoles] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [updatingRole, setUpdatingRole] = useState(null);
   const { user, accessToken } = useAuth();
   const toast = useToast();
   const router = useRouter();
@@ -128,11 +131,7 @@ export default function RoleSelectionPage() {
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to update roles");
-      }
-
+      if (!response.ok) throw new Error(data.error || "Failed to update roles");
       return true;
     } catch (error) {
       console.error("Error updating roles:", error);
@@ -154,10 +153,7 @@ export default function RoleSelectionPage() {
       : [...selectedRoles, roleId];
 
     const success = await updateRolesInDb(newRoles);
-
-    if (success) {
-      setSelectedRoles(newRoles);
-    }
+    if (success) setSelectedRoles(newRoles);
     setUpdatingRole(null);
   };
 
@@ -184,11 +180,8 @@ export default function RoleSelectionPage() {
         body: JSON.stringify({ userId: user.id }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update onboarding status");
-      }
-
-      router.push("/dashboard");
+      if (!response.ok) throw new Error("Failed to update onboarding status");
+      router.push("/onboarding/topics");
     } catch (error) {
       console.error("Error updating roles:", error);
       toast({
@@ -215,11 +208,8 @@ export default function RoleSelectionPage() {
         body: JSON.stringify({ userId: user.id }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update onboarding status");
-      }
-
-      router.push("/dashboard");
+      if (!response.ok) throw new Error("Failed to update onboarding status");
+      router.push("/onboarding/topics");
     } catch (error) {
       console.error("Error updating onboarding status:", error);
       toast({
@@ -234,7 +224,39 @@ export default function RoleSelectionPage() {
     }
   };
 
-  if (!user) {
+  useEffect(() => {
+    const fetchUserRoles = async () => {
+      if (!user?.id) return;
+
+      try {
+        const response = await fetch("/api/onboarding/get-roles", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch roles");
+
+        const data = await response.json();
+        setSelectedRoles(data.roles || []);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your roles. Please try again.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+
+    fetchUserRoles();
+  }, [user?.id, accessToken]);
+
+  if (!user || loadingRoles) {
     return (
       <Box textAlign="center" py={4}>
         <Spinner />
@@ -243,18 +265,43 @@ export default function RoleSelectionPage() {
   }
 
   return (
-    <Container maxW="4xl" py={12}>
+    <Container maxW="4xl" py={8}>
+      <Box mb={8}>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Button
+            variant="ghost"
+            size="sm"
+            leftIcon={<ChevronLeftIcon />}
+            onClick={() => router.push("/signup")}
+          >
+            Back
+          </Button>
+          <Text fontSize="sm" color="gray.600" textAlign="center">
+            Step 1 of 4 - Choose Roles
+          </Text>
+          <Button
+            variant="ghost"
+            size="sm"
+            rightIcon={<ChevronRightIcon />}
+            onClick={handleContinue}
+          >
+            Next
+          </Button>
+        </Flex>
+        <Progress value={25} size="sm" colorScheme="blue" borderRadius="full" />
+      </Box>
+
       <VStack spacing={8} align="stretch">
         <Box textAlign="center">
-          <Heading size="lg" mb={4}>
+          <Heading size="lg" mb={3}>
             I am a...
           </Heading>
-          <Text color="gray.600" mb={2}>
+          <Text color="gray.600" fontSize="lg">
             Select all that apply
           </Text>
         </Box>
 
-        <SimpleGrid columns={[1, 2, 3]} spacing={6}>
+        <SimpleGrid columns={[1, 2, 3]} spacing={6} pt={4}>
           {roles.map((role) => (
             <RoleCard
               key={role.id}
@@ -266,23 +313,25 @@ export default function RoleSelectionPage() {
           ))}
         </SimpleGrid>
 
-        <Box display="flex" justifyContent="space-between" pt={6}>
+        <Flex justify="space-between" pt={8}>
           <Button
             variant="ghost"
             onClick={handleSkip}
             isDisabled={isLoading || updatingRole !== null}
           >
-            Do this later
+            Skip for now
           </Button>
           <Button
             colorScheme="blue"
             onClick={handleContinue}
             isLoading={isLoading}
             isDisabled={updatingRole !== null}
+            size="lg"
+            px={8}
           >
             Continue
           </Button>
-        </Box>
+        </Flex>
       </VStack>
     </Container>
   );

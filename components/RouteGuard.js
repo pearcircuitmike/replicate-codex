@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
+
 const protectedRoutes = ["/account", "/dashboard"];
 
 const RouteGuard = ({ children }) => {
@@ -26,7 +27,7 @@ const RouteGuard = ({ children }) => {
       // 2. Get user profile with all onboarding flags
       const { data: userProfile, error: profileError } = await supabase
         .from("profiles")
-        .select("topics_onboarded, roles_onboarded")
+        .select("topics_onboarded, roles_onboarded, frequency_onboarded")
         .eq("id", user.id)
         .single();
 
@@ -35,16 +36,7 @@ const RouteGuard = ({ children }) => {
         return;
       }
 
-      // Check topics onboarding
-      if (!userProfile?.topics_onboarded) {
-        console.log(
-          "User hasn't completed topics onboarding, redirecting to /onboarding/topics"
-        );
-        await router.push("/onboarding/topics");
-        return;
-      }
-
-      // Check roles onboarding
+      // 3. Check roles onboarding (first step)
       if (!userProfile?.roles_onboarded) {
         console.log(
           "User hasn't completed roles onboarding, redirecting to /onboarding/roles"
@@ -53,7 +45,25 @@ const RouteGuard = ({ children }) => {
         return;
       }
 
-      // 4. Check subscription status for dashboard access
+      // 4. Check topics onboarding (second step)
+      if (!userProfile?.topics_onboarded) {
+        console.log(
+          "User hasn't completed topics onboarding, redirecting to /onboarding/topics"
+        );
+        await router.push("/onboarding/topics");
+        return;
+      }
+
+      // 5. Check frequency onboarding (third step)
+      if (!userProfile?.frequency_onboarded) {
+        console.log(
+          "User hasn't completed frequency onboarding, redirecting to /onboarding/frequency"
+        );
+        await router.push("/onboarding/frequency");
+        return;
+      }
+
+      // 6. Check subscription status for dashboard access
       if (!hasActiveSubscription && router.pathname.startsWith("/dashboard")) {
         console.log("User lacks active subscription, redirecting to /pricing.");
         await router.push("/pricing");

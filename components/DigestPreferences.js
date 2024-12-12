@@ -1,3 +1,4 @@
+// components/DigestPreferences.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -16,32 +17,23 @@ const DigestPreferences = () => {
   const toast = useToast();
 
   useEffect(() => {
-    const fetchPreferences = async () => {
-      if (!user) return;
-
-      try {
-        const response = await fetch("/api/preferences", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setPapersFrequency(data.papers_frequency || "weekly");
-          setModelsFrequency(data.models_frequency || "weekly");
-        } else {
-          const errorData = await response.json();
-          console.error("Error fetching preferences:", errorData.error);
-        }
-      } catch (error) {
-        console.error("Error fetching preferences:", error.message);
-      }
-    };
-
+    if (!user) return;
     fetchPreferences();
   }, [user, accessToken]);
+
+  const fetchPreferences = async () => {
+    try {
+      const response = await fetch("/api/preferences", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!response.ok) throw new Error((await response.json()).error);
+      const data = await response.json();
+      setPapersFrequency(data.papers_frequency);
+      setModelsFrequency(data.models_frequency);
+    } catch (error) {
+      console.error("Error fetching preferences:", error);
+    }
+  };
 
   const handlePreferenceChange = async (field, value) => {
     try {
@@ -54,22 +46,21 @@ const DigestPreferences = () => {
         body: JSON.stringify({ field, value }),
       });
 
+      if (!response.ok) throw new Error((await response.json()).error);
+
       const data = await response.json();
-      if (response.ok) {
-        toast({
-          title: "Preferences updated",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        if (field === "papers_frequency") {
-          setPapersFrequency(value);
-        } else {
-          setModelsFrequency(value);
-        }
+      if (field === "papers_frequency") {
+        setPapersFrequency(value);
       } else {
-        throw new Error(data.error);
+        setModelsFrequency(value);
       }
+
+      toast({
+        title: "Preferences updated",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (error) {
       toast({
         title: "Error updating preferences",
