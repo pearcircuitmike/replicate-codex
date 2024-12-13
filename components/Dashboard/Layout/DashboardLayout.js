@@ -21,15 +21,16 @@ import {
 import { useRouter } from "next/router";
 import {
   FaSearch,
-  FaNewspaper,
+  FaBookmark,
   FaFolder,
-  FaFire,
-  FaClipboardList,
-  FaTasks, // Added the FaTasks icon
+  FaBolt,
+  FaStar,
+  FaChartLine,
+  FaFlask,
+  FaCubes,
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 import FolderSidebar from "./Sidebar/FolderSidebar";
-import TaskSidebar from "./Sidebar/TaskSidebar";
 import FolderModal from "../Modals/FolderModal";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { useAuth } from "../../../context/AuthContext";
@@ -42,7 +43,6 @@ const DashboardLayout = ({ children }) => {
   const [folders, setFolders] = useState([]);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [isFolderListModalOpen, setIsFolderListModalOpen] = useState(false);
-  const [isTaskListModalOpen, setIsTaskListModalOpen] = useState(false);
   const toast = useToast();
 
   const fetchFolders = useCallback(async () => {
@@ -123,36 +123,15 @@ const DashboardLayout = ({ children }) => {
     setIsFolderListModalOpen(false);
   };
 
-  const handleTaskListModalOpen = () => {
-    setIsTaskListModalOpen(true);
-  };
-
-  const handleTaskListModalClose = () => {
-    setIsTaskListModalOpen(false);
-  };
-
-  const navItemsBeforeFolders = [
+  const navItems = [
+    { icon: null, label: "For me", isDivider: true },
+    { icon: <FaStar />, label: "Following", href: "#" },
+    { icon: <FaBookmark />, label: "Bookmarks", href: "/dashboard/bookmarks" },
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
-    {
-      icon: <FaFire />,
-      label: "Trending",
-      href: "/dashboard",
-    },
-    {
-      icon: <FaNewspaper />,
-      label: "Weekly Papers Digest",
-      href: "/dashboard/weekly-papers-summary",
-    },
-    {
-      icon: <FaNewspaper />,
-      label: "Weekly Models Digest",
-      href: "/dashboard/weekly-models-summary",
-    },
-    {
-      icon: <FaClipboardList />,
-      label: "Followed Tasks",
-      href: "/dashboard/followed-tasks",
-    },
+    { icon: null, label: "Community", isDivider: true },
+    { icon: <FaChartLine />, label: "Trending Topics", href: "#" },
+    { icon: <FaFlask />, label: "Hot Papers", href: "/dashboard/hot-papers" },
+    { icon: <FaCubes />, label: "Hot Models", href: "/dashboard/hot-models" },
   ];
 
   return (
@@ -171,22 +150,28 @@ const DashboardLayout = ({ children }) => {
             borderRight="1px solid #e2e8f0"
           >
             <VStack spacing={2} align="stretch">
-              {navItemsBeforeFolders.map((item) => (
-                <NavItem
-                  key={item.href}
-                  icon={item.icon}
-                  label={item.label}
-                  href={item.href}
-                  isActive={router.pathname === item.href}
-                />
-              ))}
-              <Box px={4} py={2}>
-                <Text mt={8} fontSize="sm" color="gray.500">
-                  My Folders
-                </Text>
-              </Box>
+              {navItems.map((item, index) =>
+                item.isDivider ? (
+                  <Text
+                    key={index}
+                    px={4}
+                    py={2}
+                    fontSize="sm"
+                    color="gray.500"
+                  >
+                    {item.label}
+                  </Text>
+                ) : (
+                  <NavItem
+                    key={item.href || index}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    isActive={router.pathname === item.href}
+                  />
+                )
+              )}
               <FolderSidebar onFolderModalOpen={handleFolderModalOpen} />
-              <TaskSidebar /> {/* Restored Task Sidebar */}
             </VStack>
           </Box>
         )}
@@ -207,33 +192,17 @@ const DashboardLayout = ({ children }) => {
             boxShadow="0 -2px 10px rgba(0, 0, 0, 0.05)"
           >
             <HStack justify="space-around" py={2}>
-              {navItemsBeforeFolders.map((item) => (
-                <NavItem
-                  key={item.label}
-                  icon={item.icon}
-                  label={item.label}
-                  href={item.href}
-                  isActive={router.pathname === item.href}
-                />
-              ))}
-              <IconButton
-                aria-label="Folders"
-                icon={<FaFolder />}
-                variant="ghost"
-                size="lg"
-                onClick={handleFolderListModalOpen}
-                _hover={{ bg: "gray.100" }}
-                color={isFolderListModalOpen ? "blue.500" : "gray.500"}
-              />
-              <IconButton
-                aria-label="Tasks"
-                icon={<FaTasks />} // Replaced the icon to avoid duplication
-                variant="ghost"
-                size="lg"
-                onClick={handleTaskListModalOpen}
-                _hover={{ bg: "gray.100" }}
-                color={isTaskListModalOpen ? "blue.500" : "gray.500"}
-              />
+              {navItems
+                .filter((item) => !item.isDivider)
+                .map((item, index) => (
+                  <NavItem
+                    key={item.label || index}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    isActive={router.pathname === item.href}
+                  />
+                ))}
             </HStack>
           </Box>
         )}
@@ -295,23 +264,6 @@ const DashboardLayout = ({ children }) => {
               >
                 Create New Folder
               </Button>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
-
-        {/* Task List Modal for Mobile */}
-        <Modal
-          isOpen={isTaskListModalOpen}
-          onClose={handleTaskListModalClose}
-          isCentered
-          size="md"
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Tasks</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <TaskSidebar />
             </ModalBody>
           </ModalContent>
         </Modal>
