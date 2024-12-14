@@ -1,6 +1,7 @@
 // /components/Bookmarks/BookmarkItem.js
-import { Box, Button, HStack, Heading, Text } from "@chakra-ui/react";
+import { Box, IconButton, HStack, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import { FaTrash } from "react-icons/fa";
 import supabase from "@/pages/api/utils/supabaseClient";
 
 const BookmarkItem = ({
@@ -58,11 +59,15 @@ const BookmarkItem = ({
     <Box pb={6} borderBottom="1px" borderColor="gray.200">
       <HStack justify="space-between" mb={2}>
         <Text fontSize="sm" color="gray.500">
-          {new Date(bookmark.created_at).toLocaleDateString()}
+          Bookmarked {new Date(bookmark.created_at).toLocaleDateString()}
         </Text>
-        <Button size="sm" variant="ghost" onClick={handleRemove}>
-          Remove
-        </Button>
+        <IconButton
+          size="sm"
+          variant="ghost"
+          icon={<FaTrash />}
+          aria-label="Remove bookmark"
+          onClick={handleRemove}
+        />
       </HStack>
 
       <Heading size="md" mb={2} lineHeight="1.4">

@@ -78,6 +78,7 @@ const CollectionsSidebar = ({
               onClick={() => onFolderSelect(folder)}
               width="full"
               py={4}
+              pl={2}
               pr={
                 hoveredFolder === folder.id && folder.name !== "Uncategorized"
                   ? 12
@@ -85,7 +86,10 @@ const CollectionsSidebar = ({
               }
               transition="padding 0.2s"
             >
-              <Text>{folder.name}</Text>
+              <HStack spacing={2}>
+                <Box w="10px" h="10px" bg={folder.color} borderRadius="sm" />
+                <Text>{folder.name}</Text>
+              </HStack>
               <Text color="gray.500">({folder.bookmarkCount})</Text>
             </Button>
             {hoveredFolder === folder.id && folder.name !== "Uncategorized" && (
