@@ -19,7 +19,7 @@ const BookmarkHeader = ({
               bg={folderColor || "gray.200"}
               flexShrink={0}
             />
-            <Text>Bookmarks in "{folderName}"</Text>
+            <Text>Bookmarks in &quot;{folderName}&quot;</Text>
           </>
         )}
         {!folderName && <Text>Bookmarks</Text>}
