@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Textarea, Button, VStack } from "@chakra-ui/react";
-
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 const NoteInput = ({
   onAddNote,
   isDisabled,
@@ -22,6 +22,13 @@ const NoteInput = ({
 
   const handleSubmit = () => {
     if (noteText.trim()) {
+      trackEvent("add_note", {
+        is_reply: !!replyToId,
+        reply_to_id: replyToId,
+        is_edit: !!initialValue,
+        note_text: noteText,
+      });
+
       onAddNote(noteText.trim(), replyToId);
       if (!replyToId) {
         setNoteText("");

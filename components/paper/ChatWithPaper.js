@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { useAuth } from "@/context/AuthContext";
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 
 const ChatWithPaper = ({ paperId, paper }) => {
   const { user, hasActiveSubscription } = useAuth();
@@ -78,6 +79,13 @@ const ChatWithPaper = ({ paperId, paper }) => {
       });
       return;
     }
+
+    // Add tracking before submitting
+    trackEvent("paper_chat_message", {
+      paper_id: paperId,
+      message: messages,
+      is_subscribed: hasActiveSubscription,
+    });
 
     handleSubmit(e);
   };

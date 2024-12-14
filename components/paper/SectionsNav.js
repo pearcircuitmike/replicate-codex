@@ -10,6 +10,7 @@ import {
 import { FaBookmark } from "react-icons/fa";
 import BookmarkButton from "@/components/BookmarkButton";
 import ShareButton from "@/components/ShareButton";
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 
 const extractSections = (markdownContent) => {
   if (!markdownContent) return [];
@@ -118,7 +119,17 @@ const SectionsNav = ({ markdownContent = "", paper }) => {
       <VStack spacing={2} mt={6} align="stretch">
         <BookmarkButton resourceId={paper.id} resourceType="paper" />
 
-        <Button onClick={() => {}} size="sm" width="full" variant="outline">
+        <Button
+          onClick={() => {
+            trackEvent("share_paper", {
+              platform: "twitter",
+              paper_id: paper.id,
+            });
+          }}
+          size="sm"
+          width="full"
+          variant="outline"
+        >
           Share on 𝕏
         </Button>
       </VStack>

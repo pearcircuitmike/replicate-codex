@@ -11,6 +11,7 @@ import {
   SliderThumb,
 } from "@chakra-ui/react";
 import { FaPlay, FaPause } from "react-icons/fa";
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 
 const AudioPlayer = ({ text }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -153,6 +154,13 @@ const AudioPlayer = ({ text }) => {
         setCurrentTime(0);
       }
       setIsPlaying(true);
+      // Add tracking when starting playback
+      trackEvent("paper_listen", {
+        current_time: currentTime,
+        duration: duration,
+        is_restart: currentTime >= duration,
+      });
+
       cleanAndSpeak(text);
     }
   };
