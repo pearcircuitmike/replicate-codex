@@ -38,7 +38,7 @@ const NoteInput = ({
         placeholder={replyToId ? "Write a reply..." : "Add a new note..."}
         rows={3}
       />
-      <Button colorScheme="blue" onClick={handleSubmit}>
+      <Button size="sm" colorScheme="blue" onClick={handleSubmit}>
         {replyToId ? "Post Reply" : initialValue ? "Save Edit" : "Add Note"}
       </Button>
     </VStack>

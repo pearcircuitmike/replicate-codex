@@ -139,9 +139,8 @@ const BookmarkButton = ({
           />
         }
         variant="outline"
-        w="100%"
-        borderTopRadius="0"
-        boxShadow="0"
+        size="sm"
+        width="full"
         isDisabled={isLoading}
       >
         {isBookmarked ? "Bookmarked" : "Add to bookmarks"}

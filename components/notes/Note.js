@@ -1,3 +1,4 @@
+// components/notes/Note.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -33,82 +34,98 @@ const Note = ({
     setIsEditing(false);
   };
 
-  return (
-    <Box p={3} borderWidth={1} borderRadius="md" mt={isReply ? 2 : 0}>
-      {note.is_hidden ? (
+  const handleReply = (text) => {
+    onReplyNote(text, note.id);
+    setIsReplying(false);
+  };
+
+  if (note.is_hidden) {
+    return (
+      <Box py={2}>
         <Text color="gray.500" fontStyle="italic">
           This comment has been removed
         </Text>
-      ) : (
-        <>
-          <Flex align="center" justify="space-between" mb={2}>
-            <Flex align="center">
-              <Avatar
-                size="sm"
-                src={note.public_profile_info.avatar_url}
-                mr={2}
-              />
-              <Box>
-                <Text fontWeight="bold">
-                  {note.public_profile_info.full_name}
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  {formatDistanceToNow(new Date(note.created_at), {
-                    addSuffix: true,
-                  })}
-                </Text>
-              </Box>
-            </Flex>
-            {currentUser && currentUser.id === note.user_id && (
-              <HStack>
-                <IconButton
-                  icon={<EditIcon />}
-                  aria-label="Edit note"
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                />
-                <IconButton
-                  icon={<DeleteIcon />}
-                  aria-label="Delete note"
-                  size="sm"
-                  onClick={() => onDeleteNote(note.id)}
-                />
-              </HStack>
-            )}
-          </Flex>
-          {isEditing ? (
-            <NoteInput
-              initialValue={editedText}
-              onAddNote={handleEdit}
-              isDisabled={false}
+      </Box>
+    );
+  }
+
+  return (
+    <Box mb={isReply ? 2 : 3}>
+      <Box>
+        <Flex align="center" justify="space-between" mb={2}>
+          <Flex align="center">
+            <Avatar
+              size="sm"
+              src={note.public_profile_info.avatar_url}
+              mr={2}
             />
-          ) : (
-            <Text whiteSpace="pre-wrap">{note.note_text}</Text>
+            <Box>
+              <Text fontWeight="bold">
+                {note.public_profile_info.full_name}
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                {formatDistanceToNow(new Date(note.created_at), {
+                  addSuffix: true,
+                })}
+              </Text>
+            </Box>
+          </Flex>
+          {currentUser && currentUser.id === note.user_id && (
+            <HStack>
+              <IconButton
+                icon={<EditIcon />}
+                aria-label="Edit note"
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsEditing(true)}
+              />
+              <IconButton
+                icon={<DeleteIcon />}
+                aria-label="Delete note"
+                size="sm"
+                variant="ghost"
+                onClick={() => onDeleteNote(note.id)}
+              />
+            </HStack>
           )}
-        </>
-      )}
-      {!isReply && (
-        <Button
-          leftIcon={<ChatIcon />}
-          size="sm"
-          variant="outline"
-          mt={2}
-          onClick={() => setIsReplying(!isReplying)}
-        >
-          Reply
-        </Button>
-      )}
+        </Flex>
+
+        {isEditing ? (
+          <NoteInput
+            initialValue={editedText}
+            onAddNote={handleEdit}
+            isDisabled={false}
+          />
+        ) : (
+          <Text whiteSpace="pre-wrap" mb={2}>
+            {note.note_text}
+          </Text>
+        )}
+
+        {!isReply && (
+          <Button
+            leftIcon={<ChatIcon />}
+            size="sm"
+            variant="ghost"
+            onClick={() => setIsReplying(!isReplying)}
+          >
+            Reply
+          </Button>
+        )}
+      </Box>
+
       {isReplying && (
         <Box mt={2}>
           <NoteInput
-            onAddNote={(text) => onReplyNote(text, note.id)}
+            onAddNote={handleReply}
             isDisabled={!currentUser}
             replyToId={note.id}
           />
         </Box>
       )}
+
       {note.replies && note.replies.length > 0 && (
-        <Box pl={4} mt={2}>
+        <Box pl={4} mt={2} borderLeftWidth="1px" borderColor="gray.200">
           {note.replies.map((reply) => (
             <Note
               key={reply.id}
