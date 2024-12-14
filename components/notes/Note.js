@@ -42,8 +42,8 @@ const Note = ({
   if (note.is_hidden) {
     return (
       <Box py={2}>
-        <Text color="gray.500" fontStyle="italic">
-          This comment has been removed
+        <Text color="gray.500" fontStyle="italic" fontSize="xs" my={5}>
+          A comment has been removed
         </Text>
       </Box>
     );
@@ -55,15 +55,15 @@ const Note = ({
         <Flex align="center" justify="space-between" mb={2}>
           <Flex align="center">
             <Avatar
-              size="sm"
+              size="xs"
               src={note.public_profile_info.avatar_url}
               mr={2}
             />
             <Box>
-              <Text fontWeight="bold">
+              <Text fontSize="sm" fontWeight="bold" color="gray.600">
                 {note.public_profile_info.full_name}
               </Text>
-              <Text fontSize="xs" color="gray.500">
+              <Text fontSize="xs" color="gray.600">
                 {formatDistanceToNow(new Date(note.created_at), {
                   addSuffix: true,
                 })}
@@ -71,18 +71,18 @@ const Note = ({
             </Box>
           </Flex>
           {currentUser && currentUser.id === note.user_id && (
-            <HStack>
+            <HStack spacing="3px">
               <IconButton
                 icon={<EditIcon />}
                 aria-label="Edit note"
-                size="sm"
+                size="xs"
                 variant="ghost"
                 onClick={() => setIsEditing(true)}
               />
               <IconButton
                 icon={<DeleteIcon />}
                 aria-label="Delete note"
-                size="sm"
+                size="xs"
                 variant="ghost"
                 onClick={() => onDeleteNote(note.id)}
               />
@@ -97,7 +97,7 @@ const Note = ({
             isDisabled={false}
           />
         ) : (
-          <Text whiteSpace="pre-wrap" mb={2}>
+          <Text whiteSpace="pre-wrap" mb={2} color="gray.600" fontSize="sm">
             {note.note_text}
           </Text>
         )}
@@ -105,8 +105,9 @@ const Note = ({
         {!isReply && (
           <Button
             leftIcon={<ChatIcon />}
-            size="sm"
+            size="xs"
             variant="ghost"
+            color="gray.600"
             onClick={() => setIsReplying(!isReplying)}
           >
             Reply

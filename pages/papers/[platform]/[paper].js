@@ -1,4 +1,3 @@
-// pages/papers/[platform]/[paper].js
 import React, { useState, useEffect } from "react";
 import { Container, Box, Grid, GridItem } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
@@ -53,12 +52,19 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     fetchViewCounts();
   }, [paper?.slug]);
 
+  // Debug log to verify paper data
+  // Add explicit debug logging
+  useEffect(() => {
+    console.log("DEBUG - Full paper data:", paper);
+    console.log("DEBUG - Paper tasks:", paper?.tasks);
+  }, [paper]);
+
   if (!paper || !paper.abstract || !paper.generatedSummary) {
-    return null; // Or some error component
+    return null;
   }
 
   return (
-    <>
+    <Box maxW="100vw" overflowX="hidden">
       <MetaTags
         title={`${paper.title} | AI Research Paper Details`}
         description={paper.abstract}
@@ -67,18 +73,36 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
         socialPreviewSubtitle={paper.abstract}
       />
 
-      <Container maxW="8xl" px={4} position="relative">
+      <Container
+        maxW={{ base: "100%", xl: "8xl" }}
+        px={{ base: 2, md: 4 }}
+        mx="auto"
+      >
         <Grid
           templateColumns={{
             base: "1fr",
             lg: "250px minmax(0, 1fr) 300px",
           }}
-          gap={6}
+          gap={{ base: 4, lg: 6 }}
           minH="100vh"
         >
           {/* Left Column - Sections */}
-          <GridItem>
-            <Box position="sticky" top="0" h="100vh">
+          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "250px" }}>
+            <Box
+              position="sticky"
+              top="0"
+              maxH="100vh"
+              overflowY="auto"
+              overflowX="hidden"
+              css={{
+                "&::-webkit-scrollbar": { width: "4px" },
+                "&::-webkit-scrollbar-track": { background: "transparent" },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "rgba(0,0,0,0.2)",
+                  borderRadius: "2px",
+                },
+              }}
+            >
               <Box py={8}>
                 <SectionsNav
                   markdownContent={paper.generatedSummary}
@@ -89,22 +113,25 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           </GridItem>
 
           {/* Middle Column - Paper Content */}
-          <GridItem>
+          <GridItem w="100%" maxW="100%">
             <Box
               id="main-content"
-              h="100vh"
-              overflowY="auto"
+              maxH={{ base: "none", lg: "100vh" }}
+              overflowY={{ base: "visible", lg: "auto" }}
+              overflowX="hidden"
+              position="relative"
               css={{
-                "&::-webkit-scrollbar": {
-                  display: "none",
-                },
+                "&::-webkit-scrollbar": { display: "none" },
+                msOverflowStyle: "none",
                 scrollbarWidth: "none",
-                "-ms-overflow-style": "none",
               }}
             >
-              <Box py={8} pb={24}>
+              <Box py={4} pb={{ base: 32, lg: 24 }} px={{ base: 2, md: 4 }}>
                 <PaperContent
-                  paper={paper}
+                  paper={{
+                    ...paper,
+                    tasks: paper.tasks || [], // Ensure tasks are passed
+                  }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
                 />
@@ -113,12 +140,26 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           </GridItem>
 
           {/* Right Column - Audio & Notes */}
-          <GridItem>
-            <Box position="sticky" top="0" h="100vh">
+          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "300px" }}>
+            <Box
+              position="sticky"
+              top="0"
+              maxH="100vh"
+              overflowY="auto"
+              overflowX="hidden"
+              css={{
+                "&::-webkit-scrollbar": { width: "4px" },
+                "&::-webkit-scrollbar-track": { background: "transparent" },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "rgba(0,0,0,0.2)",
+                  borderRadius: "2px",
+                },
+              }}
+            >
               <Box py={8}>
                 <Box mb={6}>
                   <Box fontSize="lg" fontWeight="semibold" mb={4}>
-                    Audio Overview
+                    Listen to this paper
                   </Box>
                   {paper.generatedSummary && (
                     <AudioPlayer text={paper.generatedSummary} />
@@ -140,7 +181,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
           }}
         />
       </Container>
-    </>
+    </Box>
   );
 };
 
@@ -184,6 +225,12 @@ export async function getStaticProps({ params }) {
     return { notFound: true };
   }
 
+  // Ensure tasks are included in the paper object
+  const paperWithTasks = {
+    ...paper,
+    tasks: paper.tasks || [], // Provide a default empty array if tasks don't exist
+  };
+
   let relatedPapers = [];
   if (paper.embedding) {
     relatedPapers = await fetchRelatedPapers(paper.embedding);
@@ -194,7 +241,11 @@ export async function getStaticProps({ params }) {
   const lastUpdatedDate = new Date(paper.lastUpdated);
 
   return {
-    props: { paper, relatedPapers, slug },
+    props: {
+      paper: paperWithTasks,
+      relatedPapers,
+      slug,
+    },
     revalidate: lastUpdatedDate <= oneWeekAgo ? false : 3600 * 24,
   };
 }

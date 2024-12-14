@@ -22,6 +22,7 @@ import AuthForm from "@/components/AuthForm";
 import { usePageView } from "../hooks/usePageView";
 import Head from "next/head";
 import { FoldersProvider } from "@/context/FoldersContext";
+
 import supabase from "@/pages/api/utils/supabaseClient";
 
 function AppContent({ Component, pageProps }) {
@@ -182,10 +183,18 @@ function AppContent({ Component, pageProps }) {
 
 export default function App({ Component, pageProps }) {
   return (
-    <ChakraProvider>
-      <AuthProvider>
-        <AppContent Component={Component} pageProps={pageProps} />
-      </AuthProvider>
-    </ChakraProvider>
+    <>
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+      <ChakraProvider>
+        <AuthProvider>
+          <AppContent Component={Component} pageProps={pageProps} />
+        </AuthProvider>
+      </ChakraProvider>
+    </>
   );
 }

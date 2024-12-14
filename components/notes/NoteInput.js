@@ -35,6 +35,7 @@ const NoteInput = ({
         value={noteText}
         onChange={(e) => setNoteText(e.target.value)}
         onKeyDown={handleKeyDown}
+        fontSize="sm"
         placeholder={replyToId ? "Write a reply..." : "Add a new note..."}
         rows={3}
       />

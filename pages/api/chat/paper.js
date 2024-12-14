@@ -34,7 +34,7 @@ Answer questions about this paper based on the above context. If you're unsure a
     ];
 
     const result = streamText({
-      model: openai("gpt-4"),
+      model: openai("gpt-4o-mini"),
       messages: messagesToSend,
     });
 
