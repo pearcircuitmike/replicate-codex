@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Tag, useToast, Tooltip } from "@chakra-ui/react";
-import { BellIcon } from "@chakra-ui/icons";
 import { useAuth } from "@/context/AuthContext";
 
 const TaskTag = ({ task, initialIsFollowed }) => {
@@ -93,8 +92,8 @@ const TaskTag = ({ task, initialIsFollowed }) => {
         bg="white"
         borderRadius="md"
         border="1px solid"
-        borderColor={isFollowed ? "green.400" : "gray.200"}
-        backgroundColor={isFollowed ? "green.50" : "gray.50"}
+        borderColor={isFollowed ? "green.400" : "gray.100"}
+        backgroundColor={isFollowed ? "green.50" : "gray.100"}
         color={isFollowed ? "green.400" : "gray.600"}
         boxShadow="sm"
         px="5px"
@@ -104,11 +103,6 @@ const TaskTag = ({ task, initialIsFollowed }) => {
         pointerEvents={isLoading ? "none" : "auto"}
       >
         {task.task}
-        <BellIcon
-          ml="8px"
-          color={isFollowed ? "green.400" : "gray.600"}
-          title={isFollowed ? "Unfollow task" : "Follow task"}
-        />
       </Tag>
     </Tooltip>
   );

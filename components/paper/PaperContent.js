@@ -90,6 +90,7 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
                     maxW="100%"
                     overflow="hidden"
                     wordBreak="break-word"
+                    mb="1.2em"
                   />
                 ),
               })}
@@ -127,6 +128,7 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
                     maxW="100%"
                     overflow="hidden"
                     wordBreak="break-word"
+                    mb="1.2em"
                   />
                 ),
                 pre: (props) => (
@@ -248,10 +250,9 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
         ) : (
           <VStack spacing={1} align="stretch" maxW="100%">
             {overview}
-            {restOfContent}
 
             {paper.paperGraphics?.length > 0 && (
-              <Box maxW="100%" overflow="hidden">
+              <Box my={6}>
                 <PaperFigures
                   figures={paper.paperGraphics}
                   title="Paper Figures"
@@ -259,8 +260,10 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
               </Box>
             )}
 
+            {restOfContent}
+
             {paper.paperTables?.length > 0 && (
-              <Box maxW="100%" overflow="hidden" my={6}>
+              <Box px={6} pb={6}>
                 <PaperTables tables={paper.paperTables} />
               </Box>
             )}

@@ -52,13 +52,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     fetchViewCounts();
   }, [paper?.slug]);
 
-  // Debug log to verify paper data
-  // Add explicit debug logging
-  useEffect(() => {
-    console.log("DEBUG - Full paper data:", paper);
-    console.log("DEBUG - Paper tasks:", paper?.tasks);
-  }, [paper]);
-
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return null;
   }
@@ -106,7 +99,10 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
               <Box py={8}>
                 <SectionsNav
                   markdownContent={paper.generatedSummary}
-                  paper={paper}
+                  paper={{
+                    ...paper,
+                    url: `https://aimodels.fyi/papers/arxiv/${paper.slug}`, // Pass the correct URL directly
+                  }}
                 />
               </Box>
             </Box>

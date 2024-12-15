@@ -8,24 +8,13 @@ const TwitterShareButton = dynamic(
   { ssr: false }
 );
 
-const ShareButton = (props) => {
-  const { buttonText = "Share on 𝕏", ...shareProps } = props;
-
+const ShareButton = ({ buttonText = "Share on 𝕏", ...shareProps }) => {
   // Prevent server-side rendering for this component by returning null during SSR
   if (typeof window === "undefined") return null;
 
   return (
     <TwitterShareButton {...shareProps}>
-      <Button
-        leftIcon={
-          <span style={{ fontWeight: "bold", fontSize: "1.2em" }}>𝕏</span>
-        }
-        bg="black"
-        color="white"
-        _hover={{ bg: "gray.700" }}
-        _active={{ bg: "gray.800" }}
-        size="sm"
-      >
+      <Button size="sm" width="full" variant="outline">
         {buttonText}
       </Button>
     </TwitterShareButton>

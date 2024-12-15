@@ -1,12 +1,5 @@
-// components/paper/SectionsNav.js
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  VStack,
-  useBreakpointValue,
-  Icon,
-} from "@chakra-ui/react";
+import { Box, Button, VStack, useBreakpointValue } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
 import BookmarkButton from "@/components/BookmarkButton";
 import ShareButton from "@/components/ShareButton";
@@ -119,19 +112,18 @@ const SectionsNav = ({ markdownContent = "", paper }) => {
       <VStack spacing={2} mt={6} align="stretch">
         <BookmarkButton resourceId={paper.id} resourceType="paper" />
 
-        <Button
+        <ShareButton
+          url={paper.url}
+          title={`Interesting paper I found on @aimodelsfyi... ${paper.title}\n\n`}
+          hashtags={["AI", "ML"]}
+          buttonText="Share on 𝕏"
           onClick={() => {
             trackEvent("share_paper", {
               platform: "twitter",
               paper_id: paper.id,
             });
           }}
-          size="sm"
-          width="full"
-          variant="outline"
-        >
-          Share on 𝕏
-        </Button>
+        />
       </VStack>
     </Box>
   );
