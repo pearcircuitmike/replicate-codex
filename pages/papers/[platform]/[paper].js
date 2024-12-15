@@ -73,7 +73,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       >
         <Grid
           templateColumns={{
-            base: "1fr",
+            base: "minmax(0, 1fr)", // This is what was missing - mobile needs minmax too
             lg: "250px minmax(0, 1fr) 300px",
           }}
           gap={{ base: 4, lg: 6 }}
