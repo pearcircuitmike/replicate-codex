@@ -32,7 +32,7 @@ const EmptyState = () => (
       </Text>
       <Text color="gray.600" textAlign="center" maxW="md">
         Follow research topics above to see the latest papers and breakthroughs
-        in your areas of interest. We'll curate a personalized feed of top
+        in your areas of interest. We&apos;ll curate a personalized feed of top
         papers for you.
       </Text>
     </VStack>
