@@ -1,13 +1,5 @@
-import React from "react";
-import {
-  Box,
-  Flex,
-  useMediaQuery,
-  VStack,
-  Grid,
-  GridItem,
-  Text,
-} from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, Flex, useMediaQuery, VStack, Tooltip } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import {
   FaSearch,
@@ -16,11 +8,14 @@ import {
   FaFlask,
   FaCubes,
   FaStar,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 
 const DashboardLayout = ({ children }) => {
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
 
   const navItems = [
@@ -49,27 +44,51 @@ const DashboardLayout = ({ children }) => {
       {/* Sidebar for larger screens */}
       {isLargerThan768 && (
         <Box
-          width="300px"
+          width={isCollapsed ? "72px" : "300px"}
           py={8}
           overflowY="auto"
           borderRight="1px solid #e2e8f0"
+          transition="all 0.2s"
         >
-          <VStack spacing={4} align="stretch">
-            {navItems.map((item, index) => (
-              <NavItem
-                key={item.href || index}
-                icon={item.icon}
-                label={item.label}
-                href={item.href}
-                isActive={router.pathname === item.href}
-              />
+          {/* Sidebar Navigation */}
+          <VStack spacing={1} align="stretch" mt={12}>
+            {/* Navigation Items */}
+            {navItems.map((item) => (
+              <Box key={item.href}>
+                {isCollapsed ? (
+                  <Tooltip label={item.label} placement="right" hasArrow>
+                    <NavItem
+                      icon={item.icon}
+                      href={item.href}
+                      isActive={router.pathname === item.href}
+                    />
+                  </Tooltip>
+                ) : (
+                  <NavItem
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    isActive={router.pathname === item.href}
+                  />
+                )}
+              </Box>
             ))}
           </VStack>
+          {/* Collapse Toggle Button */}
+          <Box mt={8}>
+            <NavItem
+              label={!isCollapsed && " "} // hack to force alignment... fix later
+              icon={
+                isCollapsed ? <FaAngleDoubleRight /> : <FaAngleDoubleLeft />
+              }
+              onClick={() => setIsCollapsed(!isCollapsed)} // Toggle sidebar
+            />
+          </Box>
         </Box>
       )}
 
       {/* Main Content */}
-      <Box flex={1} overflowY="auto" p={4}>
+      <Box flex={1} overflowY="auto" p={4} transition="all 0.2s">
         {children}
       </Box>
 
@@ -88,25 +107,19 @@ const DashboardLayout = ({ children }) => {
           justifyContent="space-between"
           paddingX={4}
         >
-          {navItems.map((item, index) => (
+          {navItems.map((item) => (
             <Box
-              key={index}
+              key={item.href}
               display="flex"
               alignItems="center"
               justifyContent="center"
               flex="1"
             >
-              {/* Icon only — matches desktop styles */}
-              <Box
-                as="button"
-                onClick={() => router.push(item.href)}
-                fontSize="lg"
-                color="gray.500"
-                _hover={{ color: "gray.600" }} // Matches desktop hover behavior
-                aria-label={item.label} // For accessibility
-              >
-                {item.icon}
-              </Box>
+              <NavItem
+                icon={item.icon}
+                href={item.href}
+                isActive={router.pathname === item.href}
+              />
             </Box>
           ))}
         </Box>
