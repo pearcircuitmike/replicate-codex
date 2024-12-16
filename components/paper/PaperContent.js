@@ -20,6 +20,7 @@ import TaskTag from "@/components/TaskTag";
 import LimitMessage from "@/components/LimitMessage";
 import PDFViewer from "@/components/PDFViewer";
 import customTheme from "@/components/MarkdownTheme";
+import LinkPreview from "./LinkPreview";
 
 const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
   const [paperTasks, setPaperTasks] = useState([]);
@@ -131,6 +132,9 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
                     mb="1.2em"
                   />
                 ),
+                a: ({ href, children }) => (
+                  <LinkPreview href={href}>{children}</LinkPreview>
+                ),
                 pre: (props) => (
                   <Box
                     as="pre"
@@ -156,6 +160,10 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
           <ReactMarkdown
             components={ChakraUIRenderer({
               ...customTheme,
+              a: ({ href, children }) => (
+                <LinkPreview href={href}>{children}</LinkPreview>
+              ),
+
               h2: (props) => {
                 const id = props.children[0]
                   .toLowerCase()
