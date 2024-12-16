@@ -283,7 +283,7 @@ export default function RoleSelectionPage() {
             variant="ghost"
             size="sm"
             leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/")}
           >
             Back
           </Button>
