@@ -174,11 +174,11 @@ const FollowedTasksComponent = () => {
   return (
     <Box color="gray.700" py={isLargerThan480 ? 4 : 2} minH="60vh">
       <VStack spacing={2} align="stretch" mb={6}>
-        <Heading as="h1" size="lg" letterSpacing="tight">
-          Your Research Feed
+        <Heading as="h1" size="md" letterSpacing="tight">
+          Your feed
         </Heading>
         <Text color="gray.600">
-          Recent papers from your followed topics, updated daily
+          The most popular papers from each topic you follow
         </Text>
       </VStack>
 

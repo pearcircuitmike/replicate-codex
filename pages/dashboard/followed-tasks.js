@@ -253,15 +253,11 @@ const FollowedTasksPage = () => {
 
   return (
     <DashboardLayout>
-      <Container maxW="container.xl" py={8}>
-        <VStack spacing={4} align="stretch" mb={8}>
-          <Heading as="h1" size="lg" letterSpacing="tight">
-            Discover and Follow Research Topics
+      <Container maxW="container.xl">
+        <VStack spacing={4} align="stretch" mb={6}>
+          <Heading as="h1" size="md">
+            Your followed topics
           </Heading>
-          <Text color="gray.600">
-            Follow research topics to customize your feed. Get the latest papers
-            and breakthroughs across your fields of interest, all in one place.
-          </Text>
         </VStack>
 
         <Box mb={6}>
