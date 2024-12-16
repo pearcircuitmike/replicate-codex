@@ -56,12 +56,19 @@ const DashboardLayout = ({ children }) => {
             {navItems.map((item) => (
               <Box key={item.href}>
                 {isCollapsed ? (
-                  <Tooltip label={item.label} placement="right" hasArrow>
-                    <NavItem
-                      icon={item.icon}
-                      href={item.href}
-                      isActive={router.pathname === item.href}
-                    />
+                  <Tooltip
+                    label={item.label}
+                    placement="right"
+                    hasArrow
+                    zIndex="tooltip"
+                  >
+                    <Box>
+                      <NavItem
+                        icon={item.icon}
+                        href={item.href}
+                        isActive={router.pathname === item.href}
+                      />
+                    </Box>
                   </Tooltip>
                 ) : (
                   <NavItem
