@@ -1,9 +1,7 @@
-// components/paper/ChatWithPaper.js
 import React, { useState, useEffect, useRef } from "react";
 import { useChat } from "ai/react";
 import {
   Box,
-  Input,
   Button,
   Flex,
   VStack,
@@ -11,16 +9,32 @@ import {
   useToast,
   IconButton,
   Collapse,
+  Textarea,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronUpIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import { useAuth } from "@/context/AuthContext";
 import { trackEvent } from "@/pages/api/utils/analytics-util";
 
 const ChatWithPaper = ({ paperId, paper }) => {
   const { user, hasActiveSubscription } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [rightOffset, setRightOffset] = useState(0);
+  const columnRef = useRef(null);
   const messagesEndRef = useRef(null);
   const toast = useToast();
+
+  useEffect(() => {
+    const updateOffset = () => {
+      if (columnRef.current) {
+        const rect = columnRef.current.getBoundingClientRect();
+        setRightOffset(window.innerWidth - rect.right - 15);
+      }
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+    return () => window.removeEventListener("resize", updateOffset);
+  }, []);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
@@ -42,15 +56,10 @@ const ChatWithPaper = ({ paperId, paper }) => {
       },
     });
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Expand chat when first message is sent
   useEffect(() => {
     if (messages.length > 0 && !isExpanded) {
       setIsExpanded(true);
@@ -80,7 +89,6 @@ const ChatWithPaper = ({ paperId, paper }) => {
       return;
     }
 
-    // Add tracking before submitting
     trackEvent("paper_chat_message", {
       paper_id: paperId,
       message: messages,
@@ -91,92 +99,114 @@ const ChatWithPaper = ({ paperId, paper }) => {
   };
 
   return (
-    <Box
-      position="fixed"
-      bottom={0}
-      left="50%"
-      transform="translateX(-50%)"
-      width={{ base: "100%", md: "700px" }}
-      maxW="90%"
-      bg="white"
-      borderTopRadius="lg"
-      boxShadow="lg"
-      zIndex={10}
-      transition="height 0.2s"
-      height={isExpanded ? "60vh" : "auto"}
-    >
-      <Flex
-        borderBottom="1px"
-        borderColor="gray.200"
-        p={2}
-        align="center"
-        justify="space-between"
+    <>
+      <Box ref={columnRef} position="absolute" right={0} width="100%" />
+      <Box
+        position="fixed"
+        bottom={5}
+        right={`${rightOffset}px`}
+        width={columnRef.current?.getBoundingClientRect().width || "auto"}
+        bg="white"
+        boxShadow="lg"
+        borderTopRadius="lg"
+        zIndex={999}
       >
-        <Text fontSize="sm" fontWeight="medium" ml={2}>
-          Chat with Paper
-        </Text>
-        <IconButton
-          icon={isExpanded ? <ChevronDownIcon /> : <ChevronUpIcon />}
-          variant="ghost"
-          size="sm"
+        <Flex
+          p={2}
+          align="center"
+          justify="space-between"
+          bg="blue.800"
+          color="white"
+          borderTopRadius="lg"
+          cursor="pointer"
           onClick={() => setIsExpanded(!isExpanded)}
-          aria-label={isExpanded ? "Collapse chat" : "Expand chat"}
-        />
-      </Flex>
-
-      <Collapse in={isExpanded} animateOpacity>
-        <VStack
-          height="calc(60vh - 120px)"
-          overflowY="auto"
-          p={4}
-          spacing={4}
-          align="stretch"
-          sx={{
-            "&::-webkit-scrollbar": {
-              width: "4px",
-            },
-            "&::-webkit-scrollbar-track": {
-              width: "6px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: "gray.200",
-              borderRadius: "24px",
-            },
-          }}
         >
-          {messages.map((message, i) => (
-            <Box
-              key={i}
-              alignSelf={message.role === "user" ? "flex-end" : "flex-start"}
-              bg={message.role === "user" ? "blue.500" : "gray.100"}
-              color={message.role === "user" ? "white" : "black"}
-              px={4}
-              py={2}
-              borderRadius="lg"
-              maxW="80%"
-            >
-              <Text whiteSpace="pre-wrap">{message.content}</Text>
-            </Box>
-          ))}
-          <div ref={messagesEndRef} />
-        </VStack>
-      </Collapse>
-
-      <form onSubmit={handleMessageSubmit}>
-        <Flex p={3} gap={3} borderTop="1px" borderColor="gray.200">
-          <Input
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Ask a question about this paper..."
-            disabled={isLoading}
-            bg="gray.50"
+          <Text fontSize="sm" fontWeight="medium" ml={2}>
+            Chat with Paper
+          </Text>
+          <IconButton
+            icon={isExpanded ? <ChevronDownIcon /> : <ChevronUpIcon />}
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
+            aria-label={isExpanded ? "Collapse chat" : "Expand chat"}
+            color="white"
+            _hover={{ bg: "blue.600" }}
           />
-          <Button type="submit" isLoading={isLoading} colorScheme="blue">
-            Send
-          </Button>
         </Flex>
-      </form>
-    </Box>
+
+        <Collapse in={isExpanded}>
+          <VStack
+            maxH="300px"
+            overflowY="auto"
+            p={4}
+            spacing={4}
+            align="stretch"
+            bg="gray.50"
+          >
+            {messages.map((message, i) => (
+              <Box
+                key={i}
+                alignSelf={message.role === "user" ? "flex-end" : "flex-start"}
+                bg={message.role === "user" ? "blue.500" : "white"}
+                color={message.role === "user" ? "white" : "black"}
+                px={4}
+                py={2}
+                borderRadius="lg"
+                maxW="100%"
+                boxShadow="sm"
+              >
+                <Text fontSize="sm">{message.content}</Text>
+              </Box>
+            ))}
+            <div ref={messagesEndRef} />
+          </VStack>
+        </Collapse>
+
+        <Box p={3} borderTop="1px" borderColor="gray.200">
+          <form onSubmit={handleMessageSubmit}>
+            <Flex direction="column" gap={2}>
+              <Textarea
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Ask a question about this paper"
+                disabled={isLoading}
+                minH="60px"
+                maxH="120px"
+                rows={1}
+                resize="none"
+                borderRadius="lg"
+                fontSize="sm"
+                py={2}
+                _focus={{
+                  borderColor: "blue.500",
+                  boxShadow: "none",
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleMessageSubmit(e);
+                  }
+                }}
+              />
+              <Button
+                type="submit"
+                isLoading={isLoading}
+                colorScheme="blue"
+                size="md"
+                rightIcon={<ArrowUpIcon />}
+                alignSelf="flex-end"
+              >
+                Chat
+              </Button>
+            </Flex>
+          </form>
+        </Box>
+      </Box>
+    </>
   );
 };
 

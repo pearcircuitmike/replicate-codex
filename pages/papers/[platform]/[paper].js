@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, Grid, GridItem } from "@chakra-ui/react";
+import { Container, Box, Grid, GridItem, Flex } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
@@ -140,7 +140,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
             <Box
               position="sticky"
               top="0"
-              maxH="100vh"
+              height="100vh"
               overflowY="auto"
               overflowX="hidden"
               css={{
@@ -152,30 +152,31 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 },
               }}
             >
-              <Box py={8}>
-                <Box mb={6}>
-                  <Box fontSize="lg" fontWeight="semibold" mb={4}>
-                    Listen to this paper
+              <Flex flexDirection="column" height="100%" position="relative">
+                <Box py={8}>
+                  <Box mb={6}>
+                    <Box fontSize="lg" fontWeight="semibold" mb={4}>
+                      Listen to this paper
+                    </Box>
+                    {paper.generatedSummary && (
+                      <AudioPlayer text={paper.generatedSummary} />
+                    )}
                   </Box>
-                  {paper.generatedSummary && (
-                    <AudioPlayer text={paper.generatedSummary} />
-                  )}
+                  <Box mt={6}>
+                    <PaperNotes paperId={paper.id} />
+                  </Box>
                 </Box>
-                <Box mt={6}>
-                  <PaperNotes paperId={paper.id} />
-                </Box>
-              </Box>
+                <ChatWithPaper
+                  paperId={paper.id}
+                  paper={{
+                    abstract: paper.abstract,
+                    generatedSummary: paper.generatedSummary,
+                  }}
+                />
+              </Flex>
             </Box>
           </GridItem>
         </Grid>
-
-        <ChatWithPaper
-          paperId={paper.id}
-          paper={{
-            abstract: paper.abstract,
-            generatedSummary: paper.generatedSummary,
-          }}
-        />
       </Container>
     </Box>
   );
