@@ -28,12 +28,12 @@ const DashboardLayout = ({ children }) => {
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
     {
       icon: <FaFlask />,
-      label: "Hot Papers",
+      label: "Popular Papers",
       href: "/dashboard/weekly-papers-summary",
     },
     {
       icon: <FaCubes />,
-      label: "Hot Models",
+      label: "Popular Models",
       href: "/dashboard/weekly-models-summary",
     },
     { icon: <FaBookmark />, label: "Bookmarks", href: "/dashboard/bookmarks" },
