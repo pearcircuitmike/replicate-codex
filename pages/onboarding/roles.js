@@ -77,7 +77,8 @@ const RoleCard = ({
   </Box>
 );
 
-const roles = [
+// Define all roles
+const allRoles = [
   {
     id: "researcher",
     role: "Researcher",
@@ -109,6 +110,16 @@ const roles = [
     description: "I have a different role",
   },
 ];
+
+// Separate and shuffle roles while keeping "other" last
+const otherRole = allRoles.find((role) => role.id === "other");
+const mainRoles = allRoles.filter((role) => role.id !== "other");
+const shuffledMainRoles = [...mainRoles]
+  .map((value) => ({ value, sort: Math.random() }))
+  .sort((a, b) => a.sort - b.sort)
+  .map(({ value }) => value);
+
+const roles = [...shuffledMainRoles, otherRole];
 
 export default function RoleSelectionPage() {
   const [selectedRoles, setSelectedRoles] = useState([]);
