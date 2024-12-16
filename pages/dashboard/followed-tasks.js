@@ -42,7 +42,7 @@ const SearchSuggestion = ({ task, onSelect, isActive }) => (
     <Box>
       <Text fontWeight={isActive ? "semibold" : "normal"}>{task.task}</Text>
       <Text fontSize="sm" color="gray.500">
-        {task.task_category}
+        {task.task_description}
       </Text>
     </Box>
   </ListItem>
@@ -306,6 +306,24 @@ const FollowedTasksPage = () => {
                     onSelect={handleSuggestionSelect}
                   />
                 ))}
+                {suggestions.length == 0 && (
+                  <ListItem
+                    px={4}
+                    py={2}
+                    cursor="pointer"
+                    _hover={{ bg: "blue.50" }}
+                    display="flex"
+                    alignItems="center"
+                    gap={3}
+                  >
+                    <Box>
+                      <Text fontWeight="normal">Sorry!</Text>
+                      <Text fontSize="sm" color="gray.500">
+                        No topics match your search
+                      </Text>
+                    </Box>
+                  </ListItem>
+                )}
               </List>
             </Box>
           )}

@@ -178,7 +178,7 @@ const FollowedTasksComponent = () => {
           Your feed
         </Heading>
         <Text color="gray.600">
-          The most popular papers from each topic you follow
+          The most popular papers from each topic you follow, updated daily
         </Text>
       </VStack>
 
