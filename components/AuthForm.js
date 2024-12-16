@@ -7,6 +7,7 @@ import {
   useColorModeValue,
   Input,
   FormControl,
+  FormErrorMessage,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -25,25 +26,32 @@ export default function AuthForm({
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { handleSignInWithGoogle, handleSignInWithEmail } = useAuth();
 
   const signInWithGoogle = async () => {
     setLoading(true);
     localStorage.setItem("signupSource", signupSource);
-
     await handleSignInWithGoogle();
     setLoading(false);
   };
 
   const signInWithEmail = async (e) => {
     e.preventDefault();
+
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    }
+
     setLoading(true);
     localStorage.setItem("signupSource", signupSource);
 
     const { data, error } = await handleSignInWithEmail(email);
     if (!error) {
       setEmailSent(true);
+      setEmailError(""); // Clear the error on successful submission
       onOpen();
     }
     setLoading(false);
@@ -94,13 +102,14 @@ export default function AuthForm({
         position="relative"
       >
         <VStack spacing={4}>
-          <FormControl id="email">
+          <FormControl id="email" isInvalid={Boolean(emailError)}>
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={copy.emailPlaceholder}
             />
+            <FormErrorMessage>{emailError}</FormErrorMessage>
             {emailSent && (
               <Text fontWeight="bold" color="red.500" mt={2}>
                 Check your email for the magic link!
