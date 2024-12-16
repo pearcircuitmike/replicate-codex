@@ -3,7 +3,6 @@ import { Box, Link, Text, Flex, Image, Portal } from "@chakra-ui/react";
 
 const LinkPreview = ({ href, children }) => {
   const [showPreview, setShowPreview] = useState(false);
-  const [iframeError, setIframeError] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [pageTitle, setPageTitle] = useState("");
 
@@ -20,8 +19,8 @@ const LinkPreview = ({ href, children }) => {
     const mouseY = e.clientY;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const previewWidth = 400;
-    const previewHeight = 300;
+    const previewWidth = 320; // 80% of 400px
+    const previewHeight = 240; // 80% of 300px
 
     let left = mouseX;
     let top = mouseY + 20;
@@ -52,18 +51,6 @@ const LinkPreview = ({ href, children }) => {
     return urlDisplay;
   };
 
-  const handleIframeLoad = (e) => {
-    try {
-      const iframeDoc = e.target.contentWindow?.document;
-      if (iframeDoc) {
-        setPageTitle(iframeDoc.title);
-      }
-    } catch (error) {
-      // If we can't access iframe, use the processed paper title if it's a paper link
-      setPageTitle(getTitle(href));
-    }
-  };
-
   return (
     <Box display="inline">
       <Link
@@ -78,7 +65,6 @@ const LinkPreview = ({ href, children }) => {
           );
           if (!isMovingToPreview) {
             setShowPreview(false);
-            setIframeError(false);
             setPageTitle("");
           }
         }}
@@ -86,7 +72,7 @@ const LinkPreview = ({ href, children }) => {
         {children}
       </Link>
 
-      {showPreview && !href.startsWith("/") && (
+      {showPreview && (
         <Portal>
           <Box
             data-preview-box="true"
@@ -94,7 +80,7 @@ const LinkPreview = ({ href, children }) => {
             top={position.top}
             left={position.left}
             zIndex={99999}
-            width="400px"
+            width="320px"
             bg="white"
             borderWidth="1px"
             borderColor="gray.200"
@@ -102,50 +88,27 @@ const LinkPreview = ({ href, children }) => {
             onMouseEnter={() => setShowPreview(true)}
             onMouseLeave={() => {
               setShowPreview(false);
-              setIframeError(false);
               setPageTitle("");
             }}
           >
             <Box
-              height="200px"
+              height="160px"
               borderBottomWidth="1px"
               borderColor="gray.100"
               overflow="hidden"
               position="relative"
             >
-              <Box
-                position="absolute"
-                top="0"
-                left="0"
-                width="1200px"
-                height="800px"
-                transform="scale(0.333)"
-                transformOrigin="0 0"
-              >
-                {!iframeError ? (
-                  <iframe
-                    src={href}
-                    width="100%"
-                    height="100%"
-                    style={{
-                      border: "none",
-                      pointerEvents: "none",
-                    }}
-                    onLoad={handleIframeLoad}
-                    onError={() => setIframeError(true)}
-                  />
-                ) : (
-                  <Image
-                    src="https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg"
-                    alt="Preview fallback"
-                    width="100%"
-                    height="100%"
-                    objectFit="cover"
-                  />
-                )}
-              </Box>
+              <Image
+                src="https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg"
+                alt="Preview fallback"
+                width="100%"
+                height="100%"
+                objectFit="cover"
+              />
             </Box>
-            <Box p={4}>
+            <Box p={3}>
+              {" "}
+              {/* Adjusted padding for smaller size */}
               <Flex alignItems="center" gap={2}>
                 <Image
                   src={`https://www.google.com/s2/favicons?domain=${urlDisplay}&sz=32`}
