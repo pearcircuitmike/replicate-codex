@@ -229,19 +229,28 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
             <Text as="span">
               Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
             </Text>
-            {paper.authors?.map((author, index) => (
-              <React.Fragment key={index}>
-                <Link
-                  href={`/authors/${paper.platform}/${author}`}
-                  color="blue.500"
-                  _hover={{ textDecoration: "underline" }}
-                  display="inline"
-                >
-                  {author}
-                </Link>
-                {index < paper.authors.length - 1 && ", "}
-              </React.Fragment>
-            ))}
+            {paper.authors && paper.authors.length > 0 && (
+              <Text as="span">
+                {paper.authors.slice(0, 7).map((author, index) => (
+                  <React.Fragment key={index}>
+                    <Link
+                      href={`/authors/${paper.platform}/${author}`}
+                      color="blue.500"
+                      _hover={{ textDecoration: "underline" }}
+                      display="inline"
+                    >
+                      {author}
+                    </Link>
+                    {index < 6 && index < paper.authors.length - 1 && ", "}
+                  </React.Fragment>
+                ))}
+                {paper.authors.length > 7 && (
+                  <Text as="span">
+                    {` and ${paper.authors.length - 7} more...`}
+                  </Text>
+                )}
+              </Text>
+            )}
           </Box>
 
           <Wrap spacing={2} mt={4}>
