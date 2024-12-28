@@ -7,7 +7,7 @@ import {
   List,
   ListItem,
 } from "@chakra-ui/react";
-import MetaTags from "../../components/MetaTags";
+import MetaTags from "@/components/MetaTags";
 
 const TermsOfService = () => {
   return (
