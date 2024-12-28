@@ -16,7 +16,7 @@ import ChatWithPaper from "@/components/paper/ChatWithPaper";
 import PaperContent from "@/components/paper/PaperContent";
 import AudioPlayer from "@/components/paper/AudioPlayer";
 
-const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
+const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
   const { user, hasActiveSubscription } = useAuth();
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -24,6 +24,31 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     canViewFullArticle: true,
   });
 
+  // If we have an error or no valid paper, show a fallback UI
+  if (error || !paper) {
+    return (
+      <Box maxW="100vw" overflowX="hidden" p={8}>
+        <h1
+          style={{
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+            marginBottom: "1rem",
+          }}
+        >
+          Paper Temporarily Unavailable
+        </h1>
+        <p>
+          We're having trouble loading <strong>{slug}</strong>. Please try again
+          soon.
+        </p>
+      </Box>
+    );
+  }
+
+  // Otherwise, load the standard page content
+  // --------------------------------------------------------------------------
+
+  // On the client, fetch view counts
   useEffect(() => {
     const fetchViewCounts = async () => {
       if (!paper?.slug) return;
@@ -52,10 +77,6 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
     fetchViewCounts();
   }, [paper?.slug]);
 
-  if (!paper || !paper.abstract || !paper.generatedSummary) {
-    return null;
-  }
-
   return (
     <Box maxW="100vw" overflowX="hidden">
       <MetaTags
@@ -73,7 +94,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
       >
         <Grid
           templateColumns={{
-            base: "minmax(0, 1fr)", // This is what was missing - mobile needs minmax too
+            base: "minmax(0, 1fr)", // mobile also needs minmax
             lg: "250px minmax(0, 1fr) 300px",
           }}
           gap={{ base: 4, lg: 6 }}
@@ -101,7 +122,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                   markdownContent={paper.generatedSummary}
                   paper={{
                     ...paper,
-                    url: `https://aimodels.fyi/papers/arxiv/${paper.slug}`, // Pass the correct URL directly
+                    url: `https://aimodels.fyi/papers/arxiv/${paper.slug}`,
                   }}
                 />
               </Box>
@@ -126,7 +147,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug }) => {
                 <PaperContent
                   paper={{
                     ...paper,
-                    tasks: paper.tasks || [], // Ensure tasks are passed
+                    tasks: paper.tasks || [],
                   }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
@@ -211,21 +232,35 @@ export async function getStaticPaths() {
     }
   }
 
-  return { paths, fallback: "true" };
+  // IMPORTANT: fallback must be a boolean or 'blocking', not a string
+  return { paths, fallback: true };
 }
 
 export async function getStaticProps({ params }) {
   const { platform, paper: slug } = params;
-  const paper = await fetchPaperDataBySlug(slug, platform);
 
+  let paper = null;
+  try {
+    paper = await fetchPaperDataBySlug(slug, platform);
+  } catch (err) {
+    console.error("Error fetching paper data:", err);
+  }
+
+  // If missing or incomplete data, return a short revalidate placeholder
   if (!paper || !paper.abstract || !paper.generatedSummary) {
-    return { notFound: true };
+    return {
+      props: {
+        error: true,
+        slug,
+      },
+      revalidate: 60, // short revalidate so we can retry soon
+    };
   }
 
   // Ensure tasks are included in the paper object
   const paperWithTasks = {
     ...paper,
-    tasks: paper.tasks || [], // Provide a default empty array if tasks don't exist
+    tasks: paper.tasks || [],
   };
 
   let relatedPapers = [];
@@ -242,6 +277,7 @@ export async function getStaticProps({ params }) {
       paper: paperWithTasks,
       relatedPapers,
       slug,
+      error: false,
     },
     revalidate: lastUpdatedDate <= oneWeekAgo ? false : 3600 * 24,
   };
