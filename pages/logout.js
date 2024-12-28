@@ -1,7 +1,7 @@
-// pages/logout.js
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
+import MetaTags from "../components/MetaTags";
 
 const LogoutPage = () => {
   const { logout } = useAuth();
@@ -17,7 +17,16 @@ const LogoutPage = () => {
     handleLogout();
   }, [logout, router]);
 
-  return null;
+  return (
+    <>
+      <MetaTags
+        title="Logging Out"
+        description="Logging out of your AIModels.fyi account"
+        socialPreviewTitle="Logout - AIModels.fyi"
+        socialPreviewSubtitle="See you again soon"
+      />
+    </>
+  );
 };
 
 export default LogoutPage;

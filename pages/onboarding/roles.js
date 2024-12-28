@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import MetaTags from "@/components/MetaTags";
 
 const RoleCard = ({
   role,
@@ -276,74 +277,88 @@ export default function RoleSelectionPage() {
   }
 
   return (
-    <Container maxW="4xl" py={8}>
-      <Box mb={8}>
-        <Flex justify="space-between" align="center" mb={4}>
-          <Button
-            variant="ghost"
+    <>
+      {" "}
+      <MetaTags
+        title="Select Your Role"
+        description="Tell us about yourself and customize your AIModels.fyi experience"
+        socialPreviewTitle="Profile Setup - AIModels.fyi"
+        socialPreviewSubtitle="Choose your roles to get started"
+      />
+      <Container maxW="4xl" py={8}>
+        <Box mb={8}>
+          <Flex justify="space-between" align="center" mb={4}>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeftIcon />}
+              onClick={() => router.push("/")}
+            >
+              Back
+            </Button>
+            <Text fontSize="sm" color="gray.600" textAlign="center">
+              Step 1 of 4 - Choose Roles
+            </Text>
+            <Button
+              variant="ghost"
+              size="sm"
+              rightIcon={<ChevronRightIcon />}
+              onClick={handleContinue}
+            >
+              Next
+            </Button>
+          </Flex>
+          <Progress
+            value={25}
             size="sm"
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push("/")}
-          >
-            Back
-          </Button>
-          <Text fontSize="sm" color="gray.600" textAlign="center">
-            Step 1 of 4 - Choose Roles
-          </Text>
-          <Button
-            variant="ghost"
-            size="sm"
-            rightIcon={<ChevronRightIcon />}
-            onClick={handleContinue}
-          >
-            Next
-          </Button>
-        </Flex>
-        <Progress value={25} size="sm" colorScheme="blue" borderRadius="full" />
-      </Box>
-
-      <VStack spacing={8} align="stretch">
-        <Box textAlign="center">
-          <Heading size="lg" mb={3}>
-            I am a...
-          </Heading>
-          <Text color="gray.600" fontSize="lg">
-            Select all that apply
-          </Text>
+            colorScheme="blue"
+            borderRadius="full"
+          />
         </Box>
 
-        <SimpleGrid columns={[1, 2, 3]} spacing={6} pt={4}>
-          {roles.map((role) => (
-            <RoleCard
-              key={role.id}
-              {...role}
-              isSelected={selectedRoles.includes(role.id)}
-              onSelect={() => handleRoleSelect(role.id)}
-              isUpdating={updatingRole === role.id}
-            />
-          ))}
-        </SimpleGrid>
+        <VStack spacing={8} align="stretch">
+          <Box textAlign="center">
+            <Heading size="lg" mb={3}>
+              I am a...
+            </Heading>
+            <Text color="gray.600" fontSize="lg">
+              Select all that apply
+            </Text>
+          </Box>
 
-        <Flex justify="space-between" pt={8}>
-          <Button
-            variant="ghost"
-            onClick={handleSkip}
-            isDisabled={isLoading || updatingRole !== null}
-          >
-            Skip for now
-          </Button>
-          <Button
-            colorScheme="blue"
-            onClick={handleContinue}
-            isLoading={isLoading}
-            isDisabled={updatingRole !== null}
-            size="lg"
-            px={8}
-          >
-            Continue
-          </Button>
-        </Flex>
-      </VStack>
-    </Container>
+          <SimpleGrid columns={[1, 2, 3]} spacing={6} pt={4}>
+            {roles.map((role) => (
+              <RoleCard
+                key={role.id}
+                {...role}
+                isSelected={selectedRoles.includes(role.id)}
+                onSelect={() => handleRoleSelect(role.id)}
+                isUpdating={updatingRole === role.id}
+              />
+            ))}
+          </SimpleGrid>
+
+          <Flex justify="space-between" pt={8}>
+            <Button
+              variant="ghost"
+              onClick={handleSkip}
+              isDisabled={isLoading || updatingRole !== null}
+            >
+              Skip for now
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={handleContinue}
+              isLoading={isLoading}
+              isDisabled={updatingRole !== null}
+              size="lg"
+              px={8}
+            >
+              Continue
+            </Button>
+          </Flex>
+        </VStack>
+      </Container>
+    </>
   );
 }

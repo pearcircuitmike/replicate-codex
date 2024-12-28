@@ -25,6 +25,7 @@ import { SelectedTopics } from "@/components/SelectedTopics";
 import { TopicCard } from "@/components/TopicCard";
 import { useAuth } from "@/context/AuthContext";
 import supabase from "@/pages/api/utils/supabaseClient";
+import MetaTags from "@/components/MetaTags";
 
 const SearchSuggestion = ({ task, onSelect, isActive }) => (
   <ListItem
@@ -252,133 +253,141 @@ const FollowedTasksPage = () => {
   };
 
   return (
-    <DashboardLayout>
-      <Container maxW="container.xl">
-        <VStack spacing={4} align="stretch" mb={6}>
-          <Heading as="h1" size="md">
-            Your followed topics
-          </Heading>
-        </VStack>
+    <>
+      <MetaTags
+        title="Followed Topics"
+        description="Manage your followed research topics and discover new areas of interest"
+        socialPreviewTitle="Research Topics - AIModels.fyi"
+        socialPreviewSubtitle="Customize your research topic feed"
+      />
+      <DashboardLayout>
+        <Container maxW="container.xl">
+          <VStack spacing={4} align="stretch" mb={6}>
+            <Heading as="h1" size="md">
+              Your followed topics
+            </Heading>
+          </VStack>
 
-        <Box mb={6}>
-          <SelectedTopics tasks={tasks} onToggle={handleTaskToggle} />
-        </Box>
+          <Box mb={6}>
+            <SelectedTopics tasks={tasks} onToggle={handleTaskToggle} />
+          </Box>
 
-        <Box position="relative" mb={8}>
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <SearchIcon color="gray.400" />
-            </InputLeftElement>
-            <Input
-              ref={inputRef}
-              placeholder="Search research topics..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onFocus={handleSearchFocus}
-              onBlur={handleSearchBlur}
-              onKeyDown={handleKeyDown}
-              size="lg"
-              borderRadius="lg"
-            />
-          </InputGroup>
-          {isOpen && (
-            <Box
-              position="absolute"
-              top="100%"
-              left={0}
-              right={0}
-              mt={2}
-              bg="white"
-              maxH="400px"
-              overflowY="auto"
-              shadow="lg"
-              borderRadius="lg"
-              border="1px solid"
-              borderColor="gray.200"
-              zIndex={10}
-            >
-              <List spacing={0}>
-                {suggestions.map((task, index) => (
-                  <SearchSuggestion
-                    key={task.id}
-                    task={task}
-                    isActive={index === activeIndex}
-                    onSelect={handleSuggestionSelect}
-                  />
-                ))}
-                {suggestions.length == 0 && (
-                  <ListItem
-                    px={4}
-                    py={2}
-                    cursor="pointer"
-                    _hover={{ bg: "blue.50" }}
-                    display="flex"
-                    alignItems="center"
-                    gap={3}
-                  >
-                    <Box>
-                      <Text fontWeight="normal">Sorry!</Text>
-                      <Text fontSize="sm" color="gray.500">
-                        No topics match your search
-                      </Text>
-                    </Box>
-                  </ListItem>
-                )}
-              </List>
-            </Box>
-          )}
-        </Box>
-
-        <Box position="relative" mb={12}>
-          {!isMobile && !searchTerm && currentPage > 0 && (
-            <IconButton
-              aria-label="Previous page"
-              icon={<ChevronLeftIcon />}
-              onClick={handlePrevPage}
-              position="absolute"
-              left="0"
-              top="50%"
-              transform="translateY(-50%)"
-              colorScheme="gray"
-              variant="ghost"
-              size="lg"
-              fontSize="24px"
-            />
-          )}
-
-          <SimpleGrid columns={[1, 1, 2, 4]} spacing={6} px={12}>
-            {displayedTasks.map((task) => (
-              <TopicCard
-                key={task.id}
-                task={task}
-                isSelected={task.isFollowed}
-                onToggle={handleTaskToggle}
+          <Box position="relative" mb={8}>
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.400" />
+              </InputLeftElement>
+              <Input
+                ref={inputRef}
+                placeholder="Search research topics..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
+                onKeyDown={handleKeyDown}
+                size="lg"
+                borderRadius="lg"
               />
-            ))}
-          </SimpleGrid>
+            </InputGroup>
+            {isOpen && (
+              <Box
+                position="absolute"
+                top="100%"
+                left={0}
+                right={0}
+                mt={2}
+                bg="white"
+                maxH="400px"
+                overflowY="auto"
+                shadow="lg"
+                borderRadius="lg"
+                border="1px solid"
+                borderColor="gray.200"
+                zIndex={10}
+              >
+                <List spacing={0}>
+                  {suggestions.map((task, index) => (
+                    <SearchSuggestion
+                      key={task.id}
+                      task={task}
+                      isActive={index === activeIndex}
+                      onSelect={handleSuggestionSelect}
+                    />
+                  ))}
+                  {suggestions.length == 0 && (
+                    <ListItem
+                      px={4}
+                      py={2}
+                      cursor="pointer"
+                      _hover={{ bg: "blue.50" }}
+                      display="flex"
+                      alignItems="center"
+                      gap={3}
+                    >
+                      <Box>
+                        <Text fontWeight="normal">Sorry!</Text>
+                        <Text fontSize="sm" color="gray.500">
+                          No topics match your search
+                        </Text>
+                      </Box>
+                    </ListItem>
+                  )}
+                </List>
+              </Box>
+            )}
+          </Box>
 
-          {!isMobile && !searchTerm && currentPage < totalPages - 1 && (
-            <IconButton
-              aria-label="Next page"
-              icon={<ChevronRightIcon />}
-              onClick={handleNextPage}
-              position="absolute"
-              right="0"
-              top="50%"
-              transform="translateY(-50%)"
-              colorScheme="gray"
-              variant="ghost"
-              size="lg"
-              fontSize="24px"
-            />
-          )}
-        </Box>
+          <Box position="relative" mb={12}>
+            {!isMobile && !searchTerm && currentPage > 0 && (
+              <IconButton
+                aria-label="Previous page"
+                icon={<ChevronLeftIcon />}
+                onClick={handlePrevPage}
+                position="absolute"
+                left="0"
+                top="50%"
+                transform="translateY(-50%)"
+                colorScheme="gray"
+                variant="ghost"
+                size="lg"
+                fontSize="24px"
+              />
+            )}
 
-        <Box pt={4}>
-          <FollowedTasksComponent />
-        </Box>
-      </Container>
-    </DashboardLayout>
+            <SimpleGrid columns={[1, 1, 2, 4]} spacing={6} px={12}>
+              {displayedTasks.map((task) => (
+                <TopicCard
+                  key={task.id}
+                  task={task}
+                  isSelected={task.isFollowed}
+                  onToggle={handleTaskToggle}
+                />
+              ))}
+            </SimpleGrid>
+
+            {!isMobile && !searchTerm && currentPage < totalPages - 1 && (
+              <IconButton
+                aria-label="Next page"
+                icon={<ChevronRightIcon />}
+                onClick={handleNextPage}
+                position="absolute"
+                right="0"
+                top="50%"
+                transform="translateY(-50%)"
+                colorScheme="gray"
+                variant="ghost"
+                size="lg"
+                fontSize="24px"
+              />
+            )}
+          </Box>
+
+          <Box pt={4}>
+            <FollowedTasksComponent />
+          </Box>
+        </Container>
+      </DashboardLayout>
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-// pages/confirm-email.js
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
@@ -10,6 +9,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import supabase from "./api/utils/supabaseClient";
+import MetaTags from "../components/MetaTags";
 
 export default function ConfirmEmail() {
   const router = useRouter();
@@ -36,25 +36,34 @@ export default function ConfirmEmail() {
   }, [router.query.token_hash]);
 
   return (
-    <Center h="100vh">
-      <Box
-        maxW="md"
-        w="full"
-        bg={useColorModeValue("white", "gray.800")}
-        boxShadow="2xl"
-        rounded="lg"
-        p={6}
-        textAlign="center"
-      >
-        <Heading as="h2" size="xl" fontWeight="bold" mb={6}>
-          Email Confirmation
-        </Heading>
-        {error ? (
-          <Text color="red.500">{error}</Text>
-        ) : (
-          <Text>Confirming your email...</Text>
-        )}
-      </Box>
-    </Center>
+    <>
+      <MetaTags
+        title="Confirm your email"
+        description="Confirm your email address for your AIModels.fyi account"
+        socialPreviewTitle="Confirm Email - AIModels.fyi"
+        socialPreviewSubtitle="Complete your email verification"
+      />
+
+      <Center h="100vh">
+        <Box
+          maxW="md"
+          w="full"
+          bg={useColorModeValue("white", "gray.800")}
+          boxShadow="2xl"
+          rounded="lg"
+          p={6}
+          textAlign="center"
+        >
+          <Heading as="h2" size="xl" fontWeight="bold" mb={6}>
+            Email Confirmation
+          </Heading>
+          {error ? (
+            <Text color="red.500">{error}</Text>
+          ) : (
+            <Text>Confirming your email...</Text>
+          )}
+        </Box>
+      </Center>
+    </>
   );
 }

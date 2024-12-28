@@ -27,6 +27,7 @@ import {
 } from "@chakra-ui/icons";
 import { TopicCard } from "@/components/TopicCard";
 import { SelectedTopics } from "@/components/SelectedTopics";
+import MetaTags from "@/components/MetaTags";
 
 const SearchSuggestion = ({ task, onSelect, isActive }) => (
   <ListItem
@@ -341,147 +342,165 @@ const TopicSelectionPage = () => {
   }
 
   return (
-    <Container maxW="5xl" py={8}>
-      <Box mb={8}>
-        <Flex justify="space-between" align="center" mb={4}>
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push("/onboarding/roles")}
-          >
-            Back
-          </Button>
-          <Text fontSize="sm" color="gray.600" textAlign="center">
-            Step 2 of 4 - Choose Topics
-          </Text>
-          <Button
-            variant="ghost"
-            size="sm"
-            rightIcon={<ChevronRightIcon />}
-            onClick={handleContinue}
-          >
-            Next
-          </Button>
-        </Flex>
-        <Progress value={50} size="sm" colorScheme="blue" borderRadius="full" />
-      </Box>
-
-      <VStack spacing={8} align="stretch">
-        <Box textAlign="center">
-          <Heading size="lg" mb={3}>
-            What research areas interest you?
-          </Heading>
-          <Text color="gray.600" fontSize="lg" mb={6}>
-            We&apos;ll create a personalized feed of the latest breakthroughs
-          </Text>
-
-          {/* Selected Topics Row */}
-
-          <SelectedTopics tasks={tasks} onToggle={handleTaskToggle} />
-        </Box>
-        <Box position="relative">
-          <InputGroup>
-            <InputLeftElement pointerEvents="none">
-              <SearchIcon color="gray.400" />
-            </InputLeftElement>
-            <Input
-              ref={inputRef}
-              placeholder="Search research topics..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onFocus={handleSearchFocus}
-              onBlur={handleSearchBlur}
-              onKeyDown={handleKeyDown}
-              size="lg"
-              borderRadius="lg"
-            />
-          </InputGroup>
-          {isOpen && (
-            <Box
-              position="absolute"
-              top="100%"
-              left={0}
-              right={0}
-              mt={2}
-              bg="white"
-              maxH="400px"
-              overflowY="auto"
-              shadow="lg"
-              borderRadius="lg"
-              border="1px solid"
-              borderColor="gray.200"
-              zIndex={10}
+    <>
+      <MetaTags
+        title="Choose Research Topics"
+        description="Select the AI research areas that interest you to get personalized updates"
+        socialPreviewTitle="Topic Selection - AIModels.fyi"
+        socialPreviewSubtitle="Customize your research feed"
+      />
+      <Container maxW="5xl" py={8}>
+        <Box mb={8}>
+          <Flex justify="space-between" align="center" mb={4}>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeftIcon />}
+              onClick={() => router.push("/onboarding/roles")}
             >
-              <List spacing={0}>
-                {suggestions.map((task, index) => (
-                  <SearchSuggestion
-                    key={task.id}
-                    task={task}
-                    isActive={index === activeIndex}
-                    onSelect={handleSuggestionSelect}
-                  />
-                ))}
-              </List>
-            </Box>
-          )}
+              Back
+            </Button>
+            <Text fontSize="sm" color="gray.600" textAlign="center">
+              Step 2 of 4 - Choose Topics
+            </Text>
+            <Button
+              variant="ghost"
+              size="sm"
+              rightIcon={<ChevronRightIcon />}
+              onClick={handleContinue}
+            >
+              Next
+            </Button>
+          </Flex>
+          <Progress
+            value={50}
+            size="sm"
+            colorScheme="blue"
+            borderRadius="full"
+          />
         </Box>
 
-        <Box position="relative">
-          {!isMobile && !searchTerm && currentPage > 0 && (
-            <IconButton
-              aria-label="Previous page"
-              icon={<ChevronLeftIcon />}
-              onClick={handlePrevPage}
-              position="absolute"
-              left="-16"
-              top="50%"
-              transform="translateY(-50%)"
-              colorScheme="gray"
-              variant="ghost"
-              size="lg"
-              fontSize="24px"
-            />
-          )}
+        <VStack spacing={8} align="stretch">
+          <Box textAlign="center">
+            <Heading size="lg" mb={3}>
+              What research areas interest you?
+            </Heading>
+            <Text color="gray.600" fontSize="lg" mb={6}>
+              We&apos;ll create a personalized feed of the latest breakthroughs
+            </Text>
 
-          <SimpleGrid columns={[1, 1, 2, 4]} spacing={6}>
-            {displayedTasks.map((task) => (
-              <TopicCard
-                key={task.id}
-                task={task}
-                isSelected={task.isFollowed}
-                onToggle={handleTaskToggle}
+            {/* Selected Topics Row */}
+
+            <SelectedTopics tasks={tasks} onToggle={handleTaskToggle} />
+          </Box>
+          <Box position="relative">
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.400" />
+              </InputLeftElement>
+              <Input
+                ref={inputRef}
+                placeholder="Search research topics..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={handleSearchFocus}
+                onBlur={handleSearchBlur}
+                onKeyDown={handleKeyDown}
+                size="lg"
+                borderRadius="lg"
               />
-            ))}
-          </SimpleGrid>
+            </InputGroup>
+            {isOpen && (
+              <Box
+                position="absolute"
+                top="100%"
+                left={0}
+                right={0}
+                mt={2}
+                bg="white"
+                maxH="400px"
+                overflowY="auto"
+                shadow="lg"
+                borderRadius="lg"
+                border="1px solid"
+                borderColor="gray.200"
+                zIndex={10}
+              >
+                <List spacing={0}>
+                  {suggestions.map((task, index) => (
+                    <SearchSuggestion
+                      key={task.id}
+                      task={task}
+                      isActive={index === activeIndex}
+                      onSelect={handleSuggestionSelect}
+                    />
+                  ))}
+                </List>
+              </Box>
+            )}
+          </Box>
 
-          {!isMobile && !searchTerm && currentPage < totalPages - 1 && (
-            <IconButton
-              aria-label="Next page"
-              icon={<ChevronRightIcon />}
-              onClick={handleNextPage}
-              position="absolute"
-              right="-16"
-              top="50%"
-              transform="translateY(-50%)"
-              colorScheme="gray"
-              variant="ghost"
+          <Box position="relative">
+            {!isMobile && !searchTerm && currentPage > 0 && (
+              <IconButton
+                aria-label="Previous page"
+                icon={<ChevronLeftIcon />}
+                onClick={handlePrevPage}
+                position="absolute"
+                left="-16"
+                top="50%"
+                transform="translateY(-50%)"
+                colorScheme="gray"
+                variant="ghost"
+                size="lg"
+                fontSize="24px"
+              />
+            )}
+
+            <SimpleGrid columns={[1, 1, 2, 4]} spacing={6}>
+              {displayedTasks.map((task) => (
+                <TopicCard
+                  key={task.id}
+                  task={task}
+                  isSelected={task.isFollowed}
+                  onToggle={handleTaskToggle}
+                />
+              ))}
+            </SimpleGrid>
+
+            {!isMobile && !searchTerm && currentPage < totalPages - 1 && (
+              <IconButton
+                aria-label="Next page"
+                icon={<ChevronRightIcon />}
+                onClick={handleNextPage}
+                position="absolute"
+                right="-16"
+                top="50%"
+                transform="translateY(-50%)"
+                colorScheme="gray"
+                variant="ghost"
+                size="lg"
+                fontSize="24px"
+              />
+            )}
+          </Box>
+
+          <Flex justify="space-between" pt={6}>
+            <Button variant="ghost" onClick={handleSkip}>
+              Skip for now
+            </Button>
+            <Button
+              colorScheme="blue"
+              onClick={handleContinue}
               size="lg"
-              fontSize="24px"
-            />
-          )}
-        </Box>
-
-        <Flex justify="space-between" pt={6}>
-          <Button variant="ghost" onClick={handleSkip}>
-            Skip for now
-          </Button>
-          <Button colorScheme="blue" onClick={handleContinue} size="lg" px={8}>
-            Continue
-          </Button>
-        </Flex>
-      </VStack>
-    </Container>
+              px={8}
+            >
+              Continue
+            </Button>
+          </Flex>
+        </VStack>
+      </Container>
+    </>
   );
 };
 

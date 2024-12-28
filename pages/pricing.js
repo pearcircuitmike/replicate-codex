@@ -19,6 +19,7 @@ import { useAuth } from "../context/AuthContext";
 import { FaCheckCircle } from "react-icons/fa";
 import Testimonials from "../components/homepage/Testimonials";
 import { trackEvent } from "../pages/api/utils/analytics-util";
+import MetaTags from "../components/MetaTags";
 
 const shine = keyframes`
   0% { left: -400%; }
@@ -175,45 +176,54 @@ const PricingPage = () => {
   );
 
   return (
-    <Container
-      maxW="container.xl"
-      h="100vh"
-      py={8}
-      display="flex"
-      flexDirection="column"
-    >
-      <Flex
-        flex="1"
-        direction={isMobile ? "column" : "row"}
-        justify="center"
-        align="center"
-        spacing={8}
+    <>
+      <MetaTags
+        title="Pro Plan Subscription"
+        description="Subscribe to AIModels.fyi Pro Plan and get access to premium features including weekly digests, unlimited summaries, and more"
+        socialPreviewTitle="AIModels.fyi Pro Plan"
+        socialPreviewSubtitle="Start your 7-day free trial today"
+      />
+
+      <Container
+        maxW="container.xl"
+        h="100vh"
+        py={8}
+        display="flex"
+        flexDirection="column"
       >
-        <Box
-          width={isMobile ? "100%" : "50%"}
-          pr={isMobile ? 0 : 4}
-          mb={isMobile ? 8 : 0}
+        <Flex
+          flex="1"
+          direction={isMobile ? "column" : "row"}
+          justify="center"
+          align="center"
+          spacing={8}
         >
-          <PricingContent />
+          <Box
+            width={isMobile ? "100%" : "50%"}
+            pr={isMobile ? 0 : 4}
+            mb={isMobile ? 8 : 0}
+          >
+            <PricingContent />
+          </Box>
+          <Box
+            width={isMobile ? "100%" : "50%"}
+            pl={isMobile ? 0 : 4}
+            maxW="500px"
+            mx="auto"
+          >
+            <Heading as="h2" fontSize="3xl" mb={4} textAlign="center">
+              What our subscribers say
+            </Heading>
+            <Testimonials />
+          </Box>
+        </Flex>
+        <Box mt={10} textAlign="center">
+          <Link as={NextLink} href="/">
+            Back to Home
+          </Link>
         </Box>
-        <Box
-          width={isMobile ? "100%" : "50%"}
-          pl={isMobile ? 0 : 4}
-          maxW="500px"
-          mx="auto"
-        >
-          <Heading as="h2" fontSize="3xl" mb={4} textAlign="center">
-            What our subscribers say
-          </Heading>
-          <Testimonials />
-        </Box>
-      </Flex>
-      <Box mt={10} textAlign="center">
-        <Link as={NextLink} href="/">
-          Back to Home
-        </Link>
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 };
 

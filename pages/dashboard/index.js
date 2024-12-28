@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { Spinner, Box } from "@chakra-ui/react";
 import { useAuth } from "../../context/AuthContext";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
+import MetaTags from "../../components/MetaTags";
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -17,11 +18,20 @@ const DashboardPage = () => {
 
   // Show a spinner while redirecting
   return (
-    <DashboardLayout>
-      <Box p={8} textAlign="center">
-        <Spinner size="lg" />
-      </Box>
-    </DashboardLayout>
+    <>
+      <MetaTags
+        title="Dashboard"
+        description="Access your personalized AI research dashboard"
+        socialPreviewTitle="Dashboard - AIModels.fyi"
+        socialPreviewSubtitle="Your AI research hub"
+      />
+
+      <DashboardLayout>
+        <Box p={8} textAlign="center">
+          <Spinner size="lg" />
+        </Box>
+      </DashboardLayout>
+    </>
   );
 };
 

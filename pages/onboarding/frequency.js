@@ -14,6 +14,7 @@ import {
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { BellIcon, TimeIcon, ChevronLeftIcon } from "@chakra-ui/icons";
+import MetaTags from "@/components/MetaTags";
 
 const FrequencyOption = ({ icon, title, description, isSelected, onClick }) => (
   <Box
@@ -84,59 +85,78 @@ const FrequencyPage = () => {
   };
 
   return (
-    <Container maxW="4xl" py={8}>
-      <Box mb={8}>
-        <Flex justify="space-between" align="center" mb={4}>
-          <Button
-            variant="ghost"
+    <>
+      {" "}
+      <MetaTags
+        title="Choose Update Frequency"
+        description="Set your preferred frequency for AI research updates"
+        socialPreviewTitle="Setup - AIModels.fyi"
+        socialPreviewSubtitle="Customize your update frequency"
+      />
+      <Container maxW="4xl" py={8}>
+        <Box mb={8}>
+          <Flex justify="space-between" align="center" mb={4}>
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeftIcon />}
+              onClick={() => router.push("/onboarding/topics")}
+            >
+              Back
+            </Button>
+            <Text fontSize="sm" color="gray.600" textAlign="center">
+              Step 3 of 4 - Choose Frequency
+            </Text>
+            <Box w={16} /> {/* Spacer to maintain centering */}
+          </Flex>
+          <Progress
+            value={75}
             size="sm"
-            leftIcon={<ChevronLeftIcon />}
-            onClick={() => router.push("/onboarding/topics")}
-          >
-            Back
-          </Button>
-          <Text fontSize="sm" color="gray.600" textAlign="center">
-            Step 3 of 4 - Choose Frequency
-          </Text>
-          <Box w={16} /> {/* Spacer to maintain centering */}
-        </Flex>
-        <Progress value={75} size="sm" colorScheme="blue" borderRadius="full" />
-      </Box>
-
-      <VStack spacing={8} align="stretch">
-        <Box textAlign="center">
-          <Heading size="lg" mb={3}>
-            How often would you like updates?
-          </Heading>
-          <Text color="gray.600" fontSize="lg">
-            Choose how frequently you&apos;d like to receive research updates
-          </Text>
+            colorScheme="blue"
+            borderRadius="full"
+          />
         </Box>
 
-        <SimpleGrid columns={[1, null, 2]} spacing={6} pt={4}>
-          <FrequencyOption
-            icon={<BellIcon w={6} h={6} color="blue.500" />}
-            title="Daily Digest"
-            description="Get a summary of the day's most important developments"
-            isSelected={frequency === "daily"}
-            onClick={() => setFrequency("daily")}
-          />
-          <FrequencyOption
-            icon={<TimeIcon w={6} h={6} color="blue.500" />}
-            title="Weekly Roundup"
-            description="Receive a comprehensive weekly summary every Monday"
-            isSelected={frequency === "weekly"}
-            onClick={() => setFrequency("weekly")}
-          />
-        </SimpleGrid>
+        <VStack spacing={8} align="stretch">
+          <Box textAlign="center">
+            <Heading size="lg" mb={3}>
+              How often would you like updates?
+            </Heading>
+            <Text color="gray.600" fontSize="lg">
+              Choose how frequently you&apos;d like to receive research updates
+            </Text>
+          </Box>
 
-        <Box display="flex" justifyContent="center" pt={8}>
-          <Button colorScheme="blue" onClick={handleContinue} size="lg" px={8}>
-            Continue
-          </Button>
-        </Box>
-      </VStack>
-    </Container>
+          <SimpleGrid columns={[1, null, 2]} spacing={6} pt={4}>
+            <FrequencyOption
+              icon={<BellIcon w={6} h={6} color="blue.500" />}
+              title="Daily Digest"
+              description="Get a summary of the day's most important developments"
+              isSelected={frequency === "daily"}
+              onClick={() => setFrequency("daily")}
+            />
+            <FrequencyOption
+              icon={<TimeIcon w={6} h={6} color="blue.500" />}
+              title="Weekly Roundup"
+              description="Receive a comprehensive weekly summary every Monday"
+              isSelected={frequency === "weekly"}
+              onClick={() => setFrequency("weekly")}
+            />
+          </SimpleGrid>
+
+          <Box display="flex" justifyContent="center" pt={8}>
+            <Button
+              colorScheme="blue"
+              onClick={handleContinue}
+              size="lg"
+              px={8}
+            >
+              Continue
+            </Button>
+          </Box>
+        </VStack>
+      </Container>
+    </>
   );
 };
 

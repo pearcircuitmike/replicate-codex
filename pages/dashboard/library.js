@@ -16,6 +16,7 @@ import ModelCard from "../../components/Cards/ModelCard";
 import { useRouter } from "next/router";
 import supabase from "../api/utils/supabaseClient";
 import { useAuth } from "../../context/AuthContext";
+import MetaTags from "@/components/MetaTags";
 
 const LibraryPage = () => {
   const router = useRouter();
@@ -159,43 +160,52 @@ const LibraryPage = () => {
   );
 
   return (
-    <DashboardLayout>
-      <Box p={4}>
-        <Heading size="md" mb={4}>
-          {folderName ? `Bookmarks in "${folderName}"` : "My Bookmarks"}
-        </Heading>
-        <Tabs>
-          <TabList>
-            <Tab>Papers</Tab>
-            <Tab>Models</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              {loading ? (
-                <Text>Loading...</Text>
-              ) : paperBookmarks.length > 0 ? (
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-                  {paperBookmarks.map(renderPaperCard)}
-                </SimpleGrid>
-              ) : (
-                <Text>No paper bookmarks found in this folder.</Text>
-              )}
-            </TabPanel>
-            <TabPanel>
-              {loading ? (
-                <Text>Loading...</Text>
-              ) : modelBookmarks.length > 0 ? (
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-                  {modelBookmarks.map(renderModelCard)}
-                </SimpleGrid>
-              ) : (
-                <Text>No model bookmarks found in this folder.</Text>
-              )}
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
-    </DashboardLayout>
+    <>
+      {" "}
+      <MetaTags
+        title={"My Library - AIModels.fyi"}
+        description="Access your saved AI research papers and models"
+        socialPreviewTitle="Library - AIModels.fyi"
+        socialPreviewSubtitle="Your saved papers and models"
+      />
+      <DashboardLayout>
+        <Box p={4}>
+          <Heading size="md" mb={4}>
+            {folderName ? `Bookmarks in "${folderName}"` : "My Bookmarks"}
+          </Heading>
+          <Tabs>
+            <TabList>
+              <Tab>Papers</Tab>
+              <Tab>Models</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                {loading ? (
+                  <Text>Loading...</Text>
+                ) : paperBookmarks.length > 0 ? (
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+                    {paperBookmarks.map(renderPaperCard)}
+                  </SimpleGrid>
+                ) : (
+                  <Text>No paper bookmarks found in this folder.</Text>
+                )}
+              </TabPanel>
+              <TabPanel>
+                {loading ? (
+                  <Text>Loading...</Text>
+                ) : modelBookmarks.length > 0 ? (
+                  <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+                    {modelBookmarks.map(renderModelCard)}
+                  </SimpleGrid>
+                ) : (
+                  <Text>No model bookmarks found in this folder.</Text>
+                )}
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </Box>
+      </DashboardLayout>
+    </>
   );
 };
 
