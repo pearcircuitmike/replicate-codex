@@ -1,5 +1,16 @@
+// pages/papers/[platform]/[paper].js
+
 import React, { useState, useEffect } from "react";
-import { Container, Box, Grid, GridItem, Flex } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
+import {
+  Container,
+  Box,
+  Grid,
+  GridItem,
+  Flex,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
@@ -7,16 +18,25 @@ import {
   fetchPaperDataBySlug,
   fetchPapersPaginated,
 } from "@/pages/api/utils/fetchPapers";
-import fetchRelatedPapers from "@/pages/api/utils/fetchRelatedPapers";
 
-import MetaTags from "@/components/MetaTags";
-import SectionsNav from "@/components/paper/SectionsNav";
-import PaperNotes from "@/components/notes/PaperNotes";
-import ChatWithPaper from "@/components/paper/ChatWithPaper";
-import PaperContent from "@/components/paper/PaperContent";
-import AudioPlayer from "@/components/paper/AudioPlayer";
+// Dynamically import side components
+const MetaTags = dynamic(() => import("@/components/MetaTags"));
+const SectionsNav = dynamic(() => import("@/components/paper/SectionsNav"));
+const PaperNotes = dynamic(() => import("@/components/notes/PaperNotes"), {
+  ssr: false,
+});
+const ChatWithPaper = dynamic(
+  () => import("@/components/paper/ChatWithPaper"),
+  {
+    ssr: false,
+  }
+);
+const PaperContent = dynamic(() => import("@/components/paper/PaperContent"));
+const AudioPlayer = dynamic(() => import("@/components/paper/AudioPlayer"), {
+  ssr: false,
+});
 
-const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
+const PaperDetailsPage = ({ paper, slug, error }) => {
   const { user, hasActiveSubscription } = useAuth();
 
   const [viewCounts, setViewCounts] = useState({
@@ -25,9 +45,48 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
     canViewFullArticle: true,
   });
 
-  // Always call useEffect in the same order, even if we have no paper
+  // We'll fetch related papers client-side, storing them here:
+  const [relatedPapers, setRelatedPapers] = useState([]);
+
   useEffect(() => {
-    if (!paper?.slug) return; // If there's no slug, do nothing
+    if (!paper?.embedding) return;
+
+    // Use a POST request to avoid 431 errors (large query params)
+    const fetchRelated = async () => {
+      try {
+        const res = await fetch("/api/utils/fetchRelatedPapers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            embedding: paper.embedding,
+          }),
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(
+            `Request failed with status ${res.status}: ${errorText}`
+          );
+        }
+
+        const data = await res.json();
+        setRelatedPapers(data.papers || []);
+      } catch (err) {
+        console.error("Error fetching related papers:", err);
+      }
+    };
+
+    fetchRelated();
+  }, [paper?.embedding]);
+
+  console.log(relatedPapers);
+
+  // Track resource views
+  useEffect(() => {
+    if (!paper?.slug) return;
+
     let sessionId = localStorage.getItem("sessionId");
     if (!sessionId) {
       sessionId = uuidv4();
@@ -42,36 +101,32 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
         },
       })
       .then((response) => {
-        if (!response.data) throw new Error("Failed to fetch view counts");
+        if (!response.data) {
+          throw new Error("Failed to fetch view counts");
+        }
         setViewCounts(response.data);
       })
-      .catch((error) => {
-        console.error("Error fetching view counts:", error);
+      .catch((err) => {
+        console.error("Error fetching view counts:", err);
       });
   }, [paper?.slug]);
 
-  // Now handle fallback UI if there's an error or no paper
+  // If error or no paper, return fallback
   if (error || !paper) {
     return (
       <Box maxW="100vw" overflowX="hidden" p={8}>
-        <h1
-          style={{
-            fontSize: "1.2rem",
-            fontWeight: "bold",
-            marginBottom: "1rem",
-          }}
-        >
+        <Heading as="h1" fontSize="1.2rem" fontWeight="bold" mb="1rem">
           Paper Temporarily Unavailable
-        </h1>
-        <p>
+        </Heading>
+        <Text>
           We&apos;re having trouble loading <strong>{slug}</strong>. Please try
           again later.
-        </p>
+        </Text>
       </Box>
     );
   }
 
-  // Otherwise, render the normal page content
+  // Render normal page content
   return (
     <Box maxW="100vw" overflowX="hidden">
       <MetaTags
@@ -209,15 +264,15 @@ export async function getStaticPaths() {
     let totalFetched = 0;
 
     while (totalFetched < limit) {
-      const { data: papers, totalCount } = await fetchPapersPaginated({
-        platform: `${platform}`,
+      const { data: papers } = await fetchPapersPaginated({
+        platform,
         pageSize,
         currentPage,
       });
 
-      for (const paper of papers) {
+      for (const p of papers) {
         paths.push({
-          params: { paper: paper.slug.toString(), platform },
+          params: { paper: p.slug.toString(), platform },
         });
       }
 
@@ -227,13 +282,11 @@ export async function getStaticPaths() {
     }
   }
 
-  // Boolean true, not a string
   return { paths, fallback: true };
 }
 
 export async function getStaticProps({ params }) {
   const { platform, paper: slug } = params;
-
   let paper = null;
   let error = false;
 
@@ -244,27 +297,14 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
-  // If missing or incomplete data, we'll serve fallback props
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
       props: {
         error: true,
         slug,
       },
-      revalidate: 60, // short revalidate so Next.js retries soon
+      revalidate: 60,
     };
-  }
-
-  // Otherwise, return the full data
-  // Ensure tasks are included in the paper object
-  const paperWithTasks = {
-    ...paper,
-    tasks: paper.tasks || [],
-  };
-
-  let relatedPapers = [];
-  if (paper.embedding) {
-    relatedPapers = await fetchRelatedPapers(paper.embedding);
   }
 
   const oneWeekAgo = new Date();
@@ -273,8 +313,10 @@ export async function getStaticProps({ params }) {
 
   return {
     props: {
-      paper: paperWithTasks,
-      relatedPapers,
+      paper: {
+        ...paper,
+        tasks: paper.tasks || [],
+      },
       slug,
       error: false,
     },
