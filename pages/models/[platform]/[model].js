@@ -246,14 +246,13 @@ export default function ModelPage({ model, relatedModels, slug }) {
                   and center it to avoid layout shifting and keep it visually centered.
                 */}
                 <Box
-                  minH="200px"
                   my={6}
                   display="flex"
                   flexDirection="column"
                   alignItems="center"
                   justifyContent="center"
                 >
-                  {isMounted && !user ? (
+                  {isMounted && !user && (
                     <>
                       <Text
                         align="center"
@@ -265,10 +264,8 @@ export default function ModelPage({ model, relatedModels, slug }) {
                       </Text>
                       <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
                     </>
-                  ) : (
-                    // If user is present, show a blank skeleton to retain space.
-                    <Skeleton height="150px" width="100%" />
                   )}
+                  {/* For logged-in users, simply render nothing here */}
                 </Box>
 
                 <ModelOverview model={model} />
