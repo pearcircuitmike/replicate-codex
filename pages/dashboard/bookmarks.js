@@ -9,6 +9,7 @@ import BookmarkTabs from "../../components/Bookmarks/BookmarkTabs";
 import CollectionsSidebar from "../../components/Bookmarks/CollectionsSidebar";
 import { useAuth } from "../../context/AuthContext";
 import { useFolders } from "@/context/FoldersContext";
+import MetaTags from "@/components/MetaTags";
 import supabase from "@/pages/api/utils/supabaseClient";
 
 const BookmarksPage = () => {
@@ -151,80 +152,88 @@ const BookmarksPage = () => {
   });
 
   return (
-    <DashboardLayout>
-      <Box maxW="1200px" mx="auto">
-        {!isMobile && (
-          <Box
-            display={{ base: "none", md: "block" }}
-            position="fixed"
-            right="8"
-            top="32"
-            w="64"
-          >
-            <CollectionsSidebar
-              folders={folders}
-              selectedFolderId={selectedFolder?.id}
-              onFolderSelect={setSelectedFolder}
-              onNewCollection={() => setIsFolderModalOpen(true)}
-              onFoldersRefresh={fetchFolders}
-            />
-          </Box>
-        )}
-
-        <Box px={4} py={6} mr={{ md: "300px" }}>
-          <BookmarkHeader
-            paperCount={paperBookmarks.length}
-            modelCount={modelBookmarks.length}
-            folderName={selectedFolder?.name}
-            folderColor={selectedFolder?.color}
-          />
-          <BookmarkSearch
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            mb={4}
-          />
-
-          {/* Mobile Categories Selector */}
-          {isMobile && (
-            <Box mb={4}>
-              <Box
-                as="select"
-                w="full"
-                p={2}
-                borderColor="gray.200"
-                borderWidth={1}
-                borderRadius="md"
-                value={selectedFolder?.id || ""}
-                onChange={(e) => {
-                  const folder = folders.find((f) => f.id === e.target.value);
-                  setSelectedFolder(folder);
-                }}
-              >
-                {folders.map((folder) => (
-                  <option key={folder.id} value={folder.id}>
-                    {folder.name} ({folder.bookmarkCount})
-                  </option>
-                ))}
-              </Box>
+    <>
+      <MetaTags
+        title="Your Bookmarks - AIModels.fyi"
+        description="Access and manage your saved AI papers and models"
+        socialPreviewTitle="Bookmarks - AIModels.fyi"
+        socialPreviewSubtitle="Your personal collection of AI research"
+      />
+      <DashboardLayout>
+        <Box maxW="1200px" mx="auto">
+          {!isMobile && (
+            <Box
+              display={{ base: "none", md: "block" }}
+              position="fixed"
+              right="8"
+              top="32"
+              w="64"
+            >
+              <CollectionsSidebar
+                folders={folders}
+                selectedFolderId={selectedFolder?.id}
+                onFolderSelect={setSelectedFolder}
+                onNewCollection={() => setIsFolderModalOpen(true)}
+                onFoldersRefresh={fetchFolders}
+              />
             </Box>
           )}
 
-          <BookmarkTabs
-            paperBookmarks={filteredPaperBookmarks}
-            modelBookmarks={filteredModelBookmarks}
-            isLoadingPapers={isLoadingPapers}
-            isLoadingModels={isLoadingModels}
-            onRemoveBookmark={handleRemoveBookmark}
+          <Box px={4} py={6} mr={{ md: "300px" }}>
+            <BookmarkHeader
+              paperCount={paperBookmarks.length}
+              modelCount={modelBookmarks.length}
+              folderName={selectedFolder?.name}
+              folderColor={selectedFolder?.color}
+            />
+            <BookmarkSearch
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              mb={4}
+            />
+
+            {/* Mobile Categories Selector */}
+            {isMobile && (
+              <Box mb={4}>
+                <Box
+                  as="select"
+                  w="full"
+                  p={2}
+                  borderColor="gray.200"
+                  borderWidth={1}
+                  borderRadius="md"
+                  value={selectedFolder?.id || ""}
+                  onChange={(e) => {
+                    const folder = folders.find((f) => f.id === e.target.value);
+                    setSelectedFolder(folder);
+                  }}
+                >
+                  {folders.map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folder.name} ({folder.bookmarkCount})
+                    </option>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            <BookmarkTabs
+              paperBookmarks={filteredPaperBookmarks}
+              modelBookmarks={filteredModelBookmarks}
+              isLoadingPapers={isLoadingPapers}
+              isLoadingModels={isLoadingModels}
+              onRemoveBookmark={handleRemoveBookmark}
+            />
+          </Box>
+
+          <FolderModal
+            isOpen={isFolderModalOpen}
+            onClose={handleFolderModalClose}
+            fetchFolders={fetchFolders}
           />
         </Box>
-
-        <FolderModal
-          isOpen={isFolderModalOpen}
-          onClose={handleFolderModalClose}
-          fetchFolders={fetchFolders}
-        />
-      </Box>
-    </DashboardLayout>
+      </DashboardLayout>
+    </>
   );
 };
 
