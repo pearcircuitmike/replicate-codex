@@ -1,6 +1,4 @@
-// pages/papers/[platform]/[paper].js
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import {
   Container,
@@ -19,7 +17,7 @@ import {
   fetchPapersPaginated,
 } from "@/pages/api/utils/fetchPapers";
 
-// Dynamically import side components
+// Dynamically import components
 const MetaTags = dynamic(() => import("@/components/MetaTags"));
 const SectionsNav = dynamic(() => import("@/components/paper/SectionsNav"));
 const PaperNotes = dynamic(() => import("@/components/notes/PaperNotes"), {
@@ -38,6 +36,7 @@ const AudioPlayer = dynamic(() => import("@/components/paper/AudioPlayer"), {
 
 const PaperDetailsPage = ({ paper, slug, error }) => {
   const { user, hasActiveSubscription } = useAuth();
+  const fetchedRef = useRef(false);
 
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -45,13 +44,11 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
     canViewFullArticle: true,
   });
 
-  // We'll fetch related papers client-side, storing them here:
   const [relatedPapers, setRelatedPapers] = useState([]);
 
   useEffect(() => {
-    if (!paper?.embedding) return;
+    if (!paper?.embedding || fetchedRef.current) return;
 
-    // Use a POST request to avoid 431 errors (large query params)
     const fetchRelated = async () => {
       try {
         const res = await fetch("/api/utils/fetchRelatedPapers", {
@@ -78,10 +75,9 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
       }
     };
 
+    fetchedRef.current = true;
     fetchRelated();
   }, [paper?.embedding]);
-
-  console.log(relatedPapers);
 
   // Track resource views
   useEffect(() => {
@@ -201,6 +197,7 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
                   }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
+                  relatedPapers={relatedPapers}
                 />
               </Box>
             </Box>

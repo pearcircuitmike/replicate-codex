@@ -16,7 +16,7 @@ const RelatedPapers = ({ relatedPapers }) => {
       <Heading as="h2" size="lg" mb={4}>
         Related Papers
       </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={4}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 2 }} spacing={4}>
         {displayPapers.map((relatedPaper) => (
           <PaperCard key={relatedPaper.id} paper={relatedPaper} />
         ))}

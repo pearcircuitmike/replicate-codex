@@ -9,6 +9,9 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
+
+const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
 import { FaExternalLinkAlt } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
@@ -22,7 +25,12 @@ import PDFViewer from "@/components/PDFViewer";
 import customTheme from "@/components/MarkdownTheme";
 import LinkPreview from "./LinkPreview";
 
-const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
+const PaperContent = ({
+  paper,
+  hasActiveSubscription,
+  viewCounts,
+  relatedPapers,
+}) => {
   const [paperTasks, setPaperTasks] = useState([]);
 
   useEffect(() => {
@@ -163,7 +171,6 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
               a: ({ href, children }) => (
                 <LinkPreview href={href}>{children}</LinkPreview>
               ),
-
               h2: (props) => {
                 const id = props.children[0]
                   .toLowerCase()
@@ -202,6 +209,8 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
   const { overview, restOfContent } = renderContent(paper.generatedSummary);
   const canViewContent =
     hasActiveSubscription || viewCounts?.canViewFullArticle;
+
+  const displayPapers = relatedPapers?.slice(1, 5) || [];
 
   return (
     <Box
@@ -318,6 +327,10 @@ const PaperContent = ({ paper, hasActiveSubscription, viewCounts }) => {
               overflow="hidden"
             >
               <PaperVote paperId={paper.id} />
+            </Box>
+
+            <Box mt={8} pt={4} borderTop="1px" borderColor="gray.200">
+              <RelatedPapers relatedPapers={relatedPapers} />
             </Box>
           </VStack>
         )}
