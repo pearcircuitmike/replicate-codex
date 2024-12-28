@@ -171,7 +171,7 @@ export default function ModelPage({ model, relatedModels, slug }) {
           model.modelName
         )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
           model.platform
-        )}. Overview, schema, use cases, limitations.`}
+        )}. Overview, schema, use cases, limitations. Includes example inputs and outputs, as well as some related models.`}
       />
 
       <Container maxW="container.md" py="12">
