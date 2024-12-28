@@ -1,4 +1,4 @@
-const siteUrl = "https://aimodels.fyi";
+const siteUrl = "https://www.aimodels.fyi";
 
 module.exports = {
   siteUrl,
