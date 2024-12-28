@@ -18,13 +18,39 @@ import AudioPlayer from "@/components/paper/AudioPlayer";
 
 const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
   const { user, hasActiveSubscription } = useAuth();
+
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
     uniqueResources: [],
     canViewFullArticle: true,
   });
 
-  // If we have an error or no valid paper, show a fallback UI
+  // Always call useEffect in the same order, even if we have no paper
+  useEffect(() => {
+    if (!paper?.slug) return; // If there's no slug, do nothing
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = uuidv4();
+      localStorage.setItem("sessionId", sessionId);
+    }
+
+    axios
+      .get(`/api/resource-view-count`, {
+        params: {
+          session_id: sessionId,
+          resource_type: "papers",
+        },
+      })
+      .then((response) => {
+        if (!response.data) throw new Error("Failed to fetch view counts");
+        setViewCounts(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching view counts:", error);
+      });
+  }, [paper?.slug]);
+
+  // Now handle fallback UI if there's an error or no paper
   if (error || !paper) {
     return (
       <Box maxW="100vw" overflowX="hidden" p={8}>
@@ -38,45 +64,14 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
           Paper Temporarily Unavailable
         </h1>
         <p>
-          We are having trouble loading <strong>{slug}</strong>. Please try
-          again soon.
+          We&apos;re having trouble loading <strong>{slug}</strong>. Please try
+          again later.
         </p>
       </Box>
     );
   }
 
-  // Otherwise, load the standard page content
-  // --------------------------------------------------------------------------
-
-  // On the client, fetch view counts
-  useEffect(() => {
-    const fetchViewCounts = async () => {
-      if (!paper?.slug) return;
-
-      let sessionId = localStorage.getItem("sessionId");
-      if (!sessionId) {
-        sessionId = uuidv4();
-        localStorage.setItem("sessionId", sessionId);
-      }
-
-      try {
-        const response = await axios.get(`/api/resource-view-count`, {
-          params: {
-            session_id: sessionId,
-            resource_type: "papers",
-          },
-        });
-
-        if (!response.data) throw new Error("Failed to fetch view counts");
-        setViewCounts(response.data);
-      } catch (error) {
-        console.error("Error fetching view counts:", error);
-      }
-    };
-
-    fetchViewCounts();
-  }, [paper?.slug]);
-
+  // Otherwise, render the normal page content
   return (
     <Box maxW="100vw" overflowX="hidden">
       <MetaTags
@@ -94,7 +89,7 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
       >
         <Grid
           templateColumns={{
-            base: "minmax(0, 1fr)", // mobile also needs minmax
+            base: "minmax(0, 1fr)",
             lg: "250px minmax(0, 1fr) 300px",
           }}
           gap={{ base: 4, lg: 6 }}
@@ -232,7 +227,7 @@ export async function getStaticPaths() {
     }
   }
 
-  // IMPORTANT: fallback must be a boolean or 'blocking', not a string
+  // Boolean true, not a string
   return { paths, fallback: true };
 }
 
@@ -240,23 +235,27 @@ export async function getStaticProps({ params }) {
   const { platform, paper: slug } = params;
 
   let paper = null;
+  let error = false;
+
   try {
     paper = await fetchPaperDataBySlug(slug, platform);
   } catch (err) {
     console.error("Error fetching paper data:", err);
+    error = true;
   }
 
-  // If missing or incomplete data, return a short revalidate placeholder
+  // If missing or incomplete data, we'll serve fallback props
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
       props: {
         error: true,
         slug,
       },
-      revalidate: 60, // short revalidate so we can retry soon
+      revalidate: 60, // short revalidate so Next.js retries soon
     };
   }
 
+  // Otherwise, return the full data
   // Ensure tasks are included in the paper object
   const paperWithTasks = {
     ...paper,
