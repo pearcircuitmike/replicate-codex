@@ -15,12 +15,6 @@ import { toTitleCase } from "@/pages/api/utils/toTitleCase";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";
 
-/**
- * 1) We fetch the first 50 creators for SSG paths.
- * 2) We fetch 10 models for each creator during build.
- * 3) The page may still fetch more data client-side (like creator details).
- */
-
 export async function getStaticPaths() {
   const creatorsData = await fetchCreators({
     tableName: "unique_creators_data_view",
@@ -55,9 +49,6 @@ export async function getStaticProps({ params }) {
   };
 }
 
-/**
- * Skeleton card for loading states
- */
 function LoadingModelCard() {
   return (
     <Box
@@ -78,14 +69,7 @@ function LoadingModelCard() {
   );
 }
 
-/**
- * Main Page Component
- */
 export default function Creator({ creator, models, platform }) {
-  /**
-   * We still fetch “creatorData” on the client,
-   * so we track when it's loading to show placeholders.
-   */
   const [creatorData, setCreatorData] = useState(null);
   const [isCreatorLoading, setIsCreatorLoading] = useState(true);
 
@@ -116,67 +100,66 @@ export default function Creator({ creator, models, platform }) {
   const modelCount = models?.length || 0;
   const modelText = modelCount === 1 ? "model" : "models";
 
+  // Platform-specific metadata configurations
+  const platformInfo = {
+    huggingface: {
+      title: `${toTitleCase(creator)} - Find Top AI Models on Hugging Face`,
+      description: `Looking for ${toTitleCase(
+        creator
+      )}'s top AI models? Browse their full HuggingFace collection of ${modelCount} ${modelText} and see how to use what they built.`,
+      socialTitle: `Top AI Models by ${toTitleCase(creator)}`,
+      socialSubtitle: `Browse their HuggingFace models`,
+      contextDescription: creatorData?.bio || "",
+    },
+    replicate: {
+      title: `${toTitleCase(creator)} - AI Models to Try on Replicate`,
+      description: `Want to use ${toTitleCase(
+        creator
+      )}'s AI models? See their complete list of Replicate models. Learn about how they work. Here's ${modelCount} ${modelText} you can try today.`,
+      socialTitle: `See AI Models by ${toTitleCase(creator)}`,
+      socialSubtitle: `Explore their Replicate collection`,
+      contextDescription: creatorData?.bio || "",
+    },
+  };
+
+  const platformMeta =
+    platformInfo[platform.toLowerCase()] || platformInfo.huggingface;
+
   return (
     <>
       <MetaTags
-        title={`AI model creator details for ${creator}`}
-        description={`Details about ${creator}'s account on Replicate and their AI models`}
+        title={platformMeta.title}
+        description={platformMeta.description}
         socialPreviewImage="https://em-content.zobj.net/social/emoji/artist-palette.png"
-        socialPreviewTitle={`AI models by ${kebabToTitleCase(creator)}`}
-        socialPreviewSubtitle={`Explore ${modelCount} ${kebabToTitleCase(
-          platform
-        )} ${modelText} by ${kebabToTitleCase(creator)}`}
+        socialPreviewTitle={platformMeta.socialTitle}
+        socialPreviewSubtitle={platformMeta.socialSubtitle}
       />
 
-      {/* 
-        Container for the entire page 
-        with consistent spacing/padding.
-      */}
       <Container maxW="container.xl" py="12">
-        {/* 
-          Heading section with a fallback skeleton 
-          if creator info is not yet loaded.
-        */}
         <Box minH="88px" mb={8}>
           <Heading as="h1" size="xl" mb="2">
-            {/* 
-              If we are still loading creator data, 
-              we can show a skeleton or a fallback. 
-              But the `creator` prop is always available from SSG. 
-              The extra data is in "creatorData," so we might do an if-check 
-              if you want to customize. For now we just show the name 
-              from the props. 
-            */}
             {toTitleCase(creator)}
           </Heading>
 
-          {/* Show some extra detail if you want, or skeleton if loading. */}
           {isCreatorLoading ? (
             <Skeleton height="24px" width="200px" />
           ) : creatorData ? (
             <Text fontSize="lg" color="gray.500">
-              {creatorData?.bio
-                ? `Bio: ${creatorData.bio}`
-                : `Models on ${toTitleCase(platform)}`}
+              {creatorData?.bio || platformMeta.contextDescription}
             </Text>
           ) : (
             <Text color="gray.500" fontStyle="italic">
-              No additional data found for this creator.
+              {platformMeta.contextDescription}
             </Text>
           )}
         </Box>
 
-        {/* 
-          Section for the creator’s models. 
-          We keep a minH to avoid layout jump, 
-          and show skeleton cards if needed.
-        */}
         <Box minH="400px">
           <Heading as="h2" size="lg" mb={4}>
             {isCreatorLoading ? (
               <Skeleton height="24px" width="180px" />
             ) : (
-              `Models by this creator`
+              `Available Models (${modelCount})`
             )}
           </Heading>
 
@@ -186,13 +169,6 @@ export default function Creator({ creator, models, platform }) {
               spacing={4}
               w="100%"
             >
-              {/* 
-                If we wanted to simulate a loading state for the models, 
-                we'd do a conditional. But models come from getStaticProps, 
-                so they're already available at build time. 
-                For demonstration, we can show skeleton cards if 
-                isCreatorLoading is still true.
-              */}
               {isCreatorLoading
                 ? Array(models.length)
                     .fill(null)
