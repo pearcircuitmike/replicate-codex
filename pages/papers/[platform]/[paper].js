@@ -38,8 +38,8 @@ const PaperDetailsPage = ({ paper, relatedPapers, slug, error }) => {
           Paper Temporarily Unavailable
         </h1>
         <p>
-          We're having trouble loading <strong>{slug}</strong>. Please try again
-          soon.
+          We are having trouble loading <strong>{slug}</strong>. Please try
+          again soon.
         </p>
       </Box>
     );
