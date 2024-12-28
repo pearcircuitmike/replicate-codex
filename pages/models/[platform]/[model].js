@@ -9,6 +9,7 @@ import {
   Link,
   Flex,
   Stack,
+  Skeleton,
   useToast,
 } from "@chakra-ui/react";
 import { FaBookmark } from "react-icons/fa";
@@ -31,6 +32,9 @@ import { useAuth } from "../../../context/AuthContext";
 import ImageLightbox from "@/components/ImageLightbox";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
 
+//
+// SSG: Build-time functions
+//
 export async function getStaticPaths({ numPages = 100 }) {
   const { data: models } = await supabase
     .from("modelsData")
@@ -50,15 +54,20 @@ export async function getStaticProps({ params }) {
   if (!model) {
     return { notFound: true };
   }
+
   const relatedModels = await fetchRelatedModels(model.embedding);
+
   return {
     props: { model, relatedModels, slug },
     revalidate: 3600 * 24,
   };
 }
 
+//
+// Main Page Component
+//
 export default function ModelPage({ model, relatedModels, slug }) {
-  const { user, accessToken, hasActiveSubscription, loading } = useAuth();
+  const { user, hasActiveSubscription, loading } = useAuth();
   const [creatorData, setCreatorData] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const toast = useToast();
@@ -69,15 +78,15 @@ export default function ModelPage({ model, relatedModels, slug }) {
     canViewFullArticle: true,
   });
 
+  // Track component mount to safely render client-only code
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Fetch view counts
   useEffect(() => {
     const fetchViewCounts = async () => {
-      if (!slug || loading) {
-        return;
-      }
+      if (!slug || loading) return;
 
       let sessionId = localStorage.getItem("sessionId");
       if (!sessionId) {
@@ -105,8 +114,10 @@ export default function ModelPage({ model, relatedModels, slug }) {
     fetchViewCounts();
   }, [slug, hasActiveSubscription, loading, toast]);
 
+  // Fetch creator data
   useEffect(() => {
-    const fetchCreatorData = async () => {
+    async function fetchCreatorData() {
+      if (!model?.creator || !model?.platform) return;
       const creatorObject = await fetchCreators({
         tableName: "unique_creators_data_view",
         pageSize: 1,
@@ -117,14 +128,32 @@ export default function ModelPage({ model, relatedModels, slug }) {
       const fetchedCreatorData =
         creatorObject.data.length > 0 ? creatorObject.data[0] : null;
       setCreatorData(fetchedCreatorData);
-    };
+    }
     fetchCreatorData();
   }, [model.creator, model.platform]);
 
+  // If model is missing, show fallback skeleton
   if (!model) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <MetaTags
+          title="Loading Model..."
+          description="Model details are loading..."
+        />
+        <Container maxW="container.md" py="12">
+          <Box mb="4">
+            <Heading as="h1" size="xl" mb="2">
+              <Skeleton height="35px" width="220px" />
+            </Heading>
+            <Skeleton height="18px" width="100px" mb={3} />
+            <Skeleton height="300px" />
+          </Box>
+        </Container>
+      </>
+    );
   }
 
+  // Normal content if model is available
   return (
     <>
       <MetaTags
@@ -152,15 +181,16 @@ export default function ModelPage({ model, relatedModels, slug }) {
               {model.modelName}
             </Link>
           </Heading>
+
           <Flex
             fontSize="sm"
-            mb={1}
+            mb={2}
             px="0.5px"
             color="gray.500"
             alignItems="center"
             gap={2}
           >
-            <Text>
+            <Text noOfLines={1}>
               Maintainer:{" "}
               <Link
                 href={`/creators/${encodeURIComponent(
@@ -177,61 +207,113 @@ export default function ModelPage({ model, relatedModels, slug }) {
 
           <ModelDetailsButtons model={model} creator={creatorData} />
 
-          {model?.example ? (
-            <ImageLightbox src={model.example} alt={model.modelName} />
-          ) : (
-            <EmojiWithGradient title={model?.modelName} />
-          )}
+          {/* 
+            Make the image fill the container’s full width,
+            preserve aspect ratio (height="auto"), and avoid layout shift.
+          */}
+          <Box width="100%" mt={3}>
+            {model.example ? (
+              <Box width="100%">
+                <ImageLightbox
+                  src={model.example}
+                  alt={model.modelName}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "contain",
+                  }}
+                />
+              </Box>
+            ) : (
+              <Box width="100%">
+                <EmojiWithGradient title={model?.modelName} />
+              </Box>
+            )}
+          </Box>
 
-          {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
-            <LimitMessage />
-          ) : (
-            <>
-              {/* Embedded AuthForm - Added exactly as in reference */}
-              {isMounted && !user && (
-                <Box my={6} align="center">
-                  <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
-                    Get notified when new models like this one come out!
-                  </Text>
-                  <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
+          {/* 
+            Reserve space for content below, even if toggled. 
+            Adjust minH to ensure stable layout. 
+          */}
+          <Box minH="650px" mt={6}>
+            {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
+              <LimitMessage />
+            ) : (
+              <>
+                {/* 
+                  Auth prompt is conditionally rendered, but we fix a min-height 
+                  and center it to avoid layout shifting and keep it visually centered.
+                */}
+                <Box
+                  minH="200px"
+                  my={6}
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  {isMounted && !user ? (
+                    <>
+                      <Text
+                        align="center"
+                        fontWeight="bold"
+                        mb={4}
+                        fontSize="lg"
+                      >
+                        Get notified when new models like this one come out!
+                      </Text>
+                      <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
+                    </>
+                  ) : (
+                    // If user is present, show a blank skeleton to retain space.
+                    <Skeleton height="150px" width="100%" />
+                  )}
                 </Box>
-              )}
 
-              <ModelOverview model={model} />
+                <ModelOverview model={model} />
 
-              <hr />
-              <Text mt={3} color={"gray.500"} fontStyle={"italic"}>
-                This summary was produced with help from an AI and may contain
-                inaccuracies - check out the links to read the original source
-                documents!
-              </Text>
+                <hr />
+                <Text mt={3} color="gray.500" fontStyle="italic">
+                  This summary was produced with help from an AI and may contain
+                  inaccuracies — check the links to read the original source
+                  documents!
+                </Text>
 
-              <Stack direction={["column", "row"]} spacing={5} w="100%" my={8}>
-                <SocialScore resource={model} />
-                <Box w={["100%", "auto"]}>
-                  <BookmarkButton
-                    resourceType="model"
-                    resourceId={model.id}
-                    leftIcon={<FaBookmark />}
-                    w={["100%", "140px"]}
-                  >
-                    Bookmark
-                  </BookmarkButton>
-                </Box>
-              </Stack>
-            </>
-          )}
+                <Stack
+                  direction={["column", "row"]}
+                  spacing={5}
+                  w="100%"
+                  my={8}
+                >
+                  <SocialScore resource={model} />
+                  <Box w={["100%", "auto"]}>
+                    <BookmarkButton
+                      resourceType="model"
+                      resourceId={model.id}
+                      leftIcon={<FaBookmark />}
+                      w={["100%", "140px"]}
+                    >
+                      Bookmark
+                    </BookmarkButton>
+                  </Box>
+                </Stack>
+              </>
+            )}
+          </Box>
         </Box>
       </Container>
 
-      {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
-        <Container maxW="container.xl" py="12">
-          <Box mt={8} textAlign="center">
-            <TwitterFollowButton />
-          </Box>
-          <RelatedModels relatedModels={relatedModels} />
-        </Container>
-      )}
+      <Box minH="600px">
+        {(viewCounts.canViewFullArticle || hasActiveSubscription) && (
+          <Container maxW="container.xl" py="12">
+            <Box mt={8} textAlign="center">
+              <TwitterFollowButton />
+            </Box>
+            <RelatedModels relatedModels={relatedModels} />
+          </Container>
+        )}
+      </Box>
     </>
   );
 }
