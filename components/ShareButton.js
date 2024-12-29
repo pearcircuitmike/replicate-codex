@@ -1,23 +1,35 @@
 import React from "react";
-import dynamic from "next/dynamic";
 import { Button } from "@chakra-ui/react";
 
-// Dynamically import TwitterShareButton with no SSR to prevent server-client mismatch
-const TwitterShareButton = dynamic(
-  () => import("react-share").then((mod) => mod.TwitterShareButton),
-  { ssr: false }
-);
+const ShareButton = ({
+  buttonText = "Share on 𝕏",
+  url,
+  title,
+  hashtags = [],
+  onClick,
+}) => {
+  const handleShare = () => {
+    // Construct the Twitter share URL
+    const twitterUrl = new URL("https://twitter.com/intent/tweet");
+    twitterUrl.searchParams.append("text", title);
+    twitterUrl.searchParams.append("url", url);
+    if (hashtags.length > 0) {
+      twitterUrl.searchParams.append("hashtags", hashtags.join(","));
+    }
 
-const ShareButton = ({ buttonText = "Share on 𝕏", ...shareProps }) => {
-  // Prevent server-side rendering for this component by returning null during SSR
-  if (typeof window === "undefined") return null;
+    // Open the share link in a new tab
+    window.open(twitterUrl.toString(), "_blank", "noopener,noreferrer");
+
+    // Track the share event
+    if (onClick) {
+      onClick();
+    }
+  };
 
   return (
-    <TwitterShareButton {...shareProps}>
-      <Button size="sm" width="full" variant="outline">
-        {buttonText}
-      </Button>
-    </TwitterShareButton>
+    <Button size="sm" width="full" variant="outline" onClick={handleShare}>
+      {buttonText}
+    </Button>
   );
 };
 
