@@ -1,177 +1,189 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
+// pages/models/[platform]/[model].js
+import React, { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import {
   Container,
   Box,
-  Text,
   Heading,
-  Link,
+  Text,
   Flex,
+  Link,
   Stack,
-  Skeleton,
-  useToast,
 } from "@chakra-ui/react";
-import { FaBookmark } from "react-icons/fa";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import { useAuth } from "@/context/AuthContext";
 
-import MetaTags from "../../../components/MetaTags";
-import { fetchModelDataBySlug } from "../../api/utils/modelsData";
-import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
-import ModelDetailsButtons from "@/components/modelDetailsPage/ModelDetailsButtons";
-import ModelOverview from "../../../components/modelDetailsPage/ModelOverview";
-import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
-import supabase from "@/pages/api/utils/supabaseClient";
-import EmojiWithGradient from "@/components/EmojiWithGradient";
-import RelatedModels from "../../../components/RelatedModels";
-import fetchRelatedModels from "../../api/utils/fetchRelatedModels";
-import BookmarkButton from "../../../components/BookmarkButton";
-import AuthForm from "../../../components/AuthForm";
-import SocialScore from "../../../components/SocialScore";
+// Utility imports
+import { fetchModelDataBySlug } from "@/pages/api/utils/modelsData";
+import { fetchModelsPaginated } from "@/pages/api/utils/fetchModelsPaginated";
+
+// Dynamic imports
+const MetaTags = dynamic(() => import("@/components/MetaTags"));
+const ModelDetailsButtons = dynamic(() =>
+  import("@/components/modelDetailsPage/ModelDetailsButtons")
+);
+const ModelOverview = dynamic(() =>
+  import("@/components/modelDetailsPage/ModelOverview")
+);
+
+// Regular component imports
+import RelatedModels from "@/components/RelatedModels";
+import BookmarkButton from "@/components/BookmarkButton";
+import AuthForm from "@/components/AuthForm";
+import SocialScore from "@/components/SocialScore";
 import LimitMessage from "@/components/LimitMessage";
-import { useAuth } from "../../../context/AuthContext";
-import ImageLightbox from "@/components/ImageLightbox";
 import TwitterFollowButton from "@/components/TwitterFollowButton";
+import ImageLightbox from "@/components/ImageLightbox";
+import EmojiWithGradient from "@/components/EmojiWithGradient";
 
 //
-// SSG: Build-time functions
+// getStaticPaths
 //
-export async function getStaticPaths({ numPages = 100 }) {
-  const { data: models } = await supabase
-    .from("modelsData")
-    .select("slug, platform");
+export async function getStaticPaths() {
+  // Adjust platforms, pageSize, and limit as needed
+  const platforms = ["huggingface"];
+  const paths = [];
+  const pageSize = 1000;
+  const limit = 100;
 
-  const paths = models.slice(0, numPages).map((model) => ({
-    params: { model: model.slug, platform: model.platform },
-  }));
+  for (const platform of platforms) {
+    let currentPage = 1;
+    let totalFetched = 0;
 
-  return { paths, fallback: "blocking" };
-}
+    while (totalFetched < limit) {
+      const { data: models } = await fetchModelsPaginated({
+        tableName: "modelsData",
+        platform,
+        pageSize,
+        currentPage,
+      });
 
-export async function getStaticProps({ params }) {
-  const { platform, model: slug } = params;
+      models.forEach((m) => {
+        paths.push({
+          params: {
+            model: m.slug.toString(),
+            platform,
+          },
+        });
+      });
 
-  const model = await fetchModelDataBySlug(slug, platform);
-  if (!model) {
-    return { notFound: true };
+      totalFetched += models.length;
+      if (models.length < pageSize || totalFetched >= limit) break;
+      currentPage += 1;
+    }
   }
 
-  const relatedModels = await fetchRelatedModels(model.embedding);
-
+  // fallback: 'true' => build pages on-demand if not in paths
   return {
-    props: { model, relatedModels, slug },
-    revalidate: 3600 * 24,
+    paths,
+    fallback: true,
+  };
+}
+
+//
+// getStaticProps
+//
+export async function getStaticProps({ params }) {
+  const { platform, model: slug } = params;
+  let model = null;
+  let error = false;
+
+  try {
+    model = await fetchModelDataBySlug(slug, platform);
+  } catch (err) {
+    error = true;
+  }
+
+  // Fallback if model is missing or fetch failed
+  if (!model || error) {
+    return {
+      props: { error: true, slug },
+      revalidate: 60,
+    };
+  }
+
+  // Revalidate once a day
+  return {
+    props: { model, slug, error: false },
+    revalidate: 86400,
   };
 }
 
 //
 // Main Page Component
 //
-export default function ModelPage({ model, relatedModels, slug }) {
-  const { user, hasActiveSubscription, loading } = useAuth();
-  const [creatorData, setCreatorData] = useState(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const toast = useToast();
+function ModelDetailsPage({ model, slug, error }) {
+  const { user, hasActiveSubscription } = useAuth();
 
+  // Track number of unique resource views
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
     uniqueResources: [],
     canViewFullArticle: true,
   });
 
-  // Track component mount to safely render client-only code
+  // Prevent repeated API calls in development due to Strict Mode
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    if (!model?.slug) return;
 
-  // Fetch view counts
-  useEffect(() => {
-    const fetchViewCounts = async () => {
-      if (!slug || loading) return;
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
-      let sessionId = localStorage.getItem("sessionId");
-      if (!sessionId) {
-        sessionId = uuidv4();
-        localStorage.setItem("sessionId", sessionId);
-      }
-
-      try {
-        const response = await axios.get(`/api/resource-view-count`, {
-          params: {
-            session_id: sessionId,
-            resource_type: "models",
-          },
-        });
-        const data = response.data;
-        setViewCounts(data);
-      } catch (error) {
-        console.error(
-          "Error fetching view counts:",
-          error.response || error.message
-        );
-      }
-    };
-
-    fetchViewCounts();
-  }, [slug, hasActiveSubscription, loading, toast]);
-
-  // Fetch creator data
-  useEffect(() => {
-    async function fetchCreatorData() {
-      if (!model?.creator || !model?.platform) return;
-      const creatorObject = await fetchCreators({
-        tableName: "unique_creators_data_view",
-        pageSize: 1,
-        currentPage: 1,
-        creatorName: model.creator,
-        platform: model.platform,
-      });
-      const fetchedCreatorData =
-        creatorObject.data.length > 0 ? creatorObject.data[0] : null;
-      setCreatorData(fetchedCreatorData);
+    // Ensure we have or create a session ID
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = uuidv4();
+      localStorage.setItem("sessionId", sessionId);
     }
-    fetchCreatorData();
-  }, [model.creator, model.platform]);
 
-  // If model is missing, show fallback skeleton
-  if (!model) {
+    axios
+      .get("/api/resource-view-count", {
+        params: {
+          session_id: sessionId,
+          resource_type: "models",
+        },
+      })
+      .then((response) => {
+        if (!response.data) throw new Error("Failed to fetch view counts");
+
+        // If user has viewed 5+ unique models, limit content
+        const { uniqueResources = [] } = response.data;
+        response.data.canViewFullArticle =
+          Array.isArray(uniqueResources) && uniqueResources.length < 5;
+
+        setViewCounts(response.data);
+      })
+      .catch(() => {
+        // silently fail or handle as needed
+      });
+  }, [model?.slug]);
+
+  // Show fallback if there's an error or no model data
+  if (error || !model) {
     return (
-      <>
-        <MetaTags
-          title="Loading Model..."
-          description="Model details are loading..."
-        />
-        <Container maxW="container.md" py="12">
-          <Box mb="4">
-            <Heading as="h1" size="xl" mb="2">
-              <Skeleton height="35px" width="220px" />
-            </Heading>
-            <Skeleton height="18px" width="100px" mb={3} />
-            <Skeleton height="300px" />
-          </Box>
-        </Container>
-      </>
+      <Box maxW="100vw" overflowX="hidden" p={8}>
+        <Heading as="h1" fontSize="1.2rem" fontWeight="bold" mb="1rem">
+          Model Temporarily Unavailable
+        </Heading>
+        <Text>
+          We’re having trouble loading <strong>{slug}</strong>. Please try again
+          later.
+        </Text>
+      </Box>
     );
   }
 
-  // Normal content if model is available
   return (
-    <>
+    <Box maxW="100vw" overflowX="hidden">
       <MetaTags
+        title={`${model.modelName} | AI Model Details`}
+        description={model.description || ""}
         socialPreviewImage={model.example}
-        socialPreviewTitle={kebabToTitleCase(model.modelName)}
-        socialPreviewSubtitle={`How to use ${kebabToTitleCase(
-          model.creator
-        )}'s ${kebabToTitleCase(model.modelName)} model on ${kebabToTitleCase(
-          model.platform
-        )}.`}
-        title={`${kebabToTitleCase(model.modelName)} by ${kebabToTitleCase(
-          model.creator
-        )} | AI model details`}
-        description={`Guide to running the ${kebabToTitleCase(
-          model.modelName
-        )} by ${kebabToTitleCase(model.creator)} on ${kebabToTitleCase(
-          model.platform
-        )}. Overview, schema, use cases, limitations. Includes example inputs and outputs, as well as some related models.`}
+        socialPreviewTitle={model.modelName}
+        socialPreviewSubtitle={model.description || ""}
       />
 
       <Container maxW="container.md" py="12">
@@ -205,76 +217,51 @@ export default function ModelPage({ model, relatedModels, slug }) {
             </Text>
           </Flex>
 
-          <ModelDetailsButtons model={model} creator={creatorData} />
+          <ModelDetailsButtons model={model} />
 
-          {/* 
-            Make the image fill the container’s full width,
-            preserve aspect ratio (height="auto"), and avoid layout shift.
-          */}
           <Box width="100%" mt={3}>
             {model.example ? (
-              <Box width="100%">
-                <ImageLightbox
-                  src={model.example}
-                  alt={model.modelName}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    height: "auto",
-                    objectFit: "contain",
-                  }}
-                />
-              </Box>
+              <ImageLightbox
+                src={model.example}
+                alt={model.modelName}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
+              />
             ) : (
-              <Box width="100%">
-                <EmojiWithGradient title={model?.modelName} />
-              </Box>
+              <EmojiWithGradient title={model.modelName} />
             )}
           </Box>
 
-          {/* 
-            Reserve space for content below, even if toggled. 
-            Adjust minH to ensure stable layout. 
-          */}
           <Box minH="650px" mt={6}>
             {!viewCounts.canViewFullArticle && !hasActiveSubscription ? (
               <LimitMessage />
             ) : (
               <>
-                {/* 
-                  Auth prompt is conditionally rendered, but we fix a min-height 
-                  and center it to avoid layout shifting and keep it visually centered.
-                */}
-                <Box
-                  my={6}
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  {isMounted && !user && (
-                    <>
-                      <Text
-                        align="center"
-                        fontWeight="bold"
-                        mb={4}
-                        fontSize="lg"
-                      >
-                        Get notified when new models like this one come out!
-                      </Text>
-                      <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
-                    </>
-                  )}
-                  {/* For logged-in users, simply render nothing here */}
-                </Box>
+                {!user && (
+                  <Box
+                    my={6}
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
+                      Get notified when new models like this one come out!
+                    </Text>
+                    <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
+                  </Box>
+                )}
 
                 <ModelOverview model={model} />
 
                 <hr />
                 <Text mt={3} color="gray.500" fontStyle="italic">
                   This summary was produced with help from an AI and may contain
-                  inaccuracies — check the links to read the original source
-                  documents!
+                  inaccuracies—check the original source!
                 </Text>
 
                 <Stack
@@ -284,16 +271,9 @@ export default function ModelPage({ model, relatedModels, slug }) {
                   my={8}
                 >
                   <SocialScore resource={model} />
-                  <Box w={["100%", "auto"]}>
-                    <BookmarkButton
-                      resourceType="model"
-                      resourceId={model.id}
-                      leftIcon={<FaBookmark />}
-                      w={["100%", "140px"]}
-                    >
-                      Bookmark
-                    </BookmarkButton>
-                  </Box>
+                  <BookmarkButton resourceType="model" resourceId={model.id}>
+                    Bookmark
+                  </BookmarkButton>
                 </Stack>
               </>
             )}
@@ -307,10 +287,12 @@ export default function ModelPage({ model, relatedModels, slug }) {
             <Box mt={8} textAlign="center">
               <TwitterFollowButton />
             </Box>
-            <RelatedModels relatedModels={relatedModels} />
+            <RelatedModels slug={model.slug} platform={model.platform} />
           </Container>
         )}
       </Box>
-    </>
+    </Box>
   );
 }
+
+export default ModelDetailsPage;

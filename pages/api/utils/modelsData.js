@@ -68,15 +68,32 @@ export async function fetchAllDataFromTable({
   return dataArray;
 }
 
-export async function fetchModelDataBySlug(slug) {
+export async function fetchModelDataBySlug(slug, platform) {
   try {
     const { data, error } = await supabase
       .from("modelsData")
       .select(
-        "id, lastUpdated, generatedSummary, totalScore, creator, embedding, modelName, description, tags, example, modelUrl, totalScore, githubUrl, licenseUrl, paperUrl,  platform"
+        `
+        id,
+        slug,
+        lastUpdated,
+        generatedSummary,
+        totalScore,
+        creator,
+        modelName,
+        description,
+        tags,
+        example,
+        modelUrl,
+        totalScore,
+        githubUrl,
+        licenseUrl,
+        paperUrl,
+        platform
+      `
       )
       .eq("slug", slug)
-      .limit(1)
+      .eq("platform", platform)
       .single();
 
     if (error) {
