@@ -68,19 +68,42 @@ export const fetchPaperDataById = async (paperId, platform) => {
 export const fetchPaperDataBySlug = async (paperSlug, platform) => {
   try {
     const { data, error } = await supabase
-      .from(`${platform}PapersData`)
-      .select("*")
+      .from(`${platform}PapersData`) // e.g. "arxivPapersData"
+      .select(
+        `
+        id,
+        slug,
+        totalScore,
+        redditScore,
+        hackerNewsScore,
+        title,
+        "arxivCategories",
+        abstract,
+        authors,
+        "paperUrl",
+        "pdfUrl",
+        "lastUpdated",
+        "indexedDate",
+        "publishedDate",
+        "arxivId",
+        "generatedSummary",
+        thumbnail,
+        platform,
+        task_ids
+      `
+      )
       .eq("slug", paperSlug)
+      .eq("platform", platform)
       .single();
 
     if (error) {
-      console.error("Error fetching paper data:", error);
+      console.error("Error fetching paper data by slug:", error);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error("Error fetching paper data:", error);
+    console.error("Error fetching paper data by slug (try-catch):", error);
     return null;
   }
 };

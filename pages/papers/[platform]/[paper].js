@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+// pages/papers/[platform]/[paper].js
+
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import {
   Container,
@@ -34,50 +36,16 @@ const AudioPlayer = dynamic(() => import("@/components/paper/AudioPlayer"), {
   ssr: false,
 });
 
-const PaperDetailsPage = ({ paper, slug, error }) => {
-  const { user, hasActiveSubscription } = useAuth();
-  const fetchedRef = useRef(false);
+// Import the new RelatedPapers component
+import RelatedPapers from "@/components/RelatedPapers";
 
+const PaperDetailsPage = ({ paper, slug, error }) => {
+  const { hasActiveSubscription } = useAuth();
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
     uniqueResources: [],
     canViewFullArticle: true,
   });
-
-  const [relatedPapers, setRelatedPapers] = useState([]);
-
-  useEffect(() => {
-    if (!paper?.embedding || fetchedRef.current) return;
-
-    const fetchRelated = async () => {
-      try {
-        const res = await fetch("/api/utils/fetchRelatedPapers", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            embedding: paper.embedding,
-          }),
-        });
-
-        if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(
-            `Request failed with status ${res.status}: ${errorText}`
-          );
-        }
-
-        const data = await res.json();
-        setRelatedPapers(data.papers || []);
-      } catch (err) {
-        console.error("Error fetching related papers:", err);
-      }
-    };
-
-    fetchedRef.current = true;
-    fetchRelated();
-  }, [paper?.embedding]);
 
   // Track resource views
   useEffect(() => {
@@ -168,7 +136,7 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
                   markdownContent={paper.generatedSummary}
                   paper={{
                     ...paper,
-                    url: `https://aimodels.fyi/papers/arxiv/${paper.slug}`,
+                    url: `https://aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
                   }}
                 />
               </Box>
@@ -197,8 +165,10 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
                   }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
-                  relatedPapers={relatedPapers}
+                  relatedPapers={[]} // We'll handle related in the child
                 />
+                {/* Render the RelatedPapers component here */}
+                <RelatedPapers slug={paper.slug} platform={paper.platform} />
               </Box>
             </Box>
           </GridItem>
@@ -289,6 +259,9 @@ export async function getStaticProps({ params }) {
 
   try {
     paper = await fetchPaperDataBySlug(slug, platform);
+    // Note: No deletion of `paper.embedding` needed if you don't store it at all.
+    // If you do have it in paper, remove it to keep the ISR writes smaller.
+    // delete paper.embedding;
   } catch (err) {
     console.error("Error fetching paper data:", err);
     error = true;
@@ -296,10 +269,7 @@ export async function getStaticProps({ params }) {
 
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
-      props: {
-        error: true,
-        slug,
-      },
+      props: { error: true, slug },
       revalidate: 60,
     };
   }
@@ -317,6 +287,7 @@ export async function getStaticProps({ params }) {
       slug,
       error: false,
     },
+    // Revalidate daily or your preferred interval
     revalidate: lastUpdatedDate <= oneWeekAgo ? false : 3600 * 24,
   };
 }
