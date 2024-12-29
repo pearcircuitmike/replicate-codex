@@ -52,7 +52,7 @@ const LinkPreview = ({ href, children }) => {
   };
 
   return (
-    <Box display="inline">
+    <span display="inline">
       <Link
         href={href}
         color="blue.500"
@@ -126,7 +126,7 @@ const LinkPreview = ({ href, children }) => {
           </Box>
         </Portal>
       )}
-    </Box>
+    </span>
   );
 };
 
