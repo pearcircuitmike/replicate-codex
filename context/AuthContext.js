@@ -1,3 +1,4 @@
+//context/AuthContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { trackEvent } from "../pages/api/utils/analytics-util";
@@ -64,11 +65,19 @@ export const AuthProvider = ({ children }) => {
 
           if (response.ok) {
             console.log("Signup source updated successfully");
-            // Only remove if update was successful
             localStorage.removeItem("signupSource");
           } else {
-            const errorData = await response.json();
-            console.error("Failed to update signup source:", errorData);
+            // If the server returns 409, it means the source is already set
+            if (response.status === 409) {
+              console.warn(
+                "Signup source already set. Removing localStorage key."
+              );
+              localStorage.removeItem("signupSource");
+            } else {
+              // Log other errors or handle them as needed
+              const errorData = await response.json();
+              console.error("Failed to update signup source:", errorData);
+            }
           }
         } catch (err) {
           console.error("Error calling update-signup-source API:", err);
@@ -77,6 +86,7 @@ export const AuthProvider = ({ children }) => {
 
       trackEvent("login");
     } else {
+      // No session
       setState({
         user: null,
         loading: false,
