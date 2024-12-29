@@ -42,7 +42,7 @@ import EmojiWithGradient from "@/components/EmojiWithGradient";
 //
 export async function getStaticPaths() {
   // Adjust platforms, pageSize, and limit as needed
-  const platforms = ["huggingface"];
+  const platforms = ["huggingFace", "replicate"];
   const paths = [];
   const pageSize = 1000;
   const limit = 100;
