@@ -15,7 +15,6 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/context/AuthContext";
 
-// Utility imports
 import { fetchModelDataBySlug } from "@/pages/api/utils/modelsData";
 import { fetchModelsPaginated } from "@/pages/api/utils/fetchModelsPaginated";
 
@@ -28,7 +27,6 @@ const ModelOverview = dynamic(() =>
   import("@/components/modelDetailsPage/ModelOverview")
 );
 
-// Regular component imports
 import RelatedModels from "@/components/RelatedModels";
 import BookmarkButton from "@/components/BookmarkButton";
 import AuthForm from "@/components/AuthForm";
@@ -38,39 +36,30 @@ import TwitterFollowButton from "@/components/TwitterFollowButton";
 import ImageLightbox from "@/components/ImageLightbox";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
 
-//
+// -----------------------------------------
 // getStaticPaths
-//
+// -----------------------------------------
 export async function getStaticPaths() {
-  // For example, if you want to gather all models from multiple platforms in pages:
-  // Adjust these as needed
   const pageSize = 1000;
-  const limit = 100; // Max total items
+  const limit = 100;
   const paths = [];
-
-  // Maybe you do want to gather models from multiple platforms in one table
-  // If you have a "platform" column in the table, you can fetch them all the same way
-  // If each platform is separate, you'd do separate loops. But here's a single table loop:
 
   let currentPage = 1;
   let totalFetched = 0;
 
   while (totalFetched < limit) {
-    // Pull a "page" of models
     const { data: models } = await fetchModelsPaginated({
       tableName: "modelsData",
       pageSize,
       currentPage,
     });
 
-    // Build paths from the slug/platform in each returned row
     models.forEach((m) => {
-      // Only push if both slug and platform exist
       if (m.slug && m.platform) {
         paths.push({
           params: {
-            platform: m.platform, // e.g. "huggingFace" or "replicate"
-            model: m.slug, // e.g. "my-model-slug"
+            platform: m.platform,
+            model: m.slug,
           },
         });
       }
@@ -81,25 +70,22 @@ export async function getStaticPaths() {
     currentPage += 1;
   }
 
-  // fallback: true => builds pages on-demand for any slug not in `paths`
   return {
     paths,
     fallback: true,
   };
 }
 
-//
+// -----------------------------------------
 // getStaticProps
-//
+// -----------------------------------------
 export async function getStaticProps({ params }) {
   const { platform, model: slug } = params;
   let modelData = null;
   let error = false;
 
   try {
-    // fetchModelDataBySlug should fetch exactly one row for (slug, platform)
     modelData = await fetchModelDataBySlug(slug, platform);
-
     if (!modelData) {
       error = true;
     }
@@ -110,29 +96,31 @@ export async function getStaticProps({ params }) {
 
   if (error || !modelData) {
     return {
-      props: {
-        error: true,
-        slug,
-      },
-      revalidate: 60, // e.g. re-check in 1 min if you like
+      props: { error: true, slug },
+      revalidate: 60, // check again in a minute for a missing model
     };
   }
 
-  // If we successfully found the model row, return it
+  // Apply the same 3-day logic
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const lastUpdatedDate = new Date(modelData.lastUpdated);
+
   return {
     props: {
       model: modelData,
       slug,
       error: false,
     },
-    // Revalidate once a day
-    revalidate: 86400,
+    // If the model is less than 3 days old, revalidate once per day (86400 seconds).
+    // Otherwise, never automatically revalidate (false).
+    revalidate: lastUpdatedDate <= threeDaysAgo ? false : 86400,
   };
 }
 
-//
+// -----------------------------------------
 // Main Page Component
-//
+// -----------------------------------------
 function ModelDetailsPage({ model, slug, error }) {
   const { user, hasActiveSubscription } = useAuth();
   const [viewCounts, setViewCounts] = useState({
@@ -141,21 +129,19 @@ function ModelDetailsPage({ model, slug, error }) {
     canViewFullArticle: true,
   });
 
-  // Prevent repeated API calls in development (React Strict Mode)
+  // Prevent repeated calls in development (React Strict Mode)
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     if (!model?.slug || hasFetchedRef.current) return;
     hasFetchedRef.current = true;
 
-    // Retrieve/create a session ID
     let sessionId = localStorage.getItem("sessionId");
     if (!sessionId) {
       sessionId = uuidv4();
       localStorage.setItem("sessionId", sessionId);
     }
 
-    // Check how many unique resources this session has viewed
     axios
       .get("/api/resource-view-count", {
         params: {
@@ -166,19 +152,15 @@ function ModelDetailsPage({ model, slug, error }) {
       .then((res) => {
         if (!res.data) throw new Error("No data in resource view count");
         const { uniqueResources = [] } = res.data;
-
-        // If user has viewed 5+ unique models, limit content
         res.data.canViewFullArticle =
           Array.isArray(uniqueResources) && uniqueResources.length < 5;
-
         setViewCounts(res.data);
       })
       .catch(() => {
-        // silently fail or handle error
+        // handle error silently or log it
       });
   }, [model?.slug]);
 
-  // If there's an error or no model, render fallback UI
   if (error || !model) {
     return (
       <Box maxW="100vw" overflowX="hidden" p={8}>
@@ -193,7 +175,6 @@ function ModelDetailsPage({ model, slug, error }) {
     );
   }
 
-  // Otherwise, render the main model page
   return (
     <Box maxW="100vw" overflowX="hidden">
       <MetaTags

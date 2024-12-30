@@ -36,7 +36,6 @@ const AudioPlayer = dynamic(() => import("@/components/paper/AudioPlayer"), {
   ssr: false,
 });
 
-// Import the new RelatedPapers component
 import RelatedPapers from "@/components/RelatedPapers";
 
 const PaperDetailsPage = ({ paper, slug, error }) => {
@@ -47,7 +46,6 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
     canViewFullArticle: true,
   });
 
-  // Track resource views
   useEffect(() => {
     if (!paper?.slug) return;
 
@@ -75,7 +73,6 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
       });
   }, [paper?.slug]);
 
-  // If error or no paper, return fallback
   if (error || !paper) {
     return (
       <Box maxW="100vw" overflowX="hidden" p={8}>
@@ -90,7 +87,6 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
     );
   }
 
-  // Render normal page content
   return (
     <Box maxW="100vw" overflowX="hidden">
       <MetaTags
@@ -114,7 +110,6 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
           gap={{ base: 4, lg: 6 }}
           minH="100vh"
         >
-          {/* Left Column - Sections */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "250px" }}>
             <Box
               position="sticky"
@@ -143,7 +138,6 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
             </Box>
           </GridItem>
 
-          {/* Middle Column - Paper Content */}
           <GridItem w="100%" maxW="100%">
             <Box
               id="main-content"
@@ -165,15 +159,13 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
                   }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
-                  relatedPapers={[]} // We'll handle related in the child
+                  relatedPapers={[]}
                 />
-                {/* Render the RelatedPapers component here */}
                 <RelatedPapers slug={paper.slug} platform={paper.platform} />
               </Box>
             </Box>
           </GridItem>
 
-          {/* Right Column - Audio & Notes */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "300px" }}>
             <Box
               position="sticky"
@@ -259,14 +251,12 @@ export async function getStaticProps({ params }) {
 
   try {
     paper = await fetchPaperDataBySlug(slug, platform);
-    // Note: No deletion of `paper.embedding` needed if you don't store it at all.
-    // If you do have it in paper, remove it to keep the ISR writes smaller.
-    // delete paper.embedding;
   } catch (err) {
     console.error("Error fetching paper data:", err);
     error = true;
   }
 
+  // If we can't load the paper or it lacks critical fields, show a fallback
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
       props: { error: true, slug },
@@ -274,8 +264,9 @@ export async function getStaticProps({ params }) {
     };
   }
 
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  // Compare lastUpdated to 3 days ago instead of 7
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
   const lastUpdatedDate = new Date(paper.lastUpdated);
 
   return {
@@ -287,8 +278,9 @@ export async function getStaticProps({ params }) {
       slug,
       error: false,
     },
-    // Revalidate daily or your preferred interval
-    revalidate: lastUpdatedDate <= oneWeekAgo ? false : 3600 * 24,
+    // Revalidate if the paper is less than 3 days old,
+    // otherwise don't revalidate automatically.
+    revalidate: lastUpdatedDate <= threeDaysAgo ? false : 3600 * 24,
   };
 }
 
