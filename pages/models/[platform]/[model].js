@@ -42,44 +42,46 @@ import EmojiWithGradient from "@/components/EmojiWithGradient";
 // getStaticPaths
 //
 export async function getStaticPaths() {
-  // Restore your two platforms exactly as you stated:
-  const platforms = ["huggingFace", "replicate"];
+  // For example, if you want to gather all models from multiple platforms in pages:
+  // Adjust these as needed
+  const pageSize = 1000;
+  const limit = 100; // Max total items
   const paths = [];
 
-  // For each platform, fetch up to 'limit' models in pages of 'pageSize'
-  const pageSize = 1000;
-  const limit = 100;
+  // Maybe you do want to gather models from multiple platforms in one table
+  // If you have a "platform" column in the table, you can fetch them all the same way
+  // If each platform is separate, you'd do separate loops. But here's a single table loop:
 
-  for (const platform of platforms) {
-    let currentPage = 1;
-    let totalFetched = 0;
+  let currentPage = 1;
+  let totalFetched = 0;
 
-    while (totalFetched < limit) {
-      // fetchModelsPaginated is your utility that talks to Supabase
-      const { data: models } = await fetchModelsPaginated({
-        tableName: "modelsData",
-        platform, // Ensures we only get this platform’s models
-        pageSize,
-        currentPage,
-      });
+  while (totalFetched < limit) {
+    // Pull a "page" of models
+    const { data: models } = await fetchModelsPaginated({
+      tableName: "modelsData",
+      pageSize,
+      currentPage,
+    });
 
-      // Build paths for each (slug, platform)
-      models.forEach((m) => {
+    // Build paths from the slug/platform in each returned row
+    models.forEach((m) => {
+      // Only push if both slug and platform exist
+      if (m.slug && m.platform) {
         paths.push({
           params: {
-            platform, // e.g. huggingFace or replicate
-            model: m.slug, // e.g. my-awesome-model
+            platform: m.platform, // e.g. "huggingFace" or "replicate"
+            model: m.slug, // e.g. "my-model-slug"
           },
         });
-      });
+      }
+    });
 
-      totalFetched += models.length;
-      if (models.length < pageSize || totalFetched >= limit) break;
-      currentPage += 1;
-    }
+    totalFetched += models.length;
+    if (models.length < pageSize || totalFetched >= limit) break;
+    currentPage += 1;
   }
 
-  // fallback: true => build pages on demand for any slug not in 'paths'
+  // fallback: true => builds pages on-demand for any slug not in `paths`
   return {
     paths,
     fallback: true,
@@ -91,27 +93,39 @@ export async function getStaticPaths() {
 //
 export async function getStaticProps({ params }) {
   const { platform, model: slug } = params;
-  let model = null;
+  let modelData = null;
   let error = false;
 
   try {
-    // Must use both slug AND platform inside fetchModelDataBySlug
-    model = await fetchModelDataBySlug(slug, platform);
+    // fetchModelDataBySlug should fetch exactly one row for (slug, platform)
+    modelData = await fetchModelDataBySlug(slug, platform);
+
+    if (!modelData) {
+      error = true;
+    }
   } catch (err) {
+    console.error("Error in getStaticProps:", err);
     error = true;
   }
 
-  // If we can't find a single matching model, return fallback
-  if (!model || error) {
+  if (error || !modelData) {
     return {
-      props: { error: true, slug },
-      revalidate: 60, // e.g. re-check in 1 minute
+      props: {
+        error: true,
+        slug,
+      },
+      revalidate: 60, // e.g. re-check in 1 min if you like
     };
   }
 
-  // Revalidate once a day for existing pages
+  // If we successfully found the model row, return it
   return {
-    props: { model, slug, error: false },
+    props: {
+      model: modelData,
+      slug,
+      error: false,
+    },
+    // Revalidate once a day
     revalidate: 86400,
   };
 }
@@ -121,8 +135,6 @@ export async function getStaticProps({ params }) {
 //
 function ModelDetailsPage({ model, slug, error }) {
   const { user, hasActiveSubscription } = useAuth();
-
-  // Track number of unique resource views
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
     uniqueResources: [],
@@ -133,18 +145,17 @@ function ModelDetailsPage({ model, slug, error }) {
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!model?.slug) return;
-    if (hasFetchedRef.current) return;
+    if (!model?.slug || hasFetchedRef.current) return;
     hasFetchedRef.current = true;
 
-    // Ensure we have or create a session ID
+    // Retrieve/create a session ID
     let sessionId = localStorage.getItem("sessionId");
     if (!sessionId) {
       sessionId = uuidv4();
       localStorage.setItem("sessionId", sessionId);
     }
 
-    // Fetch resource-view-count
+    // Check how many unique resources this session has viewed
     axios
       .get("/api/resource-view-count", {
         params: {
@@ -152,22 +163,22 @@ function ModelDetailsPage({ model, slug, error }) {
           resource_type: "models",
         },
       })
-      .then((response) => {
-        if (!response.data) throw new Error("Failed to fetch view counts");
-        const { uniqueResources = [] } = response.data;
+      .then((res) => {
+        if (!res.data) throw new Error("No data in resource view count");
+        const { uniqueResources = [] } = res.data;
 
         // If user has viewed 5+ unique models, limit content
-        response.data.canViewFullArticle =
+        res.data.canViewFullArticle =
           Array.isArray(uniqueResources) && uniqueResources.length < 5;
 
-        setViewCounts(response.data);
+        setViewCounts(res.data);
       })
       .catch(() => {
-        // Silently fail or handle error as needed
+        // silently fail or handle error
       });
   }, [model?.slug]);
 
-  // Show fallback if there's an error or no model data
+  // If there's an error or no model, render fallback UI
   if (error || !model) {
     return (
       <Box maxW="100vw" overflowX="hidden" p={8}>
@@ -182,6 +193,7 @@ function ModelDetailsPage({ model, slug, error }) {
     );
   }
 
+  // Otherwise, render the main model page
   return (
     <Box maxW="100vw" overflowX="hidden">
       <MetaTags
