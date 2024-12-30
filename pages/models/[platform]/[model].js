@@ -79,6 +79,8 @@ export async function getStaticPaths() {
 // -----------------------------------------
 // getStaticProps
 // -----------------------------------------
+// pages/models/[platform]/[model].js
+
 export async function getStaticProps({ params }) {
   const { platform, model: slug } = params;
   let modelData = null;
@@ -94,27 +96,24 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
+  // If there's an error or missing fields, return a fallback
   if (error || !modelData) {
     return {
       props: { error: true, slug },
-      revalidate: 60, // check again in a minute for a missing model
+      // No automatic revalidation
+      revalidate: false,
     };
   }
 
-  // Apply the same 3-day logic
-  const threeDaysAgo = new Date();
-  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-  const lastUpdatedDate = new Date(modelData.lastUpdated);
-
+  // Remove any timed revalidation
   return {
     props: {
       model: modelData,
       slug,
       error: false,
     },
-    // If the model is less than 3 days old, revalidate once per day (86400 seconds).
-    // Otherwise, never automatically revalidate (false).
-    revalidate: lastUpdatedDate <= threeDaysAgo ? false : 86400,
+    // Only revalidate when we manually trigger it
+    revalidate: false,
   };
 }
 
