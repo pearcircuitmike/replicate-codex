@@ -15,24 +15,15 @@ import { toTitleCase } from "@/pages/api/utils/toTitleCase";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";
 
-export async function getStaticPaths() {
-  const creatorsData = await fetchCreators({
-    tableName: "unique_creators_data_view",
-    pageSize: 50,
-    currentPage: 1,
-    searchValue: "",
-  });
-
-  const paths = creatorsData.data.map(({ creator, platform }) => ({
-    params: { creator: creator.toLowerCase(), platform },
-  }));
-
-  return { paths, fallback: "blocking" };
-}
-
-export async function getStaticProps({ params }) {
+/**
+ * Pure SSR: fetch data on every request.
+ *
+ * This replaces getStaticPaths/getStaticProps.
+ */
+export async function getServerSideProps({ params }) {
   const { creator, platform } = params;
 
+  // Fetch initial models
   const modelsResponse = await fetchModelsByCreator({
     tableName: "modelsData",
     pageSize: 10,
@@ -41,11 +32,12 @@ export async function getStaticProps({ params }) {
     platform,
   });
 
-  const models = modelsResponse.data;
-
   return {
-    props: { creator, models, platform },
-    revalidate: 3600 * 24,
+    props: {
+      creator,
+      platform,
+      models: modelsResponse?.data || [],
+    },
   };
 }
 
