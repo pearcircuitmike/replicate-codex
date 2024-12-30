@@ -70,40 +70,60 @@ export async function fetchAllDataFromTable({
 
 export async function fetchModelDataBySlug(slug, platform) {
   try {
-    const { data, error } = await supabase
+    // Use .maybeSingle() to avoid the "multiple/no rows" error
+    const { data, error, count } = await supabase
       .from("modelsData")
       .select(
         `
-        id,
-        slug,
-        lastUpdated,
-        generatedSummary,
-        totalScore,
-        creator,
-        modelName,
-        description,
-        tags,
-        example,
-        modelUrl,
-        totalScore,
-        githubUrl,
-        licenseUrl,
-        paperUrl,
-        platform
-      `
+          id,
+          slug,
+          lastUpdated,
+          generatedSummary,
+          totalScore,
+          creator,
+          modelName,
+          description,
+          tags,
+          example,
+          modelUrl,
+          githubUrl,
+          licenseUrl,
+          paperUrl,
+          platform
+        `,
+        { count: "exact" }
       )
       .eq("slug", slug)
       .eq("platform", platform)
-      .single();
+      // maybeSingle returns the first row if there are duplicates,
+      // and null if there are no rows. It won't throw an error.
+      .maybeSingle();
 
     if (error) {
-      console.error(`Error fetching model data: ${error.message}`);
+      console.error("Error fetching model data:", error.message);
       return null;
+    }
+
+    // If no rows matched
+    if (!data) {
+      console.log(
+        `No rows found for slug="${slug}" and platform="${platform}".`
+      );
+      return null;
+    }
+
+    // If count is more than 1, you have duplicates.
+    // You can log them or handle them as you wish:
+    if (count && count > 1) {
+      console.warn(
+        `Warning: multiple rows match slug="${slug}" and platform="${platform}".`
+      );
+      // data is still the first matching row. You can choose to return it or null.
     }
 
     return data;
   } catch (err) {
-    console.error(`Error fetching model data: ${err.message}`);
+    console.error("Error fetching model data:", err.message);
     return null;
   }
 }
