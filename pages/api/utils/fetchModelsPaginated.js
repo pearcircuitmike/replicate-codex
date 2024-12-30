@@ -1,7 +1,7 @@
 import supabase from "./supabaseClient";
 
 export async function fetchModelsPaginated({
-  tableName = "modelsData",
+  tableName,
   pageSize,
   currentPage,
   searchValue = null,

@@ -1,4 +1,5 @@
 // pages/models/[platform]/[model].js
+
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -41,9 +42,11 @@ import EmojiWithGradient from "@/components/EmojiWithGradient";
 // getStaticPaths
 //
 export async function getStaticPaths() {
-  // Adjust platforms, pageSize, and limit as needed
+  // Restore your two platforms exactly as you stated:
   const platforms = ["huggingFace", "replicate"];
   const paths = [];
+
+  // For each platform, fetch up to 'limit' models in pages of 'pageSize'
   const pageSize = 1000;
   const limit = 100;
 
@@ -52,18 +55,20 @@ export async function getStaticPaths() {
     let totalFetched = 0;
 
     while (totalFetched < limit) {
+      // fetchModelsPaginated is your utility that talks to Supabase
       const { data: models } = await fetchModelsPaginated({
         tableName: "modelsData",
-        platform,
+        platform, // Ensures we only get this platform’s models
         pageSize,
         currentPage,
       });
 
+      // Build paths for each (slug, platform)
       models.forEach((m) => {
         paths.push({
           params: {
-            model: m.slug.toString(),
-            platform,
+            platform, // e.g. huggingFace or replicate
+            model: m.slug, // e.g. my-awesome-model
           },
         });
       });
@@ -74,7 +79,7 @@ export async function getStaticPaths() {
     }
   }
 
-  // fallback: 'true' => build pages on-demand if not in paths
+  // fallback: true => build pages on demand for any slug not in 'paths'
   return {
     paths,
     fallback: true,
@@ -90,20 +95,21 @@ export async function getStaticProps({ params }) {
   let error = false;
 
   try {
+    // Must use both slug AND platform inside fetchModelDataBySlug
     model = await fetchModelDataBySlug(slug, platform);
   } catch (err) {
     error = true;
   }
 
-  // Fallback if model is missing or fetch failed
+  // If we can't find a single matching model, return fallback
   if (!model || error) {
     return {
       props: { error: true, slug },
-      revalidate: 60,
+      revalidate: 60, // e.g. re-check in 1 minute
     };
   }
 
-  // Revalidate once a day
+  // Revalidate once a day for existing pages
   return {
     props: { model, slug, error: false },
     revalidate: 86400,
@@ -123,12 +129,11 @@ function ModelDetailsPage({ model, slug, error }) {
     canViewFullArticle: true,
   });
 
-  // Prevent repeated API calls in development due to Strict Mode
+  // Prevent repeated API calls in development (React Strict Mode)
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     if (!model?.slug) return;
-
     if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
 
@@ -139,6 +144,7 @@ function ModelDetailsPage({ model, slug, error }) {
       localStorage.setItem("sessionId", sessionId);
     }
 
+    // Fetch resource-view-count
     axios
       .get("/api/resource-view-count", {
         params: {
@@ -148,16 +154,16 @@ function ModelDetailsPage({ model, slug, error }) {
       })
       .then((response) => {
         if (!response.data) throw new Error("Failed to fetch view counts");
+        const { uniqueResources = [] } = response.data;
 
         // If user has viewed 5+ unique models, limit content
-        const { uniqueResources = [] } = response.data;
         response.data.canViewFullArticle =
           Array.isArray(uniqueResources) && uniqueResources.length < 5;
 
         setViewCounts(response.data);
       })
       .catch(() => {
-        // silently fail or handle as needed
+        // Silently fail or handle error as needed
       });
   }, [model?.slug]);
 
