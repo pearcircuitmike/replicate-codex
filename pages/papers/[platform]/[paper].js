@@ -1,5 +1,3 @@
-// pages/papers/[platform]/[paper].js
-
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -212,22 +210,32 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
   );
 };
 
+/**
+ * Prebuild the top 10,000 papers (by totalScore).
+ * For all others, fallback: true will build on first request.
+ */
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
   const paths = [];
   const pageSize = 1000;
-  const limit = 100;
+  const totalLimit = 10000; // Prebuild top 10k
 
   for (const platform of platforms) {
     let currentPage = 1;
     let totalFetched = 0;
 
-    while (totalFetched < limit) {
+    // We'll keep fetching in chunks of 1000 until we reach 10,000 or run out
+    while (totalFetched < totalLimit) {
+      // You might need to implement "sort by totalScore desc" inside fetchPapersPaginated
+      // or have an endpoint param that sorts by score.
       const { data: papers } = await fetchPapersPaginated({
         platform,
         pageSize,
         currentPage,
+        // e.g. orderBy: "totalScore desc" if your backend supports it
       });
+
+      if (!papers || papers.length === 0) break;
 
       for (const p of papers) {
         paths.push({
@@ -236,7 +244,7 @@ export async function getStaticPaths() {
       }
 
       totalFetched += papers.length;
-      if (papers.length < pageSize || totalFetched >= limit) break;
+      if (papers.length < pageSize || totalFetched >= totalLimit) break;
       currentPage += 1;
     }
   }
@@ -256,6 +264,7 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
+  // If we cannot load the paper or it lacks required fields, skip it
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
       props: { error: true, slug },
@@ -265,7 +274,7 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { paper, slug, error: false },
-    revalidate: false,
+    revalidate: false, // No automatic revalidation
   };
 }
 
