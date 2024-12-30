@@ -256,31 +256,16 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
-  // If we can't load the paper or it lacks critical fields, show a fallback
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
       props: { error: true, slug },
-      revalidate: 60,
+      revalidate: false,
     };
   }
 
-  // Compare lastUpdated to 3 days ago instead of 7
-  const threeDaysAgo = new Date();
-  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-  const lastUpdatedDate = new Date(paper.lastUpdated);
-
   return {
-    props: {
-      paper: {
-        ...paper,
-        tasks: paper.tasks || [],
-      },
-      slug,
-      error: false,
-    },
-    // Revalidate if the paper is less than 3 days old,
-    // otherwise don't revalidate automatically.
-    revalidate: lastUpdatedDate <= threeDaysAgo ? false : 3600 * 24,
+    props: { paper, slug, error: false },
+    revalidate: false,
   };
 }
 
