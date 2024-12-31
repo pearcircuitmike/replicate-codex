@@ -17,12 +17,14 @@ import axios from "axios";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
+const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
+
 import PaperFigures from "../PaperFigures";
 import PaperTables from "../PaperTables";
 import PaperVote from "../PaperVote";
 import TaskTag from "@/components/TaskTag";
 import LimitMessage from "@/components/LimitMessage";
-import RelatedPapers from "@/components/RelatedPapers";
+
 import LinkPreview from "./LinkPreview";
 import customTheme from "@/components/MarkdownTheme";
 import PDFViewer from "@/components/PDFViewer";
