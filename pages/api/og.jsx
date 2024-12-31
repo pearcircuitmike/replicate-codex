@@ -1,3 +1,4 @@
+// /api/og.js
 import { ImageResponse } from "@vercel/og";
 
 export const config = {
@@ -16,7 +17,7 @@ export default async function handler(req) {
         : text;
     };
 
-    // Truncate title and subtitle with ellipsis if they exceed certain lengths
+    // Truncate title and subtitle if they exceed certain lengths
     const title = truncateWithEllipsis(
       searchParams.get("title") || "AImodels.fyi",
       45
@@ -27,8 +28,8 @@ export default async function handler(req) {
       150
     );
 
-    // Function to generate a gradient based on the title
-    const generateGradient = (title) => {
+    // Function to generate a gradient based on the title text
+    const generateGradient = (titleText) => {
       const colors = [
         "#ff6347", // tomato
         "#e91e63", // pink
@@ -40,7 +41,7 @@ export default async function handler(req) {
         "#00bcd4", // cyan
         "#009688", // teal
       ];
-      const hash = title
+      const hash = titleText
         .split("")
         .reduce((acc, char) => acc + char.charCodeAt(0), 0);
       const color1 = colors[hash % colors.length];
@@ -50,7 +51,7 @@ export default async function handler(req) {
 
     const gradientBg = generateGradient(title);
 
-    // Define the content to be displayed
+    // Define the content to display
     const content = (
       <div
         style={{
@@ -171,10 +172,15 @@ export default async function handler(req) {
       </div>
     );
 
-    // Return the image response
+    // Return the image response with caching headers and reduced quality
     return new ImageResponse(content, {
       width: 1200,
       height: 630,
+      quality: 80,
+      headers: {
+        "Cache-Control":
+          "public, s-maxage=86400, stale-while-revalidate=2592000",
+      },
     });
   } catch (e) {
     console.error(`Error generating image: ${e.message}`);
