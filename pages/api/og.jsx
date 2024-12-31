@@ -174,8 +174,8 @@ export default async function handler(req) {
 
     // Return the image response with caching headers and reduced quality
     return new ImageResponse(content, {
-      width: 1200,
-      height: 630,
+      width: 960,
+      height: 504,
       quality: 10,
       headers: {
         "Cache-Control":
