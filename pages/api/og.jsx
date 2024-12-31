@@ -176,7 +176,7 @@ export default async function handler(req) {
     return new ImageResponse(content, {
       width: 1200,
       height: 630,
-      quality: 80,
+      quality: 10,
       headers: {
         "Cache-Control":
           "public, s-maxage=86400, stale-while-revalidate=2592000",
