@@ -100,7 +100,10 @@ export async function fetchModelDataBySlug(slug, platform) {
       .maybeSingle();
 
     if (error) {
-      console.error("Error fetching model data:", error.message);
+      console.error(
+        "Error fetching model data for slug " + slug + " : ",
+        error.message
+      );
       return null;
     }
 
