@@ -40,7 +40,7 @@ const PaperContent = ({
   relatedPapers,
 }) => {
   const [paperTasks, setPaperTasks] = useState([]);
-  // const { user } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPaperTasks = async () => {
@@ -295,7 +295,7 @@ const PaperContent = ({
             {overview}
 
             {/* AuthForm shows only if the user is not logged in */}
-            {/*   {!user && (
+            {!user && (
               <Box
                 my={6}
                 display="flex"
@@ -308,7 +308,7 @@ const PaperContent = ({
                 </Text>
                 <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
               </Box>
-            )}*/}
+            )}
 
             {/* Paper Figures (if any) */}
             {paper.paperGraphics?.length > 0 && (
