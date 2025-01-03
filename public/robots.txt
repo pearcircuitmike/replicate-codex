@@ -4,7 +4,7 @@ Allow: /
 
 # Disallow Bingbot on /api/og
 User-agent: bingbot
-Disallow: /api/og
+Disallow: /api/og/*
 
 # Host
 Host: https://www.aimodels.fyi
