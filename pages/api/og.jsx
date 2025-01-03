@@ -10,14 +10,14 @@ export default async function handler(req) {
     const { searchParams } = new URL(req.url);
     const imageUrl = searchParams.get("image");
 
-    // Function to truncate text with ellipsis
+    // Helper function to truncate text
     const truncateWithEllipsis = (text, maxLength) => {
       return text.length > maxLength
         ? text.slice(0, maxLength - 3) + "..."
         : text;
     };
 
-    // Truncate title and subtitle if they exceed certain lengths
+    // Read and truncate title/subtitle
     const title = truncateWithEllipsis(
       searchParams.get("title") || "AImodels.fyi",
       45
@@ -28,7 +28,7 @@ export default async function handler(req) {
       150
     );
 
-    // Function to generate a gradient based on the title text
+    // Generate a gradient background based on the title text
     const generateGradient = (titleText) => {
       const colors = [
         "#ff6347", // tomato
@@ -51,7 +51,7 @@ export default async function handler(req) {
 
     const gradientBg = generateGradient(title);
 
-    // Define the content to display
+    // Main content layout for the OG image
     const content = (
       <div
         style={{
@@ -80,6 +80,7 @@ export default async function handler(req) {
             boxSizing: "border-box",
           }}
         >
+          {/* Text Section */}
           <div
             style={{
               display: "flex",
@@ -110,6 +111,7 @@ export default async function handler(req) {
             </div>
           </div>
 
+          {/* Image Section */}
           <div
             style={{
               display: "flex",
@@ -172,11 +174,12 @@ export default async function handler(req) {
       </div>
     );
 
-    // Return the image response with caching headers and reduced quality
+    // Return the image as JPEG so 'quality' has a real effect
     return new ImageResponse(content, {
       width: 1200,
       height: 630,
       quality: 10,
+      contentType: "image/jpeg", // Ensures we get a lossy format
       headers: {
         "Cache-Control":
           "public, s-maxage=86400, stale-while-revalidate=2592000",
