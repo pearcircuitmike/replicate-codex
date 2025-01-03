@@ -1,0 +1,13 @@
+# All other bots:
+User-agent: *
+Allow: /
+
+# Disallow Bingbot on /api/og
+User-agent: bingbot
+Disallow: /api/og
+
+# Host
+Host: https://www.aimodels.fyi
+
+# Sitemap
+Sitemap: https://www.aimodels.fyi/sitemap.xml
