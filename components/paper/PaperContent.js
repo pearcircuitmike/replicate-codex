@@ -30,8 +30,8 @@ import customTheme from "@/components/MarkdownTheme";
 import PDFViewer from "@/components/PDFViewer";
 
 // Import your auth context and form
-//import { useAuth } from "@/context/AuthContext";
-//import AuthForm from "@/components/AuthForm";
+import { useAuth } from "@/context/AuthContext";
+import AuthForm from "@/components/AuthForm";
 
 const PaperContent = ({
   paper,
