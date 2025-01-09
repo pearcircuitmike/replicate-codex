@@ -220,6 +220,7 @@ function ModelDetailsPage({ model, slug, error }) {
           <Box width="100%" mt={3}>
             {model.example ? (
               <ImageLightbox
+                optimize={true}
                 src={model.example}
                 alt={model.modelName}
                 style={{

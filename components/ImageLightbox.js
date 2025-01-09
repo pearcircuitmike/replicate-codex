@@ -6,16 +6,37 @@ import {
   ModalBody,
   ModalCloseButton,
   Box,
+  Image as ChakraImage,
 } from "@chakra-ui/react";
 import NextImage from "next/image";
 
-const ImageLightbox = ({ src, alt }) => {
+/**
+ * @param {string}  src        The image source URL
+ * @param {string}  alt        Alt text
+ * @param {boolean} optimize   If true, use Next.js Image optimization. Otherwise, use plain Chakra Image.
+ */
+const ImageLightbox = ({ src, alt, optimize = false }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
+
+  // For NextImage (optimize = true), we must specify fill or width/height
+  // so the parent container can display it correctly.
+  const Thumbnail = optimize ? (
+    <Box position="relative" width="100%" height="350px">
+      <NextImage src={src} alt={alt} fill style={{ objectFit: "cover" }} />
+    </Box>
+  ) : (
+    <ChakraImage
+      src={src}
+      alt={alt}
+      objectFit="cover"
+      width="100%"
+      height="350px"
+    />
+  );
 
   return (
     <>
-      {/* Thumbnail/Preview */}
+      {/* Thumbnail / Preview */}
       <Box
         borderWidth="1px"
         borderRadius="md"
@@ -25,40 +46,20 @@ const ImageLightbox = ({ src, alt }) => {
         onClick={() => setIsOpen(true)}
         transition="all 0.2s"
         _hover={{ transform: "scale(1.02)" }}
-        position="relative"
         width="100%"
-        height="350px" // Match your original sizing
+        height="350px"
       >
-        <NextImage
-          src={src}
-          alt={alt}
-          fill
-          style={{ objectFit: "cover" }}
-          // (Optional) If you want Next to handle responsive sizes:
-          // sizes="(max-width: 768px) 100vw,
-          //        (max-width: 1200px) 50vw,
-          //        33vw"
-        />
+        {Thumbnail}
       </Box>
 
       {/* Lightbox Modal */}
-      <Modal
-        isOpen={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-          setIsZoomed(false);
-        }}
-        size="full"
-      >
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="full">
         <ModalOverlay bg="rgba(0, 0, 0, 0.85)" />
         <ModalContent
           margin={0}
           cursor="zoom-out"
           bg="transparent"
-          onClick={() => {
-            setIsOpen(false);
-            setIsZoomed(false);
-          }}
+          onClick={() => setIsOpen(false)}
         >
           <ModalCloseButton color="white" zIndex="popover" />
           <ModalBody
@@ -68,22 +69,24 @@ const ImageLightbox = ({ src, alt }) => {
             justifyContent="center"
             position="relative"
           >
-            <Box
-              position="relative"
-              width="auto"
-              maxHeight="90vh"
-              // If you want the image to scale up to fit the screen,
-              // you can set a width, e.g., width="90vw"
-            >
-              <NextImage
+            {/* If optimize, use Next.js Image again; if not, plain Chakra Image */}
+            {optimize ? (
+              <Box position="relative" width="80vw" height="80vh">
+                <NextImage
+                  src={src}
+                  alt={alt}
+                  fill
+                  style={{ objectFit: "contain" }}
+                />
+              </Box>
+            ) : (
+              <ChakraImage
                 src={src}
                 alt={alt}
-                // Use fill if you prefer a more flexible layout
-                // or remove fill + set width/height if you prefer.
-                style={{ objectFit: "contain" }}
-                fill
+                maxH="90vh"
+                objectFit="contain"
               />
-            </Box>
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>

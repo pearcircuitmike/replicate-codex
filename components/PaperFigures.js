@@ -53,6 +53,7 @@ const FigureCard = ({ figure }) => (
       }}
     >
       <ImageLightbox
+        optimize={true}
         src={figure.content}
         alt={figure.caption}
         initialCaption={figure.originalCaption}
