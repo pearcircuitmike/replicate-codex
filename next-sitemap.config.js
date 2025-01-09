@@ -19,7 +19,7 @@ module.exports = {
         // allow root and everything else by default
         allow: "/",
         // disallow dashboard and API routes
-        // disallow: ["/dashboard/", "/api/"], -- TBD On this change, not sure on impact yet
+        disallow: ["/dashboard/"],
       },
     ],
     // Optionally add your Host and any additional sitemaps
