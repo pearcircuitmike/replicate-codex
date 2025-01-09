@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Container, Grid, Box, Text, Center, Skeleton } from "@chakra-ui/react";
+
 import MetaTags from "../../components/MetaTags";
-import PaperCard from "../../components/Cards/PaperCard";
-import Pagination from "../../components/Pagination";
-import { fetchPapersPaginated } from "../api/utils/fetchPapers";
 import SemanticSearchBar from "../../components/Common/SemanticSearchBar";
 import TimeRangeFilter from "../../components/Common/TimeRangeFilter";
+import PaperCard from "../../components/Cards/PaperCard";
+import Pagination from "../../components/Pagination";
+
+import { fetchPapersPaginated } from "../api/utils/fetchPapers";
 import { getDateRange } from "../api/utils/dateUtils";
 
 export async function getServerSideProps({ query }) {
   const currentPage = parseInt(query.page || "1", 10);
   const selectedTimeRange = query.selectedTimeRange || "thisWeek";
   const searchValue = query.search || "";
+  const pageSize = 12;
 
   const { startDate, endDate } = getDateRange(selectedTimeRange);
 
+  // Fetch data for the current page + filters
   const { data, totalCount } = await fetchPapersPaginated({
     platform: "arxiv",
-    pageSize: 12,
+    pageSize,
     currentPage,
     searchValue,
     startDate,
@@ -44,16 +48,24 @@ const PapersIndexPage = ({
   initialSelectedTimeRange,
 }) => {
   const router = useRouter();
+
+  // Hardcode your primary domain here:
+  const hardcodedDomain = "https://www.aimodels.fyi";
+  // Construct full canonical URL:
+  const canonicalUrl = `${hardcodedDomain}${router.asPath}`;
+
   const [papers, setPapers] = useState(initialPapers || []);
   const [searchValue, setSearchValue] = useState(initialSearch || "");
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalCount, setTotalCount] = useState(totalPaperCount);
-  const pageSize = 12;
   const [selectedTimeRange, setSelectedTimeRange] = useState(
     initialSelectedTimeRange
   );
   const [isLoading, setIsLoading] = useState(false);
 
+  const pageSize = 12; // Must match getServerSideProps
+
+  // Fetch papers when relevant state changes
   const fetchPapers = async () => {
     setIsLoading(true);
     try {
@@ -77,12 +89,12 @@ const PapersIndexPage = ({
     }
   };
 
-  // Fetch papers whenever relevant state changes
   useEffect(() => {
     fetchPapers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, selectedTimeRange, currentPage]);
 
-  // Update URL query parameters when state changes
+  // Sync query in the URL (shallow routing)
   useEffect(() => {
     router.replace(
       {
@@ -96,6 +108,7 @@ const PapersIndexPage = ({
       undefined,
       { shallow: true }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, selectedTimeRange, currentPage]);
 
   const handleSearchSubmit = (value) => {
@@ -112,7 +125,6 @@ const PapersIndexPage = ({
     setCurrentPage(newPage);
   };
 
-  // Function to render skeletons
   const renderSkeletons = () => {
     const skeletonArray = Array.from({ length: pageSize });
     return (
@@ -141,19 +153,20 @@ const PapersIndexPage = ({
     <>
       <MetaTags
         title="AI Papers | Explore Latest Research"
-        description="Explore the latest research papers on artificial intelligence, machine learning, and related fields. Browse through summaries, categories, and authors."
-        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_papers.png`}
+        description="Explore the latest AI and machine learning research papers."
+        socialPreviewImage={`${hardcodedDomain}/img/ogImg/ogImg_papers.png`}
         socialPreviewTitle="AI/ML Research Papers"
-        socialPreviewSubtitle="The all-in-one place for AI research"
+        socialPreviewSubtitle="Explore the newest findings"
+        canonicalUrl={canonicalUrl}
       />
+
       <Container maxW="container.xl" py="2">
         <Box mb={6}>
           <Text fontSize="3xl" fontWeight="bold">
             AI Papers
           </Text>
           <Text fontSize="lg" color="gray.500">
-            Browse and discover the latest research papers on artificial
-            intelligence, machine learning, and related fields.
+            Browse and discover new research on AI, ML, and related fields.
           </Text>
         </Box>
 
@@ -161,19 +174,19 @@ const PapersIndexPage = ({
           placeholder="Search papers by title or arXiv ID..."
           onSearchSubmit={handleSearchSubmit}
           initialSearchValue={initialSearch}
-          resourceType="paper" // Pass resourceType to SemanticSearchBar
+          resourceType="paper"
         />
+
         <Box mt={2}>
           <TimeRangeFilter
             selectedTimeRange={selectedTimeRange}
             onTimeRangeChange={handleTimeRangeChange}
           />
         </Box>
+
         {papers.length === 0 && !isLoading ? (
           <Box mt={6}>
-            <Text>
-              No papers found. Please try a different search or time range.
-            </Text>
+            <Text>No papers found. Try a different search or time range.</Text>
           </Box>
         ) : (
           <>
@@ -194,12 +207,18 @@ const PapersIndexPage = ({
                 ))}
               </Grid>
             )}
+
             <Center my={5}>
               <Pagination
                 totalCount={totalCount}
                 pageSize={pageSize}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
+                basePath="/papers" // <<-- The correct path
+                extraQuery={{
+                  search: searchValue,
+                  selectedTimeRange,
+                }}
               />
             </Center>
           </>

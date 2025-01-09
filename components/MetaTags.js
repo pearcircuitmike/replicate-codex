@@ -6,11 +6,11 @@ export default function MetaTags({
   socialPreviewImage = "",
   socialPreviewTitle = "",
   socialPreviewSubtitle = "",
+  canonicalUrl = "",
 }) {
-  // Access the environment variable; it returns a string
   const baseUrl = process.env.NEXT_PUBLIC_SITE_BASE_URL;
 
-  // Construct the URL with encoded parameters for dynamic social media images
+  // Construct the URL for dynamic social media images (if you use that logic)
   const ogImageUrl = `${baseUrl}/api/og?image=${encodeURIComponent(
     socialPreviewImage
   )}&title=${encodeURIComponent(
@@ -31,6 +31,9 @@ export default function MetaTags({
       <meta property="twitter:description" content={description} />
       <meta property="twitter:image" content={ogImageUrl} />
       <link rel="icon" href="/favicon.ico" />
+
+      {/* Only render the canonical link if you have a canonicalUrl prop */}
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     </Head>
   );
 }

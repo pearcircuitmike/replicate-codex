@@ -8,6 +8,8 @@ import {
   Center,
   Skeleton,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+
 import MetaTags from "../../components/MetaTags";
 import AuthorCard from "../../components/AuthorCard";
 import Pagination from "../../components/Pagination";
@@ -26,11 +28,17 @@ export async function getStaticProps() {
 
   return {
     props: { initialAuthors: data, initialTotalCount: totalCount || 0 },
+    // or revalidate if needed
     revalidate: false,
   };
 }
 
 const Authors = ({ initialAuthors, initialTotalCount }) => {
+  const router = useRouter();
+  // Hardcode domain for self-canonical:
+  const hardcodedDomain = "https://www.aimodels.fyi";
+  const canonicalUrl = hardcodedDomain + router.asPath;
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,29 +47,39 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
 
   const executeSearch = async (newSearchTerm) => {
     setIsLoading(true);
-    const { data, totalCount } = await fetchUniqueAuthors({
-      platform: "arxiv",
-      pageSize: ITEMS_PER_PAGE,
-      currentPage: 1,
-      searchValue: newSearchTerm,
-    });
-    setAuthors(data);
-    setTotalCount(totalCount || 0);
-    setCurrentPage(1);
-    setIsLoading(false);
+    try {
+      const { data, totalCount } = await fetchUniqueAuthors({
+        platform: "arxiv",
+        pageSize: ITEMS_PER_PAGE,
+        currentPage: 1,
+        searchValue: newSearchTerm,
+      });
+      setAuthors(data);
+      setTotalCount(totalCount || 0);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error("Error searching authors:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const changePage = async (page) => {
     setIsLoading(true);
-    const { data } = await fetchUniqueAuthors({
-      platform: "arxiv",
-      pageSize: ITEMS_PER_PAGE,
-      currentPage: page,
-      searchValue: searchTerm,
-    });
-    setAuthors(data);
-    setCurrentPage(page);
-    setIsLoading(false);
+    try {
+      const { data } = await fetchUniqueAuthors({
+        platform: "arxiv",
+        pageSize: ITEMS_PER_PAGE,
+        currentPage: page,
+        searchValue: searchTerm,
+      });
+      setAuthors(data);
+      setCurrentPage(page);
+    } catch (err) {
+      console.error("Error changing page:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,7 +90,9 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
         socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_researchers.png`}
         socialPreviewTitle="AI Researchers"
         socialPreviewSubtitle="Explore work by the top AI/ML researchers"
+        canonicalUrl={canonicalUrl} // self-referencing canonical
       />
+
       <Container maxW="5xl">
         <Heading as="h1" mt={5}>
           Authors
@@ -86,6 +106,7 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
           resourceType="author"
         />
       </Container>
+
       <Container maxW="8xl">
         <Box minHeight="800px">
           {isLoading ? (
@@ -113,12 +134,18 @@ const Authors = ({ initialAuthors, initialTotalCount }) => {
           )}
         </Box>
       </Container>
+
       <Center my={5}>
         <Pagination
           currentPage={currentPage}
           totalCount={totalCount}
           onPageChange={changePage}
           pageSize={ITEMS_PER_PAGE}
+          // specify basePath so we stay on /authors route
+          basePath="/authors"
+          extraQuery={{
+            searchTerm,
+          }}
         />
       </Center>
     </>

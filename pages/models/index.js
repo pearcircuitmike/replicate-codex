@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Container, Grid, Box, Text, Center, Skeleton } from "@chakra-ui/react";
+
 import MetaTags from "../../components/MetaTags";
 import ModelCard from "../../components/Cards/ModelCard";
 import Pagination from "../../components/Pagination";
@@ -10,7 +11,7 @@ import CategoryFilter from "../../components/CategoryFilter";
 import TimeRangeFilter from "../../components/Common/TimeRangeFilter";
 import { getDateRange } from "../api/utils/dateUtils";
 import modelCategoryDescriptions from "../../data/modelCategoryDescriptions.json";
-import { trackEvent } from "../api/utils/analytics-util"; // Import event tracking utility
+import { trackEvent } from "../api/utils/analytics-util";
 
 export async function getServerSideProps({ query }) {
   const currentPage = parseInt(query.page || "1", 10);
@@ -53,6 +54,12 @@ const ModelsIndexPage = ({
   initialSelectedTimeRange,
 }) => {
   const router = useRouter();
+
+  // Hardcode domain:
+  const hardcodedDomain = "https://www.aimodels.fyi";
+  // Build canonical:
+  const canonicalUrl = hardcodedDomain + router.asPath;
+
   const [models, setModels] = useState(initialModels || []);
   const [searchValue, setSearchValue] = useState(initialSearch || "");
   const [selectedCategories, setSelectedCategories] = useState(
@@ -66,6 +73,7 @@ const ModelsIndexPage = ({
   );
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch models
   const fetchModels = async () => {
     setIsLoading(true);
     try {
@@ -91,12 +99,13 @@ const ModelsIndexPage = ({
     }
   };
 
-  // Fetch models whenever relevant state changes
+  // Re-fetch on relevant changes
   useEffect(() => {
     fetchModels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, selectedCategories, selectedTimeRange, currentPage]);
 
-  // Update URL query parameters when state changes
+  // Update query in URL
   useEffect(() => {
     router.replace(
       {
@@ -111,6 +120,7 @@ const ModelsIndexPage = ({
       undefined,
       { shallow: true }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, selectedCategories, selectedTimeRange, currentPage]);
 
   const handleSearchSubmit = (value) => {
@@ -118,7 +128,7 @@ const ModelsIndexPage = ({
     setCurrentPage(1);
     trackEvent("semantic_search", {
       query: value,
-      resource_type: "model", // Track search for models
+      resource_type: "model",
     });
   };
 
@@ -136,7 +146,7 @@ const ModelsIndexPage = ({
     setCurrentPage(newPage);
   };
 
-  // Function to render skeletons
+  // Skeleton placeholders
   const renderSkeletons = () => {
     const skeletonArray = Array.from({ length: pageSize });
     return (
@@ -165,10 +175,12 @@ const ModelsIndexPage = ({
       <MetaTags
         title="AI Models | Browse and Discover AI Models"
         description="Explore a wide range of AI models across different categories. Browse through model descriptions, examples, and more."
-        socialPreviewImage={`${process.env.NEXT_PUBLIC_SITE_BASE_URL}/img/ogImg/ogImg_models.png`}
+        socialPreviewImage={`${hardcodedDomain}/img/ogImg/ogImg_models.png`}
         socialPreviewTitle="AI Models"
         socialPreviewSubtitle="Explore the latest AI models"
+        canonicalUrl={canonicalUrl}
       />
+
       <Container maxW="container.xl" py="2">
         <Box mb={6}>
           <Text fontSize="3xl" fontWeight="bold">
@@ -178,22 +190,26 @@ const ModelsIndexPage = ({
             Browse and discover AI models across various categories.
           </Text>
         </Box>
+
         <SemanticSearchBar
           placeholder="Search by model name..."
           onSearchSubmit={handleSearchSubmit}
           initialSearchValue={initialSearch}
-          resourceType="model" // Ensure the resourceType is passed
+          resourceType="model"
         />
+
         <CategoryFilter
           categoryDescriptions={modelCategoryDescriptions}
           selectedCategories={selectedCategories}
           onCategoryChange={handleCategoryChange}
           isModelsPage
         />
+
         <TimeRangeFilter
           selectedTimeRange={selectedTimeRange}
           onTimeRangeChange={handleTimeRangeChange}
         />
+
         {models.length === 0 && !isLoading ? (
           <Box mt={6}>
             <Text>
@@ -226,6 +242,12 @@ const ModelsIndexPage = ({
                 totalCount={totalCount}
                 onPageChange={handlePageChange}
                 pageSize={pageSize}
+                basePath="/models" // <<-- The correct path
+                extraQuery={{
+                  search: searchValue,
+                  selectedCategories: JSON.stringify(selectedCategories),
+                  selectedTimeRange,
+                }}
               />
             </Center>
           </>
