@@ -1,23 +1,25 @@
-// next-sitemap.js
 const siteUrl = "https://www.aimodels.fyi";
 
 module.exports = {
   siteUrl,
   generateRobotsTxt: true,
-  exclude: ["/components/*"],
+  exclude: ["/components/*"], // don't include these pages in the sitemap
   generateIndexSitemap: true,
   sitemapSize: 20000,
   robotsTxtOptions: {
-    // This creates custom rules
     policies: [
+      // Bingbot policy
       {
         userAgent: "bingbot",
-        // Use a wildcard so it covers query strings like /api/og?title=...
         disallow: ["/api/og*"],
       },
+      // General policy for all other crawlers
       {
         userAgent: "*",
+        // allow root and everything else by default
         allow: "/",
+        // disallow dashboard and API routes
+        // disallow: ["/dashboard/", "/api/"], -- TBD On this change, not sure on impact yet
       },
     ],
     // Optionally add your Host and any additional sitemaps
