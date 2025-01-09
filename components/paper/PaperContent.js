@@ -233,7 +233,9 @@ const PaperContent = ({
       p={{ base: 3, md: 6 }}
       mb={{ base: "40vh", lg: "60vh" }}
       maxW="100%"
-      overflow="hidden"
+      // Add these lines to enable scrolling
+      maxH="80vh"
+      overflowY="auto"
     >
       <VStack spacing={5} align="stretch" maxW="100%">
         {/* Paper Title and Info */}
