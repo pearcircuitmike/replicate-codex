@@ -1,17 +1,18 @@
 // pages/tools/[tool].js
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Container,
   Box,
   Text,
   Heading,
-  Link,
+  Link as ChakraLink,
   Image,
   Tag,
   Icon,
   Button,
   Center,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import MetaTags from "../../components/MetaTags";
 import {
@@ -39,48 +40,12 @@ export async function getStaticProps({ params }) {
   }
 
   return {
-    props: { tool, slug },
+    props: { tool },
     revalidate: false,
   };
 }
 
-const ToolDetailsPage = ({ tool, slug }) => {
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://substackcdn.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    const customScript = document.createElement("script");
-    customScript.innerHTML = `
-      window.CustomSubstackWidget = {
-        substackUrl: "aimodels.substack.com",
-        placeholder: "example@gmail.com",
-        buttonText: "Try it for free!",
-        theme: "custom",
-        colors: {
-          primary: "#319795",
-          input: "white",
-          email: "#1A202C",
-          text: "white",
-        },
-        redirect: "/thank-you?source=tools&slug=${encodeURIComponent(slug)}"
-      };
-    `;
-    document.body.appendChild(customScript);
-
-    const widgetScript = document.createElement("script");
-    widgetScript.src = "https://substackapi.com/widget.js";
-    widgetScript.async = true;
-    document.body.appendChild(widgetScript);
-
-    return () => {
-      document.body.removeChild(script);
-      document.body.removeChild(customScript);
-      document.body.removeChild(widgetScript);
-    };
-  }, [slug]);
-
+const ToolDetailsPage = ({ tool }) => {
   if (!tool) {
     return <div>Loading...</div>;
   }
@@ -97,15 +62,21 @@ const ToolDetailsPage = ({ tool, slug }) => {
       <Container maxW="container.md" py="12">
         <Box>
           <Heading as="h1" mb={2}>
-            <Link href={tool.url} isExternal>
-              {tool.toolName}{" "}
-              <Icon
-                color="blue.500"
-                as={FaExternalLinkAlt}
-                style={{ display: "inline" }}
-                boxSize={5}
-              />
-            </Link>
+            {/* 
+              Use NextLink and passHref, then use ChakraLink 
+              so there's only one real <a> tag.
+            */}
+            <NextLink href={tool.url} passHref>
+              <ChakraLink isExternal>
+                {tool.toolName}{" "}
+                <Icon
+                  color="blue.500"
+                  as={FaExternalLinkAlt}
+                  style={{ display: "inline" }}
+                  boxSize={5}
+                />
+              </ChakraLink>
+            </NextLink>
           </Heading>
           <Box fontSize="md" mb={4}>
             <Text as="span">
@@ -116,16 +87,19 @@ const ToolDetailsPage = ({ tool, slug }) => {
           <Box mb={4}>
             {tool.categories &&
               tool.categories.map((category, index) => (
-                <Link
+                <NextLink
                   key={index}
                   href={`/tools?selectedCategory=${encodeURIComponent(
                     category
                   )}`}
+                  passHref
                 >
-                  <Tag size="md" colorScheme="blue" mr="10px">
-                    {category}
-                  </Tag>
-                </Link>
+                  <ChakraLink>
+                    <Tag size="md" colorScheme="blue" mr="10px">
+                      {category}
+                    </Tag>
+                  </ChakraLink>
+                </NextLink>
               ))}
           </Box>
           <Image
@@ -142,37 +116,30 @@ const ToolDetailsPage = ({ tool, slug }) => {
             </Heading>
             <Text>{tool.description}</Text>
           </Box>
-          <Container maxW="container.md">
-            <Box mt={8}>
-              <Text fontWeight="bold" fontSize="lg" mb={4} align="center">
-                Get updates on the latest AI tools straight to your inbox:
-              </Text>
-            </Box>
-
-            <Center my={"45px"}>
-              <div id="custom-substack-embed"></div>
-            </Center>
-          </Container>
         </Box>
       </Container>
 
       <Container maxW="container.xl" py="12">
         <Box mt={8} textAlign="center">
-          <Button colorScheme="green" borderRadius="full">
-            <a
-              href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
-              className="twitter-follow-button"
-              data-show-count="false"
-            >
-              Follow @aimodelsfyi on 𝕏 for trending AI tools →
-            </a>
-
-            <script
-              async
-              src="https://platform.twitter.com/widgets.js"
-              charSet="utf-8"
-            ></script>
+          {/*
+            Use a single anchor here, instead of nesting
+            <Button> and <a> if they both create <a> tags.
+          */}
+          <Button
+            as="a"
+            href="https://twitter.com/aimodelsfyi?ref_src=aimodelsfyi"
+            target="_blank"
+            rel="noopener noreferrer"
+            colorScheme="green"
+            borderRadius="full"
+          >
+            Follow @aimodelsfyi on 𝕏 for trending AI tools →
           </Button>
+          <script
+            async
+            src="https://platform.twitter.com/widgets.js"
+            charSet="utf-8"
+          />
         </Box>
       </Container>
     </>

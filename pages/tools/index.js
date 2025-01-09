@@ -54,7 +54,6 @@ const ToolsIndexPage = ({
 
   useEffect(() => {
     const { search, page } = router.query;
-
     setSearchValue(search || initialSearch);
     setCurrentPage(parseInt(page || initialPage.toString(), 10));
   }, [router.query]);
@@ -86,42 +85,6 @@ const ToolsIndexPage = ({
     });
   };
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://substackcdn.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-
-    const customScript = document.createElement("script");
-    customScript.innerHTML = `
-      window.CustomSubstackWidget = {
-        substackUrl: "aimodels.substack.com",
-        placeholder: "example@gmail.com",
-        buttonText: "Try it for free!",
-        theme: "custom",
-        colors: {
-          primary: "#319795",
-          input: "white",
-          email: "#1A202C",
-          text: "white",
-        },
-        redirect: "/thank-you?source=tools"
-      };
-    `;
-    document.body.appendChild(customScript);
-
-    const widgetScript = document.createElement("script");
-    widgetScript.src = "https://substackapi.com/widget.js";
-    widgetScript.async = true;
-    document.body.appendChild(widgetScript);
-
-    return () => {
-      document.body.removeChild(script);
-      document.body.removeChild(customScript);
-      document.body.removeChild(widgetScript);
-    };
-  }, []);
-
   return (
     <>
       <MetaTags
@@ -141,18 +104,17 @@ const ToolsIndexPage = ({
               Get summaries of the best new tools in your inbox. Subscribe to
               the newsletter!
             </Text>
-            <Center>
-              <div id="custom-substack-embed"></div>
-            </Center>
           </Box>
         </Box>
         <Box maxW="container.lg" mx="auto" my={8}>
-          <SearchBar
-            searchValue={searchValue}
-            onSearchSubmit={handleSearchSubmit}
-            setSearchValue={setSearchValue}
-            placeholder="Search AI tools..."
-          />
+          <Box my={3}>
+            <SearchBar
+              searchValue={searchValue}
+              onSearchSubmit={handleSearchSubmit}
+              setSearchValue={setSearchValue}
+              placeholder="Search AI tools..."
+            />
+          </Box>
           {tools.length === 0 ? (
             <Box mt={6}>
               <Text>No tools found. Please try a different search.</Text>
@@ -170,6 +132,10 @@ const ToolsIndexPage = ({
               >
                 {tools.map((tool) => (
                   <GridItem key={tool.id}>
+                    {/* 
+                      Directly render ToolCard without wrapping it in an extra <Link>.
+                      ToolCard already includes its own <Link> usage.
+                    */}
                     <ToolCard tool={tool} />
                   </GridItem>
                 ))}
@@ -179,6 +145,8 @@ const ToolsIndexPage = ({
                 pageSize={pageSize}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
+                basePath="/tools"
+                extraQuery={{ search: searchValue }}
               />
             </>
           )}
