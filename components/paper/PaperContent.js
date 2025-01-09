@@ -233,9 +233,10 @@ const PaperContent = ({
       p={{ base: 3, md: 6 }}
       mb={{ base: "40vh", lg: "60vh" }}
       maxW="100%"
-      // Add these lines to enable scrolling
-      maxH="80vh"
-      overflowY="auto"
+      // Only apply 80vh max height for large screens
+      maxH={{ base: "none", lg: "80vh" }}
+      // Only apply scrolling for large screens
+      overflowY={{ base: "visible", lg: "auto" }}
     >
       <VStack spacing={5} align="stretch" maxW="100%">
         {/* Paper Title and Info */}

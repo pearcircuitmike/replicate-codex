@@ -17,7 +17,6 @@ import {
   fetchPapersPaginated,
 } from "@/pages/api/utils/fetchPapers";
 
-// Dynamically import components
 const MetaTags = dynamic(() => import("@/components/MetaTags"));
 const SectionsNav = dynamic(() => import("@/components/paper/SectionsNav"));
 const PaperNotes = dynamic(() => import("@/components/notes/PaperNotes"), {
@@ -103,12 +102,13 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
         <Grid
           templateColumns={{
             base: "minmax(0, 1fr)",
-            lg: "250px minmax(0, 1fr) 300px",
+            // Make the center column bigger by shrinking the side columns:
+            lg: "200px minmax(0, 1fr) 250px",
           }}
           gap={{ base: 4, lg: 6 }}
           minH="100vh"
         >
-          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "250px" }}>
+          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "200px" }}>
             <Box
               position="sticky"
               top="0"
@@ -164,7 +164,7 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
             </Box>
           </GridItem>
 
-          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "300px" }}>
+          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "250px" }}>
             <Box
               position="sticky"
               top="0"
@@ -210,29 +210,21 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
   );
 };
 
-/**
- * Prebuild the top 10,000 papers (by totalScore).
- * For all others, fallback: true will build on first request.
- */
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
   const paths = [];
   const pageSize = 1000;
-  const totalLimit = 10000; // Prebuild top 10k
+  const totalLimit = 10000;
 
   for (const platform of platforms) {
     let currentPage = 1;
     let totalFetched = 0;
 
-    // We'll keep fetching in chunks of 1000 until we reach 10,000 or run out
     while (totalFetched < totalLimit) {
-      // You might need to implement "sort by totalScore desc" inside fetchPapersPaginated
-      // or have an endpoint param that sorts by score.
       const { data: papers } = await fetchPapersPaginated({
         platform,
         pageSize,
         currentPage,
-        // e.g. orderBy: "totalScore desc" if your backend supports it
       });
 
       if (!papers || papers.length === 0) break;
@@ -264,7 +256,6 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
-  // If we cannot load the paper or it lacks required fields, skip it
   if (!paper || !paper.abstract || !paper.generatedSummary) {
     return {
       props: { error: true, slug },
@@ -274,7 +265,7 @@ export async function getStaticProps({ params }) {
 
   return {
     props: { paper, slug, error: false },
-    revalidate: false, // No automatic revalidation
+    revalidate: false,
   };
 }
 
