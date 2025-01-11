@@ -17,9 +17,9 @@ import { useAuth } from "@/context/AuthContext";
 
 import { fetchModelDataBySlug } from "@/pages/api/utils/modelsData";
 import { fetchModelsPaginated } from "@/pages/api/utils/fetchModelsPaginated";
+import MetaTags from "@/components/MetaTags";
 
 // Dynamic imports
-const MetaTags = dynamic(() => import("@/components/MetaTags"));
 const ModelDetailsButtons = dynamic(() =>
   import("@/components/modelDetailsPage/ModelDetailsButtons")
 );
@@ -167,8 +167,8 @@ function ModelDetailsPage({ model, slug, error }) {
           Model Temporarily Unavailable
         </Heading>
         <Text>
-          We’re having trouble loading <strong>{slug}</strong>. Please try again
-          later.
+          We are having trouble loading <strong>{slug}</strong>. Please try
+          again later.
         </Text>
       </Box>
     );

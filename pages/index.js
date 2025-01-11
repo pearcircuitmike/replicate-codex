@@ -64,6 +64,7 @@ export default function Home() {
       <MetaTags
         title="Your Roadmap to the AI Revolution - AIModels.fyi"
         description="AImodels.fyi scans repos, journals, and social media to bring you the ML breakthroughs that actually matter, so you spend less time reading and more time building."
+        canonicalUrl="https://www.aimodels.fyi/"
       />
 
       <HeroSection isMobile={isMobile} />
