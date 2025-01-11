@@ -1,3 +1,5 @@
+// pages/creators/[platform]/[creator].js
+
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -7,23 +9,23 @@ import {
   Skeleton,
   SimpleGrid,
 } from "@chakra-ui/react";
-import Head from "next/head";
-import { kebabToTitleCase } from "@/pages/api/utils/kebabToTitleCase";
+
+// Import MetaTags directly so the server-rendered HTML includes our meta info
 import MetaTags from "../../../components/MetaTags";
+
+// Utilities and components
 import ModelCard from "../../../components/Cards/ModelCard";
 import { toTitleCase } from "@/pages/api/utils/toTitleCase";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
 import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";
 
 /**
- * Pure SSR: fetch data on every request.
- *
- * This replaces getStaticPaths/getStaticProps.
+ * Get data on every request (Server-Side Rendering).
  */
 export async function getServerSideProps({ params }) {
   const { creator, platform } = params;
 
-  // Fetch initial models
+  // Fetch initial models for this creator/platform
   const modelsResponse = await fetchModelsByCreator({
     tableName: "modelsData",
     pageSize: 10,
@@ -32,11 +34,19 @@ export async function getServerSideProps({ params }) {
     platform,
   });
 
+  // Build a canonical URL on the server
+  const DOMAIN = "https://www.aimodels.fyi"; // Adjust as needed
+  const canonicalUrl = `${DOMAIN}/creators/${encodeURIComponent(
+    platform
+  )}/${encodeURIComponent(creator)}`;
+
   return {
     props: {
       creator,
       platform,
+      // If modelsResponse is undefined or empty, default to []
       models: modelsResponse?.data || [],
+      canonicalUrl,
     },
   };
 }
@@ -61,7 +71,7 @@ function LoadingModelCard() {
   );
 }
 
-export default function Creator({ creator, models, platform }) {
+export default function Creator({ creator, models, platform, canonicalUrl }) {
   const [creatorData, setCreatorData] = useState(null);
   const [isCreatorLoading, setIsCreatorLoading] = useState(true);
 
@@ -119,12 +129,14 @@ export default function Creator({ creator, models, platform }) {
 
   return (
     <>
+      {/* Server-rendered meta tags with canonical URL */}
       <MetaTags
         title={platformMeta.title}
         description={platformMeta.description}
         socialPreviewImage="https://em-content.zobj.net/social/emoji/artist-palette.png"
         socialPreviewTitle={platformMeta.socialTitle}
         socialPreviewSubtitle={platformMeta.socialSubtitle}
+        canonicalUrl={canonicalUrl}
       />
 
       <Container maxW="container.xl" py="12">
@@ -164,9 +176,7 @@ export default function Creator({ creator, models, platform }) {
               {isCreatorLoading
                 ? Array(models.length)
                     .fill(null)
-                    .map((_, idx) => (
-                      <LoadingModelCard key={`skeleton-${idx}`} />
-                    ))
+                    .map((_, idx) => <LoadingModelCard key={idx} />)
                 : models.map((model) => (
                     <Box key={model.id}>
                       <ModelCard model={model} />

@@ -15,11 +15,14 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "@/context/AuthContext";
 
+// Utility functions for data fetching
 import { fetchModelDataBySlug } from "@/pages/api/utils/modelsData";
 import { fetchModelsPaginated } from "@/pages/api/utils/fetchModelsPaginated";
+
+// Import MetaTags statically so SSR can include them
 import MetaTags from "@/components/MetaTags";
 
-// Dynamic imports
+// Dynamic imports for non-meta components
 const ModelDetailsButtons = dynamic(() =>
   import("@/components/modelDetailsPage/ModelDetailsButtons")
 );
@@ -27,6 +30,7 @@ const ModelOverview = dynamic(() =>
   import("@/components/modelDetailsPage/ModelOverview")
 );
 
+// Regular imports for other components
 import RelatedModels from "@/components/RelatedModels";
 import BookmarkButton from "@/components/BookmarkButton";
 import AuthForm from "@/components/AuthForm";
@@ -36,9 +40,9 @@ import TwitterFollowButton from "@/components/TwitterFollowButton";
 import ImageLightbox from "@/components/ImageLightbox";
 import EmojiWithGradient from "@/components/EmojiWithGradient";
 
-// -----------------------------------------
+// -----------------------------------------------------
 // getStaticPaths
-// -----------------------------------------
+// -----------------------------------------------------
 export async function getStaticPaths() {
   const pageSize = 1000;
   const limit = 100;
@@ -66,21 +70,21 @@ export async function getStaticPaths() {
     });
 
     totalFetched += models.length;
-    if (models.length < pageSize || totalFetched >= limit) break;
+    if (models.length < pageSize || totalFetched >= limit) {
+      break;
+    }
     currentPage += 1;
   }
 
   return {
     paths,
-    fallback: true,
+    fallback: true, // or 'blocking', depending on your needs
   };
 }
 
-// -----------------------------------------
+// -----------------------------------------------------
 // getStaticProps
-// -----------------------------------------
-// pages/models/[platform]/[model].js
-
+// -----------------------------------------------------
 export async function getStaticProps({ params }) {
   const { platform, model: slug } = params;
   let modelData = null;
@@ -96,31 +100,39 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
-  // If there's an error or missing fields, return a fallback
   if (error || !modelData) {
     return {
-      props: { error: true, slug },
+      props: {
+        error: true,
+        slug,
+      },
       // No automatic revalidation
       revalidate: false,
     };
   }
 
-  // Remove any timed revalidation
+  // Build the canonical URL on the server
+  const DOMAIN = "https://www.aimodels.fyi"; // adjust as needed
+  const canonicalUrl = `${DOMAIN}/models/${encodeURIComponent(
+    platform
+  )}/${encodeURIComponent(slug)}`;
+
   return {
     props: {
       model: modelData,
       slug,
       error: false,
+      canonicalUrl,
     },
-    // Only revalidate when we manually trigger it
+    // Only revalidate when triggered manually, if you have a flow for that
     revalidate: false,
   };
 }
 
-// -----------------------------------------
+// -----------------------------------------------------
 // Main Page Component
-// -----------------------------------------
-function ModelDetailsPage({ model, slug, error }) {
+// -----------------------------------------------------
+function ModelDetailsPage({ model, slug, error, canonicalUrl }) {
   const { user, hasActiveSubscription } = useAuth();
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -128,7 +140,7 @@ function ModelDetailsPage({ model, slug, error }) {
     canViewFullArticle: true,
   });
 
-  // Prevent repeated calls in development (React Strict Mode)
+  // Prevent repeated calls in dev Strict Mode
   const hasFetchedRef = useRef(false);
 
   useEffect(() => {
@@ -176,12 +188,14 @@ function ModelDetailsPage({ model, slug, error }) {
 
   return (
     <Box maxW="100vw" overflowX="hidden">
+      {/* Server-rendered meta tags with canonical URL */}
       <MetaTags
         title={`${model.modelName} | AI Model Details`}
         description={model.description || ""}
         socialPreviewImage={model.example}
         socialPreviewTitle={model.modelName}
         socialPreviewSubtitle={model.description || ""}
+        canonicalUrl={canonicalUrl} // Pass the server-generated canonical
       />
 
       <Container maxW="container.md" py="12">

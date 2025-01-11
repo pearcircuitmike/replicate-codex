@@ -1,5 +1,6 @@
+// pages/papers/[platform]/[paper].js
+
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
 import {
   Container,
   Box,
@@ -12,12 +13,14 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-import {
-  fetchPaperDataBySlug,
-  fetchPapersPaginated,
-} from "@/pages/api/utils/fetchPapers";
 
-const MetaTags = dynamic(() => import("@/components/MetaTags"));
+// ------------------------------
+// Import MetaTags with SSR
+// ------------------------------
+import MetaTags from "@/components/MetaTags";
+
+// Dynamic imports (with SSR disabled in some cases)
+import dynamic from "next/dynamic";
 const SectionsNav = dynamic(() => import("@/components/paper/SectionsNav"));
 const PaperNotes = dynamic(() => import("@/components/notes/PaperNotes"), {
   ssr: false,
@@ -34,8 +37,15 @@ const AudioPlayer = dynamic(() => import("@/components/paper/AudioPlayer"), {
 });
 
 import RelatedPapers from "@/components/RelatedPapers";
+import {
+  fetchPaperDataBySlug,
+  fetchPapersPaginated,
+} from "@/pages/api/utils/fetchPapers";
 
-const PaperDetailsPage = ({ paper, slug, error }) => {
+// -----------------------------------------------------
+// Component
+// -----------------------------------------------------
+function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
   const { hasActiveSubscription } = useAuth();
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
@@ -86,12 +96,14 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
 
   return (
     <Box maxW="100vw" overflowX="hidden">
+      {/* Server-rendered meta tags with canonical URL */}
       <MetaTags
         title={`${paper.title} | AI Research Paper Details`}
         description={paper.abstract}
         socialPreviewImage={paper.thumbnail}
         socialPreviewTitle={paper.title}
         socialPreviewSubtitle={paper.abstract}
+        canonicalUrl={canonicalUrl}
       />
 
       <Container
@@ -102,12 +114,12 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
         <Grid
           templateColumns={{
             base: "minmax(0, 1fr)",
-            // Make the center column bigger by shrinking the side columns:
             lg: "200px minmax(0, 1fr) 250px",
           }}
           gap={{ base: 4, lg: 6 }}
           minH="100vh"
         >
+          {/* Left Sidebar */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "200px" }}>
             <Box
               position="sticky"
@@ -129,13 +141,14 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
                   markdownContent={paper.generatedSummary}
                   paper={{
                     ...paper,
-                    url: `https://aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
+                    url: `https://www.aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
                   }}
                 />
               </Box>
             </Box>
           </GridItem>
 
+          {/* Main Content */}
           <GridItem w="100%" maxW="100%">
             <Box
               id="main-content"
@@ -164,6 +177,7 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
             </Box>
           </GridItem>
 
+          {/* Right Sidebar */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "250px" }}>
             <Box
               position="sticky"
@@ -208,8 +222,11 @@ const PaperDetailsPage = ({ paper, slug, error }) => {
       </Container>
     </Box>
   );
-};
+}
 
+// -----------------------------------------------------
+// getStaticPaths
+// -----------------------------------------------------
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
   const paths = [];
@@ -244,27 +261,42 @@ export async function getStaticPaths() {
   return { paths, fallback: true };
 }
 
+// -----------------------------------------------------
+// getStaticProps
+// -----------------------------------------------------
 export async function getStaticProps({ params }) {
   const { platform, paper: slug } = params;
-  let paper = null;
+  let paperData = null;
   let error = false;
 
   try {
-    paper = await fetchPaperDataBySlug(slug, platform);
+    paperData = await fetchPaperDataBySlug(slug, platform);
   } catch (err) {
     console.error("Error fetching paper data:", err);
     error = true;
   }
 
-  if (!paper || !paper.abstract || !paper.generatedSummary) {
+  // If no data or missing essential fields
+  if (!paperData || !paperData.abstract || !paperData.generatedSummary) {
     return {
       props: { error: true, slug },
       revalidate: false,
     };
   }
 
+  // Build a canonical URL on the server
+  const DOMAIN = "https://www.aimodels.fyi"; // adjust if needed
+  const canonicalUrl = `${DOMAIN}/papers/${encodeURIComponent(
+    platform
+  )}/${encodeURIComponent(slug)}`;
+
   return {
-    props: { paper, slug, error: false },
+    props: {
+      paper: paperData,
+      slug,
+      error: false,
+      canonicalUrl,
+    },
     revalidate: false,
   };
 }
