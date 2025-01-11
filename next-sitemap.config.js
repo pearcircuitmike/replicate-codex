@@ -22,7 +22,5 @@ module.exports = {
         disallow: ["/dashboard/"],
       },
     ],
-    // Optionally add your Host and any additional sitemaps
-    additionalSitemaps: ["https://www.aimodels.fyi/sitemap.xml"],
   },
 };
