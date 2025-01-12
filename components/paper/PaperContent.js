@@ -1,4 +1,4 @@
-// PaperContent.js
+// components/paper/PaperContent.js
 
 import React, { useState, useEffect } from "react";
 import {
@@ -65,7 +65,7 @@ const PaperContent = ({
   }, [paper?.id]);
 
   /**
-   * Split the paper content at "## Overview" and "## Plain English Explanation"
+   * Splits the paper content at "## Overview" and "## Plain English Explanation"
    * so we can render them separately.
    */
   const renderContent = (content) => {
@@ -230,13 +230,9 @@ const PaperContent = ({
     <Box
       bg="white"
       rounded="lg"
+      // Removed forced margin-bottom and forced max-height/overflow
       p={{ base: 3, md: 6 }}
-      mb={{ base: "40vh", lg: "60vh" }}
       maxW="100%"
-      // Only apply 80vh max height for large screens
-      maxH={{ base: "none", lg: "80vh" }}
-      // Only apply scrolling for large screens
-      overflowY={{ base: "visible", lg: "auto" }}
     >
       <VStack spacing={5} align="stretch" maxW="100%">
         {/* Paper Title and Info */}
@@ -370,7 +366,7 @@ const PaperContent = ({
               <PaperVote paperId={paper.id} />
             </Box>
 
-            {/* Related Papers */}
+            {/* Related Papers (bottom) */}
             <Box mt={8} pt={4} borderTop="1px" borderColor="gray.200">
               <RelatedPapers relatedPapers={relatedPapers} />
             </Box>

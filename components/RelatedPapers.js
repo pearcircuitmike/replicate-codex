@@ -1,18 +1,20 @@
 // components/RelatedPapers.js
 
 import React, { useState, useEffect } from "react";
-import { Box, Heading, SimpleGrid } from "@chakra-ui/react";
-import PaperCard from "./Cards/PaperCard";
+import { Box, Heading, Text, Link, Skeleton, VStack } from "@chakra-ui/react";
+import NextLink from "next/link";
 
 const RelatedPapers = ({ slug, platform }) => {
   const [embedding, setEmbedding] = useState(null);
   const [relatedPapers, setRelatedPapers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // 1. Fetch the embedding for this paper
+  // 1. Fetch embedding for this paper
   useEffect(() => {
     if (!slug || !platform) return;
 
     const fetchEmbedding = async () => {
+      setLoading(true);
       try {
         const res = await fetch("/api/utils/fetch-paper-embedding", {
           method: "POST",
@@ -29,8 +31,10 @@ const RelatedPapers = ({ slug, platform }) => {
 
         const data = await res.json();
         setEmbedding(data.embedding);
-      } catch (error) {
-        console.error("Error fetching embedding:", error);
+      } catch (err) {
+        console.error("Error fetching embedding:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -39,9 +43,10 @@ const RelatedPapers = ({ slug, platform }) => {
 
   // 2. Once we have the embedding, fetch related papers
   useEffect(() => {
-    if (!embedding || embedding.length === 0) return;
-
     const fetchRelated = async () => {
+      if (!embedding || embedding.length === 0) return;
+      setLoading(true);
+
       try {
         const res = await fetch("/api/utils/fetchRelatedPapers", {
           method: "POST",
@@ -58,33 +63,68 @@ const RelatedPapers = ({ slug, platform }) => {
 
         const data = await res.json();
         setRelatedPapers(data.papers || []);
-      } catch (error) {
-        console.error("Error fetching related papers:", error);
+      } catch (err) {
+        console.error("Error fetching related papers:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchRelated();
   }, [embedding]);
 
-  // If no related papers, exit early
+  // Show loader if still fetching and have no results yet
+  if (loading && relatedPapers.length === 0) {
+    return (
+      <Box mt={2} p={0}>
+        <Heading as="h2" size="sm" mb={2}>
+          Related Papers
+        </Heading>
+        <Skeleton height="60px" mb={2} />
+        <Skeleton height="60px" mb={2} />
+      </Box>
+    );
+  }
+
+  // If no related papers, show nothing
   if (!relatedPapers || relatedPapers.length === 0) {
     return null;
   }
 
   // Optionally skip the first paper if it's the current paper
-  // For demonstration, we skip the first item
   const displayPapers = relatedPapers.slice(1, 5);
 
   return (
-    <Box mt={8}>
-      <Heading as="h2" size="lg" mb={4}>
+    <Box mt={2} p={0}>
+      <Heading as="h2" size="sm" mb={2}>
         Related Papers
       </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 2 }} spacing={4}>
-        {displayPapers.map((relatedPaper) => (
-          <PaperCard key={relatedPaper.id} paper={relatedPaper} />
+      <VStack spacing={3} align="stretch">
+        {displayPapers.map((paper) => (
+          <Box
+            key={paper.id}
+            p={2}
+            borderWidth="1px"
+            borderRadius="md"
+            bg="white"
+            boxShadow="sm"
+          >
+            <Heading as="h3" size="xs" mb={1}>
+              <Link
+                as={NextLink}
+                href={`/papers/${paper.platform}/${paper.slug}`}
+                color="blue.600"
+                _hover={{ textDecoration: "underline" }}
+              >
+                {paper.title}
+              </Link>
+            </Heading>
+            <Text fontSize="xs" color="gray.700" noOfLines={2}>
+              {paper.abstract}
+            </Text>
+          </Box>
         ))}
-      </SimpleGrid>
+      </VStack>
     </Box>
   );
 };

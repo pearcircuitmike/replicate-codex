@@ -120,48 +120,24 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
           minH="100vh"
         >
           {/* Left Sidebar */}
+          {/* Left Sidebar */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "200px" }}>
-            <Box
-              position="sticky"
-              top="0"
-              maxH="100vh"
-              overflowY="auto"
-              overflowX="hidden"
-              css={{
-                "&::-webkit-scrollbar": { width: "4px" },
-                "&::-webkit-scrollbar-track": { background: "transparent" },
-                "&::-webkit-scrollbar-thumb": {
-                  background: "rgba(0,0,0,0.2)",
-                  borderRadius: "2px",
-                },
-              }}
-            >
-              <Box py={8}>
-                <SectionsNav
-                  markdownContent={paper.generatedSummary}
-                  paper={{
-                    ...paper,
-                    url: `https://www.aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
-                  }}
-                />
-              </Box>
+            <Box /* No sticky, no maxH, no overflow */ px={2} py={2} bg="white">
+              <SectionsNav
+                markdownContent={paper.generatedSummary}
+                paper={{
+                  ...paper,
+                  url: `https://www.aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
+                }}
+              />
+
+              <RelatedPapers slug={paper.slug} platform={paper.platform} />
             </Box>
           </GridItem>
 
-          {/* Main Content */}
+          {/* Main Content (no forced scrollbar) */}
           <GridItem w="100%" maxW="100%">
-            <Box
-              id="main-content"
-              maxH={{ base: "none", lg: "100vh" }}
-              overflowY={{ base: "visible", lg: "auto" }}
-              overflowX="hidden"
-              position="relative"
-              css={{
-                "&::-webkit-scrollbar": { display: "none" },
-                msOverflowStyle: "none",
-                scrollbarWidth: "none",
-              }}
-            >
+            <Box id="main-content">
               <Box py={4} pb={{ base: 32, lg: 24 }} px={{ base: 2, md: 4 }}>
                 <PaperContent
                   paper={{
@@ -170,9 +146,9 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                   }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
+                  // No relatedPapers in the main content
                   relatedPapers={[]}
                 />
-                <RelatedPapers slug={paper.slug} platform={paper.platform} />
               </Box>
             </Box>
           </GridItem>
