@@ -17,7 +17,14 @@ import axios from "axios";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
+// Dynamically import RelatedPapers
 const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
+
+// Dynamically import PDFViewer
+const PDFViewer = dynamic(() => import("@/components/PDFViewer"), {
+  ssr: false,
+  loading: () => <p>Loading PDF Viewer...</p>,
+});
 
 import PaperFigures from "../PaperFigures";
 import PaperTables from "../PaperTables";
@@ -27,7 +34,6 @@ import LimitMessage from "@/components/LimitMessage";
 
 import LinkPreview from "./LinkPreview";
 import customTheme from "@/components/MarkdownTheme";
-import PDFViewer from "@/components/PDFViewer";
 
 // Import your auth context and form
 import { useAuth } from "@/context/AuthContext";
@@ -227,13 +233,7 @@ const PaperContent = ({
     hasActiveSubscription || viewCounts?.canViewFullArticle;
 
   return (
-    <Box
-      bg="white"
-      rounded="lg"
-      // Removed forced margin-bottom and forced max-height/overflow
-      p={{ base: 3, md: 6 }}
-      maxW="100%"
-    >
+    <Box bg="white" rounded="lg" p={{ base: 3, md: 6 }} maxW="100%">
       <VStack spacing={5} align="stretch" maxW="100%">
         {/* Paper Title and Info */}
         <Box mb={5} maxW="100%">
@@ -335,8 +335,9 @@ const PaperContent = ({
                 <Heading as="h2" id="full-paper" my={5} size="lg">
                   Full paper
                 </Heading>
-                <PDFViewer url={paper.pdfUrl} />
-                <Text mt={5}>
+
+                {/* Read original link (loaded immediately) */}
+                <Text>
                   Read original:{" "}
                   <Link
                     href={`https://arxiv.org/abs/${paper.arxivId}`}
@@ -351,6 +352,11 @@ const PaperContent = ({
                     <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
                   </Link>
                 </Text>
+
+                {/* Lazy-loaded PDF Viewer */}
+                <Box mt={5}>
+                  <PDFViewer url={paper.pdfUrl} />
+                </Box>
               </Box>
             )}
 
