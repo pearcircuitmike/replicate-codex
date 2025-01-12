@@ -120,7 +120,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
           minH="100vh"
         >
           {/* Left Sidebar */}
-          {/* Left Sidebar */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "200px" }}>
             <Box /* No sticky, no maxH, no overflow */ px={2} py={2} bg="white">
               <SectionsNav
