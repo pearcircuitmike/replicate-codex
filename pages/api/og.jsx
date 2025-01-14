@@ -1,4 +1,5 @@
 // /api/og.js
+
 import { ImageResponse } from "@vercel/og";
 
 export const config = {
@@ -8,7 +9,14 @@ export const config = {
 export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const imageUrl = searchParams.get("image");
+
+    // Get the remote image URL (if provided)
+    const imageUrlParam = searchParams.get("image");
+    // Always use local fallback if no valid image URL is given
+    const finalImageUrl =
+      imageUrlParam && imageUrlParam !== "null"
+        ? imageUrlParam
+        : "/og-fallback.webp";
 
     // Helper function to truncate text
     const truncateWithEllipsis = (text, maxLength) => {
@@ -120,55 +128,31 @@ export default async function handler(req) {
               width: "460px",
             }}
           >
-            {imageUrl && imageUrl !== "null" ? (
-              <div
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                height: "504px",
+                width: "504px",
+                borderRadius: "0px 20px 20px 0px",
+              }}
+            >
+              <img
+                src={finalImageUrl}
+                width="504"
+                height="504"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  height: "504px",
-                  width: "504px",
+                  objectFit: "cover",
+                  backgroundColor: "white",
                   borderRadius: "0px 20px 20px 0px",
                 }}
-              >
-                <img
-                  src={imageUrl}
-                  width="504"
-                  height="504"
-                  style={{
-                    objectFit: "cover",
-                    backgroundColor: "white",
-                    borderRadius: "0px 20px 20px 0px",
-                  }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg";
-                  }}
-                />
-              </div>
-            ) : (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  height: "504px",
-                  width: "504px",
-                  borderRadius: "0px 20px 20px 0px",
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/og-fallback.webp";
                 }}
-              >
-                <img
-                  src="https://cdn.dribbble.com/users/63554/screenshots/10844959/media/d6e4f9ccef4cce39198a4b958d0cb47f.jpg"
-                  style={{
-                    objectFit: "cover",
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "0px 20px 20px 0px",
-                  }}
-                />
-              </div>
-            )}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -179,7 +163,7 @@ export default async function handler(req) {
       width: 1200,
       height: 630,
       quality: 10,
-      contentType: "image/jpeg", // Ensures we get a lossy format
+      contentType: "image/jpeg",
       headers: {
         "Cache-Control":
           "public, s-maxage=86400, stale-while-revalidate=2592000",
