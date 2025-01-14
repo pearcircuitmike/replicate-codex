@@ -3,14 +3,8 @@ import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import MetaTags from "../components/MetaTags";
 import HeroSection from "../components/homepage/HeroSection";
 import StatsSection from "../components/homepage/StatsSection";
-import BenefitsSection from "../components/homepage/BenefitsSection";
 import Testimonials from "../components/homepage/Testimonials";
 import AuthForm from "@/components/AuthForm";
-
-// Lazy load the LandingPageTrending component
-const LandingPageTrending = React.lazy(() =>
-  import("../components/LandingPageTrending")
-);
 
 export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
@@ -76,19 +70,6 @@ export default function Home() {
         </Heading>
         <AuthForm isUpgradeFlow />{" "}
       </Container>
-
-      {/*
-      <Box py={16} width="100%">
-        <Suspense fallback={<Box>Loading trending content...</Box>}>
-          <LandingPageTrending
-            trendingModels={trendingData.models}
-            trendingPapers={trendingData.papers}
-            isLoading={isLoading}
-          />
-        </Suspense>
-      </Box> 
-
-      <BenefitsSection /> */}
 
       <Box bg="gray.100" my={16} py={16} px={8}>
         <Container maxW="8xl">
