@@ -31,8 +31,6 @@ import PaperTables from "../PaperTables";
 import PaperVote from "../PaperVote";
 import TaskTag from "@/components/TaskTag";
 import LimitMessage from "@/components/LimitMessage";
-
-import LinkPreview from "./LinkPreview";
 import customTheme from "@/components/MarkdownTheme";
 
 // Import your auth context and form
@@ -160,7 +158,13 @@ const PaperContent = ({
                   />
                 ),
                 a: ({ href, children }) => (
-                  <LinkPreview href={href}>{children}</LinkPreview>
+                  <Link
+                    href={href}
+                    color="blue.500"
+                    _hover={{ textDecoration: "underline" }}
+                  >
+                    {children}
+                  </Link>
                 ),
                 pre: (props) => (
                   <Box
@@ -189,7 +193,13 @@ const PaperContent = ({
             components={ChakraUIRenderer({
               ...customTheme,
               a: ({ href, children }) => (
-                <LinkPreview href={href}>{children}</LinkPreview>
+                <Link
+                  href={href}
+                  color="blue.500"
+                  _hover={{ textDecoration: "underline" }}
+                >
+                  {children}
+                </Link>
               ),
               h2: (props) => {
                 const id = props.children[0]
@@ -345,6 +355,7 @@ const PaperContent = ({
                     color="blue.500"
                     display="inline-flex"
                     alignItems="center"
+                    _hover={{ textDecoration: "underline" }}
                   >
                     <Text as="span" textDecoration="underline">
                       arXiv:{paper.arxivId}
