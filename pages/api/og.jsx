@@ -10,13 +10,15 @@ export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
 
-    // Get the remote image URL (if provided)
+    // Hardcode the absolute URL for your fallback image
+    const fallbackUrl = "https://www.aimodels.fyi/og-fallback.webp";
+
+    // Look for "image" in the query string
     const imageUrlParam = searchParams.get("image");
-    // Always use local fallback if no valid image URL is given
+
+    // Use fallback if no valid image URL is provided
     const finalImageUrl =
-      imageUrlParam && imageUrlParam !== "null"
-        ? imageUrlParam
-        : "/og-fallback.webp";
+      imageUrlParam && imageUrlParam !== "null" ? imageUrlParam : fallbackUrl;
 
     // Helper function to truncate text
     const truncateWithEllipsis = (text, maxLength) => {
@@ -49,9 +51,10 @@ export default async function handler(req) {
         "#00bcd4", // cyan
         "#009688", // teal
       ];
-      const hash = titleText
-        .split("")
-        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const hash = [...titleText].reduce(
+        (acc, char) => acc + char.charCodeAt(0),
+        0
+      );
       const color1 = colors[hash % colors.length];
       const color2 = colors[(hash + 1) % colors.length];
       return `linear-gradient(to right, ${color1}, ${color2})`;
@@ -149,7 +152,7 @@ export default async function handler(req) {
                 }}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/og-fallback.webp";
+                  e.target.src = fallbackUrl;
                 }}
               />
             </div>
@@ -158,11 +161,11 @@ export default async function handler(req) {
       </div>
     );
 
-    // Return the image as JPEG so 'quality' has a real effect
+    // Return the image as JPEG
     return new ImageResponse(content, {
       width: 1200,
       height: 630,
-      quality: 10,
+      quality: 10, // This often has limited effect, but can stay
       contentType: "image/jpeg",
       headers: {
         "Cache-Control":
