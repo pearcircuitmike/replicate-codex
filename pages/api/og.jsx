@@ -10,13 +10,13 @@ export default async function handler(req) {
   try {
     const { searchParams } = new URL(req.url);
 
-    // Hardcode the absolute URL for your fallback image
-    const fallbackUrl = "https://www.aimodels.fyi/og-fallback.webp";
+    // Hardcode the absolute URL for your fallback image (PNG version)
+    const fallbackUrl = "https://www.aimodels.fyi/og-fallback.png";
 
     // Look for "image" in the query string
     const imageUrlParam = searchParams.get("image");
 
-    // Use fallback if no valid image URL is provided
+    // Use the fallback if no valid image URL is provided
     const finalImageUrl =
       imageUrlParam && imageUrlParam !== "null" ? imageUrlParam : fallbackUrl;
 
@@ -165,7 +165,7 @@ export default async function handler(req) {
     return new ImageResponse(content, {
       width: 1200,
       height: 630,
-      quality: 10, // This often has limited effect, but can stay
+      quality: 10, // This often has minimal effect in practice
       contentType: "image/jpeg",
       headers: {
         "Cache-Control":
