@@ -57,7 +57,7 @@ export default function ReplicateLeaderboard({ topTen }) {
         title="AIModels.fyi - Replicate Leaderboard"
         description="Check out the top Replicate models by run count. Updated daily."
         canonicalUrl="https://www.aimodels.fyi/replicate-leaderboard"
-        socialPreviewImage="/og-fallback.png"
+        socialPreviewImage="https://aimodels.fyi/og-fallback.png"
         socialPreviewTitle="Top 10 Replicate Models"
         socialPreviewSubtitle="Daily updated stats from Replicate"
       />
