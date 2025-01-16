@@ -16,12 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { orderBy } from "lodash-es";
 import AuthForm from "@/components/AuthForm";
-import MetaTags from "@/components/MetaTags"; // <--- Import your MetaTags component
-
-// Example hero image with next/image (optional)
-// If you have an image in your public folder at /images/replicate-leaderboard.png,
-// uncomment and customize the code below.
-// import Image from "next/image";
+import MetaTags from "@/components/MetaTags";
 
 function formatLargeNumber(num) {
   if (!num) return "0";
@@ -57,27 +52,17 @@ export async function getStaticProps() {
 export default function ReplicateLeaderboard({ topTen }) {
   return (
     <>
-      {/* 1. MetaTags component: adjust text and images as you prefer. */}
+      {/* Meta tags with a fallback OG image */}
       <MetaTags
         title="AIModels.fyi - Replicate Leaderboard"
         description="Check out the top Replicate models by run count. Updated daily."
         canonicalUrl="https://www.aimodels.fyi/replicate-leaderboard"
-        socialPreviewImage="https://www.aimodels.fyi/images/replicate-leaderboard.png"
+        socialPreviewImage="/og-fallback.png"
         socialPreviewTitle="Top 10 Replicate Models"
         socialPreviewSubtitle="Daily updated stats from Replicate"
       />
 
       <Container maxW="4xl" py={8}>
-        {/* 2. (Optional) Hero Image at the top */}
-        {/* <Box mb={6} textAlign="center">
-          <Image
-            src="/images/replicate-leaderboard.png"
-            alt="Replicate Leaderboard"
-            width={800}
-            height={300}
-          />
-        </Box> */}
-
         <Heading size="lg" mb={2}>
           Replicate Leaderboard
         </Heading>
@@ -86,7 +71,6 @@ export default function ReplicateLeaderboard({ topTen }) {
           counts. Updated daily. Click on a model&apos;s link to learn more.
         </Text>
 
-        {/* 3. Leaderboard table */}
         <Box overflowX="auto" border="1px solid #ddd" borderRadius="md" mb={8}>
           <Table variant="simple">
             <Thead bg="gray.100">
@@ -100,7 +84,7 @@ export default function ReplicateLeaderboard({ topTen }) {
             <Tbody>
               {topTen.map((model, index) => {
                 const runCountFormatted = formatLargeNumber(model.run_count);
-                // Example URL: /models/replicate/modelName-owner
+                // Example URL format: /models/replicate/modelName-owner
                 const linkHref = `/models/replicate/${encodeURIComponent(
                   model.name
                 )}-${encodeURIComponent(model.owner)}`;
@@ -133,7 +117,6 @@ export default function ReplicateLeaderboard({ topTen }) {
           </Table>
         </Box>
 
-        {/* 4. Signup form */}
         <Box align="center" mt={5}>
           <Heading size="md" my={2}>
             Want to get updates when new models top the charts?
