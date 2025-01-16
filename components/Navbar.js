@@ -54,10 +54,16 @@ const Navbar = () => {
               <Link href="/authors" aria-label="Researchers">
                 Researchers
               </Link>
-
               <Link href="https://notes.aimodels.fyi" aria-label="Notes">
                 Notes
               </Link>
+              <Link
+                href="/replicate-leaderboard"
+                aria-label="Replicate Leaderboard"
+              >
+                Leaderboard
+              </Link>
+
               {user ? (
                 <Menu>
                   <MenuButton>
@@ -88,6 +94,7 @@ const Navbar = () => {
               )}
             </HStack>
           </Flex>
+
           <IconButton
             aria-label="Open Menu"
             size={isMobile ? "md" : "lg"}
@@ -98,6 +105,7 @@ const Navbar = () => {
           />
         </Flex>
 
+        {/* Mobile Menu */}
         <Flex
           w="100vw"
           display={display}
@@ -131,6 +139,7 @@ const Navbar = () => {
               />
             </Flex>
           </HStack>
+
           {user && (
             <>
               <Flex align="center" flexDir="column" mb={isMobile ? 2 : 4}>
@@ -147,6 +156,7 @@ const Navbar = () => {
               <Divider />
             </>
           )}
+
           <Flex flexDir="column" align="center">
             <VStack
               spacing={isMobile ? 2 : 3}
@@ -165,13 +175,20 @@ const Navbar = () => {
               <Link href="/authors" aria-label="Researchers" legacyBehavior>
                 <span onClick={() => changeDisplay("none")}>Researchers</span>
               </Link>
-
               <Link
                 href="https://notes.aimodels.fyi"
                 aria-label="Notes"
                 legacyBehavior
               >
                 <span onClick={() => changeDisplay("none")}>Notes</span>
+              </Link>
+
+              <Link
+                href="/replicate-leaderboard"
+                aria-label="Replicate Leaderboard"
+                legacyBehavior
+              >
+                <span onClick={() => changeDisplay("none")}>Leaderboard</span>
               </Link>
 
               {user && (
