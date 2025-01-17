@@ -1,15 +1,7 @@
 import React from "react";
-import {
-  Box,
-  Heading,
-  Text,
-  Link as ChakraLink,
-  Image,
-  Tag,
-  Flex,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Heading, Text, Tag, Flex, Tooltip } from "@chakra-ui/react";
 import Link from "next/link";
+import NextImage from "next/image";
 import removeMd from "remove-markdown";
 
 import EmojiWithGradient from "../EmojiWithGradient";
@@ -67,18 +59,18 @@ const ModelCard = ({ model, onBookmarkChange }) => {
     >
       <Box h="250px" overflow="hidden" position="relative">
         {model.example ? (
-          <Image
-            src={model.example}
-            alt={model.modelName}
-            objectFit="cover"
-            w="100%"
-            h="100%"
-            loading="lazy"
-          />
+          <Box position="relative" width="100%" height="250px">
+            <NextImage
+              src={model.example}
+              alt={model.modelName}
+              fill
+              style={{ objectFit: "cover" }}
+            />
+          </Box>
         ) : (
           <EmojiWithGradient title={model.modelName} />
         )}
-        <Tooltip label="Calculated based on factors such as likes, downloads, etc">
+        <Tooltip label="Calculated using likes, downloads, and other factors.">
           <Flex
             position="absolute"
             bottom="10px"
@@ -89,11 +81,10 @@ const ModelCard = ({ model, onBookmarkChange }) => {
             alignItems="center"
             boxShadow="md"
           >
-            <Image
+            <img
               src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/robot-face.png"
               alt="Total Score"
-              boxSize="24px"
-              mr={2}
+              style={{ width: "24px", height: "24px", marginRight: "8px" }}
             />
             <Text fontSize="md">
               {formatLargeNumber(Math.floor(model.totalScore))}
