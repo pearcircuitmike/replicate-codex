@@ -66,6 +66,7 @@
     "react-spinners": "^0.13.8",
     "react-table": "^7.8.0",
     "react-window": "^1.8.8",
+    "recharts": "^2.15.0",
     "rehype": "^13.0.2",
     "rehype-stringify": "^10.0.1",
     "remark": "^15.0.1",
