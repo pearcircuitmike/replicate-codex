@@ -95,7 +95,7 @@ export default function ChartArea({
         Leaderboard: {chartHeading} Graph
       </Heading>
       <Text mb={4} fontSize="sm" color="gray.600">
-        This chart shows daily runs for the top-10 models in the {chartHeading}
+        This chart shows daily runs for the top-10 models in the {chartHeading}{" "}
         list
       </Text>
 

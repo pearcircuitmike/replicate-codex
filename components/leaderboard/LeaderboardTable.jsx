@@ -1,5 +1,4 @@
-// components/leaderboard/LeaderboardTable.jsx
-
+// LeaderboardTable.jsx
 import React from "react";
 import {
   Box,
@@ -11,7 +10,7 @@ import {
   Tr,
   Th,
   Td,
-  Link,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import { formatLargeNumber } from "./utils";
 
@@ -39,21 +38,22 @@ export default function LeaderboardTable({
         </Text>
       ) : (
         <Box overflowX="auto" border="1px solid #ddd" borderRadius="md" mb={8}>
-          {/* Use inline style for tableLayout to avoid React warnings */}
-          <Table variant="simple" style={{ tableLayout: "fixed" }}>
+          {/* Let the browser auto-size columns */}
+          <Table variant="simple" width="100%">
             <Thead bg="gray.100">
               <Tr>
-                {/* Make Rank a bit wider so it’s not squished */}
-                <Th width="12%">Rank</Th>
-                <Th width="28%">Model</Th>
-                <Th width="15%">Run count</Th>
-                <Th width="45%">Description</Th>
+                <Th>Rank</Th>
+                <Th>Model</Th>
+                <Th>Run Count</Th>
+                <Th>Description</Th>
               </Tr>
             </Thead>
             <Tbody>
               {models.map((model, index) => {
                 const rawValue = model[runsField] || 0;
                 const runCountFormatted = formatLargeNumber(rawValue);
+
+                // Construct link for your own model route as needed
                 const linkHref = `/models/replicate/${encodeURIComponent(
                   model.name
                 )}-${encodeURIComponent(model.owner)}`;
@@ -65,17 +65,24 @@ export default function LeaderboardTable({
                       {getTrophy(index)}
                     </Td>
                     <Td>
-                      <Link
+                      <ChakraLink
                         href={linkHref}
                         color="blue.500"
                         fontWeight="semibold"
                       >
                         {model.name}
-                      </Link>
+                      </ChakraLink>
                     </Td>
                     <Td>{runCountFormatted}</Td>
-                    <Td noOfLines={2}>
-                      {model.description || "No description"}
+                    <Td>
+                      {/* Wrap the description in a Box so we can clamp lines */}
+                      <Box
+                        noOfLines={2}
+                        whiteSpace="normal"
+                        wordBreak="break-word"
+                      >
+                        {model.description || "No description"}
+                      </Box>
                     </Td>
                   </Tr>
                 );
