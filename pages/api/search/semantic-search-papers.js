@@ -1,7 +1,5 @@
-// pages/api/search/semantic-search-papers.js
-
 import { createClient } from "@supabase/supabase-js";
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -9,11 +7,10 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Initialize OpenAI client with configuration
-const configuration = new Configuration({
+// Initialize OpenAI client
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 /**
  * Helper function to determine the start date based on the timeRange.
@@ -47,14 +44,14 @@ function getStartDate(timeRange) {
  * @returns {Array} - The embedding vector.
  */
 async function createEmbedding(query, signal) {
-  const embeddingResponse = await openai.createEmbedding(
+  const response = await openai.embeddings.create(
     {
-      model: "text-embedding-ada-002", // Ensure the model name is correct
+      model: "text-embedding-ada-002",
       input: query,
     },
-    { signal } // Pass the abort signal to allow cancellation
+    { signal }
   );
-  const [{ embedding }] = embeddingResponse.data.data;
+  const [{ embedding }] = response.data;
   return embedding;
 }
 
@@ -156,7 +153,7 @@ export default async function handler(req, res) {
             throw fuzzyError;
           }
 
-          // Filter out duplicate entries
+          // Filter out duplicates
           const uniqueFuzzyPapers = fuzzyPapers.filter(
             (fuzzy) => !results.some((paper) => paper.id === fuzzy.id)
           );
