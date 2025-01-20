@@ -17,7 +17,7 @@ import {
 import NextLink from "next/link";
 import { useAuth } from "../context/AuthContext";
 import { FaCheckCircle } from "react-icons/fa";
-import Testimonials from "../components/Homepage/Testimonials";
+import Testimonials from "../components/Homepage1/Testimonials";
 import { trackEvent } from "../pages/api/utils/analytics-util";
 import MetaTags from "../components/MetaTags";
 
