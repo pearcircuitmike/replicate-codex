@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     try {
       const { data, error, count } = await supabase
-        .from("weekly_summaries")
+        .from("weekly_summaries_papers")
         .select("*", { count: "exact" })
         .order("created_at", { ascending: false })
         .range(parseInt(offset), parseInt(offset));

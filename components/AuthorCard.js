@@ -1,13 +1,12 @@
 // components/AuthorCard.js
 import React from "react";
-import { Box, Heading, Text, Button, Flex, Image } from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Flex } from "@chakra-ui/react";
 import Link from "next/link";
-import { getMedalEmoji } from "../pages/api/utils/getMedalEmoji";
 
 const getInitials = (name) => {
   const names = name.split(" ");
   const initials = names
-    .map((name) => name.charAt(0))
+    .map((part) => part.charAt(0))
     .slice(0, 2)
     .join("");
   return initials.toUpperCase();
@@ -30,6 +29,19 @@ const getColorByAuthor = (author) => {
     .reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const index = hash % colors.length;
   return colors[index];
+};
+
+const getMedalEmoji = (rank) => {
+  switch (rank) {
+    case 1:
+      return "🥇";
+    case 2:
+      return "🥈";
+    case 3:
+      return "🥉";
+    default:
+      return "";
+  }
 };
 
 const AuthorCard = ({ author, platform }) => {
@@ -87,7 +99,7 @@ const AuthorCard = ({ author, platform }) => {
           <Heading as="h2" size="md" isTruncated mb={2}>
             {author.author}
           </Heading>
-          <Text>Total Score: {author.totalAuthorScore} </Text>
+          <Text>Total Score: {author.totalAuthorScore}</Text>
           <Text>
             Author Rank: {author.authorRank} {medalEmoji}
           </Text>

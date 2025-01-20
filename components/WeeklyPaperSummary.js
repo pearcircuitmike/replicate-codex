@@ -22,7 +22,9 @@ const WeeklySummary = () => {
 
   const fetchSummary = async () => {
     try {
-      const response = await fetch(`/api/weekly-summaries?offset=${offset}`);
+      const response = await fetch(
+        `/api/weekly-summaries-papers?offset=${offset}`
+      );
       const data = await response.json();
       setSummary(data.data);
       setTotalCount(data.totalCount);

@@ -15,9 +15,17 @@ import MetaTags from "../../../components/MetaTags";
 
 // Utilities and components
 import ModelCard from "../../../components/Cards/ModelCard";
-import { toTitleCase } from "@/pages/api/utils/toTitleCase";
 import { fetchCreators } from "../../api/utils/fetchCreatorsPaginated";
-import { fetchModelsByCreator } from "@/pages/api/utils/fetchModelsByCreator";
+import { fetchModelsByCreator } from "../../api/utils/fetchModelsByCreator";
+
+/**
+ * Convert a string to title case.
+ */
+function toTitleCase(str) {
+  return str?.replace(/\w\S*/g, (txt) => {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
 
 /**
  * Get data on every request (Server-Side Rendering).
