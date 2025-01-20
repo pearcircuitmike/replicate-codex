@@ -2,7 +2,7 @@ import React from "react";
 import { Box, VStack } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
-import customTheme from "../../components/MarkdownTheme";
+import customTheme from "../MarkdownTheme";
 
 const ModelOverview = ({ model }) => {
   return (

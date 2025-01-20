@@ -21,20 +21,27 @@ import MetaTags from "@/components/MetaTags";
 
 // Dynamic imports (with SSR disabled in some cases)
 import dynamic from "next/dynamic";
-const SectionsNav = dynamic(() => import("@/components/paper/SectionsNav"));
-const PaperNotes = dynamic(() => import("@/components/notes/PaperNotes"), {
+const SectionsNav = dynamic(() =>
+  import("@/components/PaperDetailsPage/SectionsNav")
+);
+const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
 });
 const ChatWithPaper = dynamic(
-  () => import("@/components/paper/ChatWithPaper"),
+  () => import("@/components/PaperDetailsPage/ChatWithPaper"),
   {
     ssr: false,
   }
 );
-const PaperContent = dynamic(() => import("@/components/paper/PaperContent"));
-const AudioPlayer = dynamic(() => import("@/components/paper/AudioPlayer"), {
-  ssr: false,
-});
+const PaperContent = dynamic(() =>
+  import("@/components/PaperDetailsPage/PaperContent")
+);
+const AudioPlayer = dynamic(
+  () => import("@/components/PaperDetailsPage/AudioPlayer"),
+  {
+    ssr: false,
+  }
+);
 
 import RelatedPapers from "@/components/RelatedPapers";
 import {

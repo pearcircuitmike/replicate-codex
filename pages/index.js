@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { Box, Container, Heading, Text } from "@chakra-ui/react";
 import MetaTags from "../components/MetaTags";
-import HeroSection from "../components/homepage/HeroSection";
-import StatsSection from "../components/homepage/StatsSection";
-import Testimonials from "../components/homepage/Testimonials";
+import HeroSection from "../components/Homepage/HeroSection";
+import StatsSection from "../components/Homepage/StatsSection";
+import Testimonials from "../components/Homepage/Testimonials";
 import AuthForm from "@/components/AuthForm";
 
 export default function Home() {

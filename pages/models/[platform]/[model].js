@@ -24,10 +24,10 @@ import MetaTags from "@/components/MetaTags";
 
 // Dynamic imports for non-meta components
 const ModelDetailsButtons = dynamic(() =>
-  import("@/components/modelDetailsPage/ModelDetailsButtons")
+  import("@/components/ModelDetailsPage/ModelDetailsButtons")
 );
 const ModelOverview = dynamic(() =>
-  import("@/components/modelDetailsPage/ModelOverview")
+  import("@/components/ModelDetailsPage/ModelOverview")
 );
 
 // Regular imports for other components

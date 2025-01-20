@@ -14,9 +14,9 @@ import {
 import { orderBy } from "lodash-es";
 import MetaTags from "@/components/MetaTags";
 import AuthForm from "@/components/AuthForm";
-import ChartArea from "@/components/leaderboard/ChartArea"; // We'll see this below
-import LeaderboardTable from "@/components/leaderboard/LeaderboardTable";
-import { buildSlugMap, daysAgo } from "@/components/leaderboard/dataHelpers";
+import ChartArea from "@/components/Leaderboard/ChartArea"; // We'll see this below
+import LeaderboardTable from "@/components/Leaderboard/LeaderboardTable";
+import { buildSlugMap, daysAgo } from "@/components/Leaderboard/dataHelpers";
 
 export async function getStaticProps() {
   let topTen10d = [];
