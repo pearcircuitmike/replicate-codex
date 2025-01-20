@@ -21,14 +21,17 @@ import dynamic from "next/dynamic";
 const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
 
 // Dynamically import PDFViewer
-const PDFViewer = dynamic(() => import("@/components/PDFViewer"), {
-  ssr: false,
-  loading: () => <p>Loading PDF Viewer...</p>,
-});
+const PDFViewer = dynamic(
+  () => import("@/components/PaperDetailsPage/PDFViewer"),
+  {
+    ssr: false,
+    loading: () => <p>Loading PDF Viewer...</p>,
+  }
+);
 
-import PaperFigures from "../PaperFigures";
-import PaperTables from "../PaperTables";
-import PaperVote from "../PaperVote";
+import PaperFigures from "./PaperFigures";
+import PaperTables from "./PaperTables";
+import PaperVote from "./PaperVote";
 import TaskTag from "@/components/TaskTag";
 import LimitMessage from "@/components/LimitMessage";
 import customTheme from "@/components/MarkdownTheme";
