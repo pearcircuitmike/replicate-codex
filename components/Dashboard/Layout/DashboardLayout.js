@@ -1,3 +1,4 @@
+// /components/Dashboard/Layout/DashboardLayout.js
 import React, { useState } from "react";
 import { Box, Flex, useMediaQuery, VStack, Tooltip } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -10,6 +11,7 @@ import {
   FaStar,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
+  FaUsers, // <-- NEW import for Communities icon
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 
@@ -18,6 +20,7 @@ const DashboardLayout = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
 
+  // Updated navItems array with a "Communities" link
   const navItems = [
     { icon: <FaStar />, label: "Following", href: "/dashboard/followed-tasks" },
     {
@@ -26,6 +29,11 @@ const DashboardLayout = ({ children }) => {
       href: "/dashboard/trending",
     },
     { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
+    {
+      icon: <FaUsers />,
+      label: "Communities",
+      href: "/dashboard/communities", // <-- NEW link
+    },
     {
       icon: <FaFlask />,
       label: "Popular Papers",
@@ -50,9 +58,7 @@ const DashboardLayout = ({ children }) => {
           borderRight="1px solid #e2e8f0"
           transition="all 0.2s"
         >
-          {/* Sidebar Navigation */}
           <VStack spacing={1} align="stretch" mt={12}>
-            {/* Navigation Items */}
             {navItems.map((item) => (
               <Box key={item.href}>
                 {isCollapsed ? (
@@ -81,14 +87,15 @@ const DashboardLayout = ({ children }) => {
               </Box>
             ))}
           </VStack>
-          {/* Collapse Toggle Button */}
+
+          {/* Collapse/Expand Toggle */}
           <Box mt={8}>
             <NavItem
-              label={!isCollapsed && " "} // hack to force alignment... fix later
+              label={!isCollapsed && " "} // spacing hack
               icon={
                 isCollapsed ? <FaAngleDoubleRight /> : <FaAngleDoubleLeft />
               }
-              onClick={() => setIsCollapsed(!isCollapsed)} // Toggle sidebar
+              onClick={() => setIsCollapsed(!isCollapsed)}
             />
           </Box>
         </Box>
@@ -99,7 +106,7 @@ const DashboardLayout = ({ children }) => {
         {children}
       </Box>
 
-      {/* Mobile Footer Navigation */}
+      {/* Mobile Footer Nav */}
       {!isLargerThan768 && (
         <Box
           position="fixed"
@@ -112,7 +119,7 @@ const DashboardLayout = ({ children }) => {
           display="flex"
           alignItems="center"
           justifyContent="space-between"
-          paddingX={4}
+          px={4}
         >
           {navItems.map((item) => (
             <Box

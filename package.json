@@ -39,6 +39,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "crisp-sdk-web": "^1.0.19",
     "date-fns": "^2.30.0",
+    "dayjs": "^1.11.13",
     "dompurify": "^3.1.5",
     "eslint": "8.35.0",
     "fontawesome": "^5.6.3",
