@@ -226,7 +226,7 @@ export default function CommunitiesOnboardingPage() {
           {community.name}
         </Heading>
         <Text fontSize="xs" color="gray.500" mb={1}>
-          Created by {community.created_by || "Unknown"}
+          Created by Mike Young
         </Text>
 
         <Text fontSize="sm" color="gray.700" mb={2}>
