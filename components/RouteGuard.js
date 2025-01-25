@@ -1,3 +1,4 @@
+// /components/RouteGuard.js
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
@@ -28,7 +29,7 @@ export default function RouteGuard({ children }) {
       // Check onboarding
       const { data: userProfile, error: profileError } = await supabase
         .from("profiles")
-        .select("topics_onboarded, roles_onboarded, frequency_onboarded")
+        .select("roles_onboarded, communities_onboarded, frequency_onboarded")
         .eq("id", user.id)
         .single();
 
@@ -37,25 +38,26 @@ export default function RouteGuard({ children }) {
         return;
       }
 
+      // Step 1: Roles
       if (!userProfile.roles_onboarded) {
         console.log("Redirecting to /onboarding/roles");
         await router.push("/onboarding/roles");
         return;
       }
 
-      if (!userProfile.topics_onboarded) {
-        console.log("Redirecting to /onboarding/topics");
-        await router.push("/onboarding/topics");
+      // Step 2: Communities (new step)
+      if (!userProfile.communities_onboarded) {
+        console.log("Redirecting to /onboarding/communities");
+        await router.push("/onboarding/communities");
         return;
       }
 
+      // Step 3: Frequency
       if (!userProfile.frequency_onboarded) {
         console.log("Redirecting to /onboarding/frequency");
         await router.push("/onboarding/frequency");
         return;
       }
-
-      // That's it. No subscription check here.
     };
 
     checkUserRequirements().catch((error) => {

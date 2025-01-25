@@ -100,7 +100,7 @@ const FrequencyPage = () => {
               variant="ghost"
               size="sm"
               leftIcon={<ChevronLeftIcon />}
-              onClick={() => router.push("/onboarding/topics")}
+              onClick={() => router.push("/onboarding/communities")}
             >
               Back
             </Button>

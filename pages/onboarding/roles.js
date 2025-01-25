@@ -193,7 +193,7 @@ export default function RoleSelectionPage() {
       });
 
       if (!response.ok) throw new Error("Failed to update onboarding status");
-      router.push("/onboarding/topics");
+      router.push("/onboarding/communities");
     } catch (error) {
       console.error("Error updating roles:", error);
       toast({
@@ -221,7 +221,7 @@ export default function RoleSelectionPage() {
       });
 
       if (!response.ok) throw new Error("Failed to update onboarding status");
-      router.push("/onboarding/topics");
+      router.push("/onboarding/communities");
     } catch (error) {
       console.error("Error updating onboarding status:", error);
       toast({
