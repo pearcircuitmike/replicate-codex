@@ -12,7 +12,7 @@ const DashboardPage = () => {
   useEffect(() => {
     // Redirect to "Following" page if the user is authenticated
     if (user) {
-      router.replace("/dashboard/followed-tasks");
+      router.replace("/dashboard/communities");
     }
   }, [user, router]);
 
