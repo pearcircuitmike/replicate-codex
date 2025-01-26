@@ -43,11 +43,11 @@ const NoteInput = ({
         onChange={(e) => setNoteText(e.target.value)}
         onKeyDown={handleKeyDown}
         fontSize="sm"
-        placeholder={replyToId ? "Write a reply..." : "Add a new note..."}
+        placeholder={replyToId ? "Write a reply..." : "Add a new comment..."}
         rows={3}
       />
       <Button size="sm" colorScheme="blue" onClick={handleSubmit}>
-        {replyToId ? "Post Reply" : initialValue ? "Save Edit" : "Add Note"}
+        {replyToId ? "Post Reply" : initialValue ? "Save Edit" : "Add Comment"}
       </Button>
     </VStack>
   );
