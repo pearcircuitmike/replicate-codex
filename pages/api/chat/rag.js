@@ -55,8 +55,6 @@ Example image: ${doc.example || "No example provided"}
 Creator: ${doc.creator || "Unknown"}
 Description: ${doc.description || "No description."}
 Tags: ${doc.tags || "None"}
-Model URL: ${doc.modelUrl || "N/A"}
-Paper URL: ${doc.paperUrl || "N/A"}
 Score: ${doc.totalScore || "N/A"}
 Last Updated: ${doc.lastUpdated || "N/A"}
 Slug: ${doc.slug || "N/A"}`;
@@ -75,10 +73,6 @@ Title: ${doc.title || "Untitled"}
 Example image: ${doc.thumbnail || "No example image provided."}
 Authors: ${authors}
 Abstract: ${doc.abstract || "No abstract."}
-arXiv ID: ${doc.arxivId || "N/A"}
-arXiv Categories: ${categories}
-Paper URL: ${doc.paperUrl || "N/A"}
-PDF URL: ${doc.pdfUrl || "N/A"}
 Score: ${doc.totalScore || "N/A"}
 Published Date: ${doc.publishedDate || "N/A"}
 Slug: ${doc.slug || "N/A"}`;
