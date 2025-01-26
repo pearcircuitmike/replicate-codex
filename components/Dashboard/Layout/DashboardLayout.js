@@ -63,7 +63,9 @@ const DashboardLayout = ({ children }) => {
   // 4) Create a helper to get the final label (optionally adding "PRO" if unsubscribed)
   function getNavLabel(originalLabel) {
     const isProFeature =
-      originalLabel === "Popular Papers" || originalLabel === "Popular Models";
+      originalLabel === "Popular Papers" ||
+      originalLabel === "Popular Models" ||
+      originalLabel === "Discover";
     if (!hasActiveSubscription && isProFeature) {
       return (
         <>

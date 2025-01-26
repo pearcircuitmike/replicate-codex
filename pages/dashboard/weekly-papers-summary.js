@@ -35,7 +35,7 @@ const WeeklyPaperSummaryPage = () => {
                 textAlign="center"
               >
                 <Heading as="h3" size="md" mb={4}>
-                  Weekly Papers Summary (Limited Preview)
+                  Weekly Papers Summary
                 </Heading>
                 <Text mb={4}>
                   Subscribe to unlock the full weekly papers summary.

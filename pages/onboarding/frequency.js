@@ -1,3 +1,4 @@
+// pages/onboarding/frequency.js
 import React, { useState } from "react";
 import {
   VStack,
@@ -50,7 +51,7 @@ const FrequencyOption = ({ icon, title, description, isSelected, onClick }) => (
 
 const FrequencyPage = () => {
   const [frequency, setFrequency] = useState("daily");
-  const { user, accessToken } = useAuth();
+  const { user, accessToken, hasActiveSubscription } = useAuth();
   const router = useRouter();
   const toast = useToast();
 
@@ -64,14 +65,20 @@ const FrequencyPage = () => {
         },
         body: JSON.stringify({
           userId: user.id,
+          frequency,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update onboarding status");
+        throw new Error("Failed to update onboarding status.");
       }
 
-      router.push("/dashboard");
+      // Redirect based on subscription
+      if (hasActiveSubscription) {
+        router.push("/dashboard");
+      } else {
+        router.push("/pricing");
+      }
     } catch (error) {
       console.error("Error updating frequency:", error);
       toast({
@@ -86,7 +93,6 @@ const FrequencyPage = () => {
 
   return (
     <>
-      {" "}
       <MetaTags
         title="Choose Update Frequency"
         description="Set your preferred frequency for AI research updates"
@@ -104,10 +110,10 @@ const FrequencyPage = () => {
             >
               Back
             </Button>
-            <Text fontSize="sm" color="gray.600" textAlign="center">
+            <Text fontSize="sm" color="gray.600">
               Step 3 of 4 - Choose Frequency
             </Text>
-            <Box w={16} /> {/* Spacer to maintain centering */}
+            <Box w={16} />
           </Flex>
           <Progress
             value={75}
@@ -123,7 +129,7 @@ const FrequencyPage = () => {
               How often would you like updates?
             </Heading>
             <Text color="gray.600" fontSize="lg">
-              Choose how frequently you&apos;d like to receive research updates
+              Choose how frequently you'd like to receive research updates
             </Text>
           </Box>
 

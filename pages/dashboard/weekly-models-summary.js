@@ -35,7 +35,7 @@ const WeeklyModelSummaryPage = () => {
                 textAlign="center"
               >
                 <Heading as="h3" size="md" mb={4}>
-                  Weekly Models Summary (Limited Preview)
+                  Weekly Models Summary
                 </Heading>
                 <Text mb={4}>
                   Subscribe to unlock full details about the latest AI model
