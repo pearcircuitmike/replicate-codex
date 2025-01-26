@@ -28,7 +28,7 @@ export default function RAGchat() {
   const toast = useToast();
   const { user } = useAuth();
 
-  // We only call handleSubmit. We never manually push to messages.
+  // 1) Let useChat manage conversation state; do *not* add messages yourself.
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       api: "/api/chat/rag",
@@ -40,12 +40,13 @@ export default function RAGchat() {
           duration: 5000,
         });
       },
-      // Only called once the assistant has fully streamed its reply:
+      // 2) onFinish fires once the assistant has fully streamed its response.
       onFinish: (finalAssistantMessage) => {
-        if (user && finalAssistantMessage.role === "assistant") {
+        if (!user) return;
+        if (finalAssistantMessage.role === "assistant") {
+          // Track entire conversation once the final chunk arrives.
           trackEvent("ragchat", {
             userId: user.id,
-            // messages now contains the final assistant response
             messages,
           });
         }
@@ -54,7 +55,7 @@ export default function RAGchat() {
 
   const messagesContainerRef = useRef(null);
 
-  // Keep the view scrolled to the bottom
+  // Keep scroll at bottom when messages update
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -62,9 +63,21 @@ export default function RAGchat() {
     }
   }, [messages]);
 
+  // RAG retrieval
+  async function retrieveModels(query) {
+    const res = await fetch("/api/search/semantic-search-models", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    });
+    if (!res.ok) throw new Error("Failed to retrieve models");
+    return (await res.json())?.data || [];
+  }
+
+  // 3) On user submission, call retrieveModels, then handleSubmit.
+  //    Don't manually push user messages into messages.
   async function handleMessageSend(e) {
     e.preventDefault();
-
     if (!user) {
       toast({
         title: "Please log in to chat.",
@@ -74,17 +87,36 @@ export default function RAGchat() {
       return;
     }
 
-    // Don’t manually insert the new user message into `messages` here.
-    // Just call handleSubmit() with any extra data your API needs:
-    handleSubmit(e, {
-      body: {
-        userId: user.id,
-        // If you need to retrieve models, do so here and pass them along:
-        // ragContext: retrievedModels,
-      },
-    });
+    const userQuery = input.trim();
+    if (!userQuery) return;
+
+    try {
+      const retrieved = await retrieveModels(userQuery);
+
+      // Optionally track just the user’s query, but don’t mutate messages:
+      // trackEvent("ragchat_user_query", {
+      //   userId: user.id,
+      //   userQuery,
+      // });
+
+      // Pass ragContext so the AI can use the retrieved models
+      handleSubmit(e, {
+        body: {
+          userId: user.id,
+          ragContext: retrieved,
+        },
+      });
+    } catch (err) {
+      toast({
+        title: "Error retrieving models",
+        description: err.message,
+        status: "error",
+        duration: 5000,
+      });
+    }
   }
 
+  // Let Enter send the message (without SHIFT)
   function handleKeyDown(e) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -114,7 +146,7 @@ export default function RAGchat() {
           </Text>
         </Box>
 
-        {/* Messages list */}
+        {/* Messages */}
         <Box
           ref={messagesContainerRef}
           flex="1"
