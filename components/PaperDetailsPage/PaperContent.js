@@ -1,5 +1,3 @@
-// components/paper/PaperContent.js
-
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -9,7 +7,6 @@ import {
   Icon,
   VStack,
   Wrap,
-  WrapItem,
   Grid,
   GridItem,
 } from "@chakra-ui/react";
@@ -31,42 +28,21 @@ const PDFViewer = dynamic(
 import PaperFigures from "./PaperFigures";
 import PaperTables from "./PaperTables";
 import PaperVote from "./PaperVote";
-import TaskTag from "@/components/TaskTag";
 import LimitMessage from "@/components/LimitMessage";
 import customTheme from "@/components/MarkdownTheme";
 import { useAuth } from "@/context/AuthContext";
 import AuthForm from "@/components/AuthForm";
 
-const PaperContent = ({
+function PaperContent({
   paper,
   hasActiveSubscription,
   viewCounts,
   relatedPapers,
-}) => {
-  const [paperTasks, setPaperTasks] = useState([]);
+}) {
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchPaperTasks = async () => {
-      if (paper?.id) {
-        try {
-          const response = await axios.get("/api/tasks/get-followed-tasks", {
-            params: { paperId: paper.id },
-          });
-          if (!response.data || !response.data.tasks) {
-            throw new Error("Failed to fetch paper tasks");
-          }
-          setPaperTasks(response.data.tasks);
-        } catch (error) {
-          console.error("Error fetching paper tasks:", error);
-        }
-      }
-    };
-    fetchPaperTasks();
-  }, [paper?.id]);
-
-  // Splits "## Overview" and "## Plain English Explanation" if present
-  const renderContent = (content) => {
+  // Split out “## Overview” and “## Plain English Explanation”
+  function renderContent(content) {
     if (!content) {
       return { overview: null, restOfContent: null };
     }
@@ -137,7 +113,7 @@ const PaperContent = ({
       };
     }
 
-    // No headings found, return all at once
+    // If headings not found
     return {
       overview: null,
       restOfContent: (
@@ -178,7 +154,7 @@ const PaperContent = ({
         </Box>
       ),
     };
-  };
+  }
 
   const { overview, restOfContent } = renderContent(paper.generatedSummary);
 
@@ -189,7 +165,7 @@ const PaperContent = ({
   return (
     <Box bg="white" rounded="lg" p={{ base: 3, md: 6 }} maxW="100%">
       <VStack spacing={5} align="stretch">
-        {/* Header with up/down vote to the left, paper details on the right */}
+        {/* Header with up/down vote on the left, paper details on the right */}
         <Box mb={5}>
           <Grid templateColumns="auto 1fr" gap={4}>
             {/* Left column: up/down vote */}
@@ -197,12 +173,11 @@ const PaperContent = ({
               <PaperVote paperId={paper.id} variant="vertical" size="md" />
             </GridItem>
 
-            {/* Right column: paper title, authors, tasks */}
+            {/* Right column: paper title, authors */}
             <GridItem>
               <Heading as="h1" size="lg" noOfLines={2}>
                 {paper.title}
               </Heading>
-
               <Box fontSize="sm" color="gray.600" mt={1}>
                 <Text as="span">
                   Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
@@ -227,14 +202,6 @@ const PaperContent = ({
                   </Text>
                 )}
               </Box>
-
-              <Wrap spacing={2} mt={4}>
-                {paperTasks.map((task) => (
-                  <WrapItem key={task.id}>
-                    <TaskTag task={task} initialIsFollowed={task.isFollowed} />
-                  </WrapItem>
-                ))}
-              </Wrap>
             </GridItem>
           </Grid>
         </Box>
@@ -314,6 +281,6 @@ const PaperContent = ({
       </VStack>
     </Box>
   );
-};
+}
 
 export default PaperContent;
