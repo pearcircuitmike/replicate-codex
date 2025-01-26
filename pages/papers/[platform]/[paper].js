@@ -1,5 +1,3 @@
-// pages/papers/[platform]/[paper].js
-
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -21,18 +19,14 @@ import MetaTags from "@/components/MetaTags";
 
 // Dynamic imports (with SSR disabled in some cases)
 import dynamic from "next/dynamic";
+
 const SectionsNav = dynamic(() =>
   import("@/components/PaperDetailsPage/SectionsNav")
 );
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
 });
-const ChatWithPaper = dynamic(
-  () => import("@/components/PaperDetailsPage/ChatWithPaper"),
-  {
-    ssr: false,
-  }
-);
+// Removed ChatWithPaper import
 const PaperContent = dynamic(() =>
   import("@/components/PaperDetailsPage/PaperContent")
 );
@@ -128,7 +122,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         >
           {/* Left Sidebar */}
           <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "200px" }}>
-            <Box /* No sticky, no maxH, no overflow */ px={2} py={2} bg="white">
+            <Box px={2} py={2} bg="white">
               <SectionsNav
                 markdownContent={paper.generatedSummary}
                 paper={{
@@ -136,12 +130,11 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                   url: `https://www.aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
                 }}
               />
-
               <RelatedPapers slug={paper.slug} platform={paper.platform} />
             </Box>
           </GridItem>
 
-          {/* Main Content (no forced scrollbar) */}
+          {/* Main Content */}
           <GridItem w="100%" maxW="100%">
             <Box id="main-content">
               <Box py={4} pb={{ base: 32, lg: 24 }} px={{ base: 2, md: 4 }}>
@@ -152,7 +145,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                   }}
                   hasActiveSubscription={hasActiveSubscription}
                   viewCounts={viewCounts}
-                  // No relatedPapers in the main content
                   relatedPapers={[]}
                 />
               </Box>
@@ -190,13 +182,8 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                     <PaperNotes paperId={paper.id} />
                   </Box>
                 </Box>
-                <ChatWithPaper
-                  paperId={paper.id}
-                  paper={{
-                    abstract: paper.abstract,
-                    generatedSummary: paper.generatedSummary,
-                  }}
-                />
+
+                {/* Removed ChatWithPaper component */}
               </Flex>
             </Box>
           </GridItem>
@@ -267,7 +254,7 @@ export async function getStaticProps({ params }) {
   }
 
   // Build a canonical URL on the server
-  const DOMAIN = "https://www.aimodels.fyi"; // adjust if needed
+  const DOMAIN = "https://www.aimodels.fyi";
   const canonicalUrl = `${DOMAIN}/papers/${encodeURIComponent(
     platform
   )}/${encodeURIComponent(slug)}`;
