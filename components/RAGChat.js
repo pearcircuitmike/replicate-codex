@@ -10,6 +10,7 @@ import {
   Image,
   useToast,
   Container,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,13 +23,22 @@ const customMarkdownTheme = ChakraUIRenderer({
   img: ({ src, alt }) => (
     <Image src={src} alt={alt} maxWidth="150px" borderRadius="md" my={4} />
   ),
+  a: ({ href, children }) => (
+    <ChakraLink
+      href={href}
+      color="blue.500"
+      textDecoration="underline"
+      isExternal
+    >
+      {children}
+    </ChakraLink>
+  ),
 });
 
 export default function RAGchat() {
   const toast = useToast();
   const { user } = useAuth();
 
-  // 1) Let useChat manage conversation state; do *not* add messages yourself.
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       api: "/api/chat/rag",
@@ -40,11 +50,8 @@ export default function RAGchat() {
           duration: 5000,
         });
       },
-      // 2) onFinish fires once the assistant has fully streamed its response.
       onFinish: (finalAssistantMessage) => {
-        if (!user) return;
-        if (finalAssistantMessage.role === "assistant") {
-          // Track entire conversation once the final chunk arrives.
+        if (user && finalAssistantMessage.role === "assistant") {
           trackEvent("ragchat", {
             userId: user.id,
             messages,
@@ -55,7 +62,6 @@ export default function RAGchat() {
 
   const messagesContainerRef = useRef(null);
 
-  // Keep scroll at bottom when messages update
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -63,21 +69,37 @@ export default function RAGchat() {
     }
   }, [messages]);
 
-  // RAG retrieval
-  async function retrieveModels(query) {
-    const res = await fetch("/api/search/semantic-search-models", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-    });
-    if (!res.ok) throw new Error("Failed to retrieve models");
-    return (await res.json())?.data || [];
+  async function retrieveModelsAndPapers(query) {
+    const [modelsRes, papersRes] = await Promise.all([
+      fetch("/api/search/semantic-search-models", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      }),
+      fetch("/api/search/semantic-search-papers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      }),
+    ]);
+
+    if (!modelsRes.ok) throw new Error("Failed to retrieve models");
+    if (!papersRes.ok) throw new Error("Failed to retrieve papers");
+
+    const [modelsJson, papersJson] = await Promise.all([
+      modelsRes.json(),
+      papersRes.json(),
+    ]);
+
+    return {
+      models: modelsJson.data || [],
+      papers: papersJson.data || [],
+    };
   }
 
-  // 3) On user submission, call retrieveModels, then handleSubmit.
-  //    Don't manually push user messages into messages.
   async function handleMessageSend(e) {
     e.preventDefault();
+
     if (!user) {
       toast({
         title: "Please log in to chat.",
@@ -91,24 +113,18 @@ export default function RAGchat() {
     if (!userQuery) return;
 
     try {
-      const retrieved = await retrieveModels(userQuery);
+      const retrieved = await retrieveModelsAndPapers(userQuery);
 
-      // Optionally track just the user’s query, but don’t mutate messages:
-      // trackEvent("ragchat_user_query", {
-      //   userId: user.id,
-      //   userQuery,
-      // });
-
-      // Pass ragContext so the AI can use the retrieved models
       handleSubmit(e, {
         body: {
           userId: user.id,
+
           ragContext: retrieved,
         },
       });
     } catch (err) {
       toast({
-        title: "Error retrieving models",
+        title: "Error retrieving data",
         description: err.message,
         status: "error",
         duration: 5000,
@@ -116,7 +132,6 @@ export default function RAGchat() {
     }
   }
 
-  // Let Enter send the message (without SHIFT)
   function handleKeyDown(e) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -127,26 +142,25 @@ export default function RAGchat() {
   const isEmptyChat = messages.length === 0;
 
   return (
-    <Container maxW="container.md" p={0}>
+    <Container maxW="container.8xl" p={0}>
       <Box
         display="flex"
         flexDirection="column"
-        height="80vh"
+        // Responsive height: 80vh on mobile, 85vh on desktop
+        height={{ base: "80vh", md: "85vh" }}
         border="1px solid #ccc"
         borderRadius="md"
       >
-        {/* Header */}
-        <Box p={4} borderBottom="1px solid #e2e2e2">
-          <Text fontSize="2xl" fontWeight="bold">
+        <Box py={2} px={4} borderBottom="1px solid #e2e2e2">
+          <Text fontSize="xl" fontWeight="bold">
             Discover Chat
           </Text>
-          <Text fontSize="md" color="gray.600" mt={1}>
+          <Text fontSize="sm" color="gray.600" mt={1}>
             Describe what you are working on and get models and papers that can
             help.
           </Text>
         </Box>
 
-        {/* Messages */}
         <Box
           ref={messagesContainerRef}
           flex="1"
@@ -156,7 +170,10 @@ export default function RAGchat() {
         >
           {isEmptyChat ? (
             <Box textAlign="center" color="gray.500" mt={8}>
-              <Text>No conversation yet.</Text>
+              <Text mb={3}>Ask a question! Examples...</Text>
+              <Text>What are some good models to colorize a line drawing?</Text>
+              <Text>What is the latest research on ASR error correction?</Text>
+              <Text>Can you explain the multi-armed bandit problem?</Text>
             </Box>
           ) : (
             <VStack align="stretch" spacing={4}>
@@ -181,7 +198,6 @@ export default function RAGchat() {
           )}
         </Box>
 
-        {/* Input form */}
         <Box
           as="form"
           onSubmit={handleMessageSend}

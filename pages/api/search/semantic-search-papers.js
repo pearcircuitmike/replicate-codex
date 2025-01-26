@@ -75,7 +75,7 @@ export default async function handler(req, res) {
       const {
         query = "",
         similarityThreshold = 0.7,
-        matchCount = 20,
+        matchCount = 10,
         timeRange = "allTime",
       } = req.body;
 

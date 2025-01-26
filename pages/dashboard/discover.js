@@ -14,11 +14,11 @@ export default function DiscoverPage() {
   return (
     <>
       <MetaTags
-        title="Discover - RAG Chat"
-        description="Pinned in the main area, never over the sidebar."
+        title="Discover - AImodels.fyi"
+        description="Describe what you are working on and get models and papers that can help."
       />
       <DashboardLayout>
-        <Container maxW="container.xl" py={8}>
+        <Container maxW="8xl">
           <Box>
             {hasActiveSubscription ? (
               <RAGchat />
