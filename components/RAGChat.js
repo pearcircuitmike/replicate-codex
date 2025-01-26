@@ -15,6 +15,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 
+import { trackEvent } from "@/pages/api/utils/analytics-util";
 import { useAuth } from "../context/AuthContext";
 
 const customMarkdownTheme = ChakraUIRenderer({
@@ -27,6 +28,7 @@ export default function RAGchat() {
   const toast = useToast();
   const { user } = useAuth();
 
+  // We only call handleSubmit. We never manually push to messages.
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       api: "/api/chat/rag",
@@ -38,13 +40,21 @@ export default function RAGchat() {
           duration: 5000,
         });
       },
+      // Only called once the assistant has fully streamed its reply:
+      onFinish: (finalAssistantMessage) => {
+        if (user && finalAssistantMessage.role === "assistant") {
+          trackEvent("ragchat", {
+            userId: user.id,
+            // messages now contains the final assistant response
+            messages,
+          });
+        }
+      },
     });
 
-  // This ref will be used for the scrollable container
   const messagesContainerRef = useRef(null);
 
-  // Scroll to bottom whenever messages change,
-  // but only inside the messages container, NOT the entire page.
+  // Keep the view scrolled to the bottom
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -52,18 +62,9 @@ export default function RAGchat() {
     }
   }, [messages]);
 
-  async function retrieveModels(query) {
-    const res = await fetch("/api/search/semantic-search-models", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-    });
-    if (!res.ok) throw new Error("Failed to retrieve models");
-    return (await res.json())?.data || [];
-  }
-
   async function handleMessageSend(e) {
     e.preventDefault();
+
     if (!user) {
       toast({
         title: "Please log in to chat.",
@@ -72,25 +73,16 @@ export default function RAGchat() {
       });
       return;
     }
-    const userQuery = input.trim();
-    if (!userQuery) return;
 
-    try {
-      const retrieved = await retrieveModels(userQuery);
-      handleSubmit(e, {
-        body: {
-          userId: user.id,
-          ragContext: retrieved,
-        },
-      });
-    } catch (err) {
-      toast({
-        title: "Error retrieving models",
-        description: err.message,
-        status: "error",
-        duration: 5000,
-      });
-    }
+    // Don’t manually insert the new user message into `messages` here.
+    // Just call handleSubmit() with any extra data your API needs:
+    handleSubmit(e, {
+      body: {
+        userId: user.id,
+        // If you need to retrieve models, do so here and pass them along:
+        // ragContext: retrievedModels,
+      },
+    });
   }
 
   function handleKeyDown(e) {
@@ -104,7 +96,6 @@ export default function RAGchat() {
 
   return (
     <Container maxW="container.md" p={0}>
-      {/* Give the chat container a fixed height so only it scrolls, not the entire page */}
       <Box
         display="flex"
         flexDirection="column"
@@ -118,12 +109,12 @@ export default function RAGchat() {
             Discover Chat
           </Text>
           <Text fontSize="md" color="gray.600" mt={1}>
-            Describe a what you are working on and get models and papers that
-            can help you.
+            Describe what you are working on and get models and papers that can
+            help.
           </Text>
         </Box>
 
-        {/* Scrollable messages section (use the ref here) */}
+        {/* Messages list */}
         <Box
           ref={messagesContainerRef}
           flex="1"
@@ -141,8 +132,8 @@ export default function RAGchat() {
                 <Box key={i}>
                   <Text
                     fontWeight="bold"
-                    color={msg.role === "assistant" ? "blue.600" : "green.600"}
                     mb={1}
+                    color={msg.role === "assistant" ? "blue.600" : "green.600"}
                   >
                     {msg.role === "assistant" ? "AI" : "You"}
                   </Text>
@@ -158,7 +149,7 @@ export default function RAGchat() {
           )}
         </Box>
 
-        {/* Sticky input bar at the bottom */}
+        {/* Input form */}
         <Box
           as="form"
           onSubmit={handleMessageSend}
