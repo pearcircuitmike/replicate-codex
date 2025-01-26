@@ -10,6 +10,8 @@ import {
   VStack,
   Wrap,
   WrapItem,
+  Grid,
+  GridItem,
 } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
@@ -17,10 +19,7 @@ import axios from "axios";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
-// Dynamically import RelatedPapers
 const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
-
-// Dynamically import PDFViewer
 const PDFViewer = dynamic(
   () => import("@/components/PaperDetailsPage/PDFViewer"),
   {
@@ -35,8 +34,6 @@ import PaperVote from "./PaperVote";
 import TaskTag from "@/components/TaskTag";
 import LimitMessage from "@/components/LimitMessage";
 import customTheme from "@/components/MarkdownTheme";
-
-// Import your auth context and form
 import { useAuth } from "@/context/AuthContext";
 import AuthForm from "@/components/AuthForm";
 
@@ -53,10 +50,8 @@ const PaperContent = ({
     const fetchPaperTasks = async () => {
       if (paper?.id) {
         try {
-          const response = await axios.get(`/api/tasks/get-followed-tasks`, {
-            params: {
-              paperId: paper.id,
-            },
+          const response = await axios.get("/api/tasks/get-followed-tasks", {
+            params: { paperId: paper.id },
           });
           if (!response.data || !response.data.tasks) {
             throw new Error("Failed to fetch paper tasks");
@@ -67,14 +62,10 @@ const PaperContent = ({
         }
       }
     };
-
     fetchPaperTasks();
   }, [paper?.id]);
 
-  /**
-   * Splits the paper content at "## Overview" and "## Plain English Explanation"
-   * so we can render them separately.
-   */
+  // Splits "## Overview" and "## Plain English Explanation" if present
   const renderContent = (content) => {
     if (!content) {
       return { overview: null, restOfContent: null };
@@ -90,37 +81,13 @@ const PaperContent = ({
 
       return {
         overview: (
-          <Box
-            id="overview"
-            bg="gray.100"
-            rounded="lg"
-            p={{ base: 4, md: 6 }}
-            maxW="100%"
-            overflow="hidden"
-          >
+          <Box bg="gray.100" rounded="lg" p={{ base: 4, md: 6 }} maxW="100%">
             <ReactMarkdown
               components={ChakraUIRenderer({
                 ...customTheme,
-                h2: (props) => (
-                  <Heading
-                    {...props}
-                    id="overview"
-                    as="h2"
-                    size="lg"
-                    mb={4}
-                    maxW="100%"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                  />
-                ),
+                h2: (props) => <Heading {...props} as="h2" size="lg" mb={4} />,
                 p: (props) => (
-                  <Text
-                    {...props}
-                    maxW="100%"
-                    overflow="hidden"
-                    wordBreak="break-word"
-                    mb="1.2em"
-                  />
+                  <Text {...props} mb="1.2em" wordBreak="break-word" />
                 ),
               })}
             >
@@ -129,7 +96,7 @@ const PaperContent = ({
           </Box>
         ),
         restOfContent: (
-          <Box maxW="100%" overflow="hidden">
+          <Box maxW="100%">
             <ReactMarkdown
               components={ChakraUIRenderer({
                 ...customTheme,
@@ -145,20 +112,12 @@ const PaperContent = ({
                       size="lg"
                       mt={8}
                       mb={4}
-                      maxW="100%"
-                      overflow="hidden"
                       textOverflow="ellipsis"
                     />
                   );
                 },
                 p: (props) => (
-                  <Text
-                    {...props}
-                    maxW="100%"
-                    overflow="hidden"
-                    wordBreak="break-word"
-                    mb="1.2em"
-                  />
+                  <Text {...props} mb="1.2em" wordBreak="break-word" />
                 ),
                 a: ({ href, children }) => (
                   <Link
@@ -169,15 +128,6 @@ const PaperContent = ({
                     {children}
                   </Link>
                 ),
-                pre: (props) => (
-                  <Box
-                    as="pre"
-                    maxW="100%"
-                    overflow="auto"
-                    whiteSpace="pre-wrap"
-                    {...props}
-                  />
-                ),
               })}
             >
               {restOfContent}
@@ -187,11 +137,11 @@ const PaperContent = ({
       };
     }
 
-    // If we can't find those headings, return the entire content as restOfContent
+    // No headings found, return all at once
     return {
       overview: null,
       restOfContent: (
-        <Box maxW="100%" overflow="hidden">
+        <Box maxW="100%">
           <ReactMarkdown
             components={ChakraUIRenderer({
               ...customTheme,
@@ -216,20 +166,11 @@ const PaperContent = ({
                     size="lg"
                     mt={8}
                     mb={4}
-                    maxW="100%"
-                    overflow="hidden"
                     textOverflow="ellipsis"
                   />
                 );
               },
-              p: (props) => (
-                <Text
-                  {...props}
-                  maxW="100%"
-                  overflow="hidden"
-                  wordBreak="break-word"
-                />
-              ),
+              p: (props) => <Text {...props} wordBreak="break-word" />,
             })}
           >
             {content}
@@ -241,88 +182,82 @@ const PaperContent = ({
 
   const { overview, restOfContent } = renderContent(paper.generatedSummary);
 
-  // If user has a subscription or hasn't hit the limit yet, let them view the content
+  // Only paid or under-free-limit can see the full text
   const canViewContent =
     hasActiveSubscription || viewCounts?.canViewFullArticle;
 
   return (
     <Box bg="white" rounded="lg" p={{ base: 3, md: 6 }} maxW="100%">
-      <VStack spacing={5} align="stretch" maxW="100%">
-        {/* Paper Title and Info */}
-        <Box mb={5} maxW="100%">
-          <Heading
-            as="h1"
-            size="lg"
-            mb={4}
-            maxW="100%"
-            overflow="hidden"
-            textOverflow="ellipsis"
-          >
-            {paper.title}
-          </Heading>
+      <VStack spacing={5} align="stretch">
+        {/* Header with up/down vote to the left, paper details on the right */}
+        <Box mb={5}>
+          <Grid templateColumns="auto 1fr" gap={4}>
+            {/* Left column: up/down vote */}
+            <GridItem>
+              <PaperVote paperId={paper.id} variant="vertical" size="md" />
+            </GridItem>
 
-          <Box fontSize="sm" color="gray.600" maxW="100%" overflow="hidden">
-            <Text as="span">
-              Published {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
-            </Text>
-            {paper.authors && paper.authors.length > 0 && (
-              <Text as="span">
-                {paper.authors.slice(0, 7).map((author, index) => (
-                  <React.Fragment key={index}>
+            {/* Right column: paper title, authors, tasks */}
+            <GridItem>
+              <Heading as="h1" size="lg" noOfLines={2}>
+                {paper.title}
+              </Heading>
+
+              <Box fontSize="sm" color="gray.600" mt={1}>
+                <Text as="span">
+                  Published {new Date(paper.publishedDate).toLocaleDateString()}{" "}
+                  by{" "}
+                </Text>
+                {paper.authors?.slice(0, 7).map((author, idx) => (
+                  <React.Fragment key={author}>
                     <Link
                       href={`/authors/${paper.platform}/${author}`}
                       color="blue.500"
                       _hover={{ textDecoration: "underline" }}
-                      display="inline"
                     >
                       {author}
                     </Link>
-                    {index < 6 && index < paper.authors.length - 1 && ", "}
+                    {idx < 6 && idx < paper.authors.length - 1 && ", "}
                   </React.Fragment>
                 ))}
-                {paper.authors.length > 7 && (
+                {paper.authors?.length > 7 && (
                   <Text as="span">
-                    {` and ${paper.authors.length - 7} more...`}
+                    {" and "}
+                    {paper.authors.length - 7} more...
                   </Text>
                 )}
-              </Text>
-            )}
-          </Box>
+              </Box>
 
-          <Wrap spacing={2} mt={4}>
-            {paperTasks.map((task) => (
-              <WrapItem key={task.id}>
-                <TaskTag task={task} initialIsFollowed={task.isFollowed} />
-              </WrapItem>
-            ))}
-          </Wrap>
+              <Wrap spacing={2} mt={4}>
+                {paperTasks.map((task) => (
+                  <WrapItem key={task.id}>
+                    <TaskTag task={task} initialIsFollowed={task.isFollowed} />
+                  </WrapItem>
+                ))}
+              </Wrap>
+            </GridItem>
+          </Grid>
         </Box>
 
-        {/* Show either the LimitMessage or everything else */}
+        {/* Paywall check */}
         {!canViewContent ? (
           <LimitMessage />
         ) : (
-          <VStack spacing={1} align="stretch" maxW="100%">
+          <VStack spacing={1} align="stretch">
             {/* Overview section */}
             {overview}
 
-            {/* AuthForm shows only if the user is not logged in */}
+            {/* Show signup form if user is not logged in */}
             {!user && (
-              <Box
-                my={6}
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text align="center" fontWeight="bold" my={4} fontSize="lg">
+              <Box my={6} textAlign="center">
+                <Text fontWeight="bold" my={4} fontSize="lg">
                   Get notified when new papers like this one come out!
                 </Text>
                 <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
               </Box>
             )}
 
-            {/* Paper Figures (if any) */}
+            {/* Paper Figures */}
             {paper.paperGraphics?.length > 0 && (
               <Box my={6}>
                 <PaperFigures
@@ -332,24 +267,22 @@ const PaperContent = ({
               </Box>
             )}
 
-            {/* Rest of the content */}
+            {/* Main summary/content */}
             {restOfContent}
 
-            {/* Paper Tables (if any) */}
+            {/* Tables */}
             {paper.paperTables?.length > 0 && (
               <Box px={6} pb={6}>
                 <PaperTables tables={paper.paperTables} />
               </Box>
             )}
 
-            {/* PDF Viewer (if available) */}
+            {/* PDF Viewer */}
             {paper.pdfUrl && (
-              <Box maxW="100%" overflow="hidden" my={6}>
+              <Box my={6}>
                 <Heading as="h2" id="full-paper" my={5} size="lg">
                   Full paper
                 </Heading>
-
-                {/* Read original link (loaded immediately) */}
                 <Text>
                   Read original:{" "}
                   <Link
@@ -366,27 +299,13 @@ const PaperContent = ({
                     <Icon as={FaExternalLinkAlt} ml={1} boxSize={3} />
                   </Link>
                 </Text>
-
-                {/* Lazy-loaded PDF Viewer */}
                 <Box mt={5}>
                   <PDFViewer url={paper.pdfUrl} />
                 </Box>
               </Box>
             )}
 
-            {/* Paper Voting */}
-            <Box
-              mt={8}
-              pt={4}
-              borderTop="1px"
-              borderColor="gray.200"
-              maxW="100%"
-              overflow="hidden"
-            >
-              <PaperVote paperId={paper.id} />
-            </Box>
-
-            {/* Related Papers (bottom) */}
+            {/* Related Papers */}
             <Box mt={8} pt={4} borderTop="1px" borderColor="gray.200">
               <RelatedPapers relatedPapers={relatedPapers} />
             </Box>
