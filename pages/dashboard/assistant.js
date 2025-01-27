@@ -1,4 +1,4 @@
-// pages/dashboard/discover.js
+// pages/dashboard/assistant.js
 import React from "react";
 import { Box, Container, Heading, Text, Button } from "@chakra-ui/react";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
@@ -7,14 +7,14 @@ import RAGchat from "../../components/RAGChat";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/router";
 
-export default function DiscoverPage() {
+export default function AssistantPage() {
   const { hasActiveSubscription } = useAuth();
   const router = useRouter();
 
   return (
     <>
       <MetaTags
-        title="Discover - AImodels.fyi"
+        title="Assistant - AImodels.fyi"
         description="Describe what you are working on and get models and papers that can help."
       />
       <DashboardLayout>
@@ -30,7 +30,8 @@ export default function DiscoverPage() {
                 textAlign="center"
               >
                 <Heading as="h3" size="md" mb={4}>
-                  Discover models that can solve your problem
+                  Chat with the research assistant to find models, papers, and
+                  techniques that can solve your problem
                 </Heading>
                 <Text mb={4}>
                   Subscribe to chat with the largest collection of AI models on

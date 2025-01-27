@@ -218,7 +218,7 @@ const TrendingView = ({ trendingData = {}, hasError = false }) => {
       renderItem: (query) => (
         <ResourceCard
           key={query.id || query.uuid || query.search_query}
-          href={`/dashboard/discover?q=${encodeURIComponent(
+          href={`/dashboard/assistant?q=${encodeURIComponent(
             query.search_query
           )}`}
           title={query.search_query}

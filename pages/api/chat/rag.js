@@ -95,7 +95,11 @@ ${contextString}
 
 User query: ${userQuery || "(not provided)"}
 
-Use only the above context to answer. If unsure, say so. Keep responses concise. Ask for clarification if needed. You can render example images in your response when relevant`;
+Use only the above context to answer. If unsure, say so. 
+You may also suggest workflows that invovle combining multiple models, papers, or methods to help the user solve a problem.
+
+Keep responses concise. Ask for clarification if needed. 
+You can render example images in your response when relevant. Never return markdown headings. `;
 
     // 7) Our final messages to the model
     const messagesToSend = [

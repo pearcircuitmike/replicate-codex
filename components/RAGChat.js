@@ -39,7 +39,8 @@ export default function RAGchat() {
   const toast = useToast();
   const { user } = useAuth();
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+  // Pull in only isLoading from the useChat hook
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } =
     useChat({
       api: "/api/chat/rag",
       onError: (err) => {
@@ -97,8 +98,11 @@ export default function RAGchat() {
     };
   }
 
-  async function handleMessageSend(e) {
+  function handleMessageSend(e) {
     e.preventDefault();
+
+    // If the chat is currently generating, do nothing
+    if (isLoading) return;
 
     if (!user) {
       toast({
@@ -110,29 +114,37 @@ export default function RAGchat() {
     }
 
     const userQuery = input.trim();
-    if (!userQuery) return;
-
-    try {
-      const retrieved = await retrieveModelsAndPapers(userQuery);
-
-      handleSubmit(e, {
-        body: {
-          userId: user.id,
-
-          ragContext: retrieved,
-        },
-      });
-    } catch (err) {
-      toast({
-        title: "Error retrieving data",
-        description: err.message,
-        status: "error",
-        duration: 5000,
-      });
+    if (!userQuery) {
+      return;
     }
+
+    retrieveModelsAndPapers(userQuery)
+      .then((retrieved) => {
+        handleSubmit(e, {
+          body: {
+            userId: user.id,
+            ragContext: retrieved,
+          },
+        });
+      })
+      .catch((err) => {
+        toast({
+          title: "Error retrieving data",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+        });
+      });
   }
 
   function handleKeyDown(e) {
+    // If loading, ignore Enter
+    if (isLoading && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      return;
+    }
+
+    // If not loading, let Enter submit
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleMessageSend(e);
@@ -146,14 +158,13 @@ export default function RAGchat() {
       <Box
         display="flex"
         flexDirection="column"
-        // Responsive height: 80vh on mobile, 85vh on desktop
         height={{ base: "80vh", md: "85vh" }}
         border="1px solid #ccc"
         borderRadius="md"
       >
         <Box py={2} px={4} borderBottom="1px solid #e2e2e2">
           <Text fontSize="xl" fontWeight="bold">
-            Discover Chat
+            Research Assistant
           </Text>
           <Text fontSize="sm" color="gray.600" mt={1}>
             Describe what you are working on and get models and papers that can
@@ -184,7 +195,7 @@ export default function RAGchat() {
                     mb={1}
                     color={msg.role === "assistant" ? "blue.600" : "green.600"}
                   >
-                    {msg.role === "assistant" ? "AI" : "You"}
+                    {msg.role === "assistant" ? "🤖 Assistant" : "You"}
                   </Text>
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -215,9 +226,15 @@ export default function RAGchat() {
             rows={2}
           />
           <Flex justify="flex-end" mt={2}>
-            <Button type="submit" isLoading={isLoading} colorScheme="blue">
-              Send
-            </Button>
+            {isLoading ? (
+              <Button onClick={stop} colorScheme="red">
+                ■ Stop
+              </Button>
+            ) : (
+              <Button type="submit" colorScheme="blue">
+                Send
+              </Button>
+            )}
           </Flex>
         </Box>
       </Box>

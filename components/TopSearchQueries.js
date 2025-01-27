@@ -36,7 +36,7 @@ const TopSearchQueries = ({ onSearchQuery }) => {
       onSearchQuery(query.search_query);
     } else {
       router.push(
-        `/dashboard/discover?q=${encodeURIComponent(query.search_query)}`
+        `/dashboard/assistant?q=${encodeURIComponent(query.search_query)}`
       );
     }
   };

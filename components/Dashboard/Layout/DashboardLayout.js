@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import {
-  FaSearch,
   FaBookmark,
   FaChartLine,
   FaFlask,
@@ -20,6 +19,7 @@ import {
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
   FaUsers,
+  FaRobot,
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 import { useAuth } from "@/context/AuthContext"; // 1) Import useAuth
@@ -40,13 +40,18 @@ const DashboardLayout = ({ children }) => {
       label: "Communities",
       href: "/dashboard/communities",
     },
+    {
+      icon: <FaRobot />,
+      label: "Assistant",
+      href: "/dashboard/assistant",
+    },
     { icon: <FaStar />, label: "Following", href: "/dashboard/followed-tasks" },
     {
       icon: <FaChartLine />,
       label: "Trending Topics",
       href: "/dashboard/trending",
     },
-    { icon: <FaSearch />, label: "Discover", href: "/dashboard/discover" },
+
     {
       icon: <FaFlask />,
       label: "Popular Papers",
@@ -65,7 +70,7 @@ const DashboardLayout = ({ children }) => {
     const isProFeature =
       originalLabel === "Popular Papers" ||
       originalLabel === "Popular Models" ||
-      originalLabel === "Discover";
+      originalLabel === "Assistant";
     if (!hasActiveSubscription && isProFeature) {
       return (
         <>
