@@ -54,7 +54,7 @@ const PricingPage = () => {
   const PricingContent = () => (
     <Box width="100%" maxW="500px" mx="auto">
       <Heading size="xl" mb={6} textAlign="center">
-        Finish setting up your account
+        Upgrade for full access
       </Heading>
 
       <HStack justify="center" mb={4}>
@@ -140,34 +140,26 @@ const PricingPage = () => {
           >
             Start 7-day free trial
           </Button>
-          <List spacing={4} textAlign="left" mt={8} mx={4}>
-            <ListItem>
-              <ListIcon as={FaCheckCircle} color="green.500" />
-              Bookmark resources for easy reference
-            </ListItem>
-            <ListItem>
-              <ListIcon as={FaCheckCircle} color="green.500" />
-              See publication trends
-            </ListItem>
-            <ListItem>
-              <ListIcon as={FaCheckCircle} color="green.500" />
-              See the most-read papers
-            </ListItem>
-            <ListItem>
-              <ListIcon as={FaCheckCircle} color="green.500" />
-              See what other users are searching for
-            </ListItem>
+          <List spacing={4} textAlign="left" marginY={8} mx={4}>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
               Read unlimited summaries
             </ListItem>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
-              Join the Discord
+              Chat with the AI research assistant
             </ListItem>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
-              Get weekly digests of top models and papers
+              Revisit bookmarked articles
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Get a weekly digest of the top research
+            </ListItem>
+            <ListItem>
+              <ListIcon as={FaCheckCircle} color="green.500" />
+              Meet other users in the Discord
             </ListItem>
           </List>
         </Box>
@@ -186,7 +178,7 @@ const PricingPage = () => {
 
       <Container
         maxW="container.xl"
-        h="100vh"
+        h="90vh"
         py={8}
         display="flex"
         flexDirection="column"
@@ -212,14 +204,14 @@ const PricingPage = () => {
             mx="auto"
           >
             <Heading as="h2" fontSize="3xl" mb={4} textAlign="center">
-              What our subscribers say
+              What pro users say
             </Heading>
             <Testimonials />
           </Box>
         </Flex>
-        <Box mt={10} textAlign="center">
-          <Link as={NextLink} href="/">
-            Back to Home
+        <Box textAlign="center">
+          <Link as={NextLink} href="/dashboard">
+            Maybe later (go to dashboard) →
           </Link>
         </Box>
       </Container>
