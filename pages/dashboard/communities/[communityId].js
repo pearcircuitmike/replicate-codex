@@ -1,5 +1,3 @@
-// /pages/dashboard/communities/[communityId].js
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -36,6 +34,9 @@ import TimeRangeFilter from "@/components/Common/TimeRangeFilter";
 import PaperCard from "@/components/Cards/PaperCard";
 import CommunityNotesTab from "@/components/Community/CommunityNotesTab";
 import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
+
+// IMPORT the new modal we’ll create
+import InviteUserModal from "@/components/Community/InviteUserModal";
 
 export default function CommunityDetailPage() {
   const router = useRouter();
@@ -402,14 +403,22 @@ export default function CommunityDetailPage() {
                 </Text>
               </Box>
 
-              {userId && (
-                <JoinLeaveButton
-                  communityId={community.id}
-                  userId={userId}
-                  isMember={isMember}
-                  onToggle={handleToggleMembership}
-                />
-              )}
+              <HStack spacing={3}>
+                {/* We insert the new InviteUserModal here */}
+                {userId && (
+                  <InviteUserModal communityId={community.id} userId={userId} />
+                )}
+
+                {/* Existing membership button */}
+                {userId && (
+                  <JoinLeaveButton
+                    communityId={community.id}
+                    userId={userId}
+                    isMember={isMember}
+                    onToggle={handleToggleMembership}
+                  />
+                )}
+              </HStack>
             </Flex>
 
             <Text fontSize="md" color="gray.700" mb={4}>
