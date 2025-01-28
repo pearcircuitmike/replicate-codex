@@ -8,8 +8,10 @@ import {
   Tag,
   Flex,
   Tooltip,
+  Icon,
 } from "@chakra-ui/react";
 import Link from "next/link";
+import { TriangleUpIcon } from "@chakra-ui/icons";
 import EmojiWithGradient from "../EmojiWithGradient";
 import BookmarkButton from "../BookmarkButton";
 import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
@@ -19,7 +21,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     id,
     title,
     authors,
-    generatedSummary, // Changed from abstract to generatedSummary
+    generatedSummary,
     publishedDate,
     indexedDate,
     thumbnail,
@@ -28,19 +30,19 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     totalScore,
   } = paper;
 
-  // Move cleanAndTruncateSummary inside the component
+  // Helper to clean & truncate the summary text
   const cleanAndTruncateSummary = (summary) => {
     if (!summary) return "No description provided";
 
-    // Remove common headers like ## Overview and ## Model Overview
+    // Remove some headings
     summary = summary
       .replace(/##\s*Overview.*?(\n|$)/gi, "")
       .replace(/##\s*Model\s*Overview.*?(\n|$)/gi, "");
 
-    // Remove all Markdown syntax (e.g., `**bold**`, `*italic*`, `- lists`, etc.)
+    // Strip Markdown syntax
     summary = summary.replace(/(\*|_|`|~|#|\[.*?\]\(.*?\)|-|\>|\!.*?)/g, "");
 
-    // Remove excess whitespace and trim
+    // Remove extra whitespace
     summary = summary.replace(/\s+/g, " ").trim();
 
     // Take first 3 non-empty lines
@@ -52,11 +54,13 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       : lines.join(" ");
   };
 
+  // Check if newly indexed
   const isNew = React.useMemo(() => {
     const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
     return new Date(indexedDate) >= seventyTwoHoursAgo;
   }, [indexedDate]);
 
+  // Format date
   const formattedDate = React.useMemo(
     () => new Date(publishedDate).toLocaleDateString(),
     [publishedDate]
@@ -99,7 +103,9 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         ) : (
           <EmojiWithGradient title={title} />
         )}
-        <Tooltip label="Calculated based on factors such as likes, downloads, etc">
+
+        {/* Show totalScore + up-arrow instead of a flame icon */}
+        <Tooltip label="Total upvote score">
           <Flex
             position="absolute"
             bottom="10px"
@@ -110,18 +116,14 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
             alignItems="center"
             boxShadow="md"
           >
-            <Image
-              src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/fire.png"
-              alt="Total Score"
-              boxSize="16px"
-              mr={1}
-            />
+            <Icon as={TriangleUpIcon} color="gray.500" boxSize="16px" mr={1} />
             <Text fontSize="sm" fontWeight="bold">
               {formatLargeNumber(Math.floor(totalScore))}
             </Text>
           </Flex>
         </Tooltip>
       </Box>
+
       <Box p="15px">
         <Heading
           as="h3"
@@ -154,6 +156,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           Read more
         </Text>
       </Box>
+
       <Flex
         justify="space-between"
         mt="auto"

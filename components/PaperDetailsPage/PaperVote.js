@@ -1,4 +1,3 @@
-// components/PaperVote.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Button,
@@ -20,12 +19,11 @@ const PaperVote = ({
 }) => {
   const [vote, setVote] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { user, accessToken } = useAuth();
   const toast = useToast();
   const [isMobile] = useMediaQuery("(max-width: 768px)");
 
-  // Fetch user's vote and paper totalScore
   const checkVoteStatus = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -37,18 +35,16 @@ const PaperVote = ({
       const response = await fetch(`/api/get-vote-status?paperId=${paperId}`, {
         headers,
       });
-
       if (!response.ok) {
         throw new Error("Failed to check vote status");
       }
 
       const data = await response.json();
-      // Only set user vote if they're logged in
       if (user) {
         setVote(data.userVote || 0);
       }
-      // Always set the total score from the paper record
-      setTotalScore(data.totalScore || 0);
+      // If data.totalScore is a string, parse it, otherwise just use 0 as fallback
+      setTotalScore(parseFloat(data.totalScore) || 0);
     } catch (error) {
       console.error("Error checking vote status:", error);
       toast({
@@ -60,13 +56,12 @@ const PaperVote = ({
     } finally {
       setIsLoading(false);
     }
-  }, [user, accessToken, paperId, toast]);
+  }, [paperId, user, accessToken, toast]);
 
   useEffect(() => {
     checkVoteStatus();
   }, [checkVoteStatus]);
 
-  // Handle user clicking up/down vote
   const handleVote = async (newVote) => {
     if (!user) {
       toast({
@@ -79,10 +74,10 @@ const PaperVote = ({
       return;
     }
 
-    if (isLoading) return;
+    if (isLoading) return; // Prevent double-click if desired
+
     setIsLoading(true);
 
-    // For immediate UI response, update local state
     const oldVote = vote;
     const finalVote = oldVote === newVote ? 0 : newVote;
     setVote(finalVote);
@@ -101,11 +96,10 @@ const PaperVote = ({
         throw new Error("Vote failed");
       }
 
-      // DB trigger updates totalScore, so refetch to see the new total
+      // Re-fetch the new total score
       await checkVoteStatus();
     } catch (error) {
-      console.error("Error voting:", error);
-      // Revert local vote on error
+      console.error("Error recording vote:", error);
       setVote(oldVote);
       toast({
         title: "Error recording vote",
@@ -118,12 +112,14 @@ const PaperVote = ({
     }
   };
 
-  // Button size maps
+  // Button sizing
   const buttonSizes = { sm: "xs", md: "sm", lg: "md" };
+  // Text sizing
   const scoreSizes = { sm: "xs", md: "sm", lg: "md" };
+
+  // Container can be row or column
   const Container = variant === "horizontal" ? HStack : VStack;
 
-  // "compact" layout
   if (variant === "compact") {
     return (
       <HStack spacing={1} align="center" {...containerProps}>
@@ -133,24 +129,26 @@ const PaperVote = ({
           cursor="pointer"
           onClick={() => handleVote(1)}
           boxSize={size === "sm" ? 3 : size === "md" ? 4 : 5}
+          opacity={isLoading ? 0.6 : 1}
         />
+        {/* Rounded score here */}
         <Text fontSize={scoreSizes[size]} fontWeight="medium">
-          {totalScore}
+          {Math.round(totalScore)}
         </Text>
       </HStack>
     );
   }
 
-  // "vertical" (default) or "horizontal" layout
   return (
     <Container spacing={1} align="center" {...containerProps}>
       <Button
         onClick={() => handleVote(1)}
-        isLoading={isLoading}
         variant="ghost"
         size={buttonSizes[size]}
         w={variant === "horizontal" ? "auto" : "full"}
         aria-label="Upvote"
+        isDisabled={isLoading}
+        opacity={isLoading ? 0.6 : 1}
       >
         <Icon
           as={TriangleUpIcon}
@@ -158,17 +156,19 @@ const PaperVote = ({
         />
       </Button>
 
+      {/* Use Math.round() so it’s a whole number */}
       <Text fontSize={scoreSizes[size]} fontWeight="medium">
-        {totalScore}
+        {Math.round(totalScore)}
       </Text>
 
       <Button
         onClick={() => handleVote(-1)}
-        isLoading={isLoading}
         variant="ghost"
         size={buttonSizes[size]}
         w={variant === "horizontal" ? "auto" : "full"}
         aria-label="Downvote"
+        isDisabled={isLoading}
+        opacity={isLoading ? 0.6 : 1}
       >
         <Icon
           as={TriangleDownIcon}
