@@ -30,15 +30,18 @@ export default function CommunitiesPage() {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // My vs. other communities
+  // "My" vs. "other" communities
   const [myCommunities, setMyCommunities] = useState([]);
   const [otherCommunities, setOtherCommunities] = useState([]);
 
   // Keep track of which communities the user is in
   const [memberSet, setMemberSet] = useState(new Set());
 
-  // For avatar previews
+  // Community ID -> up to 5 avatar objects
   const [avatarMap, setAvatarMap] = useState({});
+
+  // Community ID -> total membership count
+  const [membershipCountMap, setMembershipCountMap] = useState({});
 
   //=============================================================
   // 1) On mount, get user
@@ -68,7 +71,7 @@ export default function CommunitiesPage() {
   const loadCommunitiesData = async () => {
     setLoading(true);
     try {
-      // A) Fetch communities + tasks in one query
+      // A) Fetch communities + tasks
       const { data: allComms, error: commErr } = await supabase
         .from("communities")
         .select(
@@ -93,6 +96,7 @@ export default function CommunitiesPage() {
         setOtherCommunities([]);
         setMemberSet(new Set());
         setAvatarMap({});
+        setMembershipCountMap({});
         setLoading(false);
         return;
       }
@@ -108,7 +112,7 @@ export default function CommunitiesPage() {
 
       const userMemberSet = new Set(memberships.map((m) => m.community_id));
 
-      // Partition "my communities" vs. "others"
+      // Split into "my" vs. "other" communities
       const mine = [];
       const others = [];
       for (const c of allComms) {
@@ -119,7 +123,7 @@ export default function CommunitiesPage() {
         }
       }
 
-      // C) For avatar previews, gather membership data
+      // C) Gather membership data (which user is in which community)
       const commIds = allComms.map((c) => c.id);
       const { data: allRows, error: allRowsErr } = await supabase
         .from("community_members")
@@ -129,24 +133,34 @@ export default function CommunitiesPage() {
 
       if (allRowsErr) throw allRowsErr;
 
-      // Up to 5 user IDs per community
-      const partialIdsMap = {};
+      // Collect *all* user IDs per community
+      const membershipMap = {};
       for (const row of allRows) {
-        if (!partialIdsMap[row.community_id]) {
-          partialIdsMap[row.community_id] = [];
+        if (!membershipMap[row.community_id]) {
+          membershipMap[row.community_id] = [];
         }
-        if (partialIdsMap[row.community_id].length < 5) {
-          partialIdsMap[row.community_id].push(row.user_id);
-        }
+        membershipMap[row.community_id].push(row.user_id);
       }
 
-      // Unique user IDs
-      const uniqueUserIds = new Set();
-      Object.values(partialIdsMap).forEach((arr) =>
-        arr.forEach((uid) => uniqueUserIds.add(uid))
-      );
+      // D) Fetch total membership counts (aggregate)
+      const { data: membershipCounts, error: countErr } = await supabase
+        .from("community_members")
+        .select("community_id", { count: "exact", head: false })
+        .in("community_id", commIds)
+        .group("community_id");
 
-      // D) Fetch profile info for those user IDs
+      if (countErr) throw countErr;
+
+      const countMap = {};
+      membershipCounts.forEach((item) => {
+        // "item.count" holds the total for that community
+        countMap[item.community_id] = item.count;
+      });
+
+      // E) Collect unique user IDs for avatar info
+      const uniqueUserIds = new Set(allRows.map((r) => r.user_id));
+
+      // F) Fetch profile info for those user IDs
       const { data: profileRows, error: profErr } = await supabase
         .from("public_profile_info")
         .select("id, full_name, avatar_url, username")
@@ -165,10 +179,12 @@ export default function CommunitiesPage() {
         };
       });
 
-      // Build avatar map
+      // G) Build avatar map (show up to 5 avatars per community)
       const newAvatarMap = {};
-      for (const [cId, userIds] of Object.entries(partialIdsMap)) {
-        newAvatarMap[cId] = userIds.map((uid) => ({
+      for (const cId of Object.keys(membershipMap)) {
+        const userIds = membershipMap[cId];
+        const topFive = userIds.slice(0, 5);
+        newAvatarMap[cId] = topFive.map((uid) => ({
           user_id: uid,
           avatar_url: profileMap[uid]?.avatar_url || "",
           full_name: profileMap[uid]?.full_name || "Anonymous",
@@ -180,6 +196,7 @@ export default function CommunitiesPage() {
       setMyCommunities(mine);
       setOtherCommunities(others);
       setAvatarMap(newAvatarMap);
+      setMembershipCountMap(countMap);
     } catch (err) {
       console.error("loadCommunitiesData error:", err);
       toast({ title: "Error loading communities", status: "error" });
@@ -218,17 +235,24 @@ export default function CommunitiesPage() {
   //=============================================================
   function CommunityCard({ community }) {
     const isMember = memberSet.has(community.id);
+
+    // Up to 5 avatar objects
     const previewArr = avatarMap[community.id] || [];
 
-    // Show up to 3 avatar previews
-    const shown = previewArr.slice(0, 3);
-    const leftover = previewArr.length > 3 ? previewArr.length - 3 : 0;
+    // True total number of members
+    const totalMembers = membershipCountMap[community.id] || 0;
+
+    // We'll show up to 5 avatars
+    const shown = previewArr.slice(0, 5);
+
+    // leftover = totalMembers - 5 if the community has more than 5
+    const leftover = totalMembers > 5 ? totalMembers - 5 : 0;
 
     const handleCardClick = () => {
       router.push(`/dashboard/communities/${community.id}`);
     };
 
-    // Access the tasks array
+    // The tasks array
     const { community_tasks: commTasks } = community;
 
     return (
@@ -253,19 +277,17 @@ export default function CommunitiesPage() {
           {community.description || "No description provided."}
         </Text>
 
-        {/* Display tasks if we have any */}
+        {/* Show tasks if available */}
         {commTasks && commTasks.length > 0 ? (
-          <>
-            <Wrap mb={4}>
-              {commTasks.map((ct) => (
-                <WrapItem key={ct.task_id}>
-                  <Tag variant="subtle" colorScheme="blue">
-                    <TagLabel>{ct.tasks?.task || "Unknown Task"}</TagLabel>
-                  </Tag>
-                </WrapItem>
-              ))}
-            </Wrap>
-          </>
+          <Wrap mb={4}>
+            {commTasks.map((ct) => (
+              <WrapItem key={ct.task_id}>
+                <Tag variant="subtle" colorScheme="blue">
+                  <TagLabel>{ct.tasks?.task || "Unknown Task"}</TagLabel>
+                </Tag>
+              </WrapItem>
+            ))}
+          </Wrap>
         ) : (
           <Text fontSize="sm" color="gray.500" mb={3}>
             (No tasks linked)
@@ -289,7 +311,7 @@ export default function CommunitiesPage() {
           )}
         </Flex>
 
-        {/* Join/Leave button */}
+        {/* Join or Leave button */}
         <Box
           onClick={(e) => {
             e.stopPropagation();
@@ -333,11 +355,11 @@ export default function CommunitiesPage() {
                 My Communities
               </Heading>
               <Text fontSize="sm" color="gray.500" mb={4}>
-                Communities you&apos;ve already joined
+                Communities you’ve already joined
               </Text>
               {myCommunities.length === 0 ? (
                 <Text fontSize="sm" mb={6}>
-                  You haven&apos;t joined any community yet.
+                  You haven’t joined any community yet.
                 </Text>
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4} mb={8}>
