@@ -294,7 +294,8 @@ export default function CommunitiesPage() {
           ))}
           {leftover > 0 && (
             <Text fontSize="sm" color="gray.500" ml={3}>
-              +{leftover} more
+              {" "}
+              + {leftover} more
             </Text>
           )}
         </Flex>
