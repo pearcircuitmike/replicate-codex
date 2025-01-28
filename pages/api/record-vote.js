@@ -9,46 +9,44 @@ export default async function handler(req, res) {
   const token = req.headers.authorization?.split(" ")[1];
   const { paperId, vote } = req.body;
 
-  if (!token) {
-    return res.status(401).json({ error: "No authorization token provided" });
-  }
-
-  if (!paperId || ![-1, 0, 1].includes(vote)) {
-    return res.status(400).json({ error: "Invalid vote parameters" });
+  if (!paperId || typeof vote !== "number") {
+    return res
+      .status(400)
+      .json({ error: "Paper ID and numeric vote required" });
   }
 
   try {
+    // Confirm user is logged in
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return res.status(401).json({ error: "Invalid or expired token" });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { data, error } = await supabase
+    // Insert or update the user’s vote
+    const { error: upsertError } = await supabase
       .from("user_paper_votes")
       .upsert(
         {
           user_id: user.id,
           paper_id: paperId,
-          vote: vote,
-          updated_at: new Date().toISOString(),
+          vote,
         },
-        { onConflict: "user_id,paper_id" }
+        { onConflict: "user_id, paper_id" }
       )
-      .select()
       .single();
 
-    if (error) throw error;
+    if (upsertError) {
+      throw upsertError;
+    }
 
-    res.status(200).json({
-      message: "Vote recorded successfully",
-      vote: data,
-    });
+    // DB trigger automatically updates arxivPapersData.totalScore
+    return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error recording vote:", error);
-    res.status(500).json({ error: "Failed to record vote" });
+    return res.status(500).json({ error: "Failed to record vote" });
   }
 }

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     let userVote = 0;
 
-    // Get user's vote if they're authenticated
+    // 1. If user is logged in, look up their vote
     if (token) {
       const {
         data: { user },
@@ -24,36 +24,42 @@ export default async function handler(req, res) {
       } = await supabase.auth.getUser(token);
 
       if (!authError && user) {
-        const { data: voteData } = await supabase
+        const { data: voteData, error: voteError } = await supabase
           .from("user_paper_votes")
           .select("vote")
           .eq("user_id", user.id)
           .eq("paper_id", paperId)
           .single();
 
+        if (voteError) {
+          throw voteError;
+        }
         if (voteData) {
           userVote = voteData.vote;
         }
       }
     }
 
-    // Get total score (this should happen regardless of auth status)
-    const { data: totalData, error: totalError } = await supabase
-      .from("user_paper_votes")
-      .select("vote")
-      .eq("paper_id", paperId);
+    // 2. Fetch paper’s totalScore from arxivPapersData
+    const { data: paperData, error: paperError } = await supabase
+      .from("arxivPapersData")
+      .select("totalScore")
+      .eq("id", paperId)
+      .single();
 
-    if (totalError) throw totalError;
+    if (paperError) {
+      throw paperError;
+    }
 
-    // Calculate total score
-    const totalScore = totalData.reduce((sum, record) => sum + record.vote, 0);
+    // If the column is null, default to 0
+    const totalScore = paperData?.totalScore || 0;
 
-    res.status(200).json({
+    return res.status(200).json({
       userVote,
       totalScore,
     });
   } catch (error) {
-    console.error("Error getting vote status:", error);
-    res.status(500).json({ error: "Failed to get vote status" });
+    console.error("Error fetching vote status:", error);
+    return res.status(500).json({ error: "Failed to get vote status" });
   }
 }

@@ -1,6 +1,6 @@
+// components/PaperVote.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  Box,
   Button,
   Icon,
   useToast,
@@ -19,27 +19,36 @@ const PaperVote = ({
   containerProps = {},
 }) => {
   const [vote, setVote] = useState(0);
-  const [score, setScore] = useState(0);
+  const [totalScore, setTotalScore] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const { user, accessToken } = useAuth();
   const toast = useToast();
   const [isMobile] = useMediaQuery("(max-width: 768px)");
 
+  // Fetch user's vote and paper totalScore
   const checkVoteStatus = useCallback(async () => {
+    setIsLoading(true);
     try {
       const headers = {};
       if (accessToken) {
         headers.Authorization = `Bearer ${accessToken}`;
       }
+
       const response = await fetch(`/api/get-vote-status?paperId=${paperId}`, {
         headers,
       });
-      if (!response.ok) throw new Error("Failed to check vote status");
+
+      if (!response.ok) {
+        throw new Error("Failed to check vote status");
+      }
+
       const data = await response.json();
+      // Only set user vote if they're logged in
       if (user) {
         setVote(data.userVote || 0);
       }
-      setScore(data.totalScore || 0);
+      // Always set the total score from the paper record
+      setTotalScore(data.totalScore || 0);
     } catch (error) {
       console.error("Error checking vote status:", error);
       toast({
@@ -57,6 +66,7 @@ const PaperVote = ({
     checkVoteStatus();
   }, [checkVoteStatus]);
 
+  // Handle user clicking up/down vote
   const handleVote = async (newVote) => {
     if (!user) {
       toast({
@@ -68,15 +78,14 @@ const PaperVote = ({
       });
       return;
     }
+
     if (isLoading) return;
-
     setIsLoading(true);
-    const oldVote = vote;
-    const oldScore = score;
-    const finalVote = oldVote === newVote ? 0 : newVote;
 
+    // For immediate UI response, update local state
+    const oldVote = vote;
+    const finalVote = oldVote === newVote ? 0 : newVote;
     setVote(finalVote);
-    setScore(score + finalVote - oldVote);
 
     try {
       const response = await fetch("/api/record-vote", {
@@ -85,18 +94,19 @@ const PaperVote = ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          paperId,
-          vote: finalVote,
-        }),
+        body: JSON.stringify({ paperId, vote: finalVote }),
       });
 
-      if (!response.ok) throw new Error("Vote failed");
+      if (!response.ok) {
+        throw new Error("Vote failed");
+      }
+
+      // DB trigger updates totalScore, so refetch to see the new total
       await checkVoteStatus();
     } catch (error) {
       console.error("Error voting:", error);
+      // Revert local vote on error
       setVote(oldVote);
-      setScore(oldScore);
       toast({
         title: "Error recording vote",
         status: "error",
@@ -108,20 +118,12 @@ const PaperVote = ({
     }
   };
 
-  const buttonSizes = {
-    sm: "xs",
-    md: "sm",
-    lg: "md",
-  };
-
-  const scoreSizes = {
-    sm: "xs",
-    md: "sm",
-    lg: "md",
-  };
-
+  // Button size maps
+  const buttonSizes = { sm: "xs", md: "sm", lg: "md" };
+  const scoreSizes = { sm: "xs", md: "sm", lg: "md" };
   const Container = variant === "horizontal" ? HStack : VStack;
 
+  // "compact" layout
   if (variant === "compact") {
     return (
       <HStack spacing={1} align="center" {...containerProps}>
@@ -133,12 +135,13 @@ const PaperVote = ({
           boxSize={size === "sm" ? 3 : size === "md" ? 4 : 5}
         />
         <Text fontSize={scoreSizes[size]} fontWeight="medium">
-          {score}
+          {totalScore}
         </Text>
       </HStack>
     );
   }
 
+  // "vertical" (default) or "horizontal" layout
   return (
     <Container spacing={1} align="center" {...containerProps}>
       <Button
@@ -154,9 +157,11 @@ const PaperVote = ({
           color={vote === 1 ? "orange.500" : "gray.500"}
         />
       </Button>
+
       <Text fontSize={scoreSizes[size]} fontWeight="medium">
-        {score}
+        {totalScore}
       </Text>
+
       <Button
         onClick={() => handleVote(-1)}
         isLoading={isLoading}
