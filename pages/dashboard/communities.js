@@ -30,17 +30,17 @@ export default function CommunitiesPage() {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // "My" vs. "other" communities
+  // My vs. other communities
   const [myCommunities, setMyCommunities] = useState([]);
   const [otherCommunities, setOtherCommunities] = useState([]);
 
   // Keep track of which communities the user is in
   const [memberSet, setMemberSet] = useState(new Set());
 
-  // Community ID -> up to 5 avatar objects
+  // Community ID => up to 5 avatar objects
   const [avatarMap, setAvatarMap] = useState({});
 
-  // Community ID -> total membership count
+  // Community ID => total membership count
   const [membershipCountMap, setMembershipCountMap] = useState({});
 
   //=============================================================
@@ -90,7 +90,6 @@ export default function CommunitiesPage() {
         .limit(100);
 
       if (commErr) throw commErr;
-
       if (!allComms || allComms.length === 0) {
         setMyCommunities([]);
         setOtherCommunities([]);
@@ -112,7 +111,7 @@ export default function CommunitiesPage() {
 
       const userMemberSet = new Set(memberships.map((m) => m.community_id));
 
-      // Split into "my" vs. "other" communities
+      // Split into "mine" vs "others"
       const mine = [];
       const others = [];
       for (const c of allComms) {
@@ -123,7 +122,7 @@ export default function CommunitiesPage() {
         }
       }
 
-      // C) Gather membership data (which user is in which community)
+      // C) Fetch all membership rows for these communities
       const commIds = allComms.map((c) => c.id);
       const { data: allRows, error: allRowsErr } = await supabase
         .from("community_members")
@@ -133,7 +132,7 @@ export default function CommunitiesPage() {
 
       if (allRowsErr) throw allRowsErr;
 
-      // Collect *all* user IDs per community
+      // Build membershipMap => array of user IDs per community
       const membershipMap = {};
       for (const row of allRows) {
         if (!membershipMap[row.community_id]) {
@@ -142,25 +141,16 @@ export default function CommunitiesPage() {
         membershipMap[row.community_id].push(row.user_id);
       }
 
-      // D) Fetch total membership counts (aggregate)
-      const { data: membershipCounts, error: countErr } = await supabase
-        .from("community_members")
-        .select("community_id", { count: "exact", head: false })
-        .in("community_id", commIds)
-        .group("community_id");
-
-      if (countErr) throw countErr;
-
+      // Build the membershipCountMap in memory
       const countMap = {};
-      membershipCounts.forEach((item) => {
-        // "item.count" holds the total for that community
-        countMap[item.community_id] = item.count;
-      });
+      for (const [cId, userIds] of Object.entries(membershipMap)) {
+        countMap[cId] = userIds.length;
+      }
 
-      // E) Collect unique user IDs for avatar info
+      // D) Gather all unique user IDs
       const uniqueUserIds = new Set(allRows.map((r) => r.user_id));
 
-      // F) Fetch profile info for those user IDs
+      // E) Fetch profile info for those user IDs
       const { data: profileRows, error: profErr } = await supabase
         .from("public_profile_info")
         .select("id, full_name, avatar_url, username")
@@ -179,7 +169,7 @@ export default function CommunitiesPage() {
         };
       });
 
-      // G) Build avatar map (show up to 5 avatars per community)
+      // F) Build the avatarMap (first 5 users for each community)
       const newAvatarMap = {};
       for (const cId of Object.keys(membershipMap)) {
         const userIds = membershipMap[cId];
@@ -236,23 +226,22 @@ export default function CommunitiesPage() {
   function CommunityCard({ community }) {
     const isMember = memberSet.has(community.id);
 
-    // Up to 5 avatar objects
+    // Up to 5 avatars
     const previewArr = avatarMap[community.id] || [];
 
-    // True total number of members
+    // Real total membership
     const totalMembers = membershipCountMap[community.id] || 0;
 
-    // We'll show up to 5 avatars
+    // Shown avatars (up to 5)
     const shown = previewArr.slice(0, 5);
-
-    // leftover = totalMembers - 5 if the community has more than 5
+    // Leftover count
     const leftover = totalMembers > 5 ? totalMembers - 5 : 0;
 
     const handleCardClick = () => {
       router.push(`/dashboard/communities/${community.id}`);
     };
 
-    // The tasks array
+    // Access the tasks
     const { community_tasks: commTasks } = community;
 
     return (
@@ -277,7 +266,7 @@ export default function CommunitiesPage() {
           {community.description || "No description provided."}
         </Text>
 
-        {/* Show tasks if available */}
+        {/* Show tasks if we have any */}
         {commTasks && commTasks.length > 0 ? (
           <Wrap mb={4}>
             {commTasks.map((ct) => (
@@ -311,10 +300,10 @@ export default function CommunitiesPage() {
           )}
         </Flex>
 
-        {/* Join or Leave button */}
+        {/* Join/Leave button */}
         <Box
           onClick={(e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // prevent card-click navigation
           }}
         >
           {userId && (
