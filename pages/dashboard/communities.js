@@ -1,5 +1,3 @@
-// /pages/dashboard/communities/index.js
-
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -283,6 +281,7 @@ export default function CommunitiesPage() {
           </Text>
         )}
 
+        {/* Updated overlap and spacing */}
         <Flex align="center" mb={3}>
           {shown.map((m) => (
             <Avatar
@@ -290,11 +289,11 @@ export default function CommunitiesPage() {
               src={m.avatar_url || ""}
               name={m.full_name || "User"}
               size="sm"
-              mr={-2}
+              mr={-3} // Overlaps the avatars more
             />
           ))}
           {leftover > 0 && (
-            <Text fontSize="sm" color="gray.500" ml={2}>
+            <Text fontSize="sm" color="gray.500" ml={3}>
               +{leftover} more
             </Text>
           )}
