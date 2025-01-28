@@ -38,7 +38,7 @@ export default async function handler(req, res) {
           .select("vote")
           .eq("user_id", user.id)
           .eq("paper_id", paperId)
-          .single();
+          .maybeSingle();
 
         if (voteError) {
           // Log the detailed error
