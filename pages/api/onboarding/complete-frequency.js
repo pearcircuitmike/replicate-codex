@@ -1,12 +1,11 @@
 import supabase from "../utils/supabaseClient";
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { userId } = req.body;
-  if (!userId) {
+  const { userId, frequency } = req.body;
+  if (!userId || !frequency) {
     return res.status(400).json({ error: "Missing required parameters" });
   }
 
@@ -16,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Validate the user's token
+    // 1) Validate the token
     const {
       data: { user },
       error: authError,
@@ -32,17 +31,38 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "Unauthorized - User mismatch" });
     }
 
-    // Update frequency_onboarded in the profiles table
-    const { error: updateError } = await supabase
+    // 2) Mark frequency_onboarded as true in the profiles table
+    const { error: updateOnboardedError } = await supabase
       .from("profiles")
       .update({ frequency_onboarded: true })
       .eq("id", userId);
 
-    if (updateError) {
-      console.error("Update error:", updateError);
+    if (updateOnboardedError) {
+      console.error(
+        "Update error (profiles.frequency_onboarded):",
+        updateOnboardedError
+      );
       return res
         .status(500)
         .json({ error: "Failed to update onboarding status" });
+    }
+
+    // 3) Update the digest_subscriptions frequencies
+    //    We'll store the same frequency in both papers_frequency & models_frequency,
+    //    but feel free to customize if you want them handled separately.
+    const { error: updateSubError } = await supabase
+      .from("digest_subscriptions")
+      .update({
+        papers_frequency: frequency,
+        models_frequency: frequency,
+      })
+      .eq("user_id", userId);
+
+    if (updateSubError) {
+      console.error("Update error (digest_subscriptions):", updateSubError);
+      return res
+        .status(500)
+        .json({ error: "Failed to update digest subscription frequency" });
     }
 
     return res.status(200).json({ success: true });

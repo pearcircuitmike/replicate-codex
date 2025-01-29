@@ -1,4 +1,3 @@
-// pages/onboarding/frequency.js
 import React, { useState } from "react";
 import {
   VStack,
@@ -13,7 +12,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext"; // your custom auth context
 import { BellIcon, TimeIcon, ChevronLeftIcon } from "@chakra-ui/icons";
 import MetaTags from "@/components/MetaTags";
 
@@ -50,7 +49,10 @@ const FrequencyOption = ({ icon, title, description, isSelected, onClick }) => (
 );
 
 const FrequencyPage = () => {
+  // Defaulting to "daily" so the user sees that selected on mount
+  // If they never change anything, "daily" is what's sent to the API
   const [frequency, setFrequency] = useState("daily");
+
   const { user, accessToken, hasActiveSubscription } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -65,7 +67,7 @@ const FrequencyPage = () => {
         },
         body: JSON.stringify({
           userId: user.id,
-          frequency,
+          frequency, // Send the actual frequency (daily or weekly)
         }),
       });
 
@@ -73,7 +75,7 @@ const FrequencyPage = () => {
         throw new Error("Failed to update onboarding status.");
       }
 
-      // Redirect based on subscription
+      // If the user is subscribed, go to dashboard. Otherwise, go to pricing.
       if (hasActiveSubscription) {
         router.push("/dashboard");
       } else {
@@ -144,7 +146,7 @@ const FrequencyPage = () => {
             <FrequencyOption
               icon={<TimeIcon w={6} h={6} color="blue.500" />}
               title="Weekly Roundup"
-              description="Receive a comprehensive weekly summary every Monday"
+              description="Receive a comprehensive summary every Monday"
               isSelected={frequency === "weekly"}
               onClick={() => setFrequency("weekly")}
             />
