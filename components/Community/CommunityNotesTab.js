@@ -1,5 +1,4 @@
-// /components/Community/CommunityNotesTab.jsx
-
+// components/Community/CommunityNotesTab.jsx
 import React from "react";
 import {
   Box,
