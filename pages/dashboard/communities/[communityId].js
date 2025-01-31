@@ -282,7 +282,7 @@ export default function CommunityDetailPage() {
                   ) : papers.length === 0 ? (
                     <Text>No papers found.</Text>
                   ) : (
-                    <SimpleGrid columns={[1, 1, 2, 2]} spacing={6}>
+                    <SimpleGrid columns={[1, 2, 4, 4]} spacing={6}>
                       {papers.map((paper) => (
                         <PaperCard key={paper.id} paper={paper} />
                       ))}
