@@ -57,12 +57,6 @@ const Navbar = () => {
               <Link href="https://notes.aimodels.fyi" aria-label="Notes">
                 Notes
               </Link>
-              <Link
-                href="/replicate-leaderboard"
-                aria-label="Replicate Leaderboard"
-              >
-                Leaderboard
-              </Link>
 
               {user ? (
                 <Menu>
@@ -181,14 +175,6 @@ const Navbar = () => {
                 legacyBehavior
               >
                 <span onClick={() => changeDisplay("none")}>Notes</span>
-              </Link>
-
-              <Link
-                href="/replicate-leaderboard"
-                aria-label="Replicate Leaderboard"
-                legacyBehavior
-              >
-                <span onClick={() => changeDisplay("none")}>Leaderboard</span>
               </Link>
 
               {user && (
