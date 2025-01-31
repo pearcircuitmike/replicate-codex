@@ -1,3 +1,5 @@
+// pages/dashboard/communities/index.js
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -38,17 +40,10 @@ export default function CommunitiesPage() {
   const [avatarMap, setAvatarMap] = useState({});
   const [membershipCountMap, setMembershipCountMap] = useState({});
 
-  // Search state
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!userId) {
-      // If not logged in, show empty
-      setMyCommunities([]);
-      setOtherCommunities([]);
-      setAvatarMap({});
-      setMembershipCountMap({});
-      setMemberSet(new Set());
       setLoading(false);
       return;
     }
@@ -79,59 +74,42 @@ export default function CommunitiesPage() {
     }
   }
 
-  // Called when the user joins or leaves a community
   const handleToggleMembership = (communityId, joined) => {
     const newSet = new Set(memberSet);
 
     if (joined) {
       newSet.add(communityId);
-      // Move from "others" => "mine"
       const found = otherCommunities.find((c) => c.id === communityId);
       if (found) {
         setMyCommunities((curr) => [...curr, found]);
-        setOtherCommunities((curr) => curr.filter((c) => c.id !== communityId));
+        setOtherCommunities((curr) => curr.filter((x) => x.id !== communityId));
       }
     } else {
       newSet.delete(communityId);
-      // Move from "mine" => "others"
       const found = myCommunities.find((c) => c.id === communityId);
       if (found) {
         setOtherCommunities((curr) => [...curr, found]);
-        setMyCommunities((curr) => curr.filter((c) => c.id !== communityId));
+        setMyCommunities((curr) => curr.filter((x) => x.id !== communityId));
       }
     }
 
     setMemberSet(newSet);
   };
 
-  // Check if a community matches the current search term
   function matchesSearch(community, term) {
-    if (!term) return true; // if empty, always match
-
+    if (!term) return true;
     const lower = term.toLowerCase();
-
-    // Check name
-    if (community.name?.toLowerCase().includes(lower)) {
-      return true;
-    }
-    // Check description
-    if (community.description?.toLowerCase().includes(lower)) {
-      return true;
-    }
-    // Check tasks
+    if (community.name?.toLowerCase().includes(lower)) return true;
+    if (community.description?.toLowerCase().includes(lower)) return true;
     if (community.community_tasks?.length > 0) {
       for (const ct of community.community_tasks) {
         const taskName = ct.tasks?.task?.toLowerCase() || "";
-        if (taskName.includes(lower)) {
-          return true;
-        }
+        if (taskName.includes(lower)) return true;
       }
     }
-
     return false;
   }
 
-  // Filter "My Communities" and "Explore Communities"
   const filteredMyCommunities = myCommunities.filter((c) =>
     matchesSearch(c, searchTerm)
   );
@@ -146,8 +124,9 @@ export default function CommunitiesPage() {
     const shown = previewArr.slice(0, 5);
     const leftover = totalMembers > 5 ? totalMembers - 5 : 0;
 
+    // Important: use the slug for routing
     const handleCardClick = () => {
-      router.push(`/dashboard/communities/${community.id}`);
+      router.push(`/dashboard/communities/${community.slug}`);
     };
 
     return (
@@ -158,12 +137,7 @@ export default function CommunitiesPage() {
         boxShadow="sm"
         _hover={{ bg: "gray.50" }}
       >
-        <Flex
-          direction="column"
-          justifyContent="space-between"
-          height="100%"
-          p={4}
-        >
+        <Flex direction="column" height="100%" p={4}>
           <Box cursor="pointer" onClick={handleCardClick}>
             <Heading as="h3" size="md" mb={1}>
               {community.name}
@@ -231,17 +205,13 @@ export default function CommunitiesPage() {
 
   return (
     <>
-      <MetaTags
-        title="Communities"
-        description="Join AI communities and discover new research groups"
-      />
+      <MetaTags title="Communities" description="Join AI communities" />
       <DashboardLayout>
         <Container maxW="container.xl" py={8}>
           <Heading as="h1" size="lg" mb={4}>
             Communities
           </Heading>
 
-          {/* Search box */}
           <Box mb={6}>
             <InputGroup>
               <InputLeftElement pointerEvents="none">
@@ -259,6 +229,7 @@ export default function CommunitiesPage() {
             <Spinner size="xl" />
           ) : (
             <>
+              {/* My Communities */}
               <Heading as="h2" size="md" mb={2}>
                 My Communities
               </Heading>
@@ -279,6 +250,7 @@ export default function CommunitiesPage() {
 
               <Divider mb={8} />
 
+              {/* Explore Communities */}
               <Heading as="h2" size="md" mb={2}>
                 Explore Communities
               </Heading>

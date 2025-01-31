@@ -31,6 +31,9 @@ import { useAuth } from "@/context/AuthContext";
 import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
 import MetaTags from "@/components/MetaTags";
 
+/**
+ * Onboarding Communities Page (no clicking into community detail)
+ */
 export default function CommunitiesOnboardingPage() {
   const router = useRouter();
   const toast = useToast();
@@ -129,7 +132,6 @@ export default function CommunitiesOnboardingPage() {
   // 3) Check if a community matches the current search term
   function matchesSearch(community, term) {
     if (!term) return true;
-
     const lower = term.toLowerCase();
 
     // Check name
@@ -195,6 +197,8 @@ export default function CommunitiesOnboardingPage() {
     const shown = previewArr.slice(0, 3);
     const leftover = Math.max(0, previewArr.length - 3);
 
+    // Notice: We do NOT link or make anything clickable.
+    // The card just displays info and the join/leave button.
     return (
       <Box
         p={4}
@@ -202,7 +206,7 @@ export default function CommunitiesOnboardingPage() {
         borderRadius="md"
         bg="white"
         boxShadow="sm"
-        _hover={{ bg: "gray.50" }}
+        /* No cursor:pointer or onClick here */
       >
         <Heading as="h3" size="md" mb={1}>
           {name}
