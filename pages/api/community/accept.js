@@ -1,5 +1,6 @@
 // pages/api/community/accept.js
 import supabase from "../utils/supabaseClient";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "Invite is for a different email" });
     }
 
-    // Accept
+    // Accept invite
     const { error: updateError } = await supabase
       .from("community_invites")
       .update({
@@ -73,7 +74,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: updateError.message });
     }
 
-    // Add to community_members if not already
+    // Add to community_members if not already in the community
     const { data: existingMember } = await supabase
       .from("community_members")
       .select("*")
@@ -95,10 +96,24 @@ export default async function handler(req, res) {
       }
     }
 
-    // Return success with the communityId
-    return res
-      .status(200)
-      .json({ success: true, communityId: invite.community_id });
+    // Optionally fetch the community slug for redirecting by slug
+    const { data: communityRow, error: communityError } = await supabase
+      .from("communities")
+      .select("slug")
+      .eq("id", invite.community_id)
+      .maybeSingle();
+
+    if (communityError) {
+      console.error("Error fetching community slug:", communityError);
+      // We'll still return success but no slug if it fails
+    }
+
+    // Return success with the communityId & optional slug
+    return res.status(200).json({
+      success: true,
+      communityId: invite.community_id,
+      slug: communityRow?.slug || null,
+    });
   } catch (err) {
     console.error("Error accepting invite:", err);
     return res.status(500).json({ error: "Internal server error" });

@@ -25,7 +25,7 @@ export default function InvitePage() {
       return;
     }
 
-    // Now do single call to accept
+    // Attempt to accept the invite
     acceptInvite();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteId, user, accessToken]);
@@ -77,10 +77,14 @@ export default function InvitePage() {
           isClosable: true,
         });
 
-        // if the server returns { communityId } you can do:
-        if (data.communityId) {
+        // If the server now returns { slug } along with { communityId },
+        // redirect using slug first, else fallback to ID
+        if (data.slug) {
+          router.push(`/dashboard/communities/${data.slug}`);
+        } else if (data.communityId) {
           router.push(`/dashboard/communities/${data.communityId}`);
         } else {
+          // fallback
           router.push("/dashboard/communities");
         }
       }
@@ -91,6 +95,9 @@ export default function InvitePage() {
     }
   }
 
+  // -------------------------------------
+  // Various UI states below
+  // -------------------------------------
   if (status === "loading") {
     return (
       <Box p={6}>
