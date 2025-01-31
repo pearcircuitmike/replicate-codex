@@ -9,31 +9,33 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { inviteeEmail } = req.body;
+    const { inviteeEmail, invitedBy } = req.body;
+
     if (!inviteeEmail) {
       return res
         .status(400)
         .json({ error: "Missing inviteeEmail in request body." });
     }
+    if (!invitedBy) {
+      return res
+        .status(400)
+        .json({ error: "Missing invitedBy (the user who sends invite)." });
+    }
 
-    // For example: you might store invitations in a table called `community_invites`.
-    // Or maybe you want to see if the user is already in the community.
-    // This is just an example:
-
-    // 1) See if user with that email already has an account
+    // 1) Check if user with that email already has a profile
     const { data: userProfile, error: userErr } = await supabase
       .from("profiles")
       .select("id")
       .ilike("email", inviteeEmail) // case-insensitive
       .single();
 
+    // If supabase returned an error that isn't "no rows found"
     if (userErr && userErr.code !== "PGRST116") {
-      // PGRST116 = no rows
       throw userErr;
     }
 
+    // 2) If userProfile exists, see if they're already in community_members
     if (userProfile) {
-      // That user exists. Check if they’re already a member of this community
       const { data: existingMembership, error: memErr } = await supabase
         .from("community_members")
         .select("id")
@@ -46,26 +48,48 @@ export default async function handler(req, res) {
       }
 
       if (existingMembership) {
-        return res
-          .status(200)
-          .json({ message: "User is already a member of this community." });
+        return res.status(200).json({
+          message: "User is already a member of this community.",
+        });
       }
 
-      // Otherwise, you could create a record in `community_invites`
-      // Then an email can be sent, etc.
-      // This is just a placeholder:
-      return res
-        .status(201)
-        .json({ message: "Invite created or user notified of invite." });
+      // 3) User exists but is not a member -> create invite
+      const { data: inviteData, error: inviteError } = await supabase
+        .from("community_invites")
+        .insert({
+          community_id: communityId,
+          invited_by: invitedBy, // Must be a valid profile ID
+          invitee_email: inviteeEmail,
+          // status: 'pending' // if you want to specify; by default is 'pending'
+        })
+        .single();
+
+      if (inviteError) throw inviteError;
+
+      return res.status(201).json({
+        message: "Invite created successfully.",
+        invite: inviteData,
+      });
     } else {
-      // If there’s no existing user, you might do something else:
-      // Create an invite record, send an email link to sign up, etc.
-      return res
-        .status(201)
-        .json({ message: "No existing user. Sent them an invite link." });
+      // 4) No user with that email -> still create invite
+      const { data: inviteData, error: inviteError } = await supabase
+        .from("community_invites")
+        .insert({
+          community_id: communityId,
+          invited_by: invitedBy, // Must be a valid profile ID
+          invitee_email: inviteeEmail,
+        })
+        .single();
+
+      if (inviteError) throw inviteError;
+
+      return res.status(201).json({
+        message: "No existing user. Invite record created.",
+        invite: inviteData,
+      });
     }
   } catch (error) {
-    console.error("Error in POST invite:", error);
+    console.error("Error in POST /invite:", error);
     return res.status(500).json({ error: error.message });
   }
 }

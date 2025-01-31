@@ -19,12 +19,11 @@ import { useAuth } from "@/context/AuthContext";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function InviteUserModal({ communityId, userId }) {
+export default function InviteUserModal({ communityId }) {
   const { user, accessToken } = useAuth() || {};
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   function resetModal() {
@@ -58,10 +57,12 @@ export default function InviteUserModal({ communityId, userId }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`, // if you want to verify on server
+          Authorization: `Bearer ${accessToken}`, // if you want server to verify
         },
         body: JSON.stringify({
+          // We include both inviteeEmail and invitedBy
           inviteeEmail: email.trim().toLowerCase(),
+          invitedBy: user.id, // Must match a valid profiles.id in your DB
         }),
       });
 
