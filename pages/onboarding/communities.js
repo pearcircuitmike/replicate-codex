@@ -59,7 +59,7 @@ export default function CommunitiesOnboardingPage() {
       }
       const data = await resp.json();
 
-      // data.myCommunities, data.otherCommunities, data.avatarMap, data.membershipCountMap
+      // data.myCommunities, data.otherCommunities, data.avatarMap
       // Merge them into one array, marking isMember accordingly
       const mine = (data.myCommunities || []).map((c) => ({
         ...c,
@@ -113,7 +113,7 @@ export default function CommunitiesOnboardingPage() {
       if (!resp.ok) {
         throw new Error("Failed to toggle membership.");
       }
-      // If you want, you can re-fetch community data or rely on local state
+      // Could optionally re-fetch data or rely on local state
     } catch (err) {
       console.error("toggleMembership error:", err);
       toast({
@@ -126,7 +126,69 @@ export default function CommunitiesOnboardingPage() {
     }
   }
 
-  // 3) A helper card for each community
+  // 3) Check if a community matches the current search term
+  function matchesSearch(community, term) {
+    if (!term) return true;
+
+    const lower = term.toLowerCase();
+
+    // Check name
+    if (community.name?.toLowerCase().includes(lower)) {
+      return true;
+    }
+    // Check description
+    if (community.description?.toLowerCase().includes(lower)) {
+      return true;
+    }
+    // Check tasks
+    if (community.community_tasks?.length > 0) {
+      for (const ct of community.community_tasks) {
+        const taskName = ct.tasks?.task?.toLowerCase() || "";
+        if (taskName.includes(lower)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // 4) Filter the displayed communities
+  const filteredCommunities = communities.filter((c) =>
+    matchesSearch(c, searchTerm)
+  );
+
+  // 5) The "Next" button to continue onboarding
+  const handleContinue = async () => {
+    if (!user?.id) return;
+    try {
+      // Example: hitting a route to mark this onboarding step complete
+      const response = await fetch("/api/onboarding/complete-communities", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update communities onboarding");
+      }
+      router.push("/onboarding/frequency");
+    } catch (error) {
+      console.error("Error finalizing communities onboarding:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save your preferences. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  // 6) A helper card for each community
   function CommunityCard({ community }) {
     const { id, name, description, community_tasks, isMember } = community;
     const previewArr = avatarMap[id] || [];
@@ -200,44 +262,7 @@ export default function CommunitiesOnboardingPage() {
     );
   }
 
-  // 4) Filter the displayed communities by searchTerm
-  const filteredCommunities = searchTerm
-    ? communities.filter((c) =>
-        c.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : communities;
-
-  // 5) The "Next" button to continue onboarding
-  const handleContinue = async () => {
-    if (!user?.id) return;
-    try {
-      // Example: hitting a route to mark this onboarding step complete
-      const response = await fetch("/api/onboarding/complete-communities", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ userId: user.id }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update communities onboarding");
-      }
-      router.push("/onboarding/frequency");
-    } catch (error) {
-      console.error("Error finalizing communities onboarding:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save your preferences. Please try again.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
-
-  // 6) Render
+  // 7) Render
   return (
     <>
       <MetaTags

@@ -14,7 +14,11 @@ import {
   WrapItem,
   Tag,
   TagLabel,
+  Input,
+  InputGroup,
+  InputLeftElement,
 } from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "@/components/MetaTags";
@@ -34,8 +38,12 @@ export default function CommunitiesPage() {
   const [avatarMap, setAvatarMap] = useState({});
   const [membershipCountMap, setMembershipCountMap] = useState({});
 
+  // Search state
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     if (!userId) {
+      // If not logged in, show empty
       setMyCommunities([]);
       setOtherCommunities([]);
       setAvatarMap({});
@@ -96,6 +104,41 @@ export default function CommunitiesPage() {
     setMemberSet(newSet);
   };
 
+  // Check if a community matches the current search term
+  function matchesSearch(community, term) {
+    if (!term) return true; // if empty, always match
+
+    const lower = term.toLowerCase();
+
+    // Check name
+    if (community.name?.toLowerCase().includes(lower)) {
+      return true;
+    }
+    // Check description
+    if (community.description?.toLowerCase().includes(lower)) {
+      return true;
+    }
+    // Check tasks
+    if (community.community_tasks?.length > 0) {
+      for (const ct of community.community_tasks) {
+        const taskName = ct.tasks?.task?.toLowerCase() || "";
+        if (taskName.includes(lower)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  // Filter "My Communities" and "Explore Communities"
+  const filteredMyCommunities = myCommunities.filter((c) =>
+    matchesSearch(c, searchTerm)
+  );
+  const filteredOtherCommunities = otherCommunities.filter((c) =>
+    matchesSearch(c, searchTerm)
+  );
+
   function CommunityCard({ community }) {
     const isMember = memberSet.has(community.id);
     const previewArr = avatarMap[community.id] || [];
@@ -103,7 +146,6 @@ export default function CommunitiesPage() {
     const shown = previewArr.slice(0, 5);
     const leftover = totalMembers > 5 ? totalMembers - 5 : 0;
 
-    const router = useRouter();
     const handleCardClick = () => {
       router.push(`/dashboard/communities/${community.id}`);
     };
@@ -116,17 +158,12 @@ export default function CommunitiesPage() {
         boxShadow="sm"
         _hover={{ bg: "gray.50" }}
       >
-        {/* 
-          Use a Flex column that stretches the full height of the card.
-          "justifyContent='space-between'" pushes the button box to the bottom.
-        */}
         <Flex
           direction="column"
           justifyContent="space-between"
           height="100%"
           p={4}
         >
-          {/* Top portion: everything except the button. Clickable. */}
           <Box cursor="pointer" onClick={handleCardClick}>
             <Heading as="h3" size="md" mb={1}>
               {community.name}
@@ -173,7 +210,6 @@ export default function CommunitiesPage() {
             </Flex>
           </Box>
 
-          {/* Bottom portion: The button on the left. Stop event propagation here. */}
           {userId && (
             <Box
               mt={4}
@@ -205,6 +241,20 @@ export default function CommunitiesPage() {
             Communities
           </Heading>
 
+          {/* Search box */}
+          <Box mb={6}>
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">
+                <SearchIcon color="gray.400" />
+              </InputLeftElement>
+              <Input
+                placeholder="Search communities..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </InputGroup>
+          </Box>
+
           {loading ? (
             <Spinner size="xl" />
           ) : (
@@ -215,13 +265,13 @@ export default function CommunitiesPage() {
               <Text fontSize="sm" color="gray.500" mb={4}>
                 Communities you’ve already joined
               </Text>
-              {myCommunities.length === 0 ? (
+              {filteredMyCommunities.length === 0 ? (
                 <Text fontSize="sm" mb={6}>
-                  You haven’t joined any community yet.
+                  No matching communities found.
                 </Text>
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4} mb={8}>
-                  {myCommunities.map((c) => (
+                  {filteredMyCommunities.map((c) => (
                     <CommunityCard key={c.id} community={c} />
                   ))}
                 </SimpleGrid>
@@ -235,11 +285,13 @@ export default function CommunitiesPage() {
               <Text fontSize="sm" color="gray.500" mb={4}>
                 Discover new communities in your field
               </Text>
-              {otherCommunities.length === 0 ? (
-                <Text fontSize="sm">No other communities are available.</Text>
+              {filteredOtherCommunities.length === 0 ? (
+                <Text fontSize="sm">
+                  No matching communities found or none available right now.
+                </Text>
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4}>
-                  {otherCommunities.map((c) => (
+                  {filteredOtherCommunities.map((c) => (
                     <CommunityCard key={c.id} community={c} />
                   ))}
                 </SimpleGrid>
