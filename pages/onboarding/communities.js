@@ -280,16 +280,6 @@ export default function CommunitiesOnboardingPage() {
         {/* Onboarding Header */}
         <Box mb={8}>
           <Flex justify="space-between" align="center" mb={4}>
-            {/* BACK button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon={<ChevronLeftIcon />}
-              onClick={() => router.push("/onboarding/roles")}
-            >
-              Back
-            </Button>
-
             {/* Step Info */}
             <Text fontSize="sm" color="gray.600" textAlign="center">
               Step 2 of 4 - Communities

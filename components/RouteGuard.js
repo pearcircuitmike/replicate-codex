@@ -29,7 +29,7 @@ export default function RouteGuard({ children }) {
       // Check onboarding
       const { data: userProfile, error: profileError } = await supabase
         .from("profiles")
-        .select("roles_onboarded, communities_onboarded, frequency_onboarded")
+        .select("communities_onboarded, frequency_onboarded")
         .eq("id", user.id)
         .single();
 
@@ -38,21 +38,14 @@ export default function RouteGuard({ children }) {
         return;
       }
 
-      // Step 1: Roles
-      if (!userProfile.roles_onboarded) {
-        console.log("Redirecting to /onboarding/roles");
-        await router.push("/onboarding/roles");
-        return;
-      }
-
-      // Step 2: Communities (new step)
+      // Step 1: Communities
       if (!userProfile.communities_onboarded) {
         console.log("Redirecting to /onboarding/communities");
         await router.push("/onboarding/communities");
         return;
       }
 
-      // Step 3: Frequency
+      // Step 2: Frequency
       if (!userProfile.frequency_onboarded) {
         console.log("Redirecting to /onboarding/frequency");
         await router.push("/onboarding/frequency");
