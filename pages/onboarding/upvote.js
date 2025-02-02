@@ -57,15 +57,32 @@ export default function UpvoteOnboardingPage() {
         body: JSON.stringify({ userId: user.id }),
       });
       if (!resp.ok) throw new Error("Failed to update upvote onboarding.");
-      // After upvoting, go to Step 2: communities
       router.push("/onboarding/communities");
     } catch (err) {
       console.error("Error completing upvote step:", err);
     }
   }
 
-  function handleSkip() {
-    router.push("/onboarding/communities");
+  async function handleSkip() {
+    if (!user?.id) {
+      router.push("/onboarding/communities");
+      return;
+    }
+
+    try {
+      const resp = await fetch("/api/onboarding/complete-upvote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      if (!resp.ok) throw new Error("Failed to update upvote onboarding.");
+      router.push("/onboarding/communities");
+    } catch (err) {
+      console.error("Error completing upvote step:", err);
+    }
   }
 
   // Callback for when a vote occurs
@@ -82,7 +99,6 @@ export default function UpvoteOnboardingPage() {
         description="Upvote your favorite AI papers"
       />
       <Container maxW="6xl" py={10}>
-        {/* Onboarding Header: Step 1 of 4 */}
         <Box mb={8} width="full">
           <Flex justify="space-between" align="center" mb={4}>
             <Text fontSize="sm" color="gray.600">
