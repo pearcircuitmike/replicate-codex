@@ -1,3 +1,5 @@
+// components/Cards/PaperCard.js
+
 import React from "react";
 import {
   Box,
@@ -8,14 +10,11 @@ import {
   Tag,
   Flex,
   Tooltip,
-  Icon,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { TriangleUpIcon } from "@chakra-ui/icons";
 import EmojiWithGradient from "../EmojiWithGradient";
 import BookmarkButton from "../BookmarkButton";
-import { formatLargeNumber } from "@/pages/api/utils/formatLargeNumber";
-
+import PaperVote from "../PaperDetailsPage/PaperVote";
 const PaperCard = ({ paper, onBookmarkChange }) => {
   const {
     id,
@@ -27,34 +26,28 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
     thumbnail,
     platform,
     slug,
-    totalScore,
   } = paper;
 
-  // Helper to clean & truncate the summary text
+  // Clean and truncate summary
   const cleanAndTruncateSummary = (summary) => {
     if (!summary) return "No description provided";
 
-    // Remove some headings
     summary = summary
       .replace(/##\s*Overview.*?(\n|$)/gi, "")
-      .replace(/##\s*Model\s*Overview.*?(\n|$)/gi, "");
+      .replace(/##\s*Model\s*Overview.*?(\n|$)/gi, "")
+      .replace(/(\*|_|`|~|#|\[.*?\]\(.*?\)|-|\>|\!.*?)/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
 
-    // Strip Markdown syntax
-    summary = summary.replace(/(\*|_|`|~|#|\[.*?\]\(.*?\)|-|\>|\!.*?)/g, "");
-
-    // Remove extra whitespace
-    summary = summary.replace(/\s+/g, " ").trim();
-
-    // Take first 3 non-empty lines
-    const maxLines = 3;
     const lines = summary.split("\n").filter(Boolean);
-
-    return lines.length > maxLines
-      ? lines.slice(0, maxLines).join(" ") + "..."
-      : lines.join(" ");
+    const maxLines = 3;
+    if (lines.length > maxLines) {
+      return lines.slice(0, maxLines).join(" ") + "...";
+    }
+    return lines.join(" ");
   };
 
-  // Check if newly indexed
+  // Check if newly indexed (72 hours)
   const isNew = React.useMemo(() => {
     const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
     return new Date(indexedDate) >= seventyTwoHoursAgo;
@@ -68,6 +61,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
 
   return (
     <Box
+      // The entire card is a link except for the vote area
       as={Link}
       href={`/papers/${encodeURIComponent(platform)}/${encodeURIComponent(
         slug
@@ -79,8 +73,6 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
       boxShadow="base"
       display="flex"
       flexDirection="column"
-      justifyContent="space-between"
-      rounded="md"
       bg="white"
       overflow="hidden"
       transition="transform 0.2s ease, box-shadow 0.2s ease"
@@ -89,6 +81,7 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         boxShadow: "lg",
       }}
       cursor="pointer"
+      position="relative"
     >
       <Box h="250px" overflow="hidden" position="relative">
         {thumbnail ? (
@@ -103,35 +96,10 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
         ) : (
           <EmojiWithGradient title={title} />
         )}
-
-        {/* Show totalScore + up-arrow instead of a flame icon */}
-        <Tooltip label="Total upvote score">
-          <Flex
-            position="absolute"
-            bottom="10px"
-            right="10px"
-            bg="white"
-            borderRadius="md"
-            p="4px 8px"
-            alignItems="center"
-            boxShadow="md"
-          >
-            <Icon as={TriangleUpIcon} color="gray.500" boxSize="16px" mr={1} />
-            <Text fontSize="sm" fontWeight="bold">
-              {formatLargeNumber(Math.floor(totalScore))}
-            </Text>
-          </Flex>
-        </Tooltip>
       </Box>
 
       <Box p="15px">
-        <Heading
-          as="h3"
-          size="sm"
-          noOfLines={3}
-          mb={1}
-          style={{ whiteSpace: "normal", wordWrap: "break-word" }}
-        >
+        <Heading as="h3" size="sm" noOfLines={3} mb={1}>
           {isNew && (
             <Tag size="md" colorScheme="green" mr="5px">
               New!
@@ -143,30 +111,39 @@ const PaperCard = ({ paper, onBookmarkChange }) => {
           {authors.join(", ")}
         </Text>
         <Text fontSize="sm" noOfLines={4}>
-          {cleanAndTruncateSummary(generatedSummary) || "No summary available."}
+          {cleanAndTruncateSummary(generatedSummary)}
         </Text>
-        <Text
-          as="span"
-          fontSize="sm"
-          color="blue.500"
-          _hover={{
-            color: "blue.700",
-          }}
-        >
+        <Text fontSize="sm" color="blue.500">
           Read more
         </Text>
       </Box>
 
-      <Flex
-        justify="space-between"
-        mt="auto"
-        mb="10px"
-        spacing={5}
-        pl="15px"
-        pr="15px"
-      >
+      <Flex justify="space-between" mt="auto" mb="10px" px="15px">
         <Text fontSize="sm">{formattedDate}</Text>
       </Flex>
+
+      {/* Floating upvote widget in bottom-right corner */}
+      <Box
+        position="absolute"
+        bottom="10px"
+        right="10px"
+        bg="white"
+        borderRadius="md"
+        p="4px 8px"
+        boxShadow="md"
+        onClick={(e) => {
+          // Stop card link navigation
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        cursor="default"
+      >
+        <Tooltip label="Upvote / downvote this paper">
+          <Box>
+            <PaperVote paperId={id} variant="compact" size="md" />
+          </Box>
+        </Tooltip>
+      </Box>
     </Box>
   );
 };

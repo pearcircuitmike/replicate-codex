@@ -8,7 +8,6 @@ import {
   Flex,
   Avatar,
   Spinner,
-  Divider,
   Button,
   VStack,
   useToast,
@@ -32,7 +31,7 @@ import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
 import MetaTags from "@/components/MetaTags";
 
 /**
- * Onboarding Communities Page (no clicking into community detail)
+ * Onboarding Communities Page
  */
 export default function CommunitiesOnboardingPage() {
   const router = useRouter();
@@ -44,7 +43,7 @@ export default function CommunitiesOnboardingPage() {
   const [avatarMap, setAvatarMap] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 1) Load from /api/community/list
+  // Load from /api/community/list
   useEffect(() => {
     if (!user?.id) {
       setLoading(false);
@@ -62,8 +61,6 @@ export default function CommunitiesOnboardingPage() {
       }
       const data = await resp.json();
 
-      // data.myCommunities, data.otherCommunities, data.avatarMap
-      // Merge them into one array, marking isMember accordingly
       const mine = (data.myCommunities || []).map((c) => ({
         ...c,
         isMember: true,
@@ -73,9 +70,8 @@ export default function CommunitiesOnboardingPage() {
         isMember: false,
       }));
       let merged = [...mine, ...others];
-
-      // Shuffle them if you want a random order:
-      merged = merged.sort(() => Math.random() - 0.5);
+      // Optional shuffle
+      merged.sort(() => Math.random() - 0.5);
 
       setCommunities(merged);
       setAvatarMap(data.avatarMap || {});
@@ -91,20 +87,19 @@ export default function CommunitiesOnboardingPage() {
     }
   }
 
-  // 2) Handle membership toggling
+  // Toggle membership
   async function handleToggleMembership(communityId, joined) {
-    // Immediately update local state
+    // Update local state first
     setCommunities((prev) =>
       prev.map((c) => (c.id === communityId ? { ...c, isMember: joined } : c))
     );
-
-    // Then call /api/community/toggle-membership
+    // Then call API
     try {
       const resp = await fetch("/api/community/toggle-membership", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`, // optional if you verify on server
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           userId: user?.id,
@@ -112,11 +107,9 @@ export default function CommunitiesOnboardingPage() {
           join: joined,
         }),
       });
-
       if (!resp.ok) {
         throw new Error("Failed to toggle membership.");
       }
-      // Could optionally re-fetch data or rely on local state
     } catch (err) {
       console.error("toggleMembership error:", err);
       toast({
@@ -129,42 +122,30 @@ export default function CommunitiesOnboardingPage() {
     }
   }
 
-  // 3) Check if a community matches the current search term
+  // Search filter
   function matchesSearch(community, term) {
     if (!term) return true;
     const lower = term.toLowerCase();
 
-    // Check name
-    if (community.name?.toLowerCase().includes(lower)) {
-      return true;
-    }
-    // Check description
-    if (community.description?.toLowerCase().includes(lower)) {
-      return true;
-    }
-    // Check tasks
+    if (community.name?.toLowerCase().includes(lower)) return true;
+    if (community.description?.toLowerCase().includes(lower)) return true;
     if (community.community_tasks?.length > 0) {
       for (const ct of community.community_tasks) {
         const taskName = ct.tasks?.task?.toLowerCase() || "";
-        if (taskName.includes(lower)) {
-          return true;
-        }
+        if (taskName.includes(lower)) return true;
       }
     }
-
     return false;
   }
 
-  // 4) Filter the displayed communities
   const filteredCommunities = communities.filter((c) =>
     matchesSearch(c, searchTerm)
   );
 
-  // 5) The "Next" button to continue onboarding
+  // Next button: mark communities_onboarded & go to frequency
   const handleContinue = async () => {
     if (!user?.id) return;
     try {
-      // Example: hitting a route to mark this onboarding step complete
       const response = await fetch("/api/onboarding/complete-communities", {
         method: "POST",
         headers: {
@@ -190,24 +171,14 @@ export default function CommunitiesOnboardingPage() {
     }
   };
 
-  // 6) A helper card for each community
   function CommunityCard({ community }) {
     const { id, name, description, community_tasks, isMember } = community;
     const previewArr = avatarMap[id] || [];
     const shown = previewArr.slice(0, 3);
     const leftover = Math.max(0, previewArr.length - 3);
 
-    // Notice: We do NOT link or make anything clickable.
-    // The card just displays info and the join/leave button.
     return (
-      <Box
-        p={4}
-        borderWidth="1px"
-        borderRadius="md"
-        bg="white"
-        boxShadow="sm"
-        /* No cursor:pointer or onClick here */
-      >
+      <Box p={4} borderWidth="1px" borderRadius="md" bg="white" boxShadow="sm">
         <Heading as="h3" size="md" mb={1}>
           {name}
         </Heading>
@@ -266,7 +237,6 @@ export default function CommunitiesOnboardingPage() {
     );
   }
 
-  // 7) Render
   return (
     <>
       <MetaTags
@@ -275,17 +245,23 @@ export default function CommunitiesOnboardingPage() {
         socialPreviewTitle="Communities Setup - AIModels.fyi"
         socialPreviewSubtitle="Join AI communities"
       />
-
       <Container maxW="4xl" py={8}>
-        {/* Onboarding Header */}
         <Box mb={8}>
+          {/* ADDED A BACK BUTTON HERE */}
           <Flex justify="space-between" align="center" mb={4}>
-            {/* Step Info */}
+            <Button
+              variant="ghost"
+              size="sm"
+              leftIcon={<ChevronLeftIcon />}
+              onClick={() => router.push("/onboarding/upvote")}
+            >
+              Back
+            </Button>
+
             <Text fontSize="sm" color="gray.600" textAlign="center">
               Step 2 of 4 - Communities
             </Text>
 
-            {/* NEXT button (top right) */}
             <Button
               variant="ghost"
               size="sm"
@@ -297,7 +273,7 @@ export default function CommunitiesOnboardingPage() {
           </Flex>
 
           <Progress
-            value={50} // or 66, depending on your steps
+            value={50}
             size="sm"
             colorScheme="blue"
             borderRadius="full"
@@ -312,7 +288,6 @@ export default function CommunitiesOnboardingPage() {
             Join any groups that interest you
           </Text>
 
-          {/* Search Box */}
           <InputGroup my={4}>
             <InputLeftElement pointerEvents="none">
               <SearchIcon color="gray.400" />
@@ -324,7 +299,6 @@ export default function CommunitiesOnboardingPage() {
             />
           </InputGroup>
 
-          {/* Single grid of all communities */}
           {loading ? (
             <Box textAlign="center" py={6}>
               <Spinner size="lg" />
