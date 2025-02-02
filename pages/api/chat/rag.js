@@ -49,6 +49,10 @@ export default async function handler(req) {
             .map((doc, i) => {
               // If it's a model doc
               if (doc.modelName) {
+                // Compute URL for a model doc.
+                const modelURL = `https://aimodels.fyi/models/${
+                  doc.platform || "unknown"
+                }/${doc.slug || "N/A"}`;
                 return `Result ${i + 1}:
 Model Name: ${doc.modelName || "Unknown"}
 Example image: ${doc.example || "No example provided"}
@@ -57,8 +61,7 @@ Description: ${doc.description || "No description."}
 Tags: ${doc.tags || "None"}
 Score: ${doc.totalScore || "N/A"}
 Last Updated: ${doc.lastUpdated || "N/A"}
-Slug: ${doc.slug || "N/A"}`;
-
+URL: ${modelURL}`;
                 // If it's a paper doc
               } else if (doc.title) {
                 const authors = Array.isArray(doc.authors)
@@ -67,7 +70,10 @@ Slug: ${doc.slug || "N/A"}`;
                 const categories = Array.isArray(doc.arxivCategories)
                   ? doc.arxivCategories.join(", ")
                   : doc.arxivCategories || "None";
-
+                // Compute URL for a paper doc.
+                const paperURL = `https://aimodels.fyi/papers/${
+                  doc.platform || "unknown"
+                }/${doc.slug || "N/A"}`;
                 return `Result ${i + 1}:
 Title: ${doc.title || "Untitled"}
 Example image: ${doc.thumbnail || "No example image provided."}
@@ -75,8 +81,7 @@ Authors: ${authors}
 Abstract: ${doc.abstract || "No abstract."}
 Score: ${doc.totalScore || "N/A"}
 Published Date: ${doc.publishedDate || "N/A"}
-Slug: ${doc.slug || "N/A"}`;
-
+URL: ${paperURL}`;
                 // Fallback if neither
               } else {
                 return `Result ${i + 1}:
@@ -96,10 +101,10 @@ ${contextString}
 User query: ${userQuery || "(not provided)"}
 
 Use only the above context to answer. If unsure, say so. 
-You may also suggest workflows that invovle combining multiple models, papers, or methods to help the user solve a problem.
+You may also suggest workflows that involve combining multiple models, papers, or methods to help the user solve a problem.
 
-Keep responses concise. Ask for clarification if needed. 
-You can render example images in your response when relevant. Never return markdown headings. `;
+Keep responses concise. Ask for clarification if needed. Link to urls in AImodels.fyi rather than to external sites like arxiv, huggingface, or replicate.
+Always render example images or thumbnails in your response as markdown when relevant if they're available. Never return markdown headings. `;
 
     // 7) Our final messages to the model
     const messagesToSend = [
