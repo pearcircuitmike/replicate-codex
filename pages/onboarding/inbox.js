@@ -90,7 +90,7 @@ export default function InboxOnboardingPage() {
               onClick={skipForNow}
               data-testid="secondary-button"
             >
-              Skip for now (but you'll miss out on key AI updates!)
+              Skip for now (but you&apos;ll miss out on key AI updates!)
             </Button>
           </VStack>
         </VStack>
