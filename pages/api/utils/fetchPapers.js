@@ -1,4 +1,4 @@
-// utils/fetchPapers.js
+// pages/api/utils/fetchPapers.js
 import supabase from "./supabaseClient";
 
 export async function fetchPapersPaginated({

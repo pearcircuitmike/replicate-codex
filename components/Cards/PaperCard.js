@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import EmojiWithGradient from "../EmojiWithGradient";
-import BookmarkButton from "../BookmarkButton";
 import PaperVote from "../PaperDetailsPage/PaperVote";
 const PaperCard = ({ paper, onBookmarkChange }) => {
   const {

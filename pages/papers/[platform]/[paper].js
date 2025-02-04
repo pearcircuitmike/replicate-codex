@@ -26,16 +26,14 @@ const SectionsNav = dynamic(() =>
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
 });
-// Removed ChatWithPaper import
 const PaperContent = dynamic(() =>
   import("@/components/PaperDetailsPage/PaperContent")
 );
-const AudioPlayer = dynamic(
-  () => import("@/components/PaperDetailsPage/AudioPlayer"),
-  {
-    ssr: false,
-  }
-);
+// Removed AudioPlayer import
+// const AudioPlayer = dynamic(() =>
+//   import("@/components/PaperDetailsPage/AudioPlayer"),
+//   { ssr: false }
+// );
 
 import RelatedPapers from "@/components/RelatedPapers";
 import {
@@ -170,20 +168,11 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             >
               <Flex flexDirection="column" height="100%" position="relative">
                 <Box py={8}>
-                  <Box mb={6}>
-                    <Box fontSize="lg" fontWeight="semibold" mb={4}>
-                      Listen to this paper
-                    </Box>
-                    {paper.generatedSummary && (
-                      <AudioPlayer text={paper.generatedSummary} />
-                    )}
-                  </Box>
+                  {/* Audio player feature removed */}
                   <Box mt={6}>
                     <PaperNotes paperId={paper.id} />
                   </Box>
                 </Box>
-
-                {/* Removed ChatWithPaper component */}
               </Flex>
             </Box>
           </GridItem>
