@@ -1,3 +1,5 @@
+// components/Notes/NoteSkeleton.js
+
 import React from "react";
 import { VStack, Skeleton } from "@chakra-ui/react";
 

@@ -1,3 +1,5 @@
+// components/Notes/PaperNotes.js
+
 import React, { useState, useEffect } from "react";
 import {
   VStack,

@@ -1,3 +1,5 @@
+// components/Notes/NoteList.js
+
 import React from "react";
 import { VStack } from "@chakra-ui/react";
 import Note from "./Note";

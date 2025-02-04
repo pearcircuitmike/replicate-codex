@@ -29,11 +29,6 @@ const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
 const PaperContent = dynamic(() =>
   import("@/components/PaperDetailsPage/PaperContent")
 );
-// Removed AudioPlayer import
-// const AudioPlayer = dynamic(() =>
-//   import("@/components/PaperDetailsPage/AudioPlayer"),
-//   { ssr: false }
-// );
 
 import RelatedPapers from "@/components/RelatedPapers";
 import {

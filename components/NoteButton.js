@@ -1,3 +1,5 @@
+// components/NoteButton
+
 import React, { useState, useEffect } from "react";
 import { Button, Icon } from "@chakra-ui/react";
 import { FaComment } from "react-icons/fa";

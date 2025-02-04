@@ -1,3 +1,5 @@
+// components/Notes/NoteInput.js
+
 import React, { useState, useEffect } from "react";
 import { Textarea, Button, VStack } from "@chakra-ui/react";
 import { trackEvent } from "@/pages/api/utils/analytics-util";
