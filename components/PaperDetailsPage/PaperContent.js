@@ -1,19 +1,18 @@
-// components/PaperDetailsPage/PaperContent.js
+// PaperContent.jsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Heading,
   Text,
   Link,
-  Icon,
   VStack,
   Grid,
   GridItem,
+  useToast,
 } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
 import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import rehypeRaw from "rehype-raw";
-import { FaExternalLinkAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 
 const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
@@ -31,8 +30,7 @@ import PaperVote from "./PaperVote";
 import LimitMessage from "@/components/LimitMessage";
 import customTheme from "@/components/MarkdownTheme";
 import { useAuth } from "@/context/AuthContext";
-import AuthForm from "@/components/AuthForm";
-import TextHighlighter from "../TextHighlighter";
+import ContextualHighlighter from "../ContextualHighlighter";
 import InjectedHighlights from "../InjectedHighlights";
 import HighlightSidebar from "../HighlightSidebar";
 
@@ -43,126 +41,239 @@ function PaperContent({
   relatedPapers,
 }) {
   const { user } = useAuth();
-  const [prepopulatedComment, setPrepopulatedComment] = useState("");
   const [highlights, setHighlights] = useState([]);
+  const [selectedHighlightId, setSelectedHighlightId] = useState(null);
   const contentRef = useRef(null);
-
-  function renderContent(content) {
-    if (!content) return { overview: null, restOfContent: null };
-    const overviewStart = content.indexOf("## Overview");
-    const overviewEnd = content.indexOf("## Plain English Explanation");
-    if (overviewStart !== -1 && overviewEnd !== -1) {
-      const overview = content.slice(overviewStart, overviewEnd);
-      const restOfContent =
-        content.slice(0, overviewStart) + content.slice(overviewEnd);
-      return {
-        overview: (
-          <Box bg="gray.100" rounded="lg" p={{ base: 4, md: 6 }} maxW="100%">
-            <ReactMarkdown
-              components={ChakraUIRenderer({
-                ...customTheme,
-                h2: (props) => <Heading {...props} as="h2" size="lg" mb={4} />,
-                p: (props) => (
-                  <Text {...props} mb="1.2em" wordBreak="break-word" />
-                ),
-              })}
-            >
-              {overview}
-            </ReactMarkdown>
-          </Box>
-        ),
-        restOfContent: (
-          <Box maxW="100%">
-            <ReactMarkdown
-              components={ChakraUIRenderer({
-                ...customTheme,
-                h2: (props) => {
-                  const id = props.children[0]
-                    ?.toLowerCase()
-                    .replace(/[^a-zA-Z0-9]+/g, "-");
-                  return (
-                    <Heading
-                      {...props}
-                      id={id}
-                      as="h2"
-                      size="lg"
-                      mt={8}
-                      mb={4}
-                      textOverflow="ellipsis"
-                    />
-                  );
-                },
-                p: (props) => (
-                  <Text {...props} mb="1.2em" wordBreak="break-word" />
-                ),
-                a: ({ href, children }) => (
-                  <Link
-                    href={href}
-                    color="blue.500"
-                    _hover={{ textDecoration: "underline" }}
-                  >
-                    {children}
-                  </Link>
-                ),
-              })}
-            >
-              {restOfContent}
-            </ReactMarkdown>
-          </Box>
-        ),
-      };
-    }
-    return {
-      overview: null,
-      restOfContent: (
-        <Box maxW="100%">
-          <ReactMarkdown components={ChakraUIRenderer(customTheme)}>
-            {content}
-          </ReactMarkdown>
-        </Box>
-      ),
-    };
-  }
-
-  const { overview, restOfContent } = renderContent(paper.generatedSummary);
-  const canViewContent =
-    hasActiveSubscription || viewCounts?.canViewFullArticle;
+  const toast = useToast();
 
   useEffect(() => {
-    async function fetchHighlights() {
-      const { data, error } = await (
-        await import("@/pages/api/utils/supabaseClient")
-      ).default
+    fetchHighlights();
+  }, [paper.id]);
+
+  const fetchHighlights = async () => {
+    try {
+      const supabase = (await import("@/pages/api/utils/supabaseClient"))
+        .default;
+      const { data, error } = await supabase
         .from("highlights")
         .select(
           `
           *,
-          public_profile_info:profiles (id, full_name, avatar_url, username)
+          user_profile:public_profile_info!highlights_user_id_fkey (
+            id,
+            full_name,
+            avatar_url,
+            username
+          )
         `
         )
         .eq("paper_id", paper.id)
-        .order("start_offset", { ascending: true });
-      if (error) {
-        console.error("Error fetching highlights:", error);
-      } else {
-        setHighlights(data);
-      }
-    }
-    fetchHighlights();
-  }, [paper.id]);
+        .order("created_at", { ascending: false });
 
-  const handleNewHighlight = (newHighlight) => {
-    setHighlights((prev) => [...prev, newHighlight]);
+      if (error) throw error;
+      console.log("Fetched highlights:", data);
+      setHighlights(data.filter((hl) => hl && hl.id));
+    } catch (error) {
+      console.error("Error fetching highlights:", error);
+      toast({
+        title: "Error fetching highlights",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
-  const handlePrepopulateComment = (selectedText) => {
-    setPrepopulatedComment(selectedText);
+  const handleNewHighlight = async (anchor) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to create highlights",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
+    try {
+      const supabase = (await import("@/pages/api/utils/supabaseClient"))
+        .default;
+      const newHighlight = {
+        user_id: user.id,
+        paper_id: paper.id,
+        quote: anchor.exact,
+        prefix: anchor.prefix,
+        suffix: anchor.suffix,
+        context_snippet:
+          `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
+      };
+
+      const { data, error } = await supabase
+        .from("highlights")
+        .insert(newHighlight)
+        .select(
+          `
+          *,
+          user_profile:public_profile_info!highlights_user_id_fkey (
+            id,
+            full_name,
+            avatar_url,
+            username
+          )
+        `
+        )
+        .single();
+
+      if (error) throw error;
+
+      console.log("Created new highlight:", data);
+      setHighlights((prev) => [data, ...prev]);
+      toast({
+        title: "Highlight created",
+        status: "success",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Error creating highlight:", error);
+      toast({
+        title: "Error creating highlight",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleNewComment = async (anchor) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to add comments",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
+    try {
+      const supabase = (await import("@/pages/api/utils/supabaseClient"))
+        .default;
+      const newComment = {
+        user_id: user.id,
+        paper_id: paper.id,
+        quote: anchor.exact,
+        prefix: anchor.prefix,
+        suffix: anchor.suffix,
+        context_snippet:
+          `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
+        is_comment: true,
+      };
+
+      const { data, error } = await supabase
+        .from("highlights")
+        .insert(newComment)
+        .select(
+          `
+          *,
+          user_profile:public_profile_info!highlights_user_id_fkey (
+            id,
+            full_name,
+            avatar_url,
+            username
+          )
+        `
+        )
+        .single();
+
+      if (error) throw error;
+
+      console.log("Created new comment:", data);
+      setHighlights((prev) => [data, ...prev]);
+      toast({
+        title: "Comment created",
+        status: "success",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      toast({
+        title: "Error creating comment",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleHighlightClick = (highlight) => {
+    setSelectedHighlightId(highlight.id);
+
+    const el = contentRef.current?.querySelector(
+      `mark[data-highlight-id="${highlight.id}"], [data-full-element-highlight="true"][data-highlight-id="${highlight.id}"]`
+    );
+
+    if (el) {
+      console.log("Scrolling to highlight element:", el);
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      const originalColor = el.style.backgroundColor;
+      el.style.backgroundColor = "rgba(255, 255, 0, 0.5)";
+      setTimeout(() => {
+        el.style.backgroundColor = originalColor;
+      }, 1000);
+    } else {
+      console.warn("No element found for highlight id:", highlight.id);
+    }
+  };
+
+  const handleHighlightRemove = async (highlightId) => {
+    if (!user) return;
+
+    try {
+      const supabase = (await import("@/pages/api/utils/supabaseClient"))
+        .default;
+      const { error } = await supabase
+        .from("highlights")
+        .delete()
+        .eq("id", highlightId)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      console.log("Removed highlight id:", highlightId);
+      setHighlights((prev) => prev.filter((h) => h.id !== highlightId));
+      setSelectedHighlightId(null);
+
+      toast({
+        title: "Highlight removed",
+        status: "success",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Error removing highlight:", error);
+      toast({
+        title: "Error removing highlight",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
     <Box bg="white" rounded="lg" p={{ base: 3, md: 6 }} maxW="100%">
       <VStack spacing={5} align="stretch">
-        {/* Header */}
         <Box mb={5}>
           <Grid templateColumns="auto 1fr" gap={4}>
             <GridItem>
@@ -199,18 +310,20 @@ function PaperContent({
             </GridItem>
           </Grid>
         </Box>
-        {!canViewContent ? (
+        {!hasActiveSubscription && !viewCounts?.canViewFullArticle ? (
           <LimitMessage />
         ) : (
-          <Grid templateColumns={{ base: "1fr", lg: "1fr 250px" }} gap={6}>
+          <Grid templateColumns={{ base: "1fr", lg: "1fr 300px" }} gap={6}>
             <GridItem>
-              <TextHighlighter
-                paperId={paper.id}
-                user={user}
-                onComment={handlePrepopulateComment}
-                onNewHighlight={handleNewHighlight}
+              <ContextualHighlighter
+                onHighlight={handleNewHighlight}
+                onComment={handleNewComment}
               >
-                <Box position="relative" ref={contentRef}>
+                <Box
+                  ref={contentRef}
+                  position="relative"
+                  className="markdown-content"
+                >
                   <ReactMarkdown
                     components={ChakraUIRenderer(customTheme)}
                     rehypePlugins={[rehypeRaw]}
@@ -220,15 +333,30 @@ function PaperContent({
                   <InjectedHighlights
                     containerRef={contentRef}
                     highlights={highlights}
+                    onHighlightClick={handleHighlightClick}
                   />
                 </Box>
-              </TextHighlighter>
+              </ContextualHighlighter>
+              {paper.figures && paper.figures.length > 0 && (
+                <PaperFigures figures={paper.figures} />
+              )}
+              {paper.tables && paper.tables.length > 0 && (
+                <PaperTables tables={paper.tables} />
+              )}
             </GridItem>
             <GridItem>
               <HighlightSidebar
-                containerRef={contentRef}
                 highlights={highlights}
+                onHighlightClick={handleHighlightClick}
+                onHighlightRemove={(id) => {
+                  const highlight = highlights.find((h) => h.id === id);
+                  if (highlight?.user_id === user.id) {
+                    handleHighlightRemove(id);
+                  }
+                }}
+                selectedHighlightId={selectedHighlightId}
               />
+              {relatedPapers && <RelatedPapers papers={relatedPapers} />}
             </GridItem>
           </Grid>
         )}

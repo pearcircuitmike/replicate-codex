@@ -1,30 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Box, Button, Portal } from "@chakra-ui/react";
-import { fromRange, toRange } from "dom-anchor-text-quote";
+import { fromRange } from "dom-anchor-text-quote";
 
-const ContextualHighlighter = ({
-  children,
-  onHighlight,
-  onComment,
-  highlights = [],
-  containerRef,
-}) => {
-  const highlighterRef = useRef(null);
+const ContextualHighlighter = ({ children, onHighlight, onComment }) => {
+  const containerRef = useRef(null);
   const [popover, setPopover] = useState(null);
-  const [activeHighlight, setActiveHighlight] = useState(null);
 
   const computePopoverPosition = (range) => {
-    const rects = range.getClientRects();
-    if (!rects.length) return null;
+    const selection = window.getSelection();
+    const selectedRange = selection.getRangeAt(0);
+    const bounds = selectedRange.getBoundingClientRect();
 
-    const rect = rects[0];
-    const left = rect.left + rect.width / 2;
-    const top = rect.top - 10;
+    // With position: fixed, we use viewport coordinates directly
+    const left = bounds.left + bounds.width / 2;
+    const top = bounds.top; // Position above the selection
 
     return {
-      left: left + window.scrollX,
-      top: top + window.scrollY,
-      pos: "above",
+      left,
+      top,
+      pos: bounds.top < 50 ? "below" : "above", // Switch to below if too close to top
     };
   };
 
@@ -36,13 +30,13 @@ const ContextualHighlighter = ({
     }
 
     const range = selection.getRangeAt(0);
-    if (!highlighterRef.current.contains(range.commonAncestorContainer)) {
+    if (!containerRef.current.contains(range.commonAncestorContainer)) {
       setPopover(null);
       return;
     }
 
     try {
-      const anchor = fromRange(highlighterRef.current, range);
+      const anchor = fromRange(containerRef.current, range);
       if (!anchor || !anchor.exact || anchor.exact.trim() === "") {
         setPopover(null);
         return;
@@ -67,21 +61,25 @@ const ContextualHighlighter = ({
 
   useEffect(() => {
     document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchend", handleMouseUp);
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchend", handleMouseUp);
     };
   }, []);
 
   return (
-    <Box position="relative" ref={highlighterRef}>
+    <Box position="relative" ref={containerRef}>
       {children}
       {popover && (
         <Portal>
           <Box
-            position="absolute"
+            position="fixed"
             left={`${popover.left}px`}
             top={`${popover.top}px`}
-            transform="translate(-50%, -100%)"
+            transform={`translate(-50%, ${
+              popover.pos === "above" ? "-100%" : "100%"
+            })`}
             bg="white"
             boxShadow="md"
             borderRadius="md"
@@ -95,11 +93,12 @@ const ContextualHighlighter = ({
               content: '""',
               position: "absolute",
               left: "50%",
-              bottom: "-5px",
+              [popover.pos === "above" ? "bottom" : "top"]: "-5px",
               transform: "translateX(-50%)",
               borderLeft: "6px solid transparent",
               borderRight: "6px solid transparent",
-              borderTop: "6px solid white",
+              [popover.pos === "above" ? "borderTop" : "borderBottom"]:
+                "6px solid white",
             }}
           >
             <Button
