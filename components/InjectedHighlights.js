@@ -1,185 +1,116 @@
-// InjectedHighlights.jsx
 import React, { useLayoutEffect } from "react";
 import { toRange } from "dom-anchor-text-quote";
 import { hashStringToRgba } from "@/utils/hashColor";
 
-// Helper to normalize whitespace for text comparisons.
-const normalizeText = (text) => text.replace(/\s+/g, " ").trim();
-
 const InjectedHighlights = ({ containerRef, highlights, onHighlightClick }) => {
   useLayoutEffect(() => {
-    if (!containerRef.current) {
-      console.log("Container ref is not available.");
-      return;
-    }
+    if (!containerRef.current) return;
     const container = containerRef.current;
-    console.log("Container found:", container);
 
-    // Remove any previously injected <mark> elements.
-    const existingMarks = container.querySelectorAll("mark[data-highlight-id]");
-    existingMarks.forEach((mark) => {
+    // Remove previous highlight marks.
+    const marks = container.querySelectorAll("mark[data-highlight]");
+    marks.forEach((mark) => {
       const parent = mark.parentNode;
       while (mark.firstChild) {
         parent.insertBefore(mark.firstChild, mark);
       }
       parent.removeChild(mark);
-      parent.normalize();
     });
 
-    // Remove any previous full-element highlights (if applied directly).
-    const fullHighlights = container.querySelectorAll(
-      "[data-full-element-highlight='true']"
-    );
-    fullHighlights.forEach((el) => {
-      el.style.removeProperty("background-color");
-      el.removeAttribute("data-full-element-highlight");
-      el.removeAttribute("data-highlight-id");
-      el.removeAttribute("data-user-id");
-    });
-
-    // Use a higher base opacity so the highlight is clearly visible.
-    const baseAlpha = 0.4;
-    const hoverAlpha = 0.6;
-
-    // Process highlights (sorted by quote length descending so longer quotes get processed first).
-    const sortedHighlights = [...highlights].sort(
-      (a, b) => b.quote.length - a.quote.length
-    );
-    console.log("Sorted highlights:", sortedHighlights);
-
-    sortedHighlights.forEach((hl) => {
-      console.log("Processing highlight:", hl);
+    highlights.forEach((hl) => {
       try {
+        // Create a range using the dom-anchor-text-quote library.
         const range = toRange(container, {
           exact: hl.quote,
           prefix: hl.prefix,
           suffix: hl.suffix,
         });
-        if (!range) {
-          console.warn("No range found for highlight:", hl);
-          return;
-        }
-        console.log("Found range:", range);
+        if (!range) return;
 
-        // Generate the colors.
-        const normalColor = hashStringToRgba(hl.user_id, baseAlpha);
-        const hoverColor = hashStringToRgba(hl.user_id, hoverAlpha);
+        // Compute colors.
+        const color = hashStringToRgba(hl.user_id, 0.4);
+        const hoverColor = hashStringToRgba(hl.user_id, 0.6);
 
-        // Identify a candidate block element.
-        let blockEl = range.commonAncestorContainer;
-        if (blockEl.nodeType === 3) {
-          blockEl = blockEl.parentNode;
-        }
-        console.log("Candidate block element:", blockEl);
-
-        // Create a range spanning the entire block element.
-        const fullRange = document.createRange();
-        fullRange.selectNodeContents(blockEl);
-        const fullText = normalizeText(fullRange.toString());
-        const selectedText = normalizeText(range.toString());
-        console.log("Full element text:", fullText);
-        console.log("Selected text:", selectedText);
-
-        const isFullElement = fullText === selectedText;
-        console.log("Is full element highlight:", isFullElement);
-
-        if (isFullElement) {
-          // For full-element highlights, apply styles directly to the element.
-          blockEl.style.setProperty(
-            "background-color",
-            normalColor,
-            "important"
-          );
-          blockEl.style.cursor = "pointer";
-          blockEl.style.transition = "background-color 0.2s ease";
-          blockEl.setAttribute("data-full-element-highlight", "true");
-          blockEl.setAttribute("data-highlight-id", hl.id);
-          blockEl.setAttribute("data-user-id", hl.user_id);
-          blockEl.title = `${hl.is_comment ? "Comment" : "Highlight"} by ${
-            hl.user_profile?.full_name ||
-            hl.user_profile?.username ||
-            "Anonymous"
-          }`;
-
-          const onMouseEnter = () => {
-            blockEl.style.setProperty(
-              "background-color",
-              hoverColor,
-              "important"
-            );
-          };
-          const onMouseLeave = () => {
-            blockEl.style.setProperty(
-              "background-color",
-              normalColor,
-              "important"
-            );
-          };
-          const onClick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onHighlightClick?.(hl);
-          };
-          blockEl.addEventListener("mouseenter", onMouseEnter);
-          blockEl.addEventListener("mouseleave", onMouseLeave);
-          blockEl.addEventListener("click", onClick);
-        } else {
-          // For partial selections, wrap the selected content in a <mark> element.
+        // Split the range into sub-ranges. This handles cases where
+        // the selection spans more than one text node (or DOM element).
+        const subRanges = getSubRanges(range);
+        // Process the sub-ranges in reverse order. That way, DOM changes in one
+        // part do not affect the others.
+        subRanges.reverse().forEach((subRange) => {
           const mark = document.createElement("mark");
-          // Force the background color and display styles with !important.
-          mark.style.setProperty("background-color", normalColor, "important");
-          mark.style.setProperty("display", "inline", "important");
-          mark.style.setProperty(
-            "transition",
-            "background-color 0.2s",
-            "important"
-          );
-          mark.style.cursor = "pointer";
-          mark.setAttribute("data-highlight-id", hl.id);
-          mark.setAttribute("data-user-id", hl.user_id);
-          mark.title = `${hl.is_comment ? "Comment" : "Highlight"} by ${
-            hl.user_profile?.full_name ||
-            hl.user_profile?.username ||
-            "Anonymous"
-          }`;
+          mark.style.setProperty("background-color", color, "important");
+          mark.style.setProperty("color", "inherit", "important");
+          mark.style.setProperty("cursor", "pointer", "important");
+          mark.setAttribute("data-highlight", "true");
 
           mark.addEventListener("mouseenter", () => {
-            mark.style.setProperty("background-color", hoverColor, "important");
+            mark.style.backgroundColor = hoverColor;
           });
           mark.addEventListener("mouseleave", () => {
-            mark.style.setProperty(
-              "background-color",
-              normalColor,
-              "important"
-            );
+            mark.style.backgroundColor = color;
           });
           mark.addEventListener("click", (e) => {
             e.preventDefault();
-            e.stopPropagation();
             onHighlightClick?.(hl);
           });
 
-          // Extract and insert the selected content.
-          const contents = range.extractContents();
-          mark.appendChild(contents);
-          range.insertNode(mark);
-          console.log("Inserted inline mark:", mark);
-
-          // If the inserted mark contains any block-level children (e.g. an <h2>), force their background color as well.
-          Array.from(mark.children).forEach((child) => {
-            // You could check for specific tag names if desired.
-            child.style.setProperty(
-              "background-color",
-              normalColor,
-              "important"
-            );
-          });
-        }
+          // Wrap the selected portion.
+          mark.appendChild(subRange.extractContents());
+          subRange.insertNode(mark);
+        });
       } catch (err) {
-        console.error("Error processing highlight:", hl, err);
+        console.error("Error:", err);
       }
     });
   }, [containerRef, highlights, onHighlightClick]);
+
+  // This helper function returns an array of ranges that each lie
+  // within a single text node. It computes the intersection of the
+  // original range with each text node inside the common ancestor.
+  function getSubRanges(range) {
+    const subRanges = [];
+    const commonAncestor = range.commonAncestorContainer;
+    const walker = document.createTreeWalker(
+      commonAncestor,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node) {
+          // Check if the text node intersects the highlight range.
+          const nodeRange = document.createRange();
+          nodeRange.selectNodeContents(node);
+          if (
+            range.compareBoundaryPoints(Range.END_TO_START, nodeRange) < 0 &&
+            range.compareBoundaryPoints(Range.START_TO_END, nodeRange) > 0
+          ) {
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_REJECT;
+        },
+      }
+    );
+
+    // Iterate over all text nodes that intersect the range.
+    let textNode;
+    while ((textNode = walker.nextNode())) {
+      const nodeRange = document.createRange();
+      nodeRange.selectNodeContents(textNode);
+      // Set the start to the original range start if this is the start node.
+      const start = textNode === range.startContainer ? range.startOffset : 0;
+      // Set the end to the original range end if this is the end node.
+      const end =
+        textNode === range.endContainer
+          ? range.endOffset
+          : textNode.textContent.length;
+
+      if (start !== end) {
+        const subRange = document.createRange();
+        subRange.setStart(textNode, start);
+        subRange.setEnd(textNode, end);
+        subRanges.push(subRange);
+      }
+    }
+    return subRanges;
+  }
 
   return null;
 };
