@@ -1,3 +1,4 @@
+// components/HighlightSidebar.js
 import React from "react";
 import { Box, VStack, Text, Avatar, Flex, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -12,36 +13,27 @@ const HighlightSidebar = ({
 }) => {
   const { user } = useAuth();
 
-  // Sort highlights by their position in the text (prefix length)
-  const sortedHighlights = [...highlights].sort((a, b) => {
-    // First compare prefix lengths
-    const positionDiff = a.prefix.length - b.prefix.length;
-
-    if (positionDiff !== 0) {
-      return positionDiff;
-    }
-
-    // If prefixes are equal length (rare but possible),
-    // use creation date as secondary sort
-    return new Date(a.created_at) - new Date(b.created_at);
-  });
+  // Order highlights by prefix length (i.e. where they appear in the text)
+  const sortedHighlights = [...(highlights || [])].sort(
+    (a, b) => a.prefix.length - b.prefix.length
+  );
 
   return (
     <Box
-      p={4}
+      p={2}
       borderLeft="1px solid"
       borderColor="gray.200"
       height="100%"
       overflowY="auto"
     >
-      <Text fontSize="lg" fontWeight="bold" mb={4}>
+      <Text fontSize="lg" fontWeight="bold" mb={2}>
         Highlights & Comments
       </Text>
-      <VStack spacing={4} align="stretch">
+      <VStack spacing={2} align="stretch">
         {sortedHighlights.map((highlight) => (
           <Box
             key={highlight.id}
-            p={3}
+            p={2}
             bg={selectedHighlightId === highlight.id ? "blue.50" : "gray.50"}
             borderRadius="md"
             borderLeft="4px solid"
@@ -49,18 +41,17 @@ const HighlightSidebar = ({
             transition="all 0.2s"
             cursor="pointer"
             onClick={() => onHighlightClick?.(highlight)}
-            _hover={{
-              bg: "gray.100",
-            }}
+            _hover={{ bg: "gray.100" }}
           >
-            <Flex justify="space-between" align="center" mb={2}>
+            <Flex justify="space-between" align="center" mb={1}>
               <Flex align="center" gap={2}>
                 <Avatar
                   size="xs"
                   src={highlight.user_profile?.avatar_url}
                   name={
                     highlight.user_profile?.full_name ||
-                    highlight.user_profile?.username
+                    highlight.user_profile?.username ||
+                    "Anonymous"
                   }
                 />
                 <Text fontSize="sm" color="gray.600">
@@ -82,7 +73,7 @@ const HighlightSidebar = ({
                 />
               )}
             </Flex>
-            <Text fontSize="sm" fontStyle="italic" mb={2} color="gray.700">
+            <Text fontSize="sm" fontStyle="italic" mb={1} color="gray.700">
               "{highlight.quote}"
             </Text>
             <Text fontSize="xs" color="gray.500">
@@ -99,7 +90,7 @@ const HighlightSidebar = ({
           </Box>
         ))}
         {sortedHighlights.length === 0 && (
-          <Text color="gray.500" fontSize="sm" textAlign="center" py={4}>
+          <Text color="gray.500" fontSize="sm" textAlign="center" py={2}>
             No highlights or comments yet
           </Text>
         )}
