@@ -12,22 +12,22 @@ const HighlightSidebar = ({
 }) => {
   const { user } = useAuth();
 
-  // Sort by stored text_position
   const sortedHighlights = [...(highlights || [])].sort(
     (a, b) => a.text_position - b.text_position
   );
 
   const handleHighlightClick = (highlight) => {
-    // First call the passed in click handler
     onHighlightClick?.(highlight);
 
-    // Then find and scroll to the highlight
-    const marks = document.querySelectorAll('mark[data-highlight="true"]');
-    for (const mark of marks) {
-      if (mark.textContent === highlight.quote) {
-        mark.scrollIntoView({ behavior: "smooth", block: "center" });
-        break;
-      }
+    // Simple scroll to the highlight
+    const mark = document.querySelector(
+      `mark[data-highlight-id="${highlight.id}"]`
+    );
+    if (mark) {
+      window.scrollTo({
+        top: mark.getBoundingClientRect().top + window.pageYOffset - 100,
+        behavior: "smooth",
+      });
     }
   };
 
@@ -40,7 +40,7 @@ const HighlightSidebar = ({
       overflowY="auto"
     >
       <Text fontSize="lg" fontWeight="bold" mb={2}>
-        Highlights & Comments
+        Highlights
       </Text>
       <VStack spacing={2} align="stretch">
         {sortedHighlights.map((highlight) => (

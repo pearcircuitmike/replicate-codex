@@ -23,7 +23,6 @@ const InjectedHighlights = ({ containerRef, highlights, onHighlightClick }) => {
         const color = hashStringToRgba(hl.user_id, 0.4);
         const hoverColor = hashStringToRgba(hl.user_id, 0.6);
 
-        // Use our robust highlighting approach
         highlightRange(range, {
           color,
           hoverColor,
@@ -31,6 +30,7 @@ const InjectedHighlights = ({ containerRef, highlights, onHighlightClick }) => {
             e.preventDefault();
             onHighlightClick?.(hl);
           },
+          highlightId: hl.id, // Pass the highlight ID
         });
       } catch (err) {
         console.error("Error highlighting:", err);
@@ -53,14 +53,38 @@ function cleanupHighlights(container) {
   });
 }
 
-function highlightRange(range, { color, hoverColor, onClick }) {
+function createHighlightSpan(color, hoverColor, onClick, highlightId) {
+  const span = document.createElement("mark");
+  span.setAttribute("data-highlight", "true");
+  span.setAttribute("data-highlight-id", highlightId); // Add unique identifier
+  span.style.backgroundColor = color;
+  span.style.color = "inherit";
+  span.style.cursor = "pointer";
+  span.style.mixBlendMode = "multiply";
+
+  span.addEventListener("mouseenter", () => {
+    span.style.backgroundColor = hoverColor;
+  });
+
+  span.addEventListener("mouseleave", () => {
+    span.style.backgroundColor = color;
+  });
+
+  if (onClick) {
+    span.addEventListener("click", onClick);
+  }
+
+  return span;
+}
+
+function highlightRange(range, { color, hoverColor, onClick, highlightId }) {
   const startNode = range.startContainer;
   const endNode = range.endContainer;
   const commonAncestor = range.commonAncestorContainer;
 
   // If highlighting within a single text node
   if (startNode === endNode && startNode.nodeType === Node.TEXT_NODE) {
-    const span = createHighlightSpan(color, hoverColor, onClick);
+    const span = createHighlightSpan(color, hoverColor, onClick, highlightId);
     const textContent = startNode.textContent;
     const beforeText = textContent.substring(0, range.startOffset);
     const highlightedText = textContent.substring(
@@ -102,9 +126,6 @@ function highlightRange(range, { color, hoverColor, onClick }) {
   let currentNode;
 
   while ((currentNode = iterator.nextNode())) {
-    const nodeRange = document.createRange();
-    nodeRange.selectNodeContents(currentNode);
-
     if (range.intersectsNode(currentNode)) {
       const intersectionStart = Math.max(
         0,
@@ -127,7 +148,7 @@ function highlightRange(range, { color, hoverColor, onClick }) {
 
   // Apply highlights in reverse order to maintain position validity
   nodesToHighlight.reverse().forEach(({ node, start, end }) => {
-    const span = createHighlightSpan(color, hoverColor, onClick);
+    const span = createHighlightSpan(color, hoverColor, onClick, highlightId);
     const range = document.createRange();
     range.setStart(node, start);
     range.setEnd(node, end);
@@ -136,29 +157,6 @@ function highlightRange(range, { color, hoverColor, onClick }) {
     span.appendChild(textContent);
     range.insertNode(span);
   });
-}
-
-function createHighlightSpan(color, hoverColor, onClick) {
-  const span = document.createElement("mark");
-  span.setAttribute("data-highlight", "true");
-  span.style.backgroundColor = color;
-  span.style.color = "inherit";
-  span.style.cursor = "pointer";
-  span.style.mixBlendMode = "multiply"; // For overlapping highlights
-
-  span.addEventListener("mouseenter", () => {
-    span.style.backgroundColor = hoverColor;
-  });
-
-  span.addEventListener("mouseleave", () => {
-    span.style.backgroundColor = color;
-  });
-
-  if (onClick) {
-    span.addEventListener("click", onClick);
-  }
-
-  return span;
 }
 
 export default InjectedHighlights;
