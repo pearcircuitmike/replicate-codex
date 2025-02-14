@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Box, Button, Portal } from "@chakra-ui/react";
 import { fromRange } from "dom-anchor-text-quote";
 
-const ContextualHighlighter = ({ children, onHighlight, onComment }) => {
+const ContextualHighlighter = ({ children, onHighlight }) => {
   const containerRef = useRef(null);
   const [popover, setPopover] = useState(null);
 
@@ -18,7 +18,7 @@ const ContextualHighlighter = ({ children, onHighlight, onComment }) => {
     return {
       left,
       top,
-      pos: bounds.top < 50 ? "below" : "above", // Switch to below if too close to top
+      pos: bounds.top < 50 ? "below" : "above",
     };
   };
 
@@ -112,18 +112,6 @@ const ContextualHighlighter = ({ children, onHighlight, onComment }) => {
               }}
             >
               Highlight
-            </Button>
-            <Button
-              size="sm"
-              colorScheme="green"
-              variant="ghost"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                onComment(popover.anchor);
-                clearSelection();
-              }}
-            >
-              Comment
             </Button>
           </Box>
         </Portal>

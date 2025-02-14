@@ -7,112 +7,157 @@ const InjectedHighlights = ({ containerRef, highlights, onHighlightClick }) => {
     if (!containerRef.current) return;
     const container = containerRef.current;
 
-    // Remove previous highlight marks.
-    const marks = container.querySelectorAll("mark[data-highlight]");
-    marks.forEach((mark) => {
-      const parent = mark.parentNode;
-      while (mark.firstChild) {
-        parent.insertBefore(mark.firstChild, mark);
-      }
-      parent.removeChild(mark);
-    });
+    // Clean up previous highlights
+    cleanupHighlights(container);
 
     highlights.forEach((hl) => {
       try {
-        // Create a range using the dom-anchor-text-quote library.
         const range = toRange(container, {
           exact: hl.quote,
           prefix: hl.prefix,
           suffix: hl.suffix,
         });
+
         if (!range) return;
 
-        // Compute colors.
         const color = hashStringToRgba(hl.user_id, 0.4);
         const hoverColor = hashStringToRgba(hl.user_id, 0.6);
 
-        // Split the range into sub-ranges. This handles cases where
-        // the selection spans more than one text node (or DOM element).
-        const subRanges = getSubRanges(range);
-        // Process the sub-ranges in reverse order. That way, DOM changes in one
-        // part do not affect the others.
-        subRanges.reverse().forEach((subRange) => {
-          const mark = document.createElement("mark");
-          mark.style.setProperty("background-color", color, "important");
-          mark.style.setProperty("color", "inherit", "important");
-          mark.style.setProperty("cursor", "pointer", "important");
-          mark.setAttribute("data-highlight", "true");
-
-          mark.addEventListener("mouseenter", () => {
-            mark.style.backgroundColor = hoverColor;
-          });
-          mark.addEventListener("mouseleave", () => {
-            mark.style.backgroundColor = color;
-          });
-          mark.addEventListener("click", (e) => {
+        // Use our robust highlighting approach
+        highlightRange(range, {
+          color,
+          hoverColor,
+          onClick: (e) => {
             e.preventDefault();
             onHighlightClick?.(hl);
-          });
-
-          // Wrap the selected portion.
-          mark.appendChild(subRange.extractContents());
-          subRange.insertNode(mark);
+          },
         });
       } catch (err) {
-        console.error("Error:", err);
+        console.error("Error highlighting:", err);
       }
     });
   }, [containerRef, highlights, onHighlightClick]);
 
-  // This helper function returns an array of ranges that each lie
-  // within a single text node. It computes the intersection of the
-  // original range with each text node inside the common ancestor.
-  function getSubRanges(range) {
-    const subRanges = [];
-    const commonAncestor = range.commonAncestorContainer;
-    const walker = document.createTreeWalker(
-      commonAncestor,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode(node) {
-          // Check if the text node intersects the highlight range.
-          const nodeRange = document.createRange();
-          nodeRange.selectNodeContents(node);
-          if (
-            range.compareBoundaryPoints(Range.END_TO_START, nodeRange) < 0 &&
-            range.compareBoundaryPoints(Range.START_TO_END, nodeRange) > 0
-          ) {
-            return NodeFilter.FILTER_ACCEPT;
-          }
-          return NodeFilter.FILTER_REJECT;
-        },
-      }
-    );
-
-    // Iterate over all text nodes that intersect the range.
-    let textNode;
-    while ((textNode = walker.nextNode())) {
-      const nodeRange = document.createRange();
-      nodeRange.selectNodeContents(textNode);
-      // Set the start to the original range start if this is the start node.
-      const start = textNode === range.startContainer ? range.startOffset : 0;
-      // Set the end to the original range end if this is the end node.
-      const end =
-        textNode === range.endContainer
-          ? range.endOffset
-          : textNode.textContent.length;
-
-      if (start !== end) {
-        const subRange = document.createRange();
-        subRange.setStart(textNode, start);
-        subRange.setEnd(textNode, end);
-        subRanges.push(subRange);
-      }
-    }
-    return subRanges;
-  }
-
   return null;
 };
+
+function cleanupHighlights(container) {
+  container.normalize();
+  const marks = container.querySelectorAll("mark[data-highlight]");
+  marks.forEach((mark) => {
+    const parent = mark.parentNode;
+    while (mark.firstChild) {
+      parent.insertBefore(mark.firstChild, mark);
+    }
+    parent.removeChild(mark);
+  });
+}
+
+function highlightRange(range, { color, hoverColor, onClick }) {
+  const startNode = range.startContainer;
+  const endNode = range.endContainer;
+  const commonAncestor = range.commonAncestorContainer;
+
+  // If highlighting within a single text node
+  if (startNode === endNode && startNode.nodeType === Node.TEXT_NODE) {
+    const span = createHighlightSpan(color, hoverColor, onClick);
+    const textContent = startNode.textContent;
+    const beforeText = textContent.substring(0, range.startOffset);
+    const highlightedText = textContent.substring(
+      range.startOffset,
+      range.endOffset
+    );
+    const afterText = textContent.substring(range.endOffset);
+
+    const fragment = document.createDocumentFragment();
+    if (beforeText) fragment.appendChild(document.createTextNode(beforeText));
+
+    span.textContent = highlightedText;
+    fragment.appendChild(span);
+
+    if (afterText) fragment.appendChild(document.createTextNode(afterText));
+
+    startNode.parentNode.replaceChild(fragment, startNode);
+    return;
+  }
+
+  // For complex ranges that cross element boundaries
+  const iterator = document.createNodeIterator(
+    commonAncestor,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode: (node) => {
+        const nodeRange = document.createRange();
+        nodeRange.selectNodeContents(node);
+
+        if (range.intersectsNode(node)) {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+        return NodeFilter.FILTER_REJECT;
+      },
+    }
+  );
+
+  const nodesToHighlight = [];
+  let currentNode;
+
+  while ((currentNode = iterator.nextNode())) {
+    const nodeRange = document.createRange();
+    nodeRange.selectNodeContents(currentNode);
+
+    if (range.intersectsNode(currentNode)) {
+      const intersectionStart = Math.max(
+        0,
+        currentNode === startNode ? range.startOffset : 0
+      );
+      const intersectionEnd = Math.min(
+        currentNode.length,
+        currentNode === endNode ? range.endOffset : currentNode.length
+      );
+
+      if (intersectionStart !== intersectionEnd) {
+        nodesToHighlight.push({
+          node: currentNode,
+          start: intersectionStart,
+          end: intersectionEnd,
+        });
+      }
+    }
+  }
+
+  // Apply highlights in reverse order to maintain position validity
+  nodesToHighlight.reverse().forEach(({ node, start, end }) => {
+    const span = createHighlightSpan(color, hoverColor, onClick);
+    const range = document.createRange();
+    range.setStart(node, start);
+    range.setEnd(node, end);
+
+    const textContent = range.extractContents();
+    span.appendChild(textContent);
+    range.insertNode(span);
+  });
+}
+
+function createHighlightSpan(color, hoverColor, onClick) {
+  const span = document.createElement("mark");
+  span.setAttribute("data-highlight", "true");
+  span.style.backgroundColor = color;
+  span.style.color = "inherit";
+  span.style.cursor = "pointer";
+
+  span.addEventListener("mouseenter", () => {
+    span.style.backgroundColor = hoverColor;
+  });
+
+  span.addEventListener("mouseleave", () => {
+    span.style.backgroundColor = color;
+  });
+
+  if (onClick) {
+    span.addEventListener("click", onClick);
+  }
+
+  return span;
+}
 
 export default InjectedHighlights;
