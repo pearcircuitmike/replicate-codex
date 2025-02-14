@@ -124,6 +124,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         quote: anchor.exact,
         prefix: anchor.prefix,
         suffix: anchor.suffix,
+        text_position: anchor.text_position,
         context_snippet:
           `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
       };
@@ -182,6 +183,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         quote: anchor.exact,
         prefix: anchor.prefix,
         suffix: anchor.suffix,
+        text_position: anchor.text_position,
         context_snippet:
           `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
         is_comment: true,
@@ -222,7 +224,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
 
   const handleHighlightClick = (highlight) => {
     setSelectedHighlightId(highlight.id);
-    // Optionally, scroll the inline highlight into view.
   };
 
   const handleHighlightRemove = async (highlightId) => {

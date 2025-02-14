@@ -42,6 +42,12 @@ const ContextualHighlighter = ({ children, onHighlight }) => {
         return;
       }
 
+      // Add text position calculation
+      const precedingRange = document.createRange();
+      precedingRange.setStart(containerRef.current, 0);
+      precedingRange.setEnd(range.startContainer, range.startOffset);
+      anchor.text_position = precedingRange.toString().length;
+
       const pos = computePopoverPosition(range);
       if (pos) {
         setPopover({ ...pos, anchor });

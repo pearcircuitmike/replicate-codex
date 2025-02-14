@@ -1,4 +1,3 @@
-// components/HighlightSidebar.js
 import React from "react";
 import { Box, VStack, Text, Avatar, Flex, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -13,10 +12,24 @@ const HighlightSidebar = ({
 }) => {
   const { user } = useAuth();
 
-  // Order highlights by prefix length (i.e. where they appear in the text)
+  // Sort by stored text_position
   const sortedHighlights = [...(highlights || [])].sort(
-    (a, b) => a.prefix.length - b.prefix.length
+    (a, b) => a.text_position - b.text_position
   );
+
+  const handleHighlightClick = (highlight) => {
+    // First call the passed in click handler
+    onHighlightClick?.(highlight);
+
+    // Then find and scroll to the highlight
+    const marks = document.querySelectorAll('mark[data-highlight="true"]');
+    for (const mark of marks) {
+      if (mark.textContent === highlight.quote) {
+        mark.scrollIntoView({ behavior: "smooth", block: "center" });
+        break;
+      }
+    }
+  };
 
   return (
     <Box
@@ -40,7 +53,7 @@ const HighlightSidebar = ({
             borderLeftColor={highlight.is_comment ? "green.400" : "blue.400"}
             transition="all 0.2s"
             cursor="pointer"
-            onClick={() => onHighlightClick?.(highlight)}
+            onClick={() => handleHighlightClick(highlight)}
             _hover={{ bg: "gray.100" }}
           >
             <Flex justify="space-between" align="center" mb={1}>

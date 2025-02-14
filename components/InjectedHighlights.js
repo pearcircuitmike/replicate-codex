@@ -144,6 +144,7 @@ function createHighlightSpan(color, hoverColor, onClick) {
   span.style.backgroundColor = color;
   span.style.color = "inherit";
   span.style.cursor = "pointer";
+  span.style.mixBlendMode = "multiply"; // For overlapping highlights
 
   span.addEventListener("mouseenter", () => {
     span.style.backgroundColor = hoverColor;
