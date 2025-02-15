@@ -1,5 +1,3 @@
-// pages/dashboard/communities/[community].js
-
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -22,6 +20,7 @@ import {
   WrapItem,
   Tag,
   TagLabel,
+  Center,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -34,17 +33,16 @@ import PaperCard from "@/components/Cards/PaperCard";
 import CommunityNotesTab from "@/components/Community/CommunityNotesTab";
 import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
 import InviteUserModal from "@/components/Community/InviteUserModal";
+import Pagination from "@/components/Pagination";
 import { useAuth } from "@/context/AuthContext";
 
 export default function CommunityDetailPage() {
   const router = useRouter();
-  // "community" is the slug from the URL [community].js
   const { community: slug } = router.query;
 
   const { user } = useAuth();
   const userId = user?.id || null;
 
-  // We'll store the entire community record (including the real "id")
   const [communityData, setCommunityData] = useState(null);
   const [loadingSlug, setLoadingSlug] = useState(true);
 
@@ -53,9 +51,17 @@ export default function CommunityDetailPage() {
   const [papers, setPapers] = useState([]);
   const [comments, setComments] = useState([]);
 
+  // NEW: for highlights
+  const [highlights, setHighlights] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState("thisWeek");
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+
+  // NEW: pagination state for papers
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+  const [totalPapersCount, setTotalPapersCount] = useState(0);
 
   // Step A: Slug -> real "id"
   useEffect(() => {
@@ -70,10 +76,9 @@ export default function CommunityDetailPage() {
           throw new Error("Community not found by slug");
         }
         const data = await resp.json();
-        setCommunityData(data); // data includes .id, .name, .description, etc.
+        setCommunityData(data);
       } catch (err) {
         console.error("Error in slug lookup:", err);
-        // Optionally router.push("/404")
       } finally {
         setLoadingSlug(false);
       }
@@ -81,11 +86,10 @@ export default function CommunityDetailPage() {
     fetchBySlug();
   }, [slug]);
 
-  // Once we have the real ID, we can do all our standard calls
   const communityId = communityData?.id || null;
   const memberCount = members.length;
 
-  // Step B: fetch members, membership, papers, comments, etc. by ID
+  // Step B: fetch members, membership, papers, comments, highlights, etc. by ID
   async function fetchMembers() {
     if (!communityId) return;
     setLoading(true);
@@ -124,13 +128,15 @@ export default function CommunityDetailPage() {
     setLoading(true);
     try {
       const resp = await fetch(
-        `/api/community/${communityId}/papers?timeRange=${selectedTimeRange}`
+        `/api/community/${communityId}/papers?timeRange=${selectedTimeRange}&page=${currentPage}&pageSize=${pageSize}`
       );
       if (!resp.ok) {
         throw new Error("Failed to load papers");
       }
-      const data = await resp.json();
-      setPapers(data || []);
+      // Expecting the API to return an object with "data" and "totalCount"
+      const json = await resp.json();
+      setPapers(json.data || []);
+      setTotalPapersCount(json.totalCount || 0);
     } catch (err) {
       console.error("fetchPapers error:", err);
     } finally {
@@ -157,26 +163,58 @@ export default function CommunityDetailPage() {
     }
   }
 
-  // Whenever the ID changes or tab/time range changes
+  // NEW: fetch highlights
+  async function fetchHighlights() {
+    if (!communityId) return;
+    setLoading(true);
+    try {
+      const resp = await fetch(
+        `/api/community/${communityId}/highlights?timeRange=${selectedTimeRange}`
+      );
+      if (!resp.ok) {
+        throw new Error("Failed to load highlights");
+      }
+      const data = await resp.json();
+      setHighlights(data || []);
+    } catch (err) {
+      console.error("fetchHighlights error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Reset current page when the time range changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedTimeRange]);
+
   useEffect(() => {
     if (!communityId) return;
     fetchMembers();
     checkIsMember();
+
+    // Load data based on the active tab.
     if (activeTabIndex === 0) {
       fetchPapers();
     } else if (activeTabIndex === 1) {
       fetchComments();
+    } else if (activeTabIndex === 2) {
+      fetchMembers();
+    } else if (activeTabIndex === 3) {
+      fetchHighlights();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [communityId, activeTabIndex, selectedTimeRange]);
+    // Include currentPage in the dependency array for papers.
+  }, [communityId, activeTabIndex, selectedTimeRange, currentPage]);
 
   function handleToggleMembership(joined) {
     setIsMember(joined);
-    // Re-fetch members for an immediate UI update
     fetchMembers();
   }
 
-  // Early loading or 404
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   if (loadingSlug) {
     return (
       <DashboardLayout>
@@ -250,7 +288,7 @@ export default function CommunityDetailPage() {
         {communityData.community_tasks?.length > 0 ? (
           <Wrap mb={4}>
             {communityData.community_tasks.map((ct) => (
-              <WrapItem key={ct.id}>
+              <WrapItem key={ct.task_id}>
                 <Tag variant="subtle" colorScheme="blue">
                   <TagLabel>{ct.tasks?.task || "Unknown Task"}</TagLabel>
                 </Tag>
@@ -263,7 +301,6 @@ export default function CommunityDetailPage() {
           </Text>
         )}
 
-        {/* Time Range */}
         <Box mb={4}>
           <TimeRangeFilter
             selectedTimeRange={selectedTimeRange}
@@ -281,6 +318,7 @@ export default function CommunityDetailPage() {
             <Tab>Papers</Tab>
             <Tab>Comments</Tab>
             <Tab>Members</Tab>
+            <Tab>Highlights</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -289,13 +327,26 @@ export default function CommunityDetailPage() {
               ) : papers.length === 0 ? (
                 <Text>No papers found.</Text>
               ) : (
-                <SimpleGrid columns={[1, 2, 4, 4]} spacing={6}>
-                  {papers.map((paper) => (
-                    <PaperCard key={paper.id} paper={paper} />
-                  ))}
-                </SimpleGrid>
+                <>
+                  <SimpleGrid columns={[1, 2, 4, 4]} spacing={6}>
+                    {papers.map((paper) => (
+                      <PaperCard key={paper.id} paper={paper} />
+                    ))}
+                  </SimpleGrid>
+                  <Center my={5}>
+                    <Pagination
+                      totalCount={totalPapersCount}
+                      pageSize={pageSize}
+                      currentPage={currentPage}
+                      onPageChange={handlePageChange}
+                      basePath={router.asPath.split("?")[0]}
+                      extraQuery={{ timeRange: selectedTimeRange }}
+                    />
+                  </Center>
+                </>
               )}
             </TabPanel>
+
             <TabPanel>
               {loading ? (
                 <Spinner size="lg" />
@@ -305,6 +356,7 @@ export default function CommunityDetailPage() {
                 <CommunityNotesTab notes={comments} />
               )}
             </TabPanel>
+
             <TabPanel>
               {loading ? (
                 <Spinner size="lg" />
@@ -325,6 +377,53 @@ export default function CommunityDetailPage() {
                     </Box>
                   ))}
                 </SimpleGrid>
+              )}
+            </TabPanel>
+
+            {/* NEW: Highlights tab */}
+            <TabPanel>
+              {loading ? (
+                <Spinner size="lg" />
+              ) : highlights.length === 0 ? (
+                <Text>No highlights yet. Start highlighting!</Text>
+              ) : (
+                <Box>
+                  {highlights.map((h) => (
+                    <Box
+                      key={h.id}
+                      p={4}
+                      mb={4}
+                      borderWidth="1px"
+                      borderRadius="md"
+                    >
+                      <HStack mb={2}>
+                        <Avatar
+                          src={h.userProfile.avatar_url}
+                          size="sm"
+                          name={h.userProfile.full_name}
+                        />
+                        <Text fontWeight="bold">{h.userProfile.full_name}</Text>
+                      </HStack>
+                      <Text color="gray.700">
+                        <strong>Paper:</strong>{" "}
+                        {h.arxivPapersData?.title || "Unknown Paper"}
+                      </Text>
+                      <Text mt={2}>
+                        <em>{h.prefix}</em>
+                        <strong> {h.quote} </strong>
+                        <em>{h.suffix}</em>
+                      </Text>
+                      {h.context_snippet && (
+                        <Text mt={2} fontStyle="italic" color="gray.600">
+                          Context: {h.context_snippet}
+                        </Text>
+                      )}
+                      <Text mt={2} fontSize="sm" color="gray.500">
+                        Highlighted at position: {h.text_position}
+                      </Text>
+                    </Box>
+                  ))}
+                </Box>
               )}
             </TabPanel>
           </TabPanels>
