@@ -87,7 +87,7 @@ const HighlightSidebar = ({
               )}
             </Flex>
             <Text fontSize="sm" fontStyle="italic" mb={1} color="gray.700">
-              "{highlight.quote}"
+              &quot;{highlight.quote}&quot;
             </Text>
             <Text fontSize="xs" color="gray.500">
               {format(
