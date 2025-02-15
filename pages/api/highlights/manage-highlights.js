@@ -2,7 +2,7 @@
 import supabase from "@/pages/api/utils/supabaseClient";
 
 export default async function handler(req, res) {
-  // Only require user_id for POST and DELETE operations
+  // For POST and DELETE, verify user_id is provided
   if ((req.method === "POST" || req.method === "DELETE") && !req.body.user_id) {
     return res.status(401).json({ error: "Authentication required" });
   }
@@ -19,7 +19,15 @@ export default async function handler(req, res) {
           .from("highlights")
           .select(
             `
-            *,
+            id,
+            quote,
+            prefix,
+            suffix,
+            text_position,
+            context_snippet,
+            created_at,
+            paper_id,
+            user_id,
             user_profile:public_profile_info!highlights_user_id_fkey (
               id,
               full_name,
@@ -39,13 +47,40 @@ export default async function handler(req, res) {
 
     case "POST":
       try {
-        const highlight = req.body;
+        const {
+          user_id,
+          paper_id,
+          quote,
+          prefix,
+          suffix,
+          text_position,
+          context_snippet,
+        } = req.body;
+
+        const highlight = {
+          user_id,
+          paper_id,
+          quote,
+          prefix,
+          suffix,
+          text_position,
+          context_snippet,
+        };
+
         const { data, error } = await supabase
           .from("highlights")
           .insert(highlight)
           .select(
             `
-            *,
+            id,
+            quote,
+            prefix,
+            suffix,
+            text_position,
+            context_snippet,
+            created_at,
+            paper_id,
+            user_id,
             user_profile:public_profile_info!highlights_user_id_fkey (
               id,
               full_name,
@@ -65,6 +100,21 @@ export default async function handler(req, res) {
     case "DELETE":
       try {
         const { highlight_id, user_id } = req.body;
+
+        // First verify the highlight exists and belongs to the user
+        const { data: highlight, error: fetchError } = await supabase
+          .from("highlights")
+          .select("id")
+          .eq("id", highlight_id)
+          .eq("user_id", user_id)
+          .single();
+
+        if (fetchError || !highlight) {
+          return res
+            .status(403)
+            .json({ error: "Not authorized to delete this highlight" });
+        }
+
         const { error } = await supabase
           .from("highlights")
           .delete()
@@ -84,101 +134,3 @@ export default async function handler(req, res) {
         .json({ error: `Method ${req.method} Not Allowed` });
   }
 }
-
-// Updated functions in PaperDetailsPage.jsx
-const fetchHighlights = async () => {
-  try {
-    if (!paper?.id) return;
-
-    const response = await axios.get("/api/highlights/manage-highlights", {
-      params: { paper_id: paper.id },
-    });
-    setHighlights(response.data);
-  } catch (error) {
-    console.error("Error fetching highlights:", error);
-    toast({
-      title: "Error fetching highlights",
-      description: error.message,
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-};
-
-const handleNewHighlight = async (anchor) => {
-  if (!user) {
-    toast({
-      title: "Authentication required",
-      description: "Please sign in to create highlights",
-      status: "warning",
-      duration: 5000,
-      isClosable: true,
-    });
-    return;
-  }
-
-  try {
-    const newHighlight = {
-      user_id: user.id,
-      paper_id: paper.id,
-      quote: anchor.exact,
-      prefix: anchor.prefix,
-      suffix: anchor.suffix,
-      text_position: anchor.text_position,
-      context_snippet: `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(
-        0,
-        500
-      ),
-    };
-
-    const response = await axios.post(
-      "/api/highlights/manage-highlights",
-      newHighlight
-    );
-    setHighlights((prev) => [response.data, ...prev]);
-    toast({
-      title: "Highlight created",
-      status: "success",
-      duration: 2000,
-    });
-  } catch (error) {
-    console.error("Error creating highlight:", error);
-    toast({
-      title: "Error creating highlight",
-      description: error.message,
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-};
-
-const handleHighlightRemove = async (highlightId) => {
-  if (!user) return;
-
-  try {
-    await axios.delete("/api/highlights/manage-highlights", {
-      data: {
-        highlight_id: highlightId,
-        user_id: user.id,
-      },
-    });
-    setHighlights((prev) => prev.filter((h) => h.id !== highlightId));
-    setSelectedHighlightId(null);
-    toast({
-      title: "Highlight removed",
-      status: "success",
-      duration: 2000,
-    });
-  } catch (error) {
-    console.error("Error removing highlight:", error);
-    toast({
-      title: "Error removing highlight",
-      description: error.message,
-      status: "error",
-      duration: 5000,
-      isClosable: true,
-    });
-  }
-};
