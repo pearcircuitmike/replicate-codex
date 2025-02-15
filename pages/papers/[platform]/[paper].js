@@ -1,4 +1,3 @@
-// pages/PaperDetailsPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -8,6 +7,7 @@ import {
   Flex,
   Heading,
   Text,
+  Link,
   useToast,
 } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
@@ -16,9 +16,9 @@ import { v4 as uuidv4 } from "uuid";
 import MetaTags from "@/components/MetaTags";
 import dynamic from "next/dynamic";
 
-const SectionsNav = dynamic(() =>
-  import("@/components/PaperDetailsPage/SectionsNav")
-);
+// Correct import for PaperVote
+import PaperVote from "@/components/PaperDetailsPage/PaperVote";
+
 const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
@@ -72,25 +72,10 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
 
   const fetchHighlights = async () => {
     try {
-      const supabase = (await import("@/pages/api/utils/supabaseClient"))
-        .default;
-      const { data, error } = await supabase
-        .from("highlights")
-        .select(
-          `
-          *,
-          user_profile:public_profile_info!highlights_user_id_fkey (
-            id,
-            full_name,
-            avatar_url,
-            username
-          )
-        `
-        )
-        .eq("paper_id", paper.id)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      setHighlights(data.filter((hl) => hl && hl.id));
+      const response = await axios.get("/api/highlights/manage-highlights", {
+        params: { paper_id: paper.id },
+      });
+      setHighlights(response.data);
     } catch (error) {
       console.error("Error fetching highlights:", error);
       toast({
@@ -103,7 +88,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
     }
   };
 
-  // Handler for creating a new highlight
   const handleNewHighlight = async (anchor) => {
     if (!user) {
       toast({
@@ -116,8 +100,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
       return;
     }
     try {
-      const supabase = (await import("@/pages/api/utils/supabaseClient"))
-        .default;
       const newHighlight = {
         user_id: user.id,
         paper_id: paper.id,
@@ -128,23 +110,12 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         context_snippet:
           `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
       };
-      const { data, error } = await supabase
-        .from("highlights")
-        .insert(newHighlight)
-        .select(
-          `
-          *,
-          user_profile:public_profile_info!highlights_user_id_fkey (
-            id,
-            full_name,
-            avatar_url,
-            username
-          )
-        `
-        )
-        .single();
-      if (error) throw error;
-      setHighlights((prev) => [data, ...prev]);
+
+      const response = await axios.post(
+        "/api/highlights/manage-highlights",
+        newHighlight
+      );
+      setHighlights((prev) => [response.data, ...prev]);
       toast({
         title: "Highlight created",
         status: "success",
@@ -162,66 +133,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
     }
   };
 
-  // Handler for creating a new comment
-  const handleNewComment = async (anchor) => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to add comments",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-    try {
-      const supabase = (await import("@/pages/api/utils/supabaseClient"))
-        .default;
-      const newComment = {
-        user_id: user.id,
-        paper_id: paper.id,
-        quote: anchor.exact,
-        prefix: anchor.prefix,
-        suffix: anchor.suffix,
-        text_position: anchor.text_position,
-        context_snippet:
-          `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
-        is_comment: true,
-      };
-      const { data, error } = await supabase
-        .from("highlights")
-        .insert(newComment)
-        .select(
-          `
-          *,
-          user_profile:public_profile_info!highlights_user_id_fkey (
-            id,
-            full_name,
-            avatar_url,
-            username
-          )
-        `
-        )
-        .single();
-      if (error) throw error;
-      setHighlights((prev) => [data, ...prev]);
-      toast({
-        title: "Comment created",
-        status: "success",
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error("Error creating comment:", error);
-      toast({
-        title: "Error creating comment",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
-
   const handleHighlightClick = (highlight) => {
     setSelectedHighlightId(highlight.id);
   };
@@ -229,14 +140,9 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
   const handleHighlightRemove = async (highlightId) => {
     if (!user) return;
     try {
-      const supabase = (await import("@/pages/api/utils/supabaseClient"))
-        .default;
-      const { error } = await supabase
-        .from("highlights")
-        .delete()
-        .eq("id", highlightId)
-        .eq("user_id", user.id);
-      if (error) throw error;
+      await axios.delete("/api/highlights/manage-highlights", {
+        data: { highlight_id: highlightId, user_id: user.id },
+      });
       setHighlights((prev) => prev.filter((h) => h.id !== highlightId));
       setSelectedHighlightId(null);
       toast({
@@ -280,22 +186,77 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         socialPreviewSubtitle={paper.abstract}
         canonicalUrl={canonicalUrl}
       />
+
       <Container
         maxW={{ base: "100%", xl: "8xl" }}
         px={{ base: 2, md: 4 }}
         mx="auto"
       >
+        {/* 
+          One Grid to rule them all, with the same columns in both
+          the "header" row and the "main" row. 
+          
+          We'll stack the rows with:
+          - Row 1: "Header" 
+          - Row 2: "Main Content"
+        */}
         <Grid
-          templateColumns={{
-            base: "minmax(0, 1fr)",
-            lg: "300px minmax(0, 1fr) 250px",
-          }}
-          gap={{ base: 4, lg: 6 }}
+          templateColumns={{ base: "1fr", lg: "300px 1fr 250px" }}
+          templateRows="auto auto"
+          rowGap={6}
+          columnGap={{ base: 4, lg: 6 }}
+          mt={6}
           minH="100vh"
         >
-          {/* Left Sidebar: HighlightSidebar */}
-          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "300px" }}>
-            <Box px={2} py={2} bg="white" borderRadius="md">
+          {/* Header - Left Column */}
+          <GridItem display={{ base: "none", lg: "block" }} />
+
+          {/* Header - Middle Column */}
+          <GridItem>
+            <Box bg="white" rounded="md" p={4}>
+              <Grid templateColumns="auto 1fr" gap={4} alignItems="center">
+                <GridItem>
+                  <PaperVote paperId={paper.id} variant="vertical" size="md" />
+                </GridItem>
+                <GridItem>
+                  <Heading as="h1" size="lg">
+                    {paper.title}
+                  </Heading>
+                  <Box fontSize="sm" color="gray.600" mt={1}>
+                    <Text as="span">
+                      Published{" "}
+                      {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
+                    </Text>
+                    {paper.authors?.slice(0, 7).map((author, idx) => (
+                      <React.Fragment key={author}>
+                        <Link
+                          href={`/authors/${paper.platform}/${author}`}
+                          color="blue.500"
+                          _hover={{ textDecoration: "underline" }}
+                        >
+                          {author}
+                        </Link>
+                        {idx < 6 && idx < paper.authors.length - 1 && ", "}
+                      </React.Fragment>
+                    ))}
+                    {paper.authors?.length > 7 && (
+                      <Text as="span">
+                        {" and "}
+                        {paper.authors.length - 7} more...
+                      </Text>
+                    )}
+                  </Box>
+                </GridItem>
+              </Grid>
+            </Box>
+          </GridItem>
+
+          {/* Header - Right Column */}
+          <GridItem display={{ base: "none", lg: "block" }} />
+
+          {/* Main Content - Left Column: Highlights */}
+          <GridItem display={{ base: "none", lg: "block" }}>
+            <Box bg="white" p={2} borderRadius="md">
               <HighlightSidebar
                 highlights={highlights}
                 onHighlightClick={handleHighlightClick}
@@ -305,31 +266,28 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             </Box>
           </GridItem>
 
-          {/* Main Content */}
-          <GridItem w="100%" maxW="100%">
-            <Box id="main-content">
-              <Box py={4} pb={{ base: 32, lg: 24 }} px={{ base: 2, md: 4 }}>
-                <PaperContent
-                  paper={{ ...paper, tasks: paper.tasks || [] }}
-                  hasActiveSubscription={hasActiveSubscription}
-                  viewCounts={viewCounts}
-                  highlights={highlights}
-                  onHighlightClick={handleHighlightClick}
-                  onHighlight={handleNewHighlight}
-                  onComment={handleNewComment}
-                />
-              </Box>
+          {/* Main Content - Middle Column: PaperContent & Related Papers */}
+          <GridItem>
+            <PaperContent
+              paper={{ ...paper, tasks: paper.tasks || [] }}
+              hasActiveSubscription={hasActiveSubscription}
+              viewCounts={viewCounts}
+              highlights={highlights}
+              onHighlightClick={handleHighlightClick}
+              onHighlight={handleNewHighlight}
+            />
+            <Box mt={6} bg="white" p={4} borderRadius="md">
+              <RelatedPapers slug={paper.slug} platform={paper.platform} />
             </Box>
           </GridItem>
 
-          {/* Right Sidebar: PaperNotes */}
-          <GridItem display={{ base: "none", lg: "block" }} w={{ lg: "250px" }}>
+          {/* Main Content - Right Column: Paper Notes */}
+          <GridItem display={{ base: "none", lg: "block" }}>
             <Box
               position="sticky"
               top="0"
               height="100vh"
               overflowY="auto"
-              overflowX="hidden"
               css={{
                 "&::-webkit-scrollbar": { width: "4px" },
                 "&::-webkit-scrollbar-track": { background: "transparent" },
@@ -349,21 +307,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             </Box>
           </GridItem>
         </Grid>
-
-        {/* New Section below the grid showing original navigation content */}
-        <Box mt={6} bg="white" p={4} borderRadius="md">
-          <Heading as="h2" size="md" mb={4}>
-            Paper Navigation & Related Papers
-          </Heading>
-          <SectionsNav
-            markdownContent={paper.generatedSummary}
-            paper={{
-              ...paper,
-              url: `https://www.aimodels.fyi/papers/${paper.platform}/${paper.slug}`,
-            }}
-          />
-          <RelatedPapers slug={paper.slug} platform={paper.platform} />
-        </Box>
       </Container>
     </Box>
   );
