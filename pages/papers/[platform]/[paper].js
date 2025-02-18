@@ -211,12 +211,28 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
 
           {/* Header - Middle Column */}
           <GridItem>
-            <Box bg="white" rounded="md" p={4}>
-              <Grid templateColumns="auto 1fr" gap={4} alignItems="center">
-                <GridItem>
+            <Box bg="white" rounded="md" p={4} position="relative">
+              {/* Desktop layout (large screens) - vote outside left margin */}
+              <Box
+                position="absolute"
+                left="-12"
+                top="4"
+                display={{ base: "none", lg: "block" }}
+              >
+                <PaperVote paperId={paper.id} variant="vertical" size="md" />
+              </Box>
+
+              {/* Mobile/Medium layout - flex container with vote inside */}
+              <Flex
+                display={{ base: "flex", lg: "none" }}
+                gap={4}
+                mb={4}
+                alignItems="flex-start"
+              >
+                <Box flex="none">
                   <PaperVote paperId={paper.id} variant="vertical" size="md" />
-                </GridItem>
-                <GridItem>
+                </Box>
+                <Box flex="1">
                   <Heading as="h1" size="lg">
                     {paper.title}
                   </Heading>
@@ -244,8 +260,39 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                       </Text>
                     )}
                   </Box>
-                </GridItem>
-              </Grid>
+                </Box>
+              </Flex>
+
+              {/* Desktop title section (large screens) - full width */}
+              <Box display={{ base: "none", lg: "block" }}>
+                <Heading as="h1" size="lg">
+                  {paper.title}
+                </Heading>
+                <Box fontSize="sm" color="gray.600" mt={1}>
+                  <Text as="span">
+                    Published{" "}
+                    {new Date(paper.publishedDate).toLocaleDateString()} by{" "}
+                  </Text>
+                  {paper.authors?.slice(0, 7).map((author, idx) => (
+                    <React.Fragment key={author}>
+                      <Link
+                        href={`/authors/${paper.platform}/${author}`}
+                        color="blue.500"
+                        _hover={{ textDecoration: "underline" }}
+                      >
+                        {author}
+                      </Link>
+                      {idx < 6 && idx < paper.authors.length - 1 && ", "}
+                    </React.Fragment>
+                  ))}
+                  {paper.authors?.length > 7 && (
+                    <Text as="span">
+                      {" and "}
+                      {paper.authors.length - 7} more...
+                    </Text>
+                  )}
+                </Box>
+              </Box>
             </Box>
           </GridItem>
 
@@ -377,7 +424,7 @@ export async function getStaticProps({ params }) {
     error = true;
   }
 
-  // If we can’t load the data or the paper is missing crucial fields, fallback
+  // If we can't load the data or the paper is missing crucial fields, fallback
   if (!paperData || !paperData.abstract || !paperData.generatedSummary) {
     return { props: { error: true, slug }, revalidate: false };
   }
