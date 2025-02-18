@@ -31,6 +31,7 @@ import MetaTags from "@/components/MetaTags";
 import TimeRangeFilter from "@/components/Common/TimeRangeFilter";
 import PaperCard from "@/components/Cards/PaperCard";
 import CommunityNotesTab from "@/components/Community/CommunityNotesTab";
+import CommunityHighlightsTab from "@/components/Community/CommunityHighlightsTab"; // <-- Import the new component
 import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
 import InviteUserModal from "@/components/Community/InviteUserModal";
 import Pagination from "@/components/Pagination";
@@ -50,15 +51,13 @@ export default function CommunityDetailPage() {
   const [isMember, setIsMember] = useState(false);
   const [papers, setPapers] = useState([]);
   const [comments, setComments] = useState([]);
-
-  // NEW: for highlights
   const [highlights, setHighlights] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState("thisWeek");
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  // NEW: pagination state for papers
+  // Pagination for papers
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 12;
   const [totalPapersCount, setTotalPapersCount] = useState(0);
@@ -133,7 +132,6 @@ export default function CommunityDetailPage() {
       if (!resp.ok) {
         throw new Error("Failed to load papers");
       }
-      // Expecting the API to return an object with "data" and "totalCount"
       const json = await resp.json();
       setPapers(json.data || []);
       setTotalPapersCount(json.totalCount || 0);
@@ -163,7 +161,6 @@ export default function CommunityDetailPage() {
     }
   }
 
-  // NEW: fetch highlights
   async function fetchHighlights() {
     if (!communityId) return;
     setLoading(true);
@@ -183,11 +180,12 @@ export default function CommunityDetailPage() {
     }
   }
 
-  // Reset current page when the time range changes
+  // Reset page if time range changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedTimeRange]);
 
+  // Re-fetch data each time conditions change
   useEffect(() => {
     if (!communityId) return;
     fetchMembers();
@@ -203,7 +201,6 @@ export default function CommunityDetailPage() {
     } else if (activeTabIndex === 3) {
       fetchHighlights();
     }
-    // Include currentPage in the dependency array for papers.
   }, [communityId, activeTabIndex, selectedTimeRange, currentPage]);
 
   function handleToggleMembership(joined) {
@@ -224,6 +221,7 @@ export default function CommunityDetailPage() {
       </DashboardLayout>
     );
   }
+
   if (!communityData) {
     return (
       <DashboardLayout>
@@ -321,6 +319,7 @@ export default function CommunityDetailPage() {
             <Tab>Highlights</Tab>
           </TabList>
           <TabPanels>
+            {/* PAPERS */}
             <TabPanel>
               {loading ? (
                 <Spinner size="lg" />
@@ -347,6 +346,7 @@ export default function CommunityDetailPage() {
               )}
             </TabPanel>
 
+            {/* COMMENTS */}
             <TabPanel>
               {loading ? (
                 <Spinner size="lg" />
@@ -357,6 +357,7 @@ export default function CommunityDetailPage() {
               )}
             </TabPanel>
 
+            {/* MEMBERS */}
             <TabPanel>
               {loading ? (
                 <Spinner size="lg" />
@@ -380,50 +381,15 @@ export default function CommunityDetailPage() {
               )}
             </TabPanel>
 
-            {/* NEW: Highlights tab */}
+            {/* HIGHLIGHTS */}
             <TabPanel>
               {loading ? (
                 <Spinner size="lg" />
               ) : highlights.length === 0 ? (
                 <Text>No highlights yet. Start highlighting!</Text>
               ) : (
-                <Box>
-                  {highlights.map((h) => (
-                    <Box
-                      key={h.id}
-                      p={4}
-                      mb={4}
-                      borderWidth="1px"
-                      borderRadius="md"
-                    >
-                      <HStack mb={2}>
-                        <Avatar
-                          src={h.userProfile.avatar_url}
-                          size="sm"
-                          name={h.userProfile.full_name}
-                        />
-                        <Text fontWeight="bold">{h.userProfile.full_name}</Text>
-                      </HStack>
-                      <Text color="gray.700">
-                        <strong>Paper:</strong>{" "}
-                        {h.arxivPapersData?.title || "Unknown Paper"}
-                      </Text>
-                      <Text mt={2}>
-                        <em>{h.prefix}</em>
-                        <strong> {h.quote} </strong>
-                        <em>{h.suffix}</em>
-                      </Text>
-                      {h.context_snippet && (
-                        <Text mt={2} fontStyle="italic" color="gray.600">
-                          Context: {h.context_snippet}
-                        </Text>
-                      )}
-                      <Text mt={2} fontSize="sm" color="gray.500">
-                        Highlighted at position: {h.text_position}
-                      </Text>
-                    </Box>
-                  ))}
-                </Box>
+                // Use the new CommunityHighlightsTab
+                <CommunityHighlightsTab highlights={highlights} />
               )}
             </TabPanel>
           </TabPanels>
