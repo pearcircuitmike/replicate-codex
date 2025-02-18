@@ -1,3 +1,5 @@
+// pages/papers/[platform]/[paper].js
+
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -13,12 +15,15 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+
+import AuthForm from "@/components/AuthForm"; // <-- For "Get Notified" signup
 import MetaTags from "@/components/MetaTags";
 import dynamic from "next/dynamic";
 
-// Correct import for PaperVote
+// Paper Vote
 import PaperVote from "@/components/PaperDetailsPage/PaperVote";
 
+// Dynamically imported components
 const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
@@ -28,6 +33,7 @@ const PaperContent = dynamic(() =>
 );
 const HighlightSidebar = dynamic(() => import("@/components/HighlightSidebar"));
 
+// Utilities
 import {
   fetchPaperDataBySlug,
   fetchPapersPaginated,
@@ -192,14 +198,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         px={{ base: 2, md: 4 }}
         mx="auto"
       >
-        {/* 
-          One Grid to rule them all, with the same columns in both
-          the "header" row and the "main" row. 
-          
-          We'll stack the rows with:
-          - Row 1: "Header" 
-          - Row 2: "Main Content"
-        */}
         <Grid
           templateColumns={{ base: "1fr", lg: "300px 1fr 250px" }}
           templateRows="auto auto"
@@ -254,7 +252,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
           {/* Header - Right Column */}
           <GridItem display={{ base: "none", lg: "block" }} />
 
-          {/* Main Content - Left Column: Highlights */}
+          {/* MAIN CONTENT - Left Column: Highlights */}
           <GridItem display={{ base: "none", lg: "block" }}>
             <Box bg="white" p={2} borderRadius="md">
               <HighlightSidebar
@@ -266,8 +264,24 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             </Box>
           </GridItem>
 
-          {/* Main Content - Middle Column: PaperContent & Related Papers */}
+          {/* MAIN CONTENT - Middle Column */}
           <GridItem>
+            {/* "Get Notified" block goes here, just above PaperContent */}
+            {!user && (
+              <Box
+                my={6}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text align="center" fontWeight="bold" mb={4} fontSize="lg">
+                  Get notified when new papers like this one come out!
+                </Text>
+                <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
+              </Box>
+            )}
+
             <PaperContent
               paper={{ ...paper, tasks: paper.tasks || [] }}
               hasActiveSubscription={hasActiveSubscription}
@@ -276,12 +290,13 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
               onHighlightClick={handleHighlightClick}
               onHighlight={handleNewHighlight}
             />
+
             <Box mt={6} bg="white" p={4} borderRadius="md">
               <RelatedPapers slug={paper.slug} platform={paper.platform} />
             </Box>
           </GridItem>
 
-          {/* Main Content - Right Column: Paper Notes */}
+          {/* MAIN CONTENT - Right Column: Paper Notes */}
           <GridItem display={{ base: "none", lg: "block" }}>
             <Box
               position="sticky"
@@ -312,11 +327,15 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
   );
 }
 
+// -----------------------------------------------------
+// getStaticPaths
+// -----------------------------------------------------
 export async function getStaticPaths() {
   const platforms = ["arxiv"];
   const paths = [];
   const pageSize = 1000;
   const totalLimit = 10000;
+
   for (const platform of platforms) {
     let currentPage = 1;
     let totalFetched = 0;
@@ -327,36 +346,48 @@ export async function getStaticPaths() {
         currentPage,
       });
       if (!papers || papers.length === 0) break;
+
       for (const p of papers) {
         paths.push({
           params: { paper: p.slug.toString(), platform },
         });
       }
+
       totalFetched += papers.length;
       if (papers.length < pageSize || totalFetched >= totalLimit) break;
       currentPage += 1;
     }
   }
+
   return { paths, fallback: true };
 }
 
+// -----------------------------------------------------
+// getStaticProps
+// -----------------------------------------------------
 export async function getStaticProps({ params }) {
   const { platform, paper: slug } = params;
   let paperData = null;
   let error = false;
+
   try {
     paperData = await fetchPaperDataBySlug(slug, platform);
   } catch (err) {
     console.error("Error fetching paper data:", err);
     error = true;
   }
+
+  // If we can’t load the data or the paper is missing crucial fields, fallback
   if (!paperData || !paperData.abstract || !paperData.generatedSummary) {
     return { props: { error: true, slug }, revalidate: false };
   }
+
+  // Build canonical URL
   const DOMAIN = "https://www.aimodels.fyi";
   const canonicalUrl = `${DOMAIN}/papers/${encodeURIComponent(
     platform
   )}/${encodeURIComponent(slug)}`;
+
   return {
     props: {
       paper: paperData,
