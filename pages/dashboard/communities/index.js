@@ -316,7 +316,7 @@ export default function CommunitiesPage() {
                 My Communities
               </Heading>
               <Text fontSize="sm" color="gray.500" mb={4}>
-                Communities you've already joined
+                Communities you already joined
               </Text>
 
               {isLoading ? (
