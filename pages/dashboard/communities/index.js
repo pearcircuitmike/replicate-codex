@@ -224,7 +224,8 @@ export default function CommunitiesPage() {
                 />
               ))}
               {leftover > 0 && (
-                <Text fontSize="sm" color="gray.500" ml={3}>
+                <Text fontSize="sm" color="gray.500" ml={4}>
+                  {" "}
                   + {leftover}
                 </Text>
               )}
