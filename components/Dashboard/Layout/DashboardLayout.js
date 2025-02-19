@@ -1,5 +1,3 @@
-// /components/Dashboard/Layout/DashboardLayout.js
-
 import React, { useState } from "react";
 import {
   Box,
@@ -20,52 +18,18 @@ import {
   FaAngleDoubleRight,
   FaUsers,
   FaRobot,
+  FaHighlighter, // <-- import this
 } from "react-icons/fa";
 import NavItem from "./NavItem";
-import { useAuth } from "@/context/AuthContext"; // 1) Import useAuth
+import { useAuth } from "@/context/AuthContext";
 
 const DashboardLayout = ({ children }) => {
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
-
-  // 2) Access hasActiveSubscription
   const { hasActiveSubscription } = useAuth();
 
-  // 3) Reorder the nav items so Communities is first
-  //    Then conditionally add a "PRO" tag to Popular Papers/Models if not subscribed
-  const navItems = [
-    {
-      icon: <FaUsers />,
-      label: "Communities",
-      href: "/dashboard/communities",
-    },
-    {
-      icon: <FaRobot />,
-      label: "Assistant",
-      href: "/dashboard/assistant",
-    },
-    { icon: <FaStar />, label: "Following", href: "/dashboard/followed-tasks" },
-    {
-      icon: <FaChartLine />,
-      label: "Trending Topics",
-      href: "/dashboard/trending",
-    },
-
-    {
-      icon: <FaFlask />,
-      label: "Popular Papers",
-      href: "/dashboard/weekly-papers-summary",
-    },
-    {
-      icon: <FaCubes />,
-      label: "Popular Models",
-      href: "/dashboard/weekly-models-summary",
-    },
-    { icon: <FaBookmark />, label: "Bookmarks", href: "/dashboard/bookmarks" },
-  ];
-
-  // 4) Create a helper to get the final label (optionally adding "PRO" if unsubscribed)
+  // Conditionally add a "PRO" tag if unsubscribed
   function getNavLabel(originalLabel) {
     const isProFeature =
       originalLabel === "Popular Papers" || originalLabel === "Popular Models";
@@ -82,6 +46,47 @@ const DashboardLayout = ({ children }) => {
     return originalLabel;
   }
 
+  const navItems = [
+    {
+      icon: <FaUsers />,
+      label: "Communities",
+      href: "/dashboard/communities",
+    },
+    {
+      icon: <FaRobot />,
+      label: "Assistant",
+      href: "/dashboard/assistant",
+    },
+    {
+      icon: <FaStar />,
+      label: "Following",
+      href: "/dashboard/followed-tasks",
+    },
+    {
+      icon: <FaChartLine />,
+      label: "Trending Topics",
+      href: "/dashboard/trending",
+    },
+    {
+      icon: <FaFlask />,
+      label: "Popular Papers",
+      href: "/dashboard/weekly-papers-summary",
+    },
+    {
+      icon: <FaCubes />,
+      label: "Popular Models",
+      href: "/dashboard/weekly-models-summary",
+    },
+    { icon: <FaBookmark />, label: "Bookmarks", href: "/dashboard/bookmarks" },
+
+    // <-- Add Highlights item here
+    {
+      icon: <FaHighlighter />,
+      label: "Highlights",
+      href: "/dashboard/highlights",
+    },
+  ];
+
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
       {/* Sidebar for larger screens */}
@@ -95,10 +100,8 @@ const DashboardLayout = ({ children }) => {
         >
           <VStack spacing={1} align="stretch" mt={12}>
             {navItems.map((item) => {
-              // For collapsed mode, use tooltips. For expanded, show label directly.
               const finalLabel = getNavLabel(item.label);
               const isActive = router.pathname === item.href;
-
               return (
                 <Box key={item.href}>
                   {isCollapsed ? (
@@ -119,7 +122,7 @@ const DashboardLayout = ({ children }) => {
                   ) : (
                     <NavItem
                       icon={item.icon}
-                      label={finalLabel} // Notice the finalLabel
+                      label={finalLabel}
                       href={item.href}
                       isActive={isActive}
                     />
@@ -173,9 +176,6 @@ const DashboardLayout = ({ children }) => {
                 justifyContent="center"
                 flex="1"
               >
-                {/* On mobile, we typically show only the icon. 
-                    If you want to show the label with PRO, 
-                    you can use finalLabel instead. */}
                 <NavItem
                   icon={item.icon}
                   href={item.href}
