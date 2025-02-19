@@ -19,6 +19,7 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Skeleton,
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
@@ -26,70 +27,97 @@ import DashboardLayout from "@/components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "@/components/MetaTags";
 import { useAuth } from "@/context/AuthContext";
 import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
+import useSWR from "swr";
 
 export default function CommunitiesPage() {
   const toast = useToast();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const userId = user?.id || null;
-
-  const [loading, setLoading] = useState(true);
-  const [myCommunities, setMyCommunities] = useState([]);
-  const [otherCommunities, setOtherCommunities] = useState([]);
-  const [memberSet, setMemberSet] = useState(new Set());
-  const [avatarMap, setAvatarMap] = useState({});
-  const [membershipCountMap, setMembershipCountMap] = useState({});
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [memberSet, setMemberSet] = useState(new Set());
 
+  // Set initial data for less flickering
+  const initialData = {
+    myCommunities: [],
+    otherCommunities: [],
+    avatarMap: {},
+    membershipCountMap: {},
+  };
+
+  // Prevent fetching until auth is ready
+  const shouldFetch = !authLoading && userId;
+
+  // Data fetching with SWR
+  const fetcher = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed to load communities");
+    return res.json();
+  };
+
+  const { data, error, mutate } = useSWR(
+    shouldFetch ? `/api/community/list?userId=${userId}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 30000, // 30 seconds
+      keepPreviousData: true,
+      fallbackData: initialData,
+    }
+  );
+
+  const isLoading = !data && !error && shouldFetch;
+  const myCommunities = data?.myCommunities || [];
+  const otherCommunities = data?.otherCommunities || [];
+  const avatarMap = data?.avatarMap || {};
+  const membershipCountMap = data?.membershipCountMap || {};
+
+  // Set memberSet once data is loaded
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-    loadCommunities();
-  }, [userId]);
-
-  async function loadCommunities() {
-    setLoading(true);
-    try {
-      const resp = await fetch(`/api/community/list?userId=${userId}`);
-      if (!resp.ok) {
-        throw new Error("Failed to load communities");
-      }
-      const data = await resp.json();
-
-      setMyCommunities(data.myCommunities || []);
-      setOtherCommunities(data.otherCommunities || []);
-      setAvatarMap(data.avatarMap || {});
-      setMembershipCountMap(data.membershipCountMap || {});
-
-      const mySet = new Set((data.myCommunities || []).map((c) => c.id));
+    if (data?.myCommunities?.length > 0) {
+      const mySet = new Set(data.myCommunities.map((c) => c.id));
       setMemberSet(mySet);
-    } catch (err) {
-      console.error("loadCommunities error:", err);
-      toast({ title: "Error loading communities", status: "error" });
-    } finally {
-      setLoading(false);
     }
-  }
+  }, [data?.myCommunities]);
 
   const handleToggleMembership = (communityId, joined) => {
     const newSet = new Set(memberSet);
 
     if (joined) {
       newSet.add(communityId);
+      // Optimistically update UI
       const found = otherCommunities.find((c) => c.id === communityId);
       if (found) {
-        setMyCommunities((curr) => [...curr, found]);
-        setOtherCommunities((curr) => curr.filter((x) => x.id !== communityId));
+        const newMyCommunities = [...myCommunities, found];
+        const newOtherCommunities = otherCommunities.filter(
+          (x) => x.id !== communityId
+        );
+        mutate(
+          {
+            ...data,
+            myCommunities: newMyCommunities,
+            otherCommunities: newOtherCommunities,
+          },
+          { revalidate: false }
+        );
       }
     } else {
       newSet.delete(communityId);
+      // Optimistically update UI
       const found = myCommunities.find((c) => c.id === communityId);
       if (found) {
-        setOtherCommunities((curr) => [...curr, found]);
-        setMyCommunities((curr) => curr.filter((x) => x.id !== communityId));
+        const newOtherCommunities = [...otherCommunities, found];
+        const newMyCommunities = myCommunities.filter(
+          (x) => x.id !== communityId
+        );
+        mutate(
+          {
+            ...data,
+            myCommunities: newMyCommunities,
+            otherCommunities: newOtherCommunities,
+          },
+          { revalidate: false }
+        );
       }
     }
 
@@ -117,7 +145,7 @@ export default function CommunitiesPage() {
     matchesSearch(c, searchTerm)
   );
 
-  function CommunityCard({ community }) {
+  function CommunityCard({ community, isLoading }) {
     const isMember = memberSet.has(community.id);
     const previewArr = avatarMap[community.id] || [];
     const totalMembers = membershipCountMap[community.id] || 0;
@@ -128,6 +156,25 @@ export default function CommunitiesPage() {
     const handleCardClick = () => {
       router.push(`/dashboard/communities/${community.slug}`);
     };
+
+    if (isLoading) {
+      return (
+        <Box
+          borderWidth="1px"
+          borderRadius="md"
+          bg="white"
+          boxShadow="sm"
+          height="100%"
+        >
+          <Flex direction="column" height="100%" p={4}>
+            <Skeleton height="24px" width="70%" mb={2} />
+            <Skeleton height="16px" width="40%" mb={3} />
+            <Skeleton height="60px" mb={4} />
+            <Skeleton height="24px" width="50%" />
+          </Flex>
+        </Box>
+      );
+    }
 
     return (
       <Box
@@ -203,6 +250,28 @@ export default function CommunitiesPage() {
     );
   }
 
+  // Skeleton loader for cards
+  const SkeletonCard = () => (
+    <Box borderWidth="1px" borderRadius="md" bg="white" boxShadow="sm">
+      <Flex direction="column" p={4}>
+        <Skeleton height="24px" width="70%" mb={2} />
+        <Skeleton height="16px" width="40%" mb={3} />
+        <Skeleton height="60px" mb={4} />
+        <Skeleton height="24px" width="50%" />
+      </Flex>
+    </Box>
+  );
+
+  const renderSkeletonGrid = (count) => (
+    <SimpleGrid columns={[1, 2, 2, 3]} spacing={4} mb={8}>
+      {Array(count)
+        .fill(0)
+        .map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+    </SimpleGrid>
+  );
+
   return (
     <>
       <MetaTags title="Communities" description="Join AI communities" />
@@ -221,12 +290,25 @@ export default function CommunitiesPage() {
                 placeholder="Search communities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                isDisabled={isLoading || authLoading}
               />
             </InputGroup>
           </Box>
 
-          {loading ? (
-            <Spinner size="xl" />
+          {authLoading ? (
+            <>
+              <Skeleton height="24px" width="150px" mb={6} />
+              {renderSkeletonGrid(3)}
+
+              <Divider mb={8} />
+
+              <Skeleton height="24px" width="180px" mb={6} />
+              {renderSkeletonGrid(3)}
+            </>
+          ) : error ? (
+            <Text color="red.500">
+              Error loading communities. Please try again.
+            </Text>
           ) : (
             <>
               {/* My Communities */}
@@ -234,16 +316,19 @@ export default function CommunitiesPage() {
                 My Communities
               </Heading>
               <Text fontSize="sm" color="gray.500" mb={4}>
-                Communities you’ve already joined
+                Communities you've already joined
               </Text>
-              {filteredMyCommunities.length === 0 ? (
+
+              {isLoading ? (
+                renderSkeletonGrid(3)
+              ) : filteredMyCommunities.length === 0 ? (
                 <Text fontSize="sm" mb={6}>
                   No matching communities found.
                 </Text>
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4} mb={8}>
                   {filteredMyCommunities.map((c) => (
-                    <CommunityCard key={c.id} community={c} />
+                    <CommunityCard key={c.id} community={c} isLoading={false} />
                   ))}
                 </SimpleGrid>
               )}
@@ -257,14 +342,17 @@ export default function CommunitiesPage() {
               <Text fontSize="sm" color="gray.500" mb={4}>
                 Discover new communities in your field
               </Text>
-              {filteredOtherCommunities.length === 0 ? (
+
+              {isLoading ? (
+                renderSkeletonGrid(3)
+              ) : filteredOtherCommunities.length === 0 ? (
                 <Text fontSize="sm">
                   No matching communities found or none available right now.
                 </Text>
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4}>
                   {filteredOtherCommunities.map((c) => (
-                    <CommunityCard key={c.id} community={c} />
+                    <CommunityCard key={c.id} community={c} isLoading={false} />
                   ))}
                 </SimpleGrid>
               )}
