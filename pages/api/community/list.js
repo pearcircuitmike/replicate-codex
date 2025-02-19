@@ -49,7 +49,7 @@ export default async function handler(req, res) {
       userMemberSet = new Set(memberships.map((m) => m.community_id));
     }
 
-    // Split into “mine” vs “others”
+    // Split into "mine" vs "others"
     const mine = [];
     const others = [];
 
@@ -61,64 +61,56 @@ export default async function handler(req, res) {
       }
     }
 
-    // 3) Fetch all membership rows for these communities
+    // Get community IDs for fetching
     const commIds = allComms.map((c) => c.id);
-    const { data: allRows, error: allRowsErr } = await supabase
-      .from("community_members")
-      .select("community_id, user_id")
-      .in("community_id", commIds)
-      .limit(5000);
 
-    if (allRowsErr) throw allRowsErr;
-
-    // Build membershipMap => array of user IDs per community
-    const membershipMap = {};
-    for (const row of allRows) {
-      if (!membershipMap[row.community_id]) {
-        membershipMap[row.community_id] = [];
-      }
-      membershipMap[row.community_id].push(row.user_id);
-    }
-
-    // 4) Build membershipCountMap
+    // 3) Get ACCURATE member counts using separate COUNT queries
     const membershipCountMap = {};
-    for (const [cId, userIds] of Object.entries(membershipMap)) {
-      membershipCountMap[cId] = userIds.length;
+
+    // We need to run individual queries for each community to get accurate counts
+    // since group_by isn't available in this supabase client version
+    for (const communityId of commIds) {
+      const { count, error: countErr } = await supabase
+        .from("community_members")
+        .select("*", { count: "exact", head: true })
+        .eq("community_id", communityId);
+
+      if (!countErr) {
+        membershipCountMap[communityId] = count;
+      }
     }
 
-    // 5) Gather all unique user IDs
-    const uniqueUserIds = [...new Set(allRows.map((r) => r.user_id))];
-
-    // 6) Fetch profile info
-    let profileMap = {};
-    if (uniqueUserIds.length > 0) {
-      const { data: profileRows, error: profErr } = await supabase
-        .from("public_profile_info")
-        .select("id, full_name, avatar_url, username")
-        .in("id", uniqueUserIds)
-        .limit(5000);
-      if (profErr) throw profErr;
-
-      profileMap = {};
-      (profileRows || []).forEach((p) => {
-        profileMap[p.id] = {
-          full_name: p.full_name || "Anonymous",
-          avatar_url: p.avatar_url || "",
-          username: p.username || "",
-        };
-      });
-    }
-
-    // 7) Build an avatarMap => first 5 user avatars for each community
+    // 4) Fetch members for avatars (limited to 5 per community)
+    // Need to run separate queries for each community to limit properly
     const avatarMap = {};
-    for (const cId of Object.keys(membershipMap)) {
-      const userIds = membershipMap[cId];
-      const topFive = userIds.slice(0, 5);
-      avatarMap[cId] = topFive.map((uid) => ({
-        user_id: uid,
-        avatar_url: profileMap[uid]?.avatar_url || "",
-        full_name: profileMap[uid]?.full_name || "Anonymous",
-      }));
+
+    for (const communityId of commIds) {
+      const { data: members, error: membersErr } = await supabase
+        .from("community_members")
+        .select("user_id")
+        .eq("community_id", communityId)
+        .limit(5);
+
+      if (!membersErr && members) {
+        const userIds = members.map((m) => m.user_id);
+
+        if (userIds.length > 0) {
+          const { data: profiles, error: profilesErr } = await supabase
+            .from("public_profile_info")
+            .select("id, full_name, avatar_url, username")
+            .in("id", userIds);
+
+          if (!profilesErr && profiles) {
+            avatarMap[communityId] = profiles.map((p) => ({
+              user_id: p.id,
+              avatar_url: p.avatar_url || "",
+              full_name: p.full_name || "Anonymous",
+            }));
+          }
+        } else {
+          avatarMap[communityId] = [];
+        }
+      }
     }
 
     return res.status(200).json({
