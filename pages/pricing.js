@@ -22,8 +22,12 @@ import { trackEvent } from "../pages/api/utils/analytics-util";
 import MetaTags from "../components/MetaTags";
 
 const shine = keyframes`
-  0% { left: -400%; }
-  100% { left: 400%; }
+  0% {
+    left: -400%;
+  }
+  100% {
+    left: 400%;
+  }
 `;
 
 const PricingPage = () => {
@@ -126,7 +130,7 @@ const PricingPage = () => {
               handleSubscription();
             }}
             _before={{
-              content: "''",
+              content: '""',
               position: "absolute",
               top: "-50%",
               left: "-50%",
@@ -140,7 +144,7 @@ const PricingPage = () => {
           >
             Start 7-day free trial
           </Button>
-          <List spacing={4} textAlign="left" marginY={8} mx={4}>
+          <List spacing={4} textAlign="left" mt={8} mx={4}>
             <ListItem>
               <ListIcon as={FaCheckCircle} color="green.500" />
               Read unlimited summaries
@@ -176,19 +180,20 @@ const PricingPage = () => {
         socialPreviewSubtitle="Start your 7-day free trial today"
       />
 
+      {/* Use 90vh on desktop, auto height on mobile */}
       <Container
         maxW="container.xl"
-        h="90vh"
+        h={{ base: "auto", md: "90vh" }}
         py={8}
         display="flex"
         flexDirection="column"
+        justifyContent="space-between"
       >
         <Flex
           flex="1"
           direction={isMobile ? "column" : "row"}
           justify="center"
           align="center"
-          spacing={8}
         >
           <Box
             width={isMobile ? "100%" : "50%"}
@@ -209,7 +214,8 @@ const PricingPage = () => {
             <Testimonials />
           </Box>
         </Flex>
-        <Box textAlign="center">
+
+        <Box textAlign="center" mt={8}>
           <Link as={NextLink} href="/dashboard">
             Maybe later (go to dashboard) →
           </Link>
