@@ -1,6 +1,13 @@
 // pages/dashboard/weekly-model-summary.js
 import React from "react";
-import { Box, Container, Heading, Text, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Button,
+  Center,
+  Text,
+  Heading,
+} from "@chakra-ui/react";
 import DashboardLayout from "@/components/Dashboard/Layout/DashboardLayout";
 import WeeklyModelSummary from "@/components/WeeklyModelSummary";
 import MetaTags from "@/components/MetaTags";
@@ -22,34 +29,59 @@ const WeeklyModelSummaryPage = () => {
 
       <DashboardLayout>
         <Container maxW="container.xl" py={8}>
-          <Box>
-            {/* If user has an active subscription, render the full WeeklyModelSummary component */}
-            {hasActiveSubscription ? (
-              <WeeklyModelSummary />
-            ) : (
-              /* Otherwise, show a preview and an Upgrade button */
+          {hasActiveSubscription ? (
+            <WeeklyModelSummary />
+          ) : (
+            <>
+              {/* Content preview with smooth gradient overlay */}
               <Box
-                border="1px solid #ccc"
-                p={4}
-                borderRadius="md"
-                textAlign="center"
+                position="relative"
+                height="450px"
+                overflow="hidden"
+                pointerEvents="none"
               >
-                <Heading as="h3" size="md" mb={4}>
-                  Weekly Models Summary
-                </Heading>
-                <Text mb={4}>
-                  Subscribe to unlock full details about the latest AI model
-                  updates.
-                </Text>
+                <WeeklyModelSummary />
+
+                {/* Single smooth gradient overlay with progressive blur */}
+                <Box
+                  position="absolute"
+                  inset="0"
+                  bgGradient="linear(to-b, rgba(255,255,255,0) 50%, rgba(255,255,255,0.85) 90%)"
+                  pointerEvents="none"
+                  sx={{
+                    maskImage:
+                      "linear-gradient(to bottom, transparent 50%, black 90%)",
+                    backdropFilter: "blur(0px)",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      inset: 0,
+                      backdropFilter: "blur(8px)",
+                      opacity: 0,
+                      background: "transparent",
+                      maskImage:
+                        "linear-gradient(to bottom, transparent 60%, black 100%)",
+                    },
+                  }}
+                />
+              </Box>
+
+              <Center mt={6}>
                 <Button
                   colorScheme="blue"
+                  pointerEvents="auto"
                   onClick={() => router.push("/pricing")}
                 >
                   Upgrade to Premium
                 </Button>
-              </Box>
-            )}
-          </Box>
+              </Center>
+
+              <Text mt={4} fontSize="sm" color="gray.600" textAlign="center">
+                Unlock full access to view the latest AI model releases and
+                updates.
+              </Text>
+            </>
+          )}
         </Container>
       </DashboardLayout>
     </>

@@ -6,6 +6,7 @@ import {
   VStack,
   Tooltip,
   Badge,
+  keyframes,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import {
@@ -18,10 +19,20 @@ import {
   FaAngleDoubleRight,
   FaUsers,
   FaRobot,
-  FaHighlighter, // <-- import this
+  FaHighlighter,
 } from "react-icons/fa";
 import NavItem from "./NavItem";
 import { useAuth } from "@/context/AuthContext";
+
+// Keyframes for a subtle sheen animation
+const shimmer = keyframes`
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+`;
 
 const DashboardLayout = ({ children }) => {
   const [isLargerThan768] = useMediaQuery("(min-width: 768px)");
@@ -29,8 +40,44 @@ const DashboardLayout = ({ children }) => {
   const router = useRouter();
   const { hasActiveSubscription } = useAuth();
 
-  // Conditionally add a "PRO" tag if unsubscribed
   function getNavLabel(originalLabel) {
+    // Show "NEW" badge on the Assistant label
+    if (originalLabel === "Assistant") {
+      return (
+        <>
+          {originalLabel}
+          <Badge
+            ml={2}
+            fontSize="0.6em"
+            position="relative"
+            color="white"
+            borderRadius="md"
+            px={1}
+            py={0.5}
+            bgGradient="linear(to-r, yellow.400, orange.400)"
+            bgSize="200% auto"
+            animation={`${shimmer} 5s linear infinite`}
+            boxShadow="0 0 4px rgba(255,165,0,0.6), inset 0 0 2px rgba(255,255,255,0.7)"
+            _before={{
+              content: `"✨"`,
+              position: "absolute",
+              top: "-4px",
+              right: "-8px",
+            }}
+            _after={{
+              content: `"✨"`,
+              position: "absolute",
+              bottom: "-4px",
+              left: "-8px",
+            }}
+          >
+            NEW
+          </Badge>
+        </>
+      );
+    }
+
+    // Show "PRO" badge for certain labels if unsubscribed
     const isProFeature =
       originalLabel === "Popular Papers" || originalLabel === "Popular Models";
     if (!hasActiveSubscription && isProFeature) {
@@ -43,6 +90,7 @@ const DashboardLayout = ({ children }) => {
         </>
       );
     }
+
     return originalLabel;
   }
 
@@ -78,8 +126,6 @@ const DashboardLayout = ({ children }) => {
       href: "/dashboard/weekly-models-summary",
     },
     { icon: <FaBookmark />, label: "Bookmarks", href: "/dashboard/bookmarks" },
-
-    // <-- Add Highlights item here
     {
       icon: <FaHighlighter />,
       label: "Highlights",
@@ -89,7 +135,6 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <Flex direction={{ base: "column", md: "row" }} minHeight="100vh">
-      {/* Sidebar for larger screens */}
       {isLargerThan768 && (
         <Box
           width={isCollapsed ? "72px" : "300px"}
@@ -105,12 +150,7 @@ const DashboardLayout = ({ children }) => {
               return (
                 <Box key={item.href}>
                   {isCollapsed ? (
-                    <Tooltip
-                      label={item.label}
-                      placement="right"
-                      hasArrow
-                      zIndex="tooltip"
-                    >
+                    <Tooltip label={item.label} placement="right" hasArrow>
                       <Box>
                         <NavItem
                           icon={item.icon}
@@ -132,7 +172,6 @@ const DashboardLayout = ({ children }) => {
             })}
           </VStack>
 
-          {/* Collapse/Expand Toggle */}
           <Box mt={8}>
             <NavItem
               label={!isCollapsed && " "}
@@ -145,12 +184,10 @@ const DashboardLayout = ({ children }) => {
         </Box>
       )}
 
-      {/* Main Content */}
       <Box flex={1} overflowY="auto" p={4} transition="all 0.2s">
         {children}
       </Box>
 
-      {/* Mobile Footer Nav */}
       {!isLargerThan768 && (
         <Box
           position="fixed"
