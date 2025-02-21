@@ -29,9 +29,7 @@ export default function RouteGuard({ children }) {
       // Fetch the user's profile
       const { data: userProfile, error: profileError } = await supabase
         .from("profiles")
-        .select(
-          "inbox_onboarded, communities_onboarded, upvote_onboarded, frequency_onboarded"
-        )
+        .select("inbox_onboarded, communities_onboarded, frequency_onboarded")
         .eq("id", user.id)
         .single();
 
@@ -40,28 +38,14 @@ export default function RouteGuard({ children }) {
         return;
       }
 
-      // Step 1: Upvote
-      if (!userProfile.upvote_onboarded) {
-        console.log("Redirecting to /onboarding/upvote");
-        await router.push("/onboarding/upvote");
-        return;
-      }
-
-      // Step 2: Communities
+      // Communities step
       if (!userProfile.communities_onboarded) {
         console.log("Redirecting to /onboarding/communities");
         await router.push("/onboarding/communities");
         return;
       }
 
-      // Step 3: Upvote
-      if (!userProfile.upvote_onboarded) {
-        console.log("Redirecting to /onboarding/upvote");
-        await router.push("/onboarding/upvote");
-        return;
-      }
-
-      // Step 4: Frequency
+      // Frequency step
       if (!userProfile.frequency_onboarded) {
         console.log("Redirecting to /onboarding/frequency");
         await router.push("/onboarding/frequency");

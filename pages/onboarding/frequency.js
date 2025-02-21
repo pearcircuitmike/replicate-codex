@@ -113,12 +113,12 @@ const FrequencyPage = () => {
               Back
             </Button>
             <Text fontSize="sm" color="gray.600">
-              Step 3 of 4 - Choose Frequency
+              Step 3 of 3 - Choose Frequency
             </Text>
             <Box w={16} />
           </Flex>
           <Progress
-            value={75}
+            value={90}
             size="sm"
             colorScheme="blue"
             borderRadius="full"

@@ -1,3 +1,4 @@
+// /pages/onboarding/communities.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -20,19 +21,12 @@ import {
   InputGroup,
   InputLeftElement,
 } from "@chakra-ui/react";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  SearchIcon,
-} from "@chakra-ui/icons";
+import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
 import MetaTags from "@/components/MetaTags";
 
-/**
- * Onboarding Communities Page
- */
 export default function CommunitiesOnboardingPage() {
   const router = useRouter();
   const toast = useToast();
@@ -43,7 +37,6 @@ export default function CommunitiesOnboardingPage() {
   const [avatarMap, setAvatarMap] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Load from /api/community/list
   useEffect(() => {
     if (!user?.id) {
       setLoading(false);
@@ -69,9 +62,7 @@ export default function CommunitiesOnboardingPage() {
         ...c,
         isMember: false,
       }));
-      let merged = [...mine, ...others];
-      // Optional shuffle
-      merged.sort(() => Math.random() - 0.5);
+      const merged = [...mine, ...others].sort(() => Math.random() - 0.5);
 
       setCommunities(merged);
       setAvatarMap(data.avatarMap || {});
@@ -87,13 +78,10 @@ export default function CommunitiesOnboardingPage() {
     }
   }
 
-  // Toggle membership
   async function handleToggleMembership(communityId, joined) {
-    // Update local state first
     setCommunities((prev) =>
       prev.map((c) => (c.id === communityId ? { ...c, isMember: joined } : c))
     );
-    // Then call API
     try {
       const resp = await fetch("/api/community/toggle-membership", {
         method: "POST",
@@ -122,14 +110,12 @@ export default function CommunitiesOnboardingPage() {
     }
   }
 
-  // Search filter
   function matchesSearch(community, term) {
     if (!term) return true;
     const lower = term.toLowerCase();
-
     if (community.name?.toLowerCase().includes(lower)) return true;
     if (community.description?.toLowerCase().includes(lower)) return true;
-    if (community.community_tasks?.length > 0) {
+    if (community.community_tasks) {
       for (const ct of community.community_tasks) {
         const taskName = ct.tasks?.task?.toLowerCase() || "";
         if (taskName.includes(lower)) return true;
@@ -142,8 +128,7 @@ export default function CommunitiesOnboardingPage() {
     matchesSearch(c, searchTerm)
   );
 
-  // Next button: mark communities_onboarded & go to frequency
-  const handleContinue = async () => {
+  async function handleContinue() {
     if (!user?.id) return;
     try {
       const response = await fetch("/api/onboarding/complete-communities", {
@@ -154,7 +139,6 @@ export default function CommunitiesOnboardingPage() {
         },
         body: JSON.stringify({ userId: user.id }),
       });
-
       if (!response.ok) {
         throw new Error("Failed to update communities onboarding");
       }
@@ -169,7 +153,7 @@ export default function CommunitiesOnboardingPage() {
         isClosable: true,
       });
     }
-  };
+  }
 
   function CommunityCard({ community }) {
     const { id, name, description, community_tasks, isMember } = community;
@@ -247,21 +231,12 @@ export default function CommunitiesOnboardingPage() {
       />
       <Container maxW="4xl" py={8}>
         <Box mb={8}>
-          {/* ADDED A BACK BUTTON HERE */}
           <Flex justify="space-between" align="center" mb={4}>
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon={<ChevronLeftIcon />}
-              onClick={() => router.push("/onboarding/upvote")}
-            >
-              Back
-            </Button>
-
+            {/* Removed the back button */}
+            <Box />
             <Text fontSize="sm" color="gray.600" textAlign="center">
-              Step 2 of 4 - Communities
+              Step 2 of 3 - Communities
             </Text>
-
             <Button
               variant="ghost"
               size="sm"
@@ -273,7 +248,7 @@ export default function CommunitiesOnboardingPage() {
           </Flex>
 
           <Progress
-            value={50}
+            value={67}
             size="sm"
             colorScheme="blue"
             borderRadius="full"
@@ -282,10 +257,11 @@ export default function CommunitiesOnboardingPage() {
 
         <VStack spacing={6} align="stretch">
           <Heading size="lg" textAlign="center">
-            Pick your communities
+            Join your first communities
           </Heading>
           <Text textAlign="center" color="gray.600" fontSize="lg">
-            Join any groups that interest you
+            Join a community to get updates on the relevant papers and models.
+            You can join or leave at any time.
           </Text>
 
           <InputGroup my={4}>
