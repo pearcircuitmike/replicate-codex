@@ -380,7 +380,7 @@ export default function CommunitiesPage() {
                 <EmptyCommunitiesState />
               ) : filteredMyCommunities.length === 0 && searchTerm ? (
                 <Text fontSize="sm" mb={6}>
-                  No matching communities found for "{searchTerm}".
+                  No matching communities found for &quot;{searchTerm}&quot;.
                 </Text>
               ) : filteredMyCommunities.length === 0 ? (
                 <EmptyCommunitiesState />
@@ -406,7 +406,7 @@ export default function CommunitiesPage() {
                 renderSkeletonGrid(3)
               ) : filteredOtherCommunities.length === 0 && searchTerm ? (
                 <Text fontSize="sm">
-                  No matching communities found for "{searchTerm}".
+                  No matching communities found for &quot;{searchTerm}&quot;.
                 </Text>
               ) : filteredOtherCommunities.length === 0 ? (
                 <Text fontSize="sm">
