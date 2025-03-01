@@ -20,8 +20,11 @@ import {
   InputGroup,
   InputLeftElement,
   Skeleton,
+  Button,
+  Center,
+  Icon,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon, WarningIcon, BellIcon, ChatIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import DashboardLayout from "@/components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "@/components/MetaTags";
@@ -207,11 +210,7 @@ export default function CommunitiesPage() {
                   </WrapItem>
                 ))}
               </Wrap>
-            ) : (
-              <Text fontSize="sm" color="gray.500" mb={3}>
-                (No tasks linked)
-              </Text>
-            )}
+            ) : null}
 
             <Flex align="center">
               {shown.map((m) => (
@@ -220,7 +219,7 @@ export default function CommunitiesPage() {
                   src={m.avatar_url}
                   name={m.full_name}
                   size="sm"
-                  mr={-3}
+                  mr={-2}
                 />
               ))}
               {leftover > 0 && (
@@ -273,6 +272,61 @@ export default function CommunitiesPage() {
     </SimpleGrid>
   );
 
+  // Improved empty state component that matches the screenshot
+  const EmptyCommunitiesState = () => (
+    <Box p={6} borderWidth="1px" borderRadius="md" bg="orange.50" mb={6}>
+      <Flex direction="column" align="center" mb={4}>
+        <WarningIcon boxSize={6} color="orange.500" mb={1} />
+        <Heading size="md" color="orange.800" textAlign="center">
+          You haven't joined any communities yet
+        </Heading>
+        <Text color="gray.700" textAlign="center" mt={1}>
+          Without communities, you're missing out on important updates and
+          discussions
+        </Text>
+      </Flex>
+
+      <SimpleGrid columns={[1, null, 2]} spacing={6} mb={6}>
+        <Flex direction="column" align="center" textAlign="center">
+          <Center boxSize="10" mb={2}>
+            <Icon as={BellIcon} color="orange.500" boxSize={5} />
+          </Center>
+          <Heading size="sm" mb={1} color="orange.800">
+            No Paper Notifications
+          </Heading>
+          <Text fontSize="sm" color="gray.600">
+            You won't be notified when new research papers are published
+          </Text>
+        </Flex>
+
+        <Flex direction="column" align="center" textAlign="center">
+          <Center boxSize="10" mb={2}>
+            <Icon as={ChatIcon} color="orange.500" boxSize={5} />
+          </Center>
+          <Heading size="sm" mb={1} color="orange.800">
+            Missing Discussions
+          </Heading>
+          <Text fontSize="sm" color="gray.600">
+            You'll miss discussions and comments from fellow users
+          </Text>
+        </Flex>
+      </SimpleGrid>
+
+      <Center>
+        <Button
+          colorScheme="blue"
+          onClick={() =>
+            document
+              .getElementById("explore-communities")
+              .scrollIntoView({ behavior: "smooth" })
+          }
+        >
+          Choose a community
+        </Button>
+      </Center>
+    </Box>
+  );
+
   return (
     <>
       <MetaTags title="Communities" description="Join AI communities" />
@@ -322,10 +376,14 @@ export default function CommunitiesPage() {
 
               {isLoading ? (
                 renderSkeletonGrid(3)
-              ) : filteredMyCommunities.length === 0 ? (
+              ) : myCommunities.length === 0 ? (
+                <EmptyCommunitiesState />
+              ) : filteredMyCommunities.length === 0 && searchTerm ? (
                 <Text fontSize="sm" mb={6}>
-                  No matching communities found.
+                  No matching communities found for "{searchTerm}".
                 </Text>
+              ) : filteredMyCommunities.length === 0 ? (
+                <EmptyCommunitiesState />
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4} mb={8}>
                   {filteredMyCommunities.map((c) => (
@@ -337,7 +395,7 @@ export default function CommunitiesPage() {
               <Divider mb={8} />
 
               {/* Explore Communities */}
-              <Heading as="h2" size="md" mb={2}>
+              <Heading as="h2" size="md" mb={2} id="explore-communities">
                 Explore Communities
               </Heading>
               <Text fontSize="sm" color="gray.500" mb={4}>
@@ -346,9 +404,13 @@ export default function CommunitiesPage() {
 
               {isLoading ? (
                 renderSkeletonGrid(3)
+              ) : filteredOtherCommunities.length === 0 && searchTerm ? (
+                <Text fontSize="sm">
+                  No matching communities found for "{searchTerm}".
+                </Text>
               ) : filteredOtherCommunities.length === 0 ? (
                 <Text fontSize="sm">
-                  No matching communities found or none available right now.
+                  No communities found right now. Check back later.
                 </Text>
               ) : (
                 <SimpleGrid columns={[1, 2, 2, 3]} spacing={4}>
