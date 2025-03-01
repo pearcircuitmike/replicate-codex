@@ -278,10 +278,10 @@ export default function CommunitiesPage() {
       <Flex direction="column" align="center" mb={4}>
         <WarningIcon boxSize={6} color="orange.500" mb={1} />
         <Heading size="md" color="orange.800" textAlign="center">
-          You haven't joined any communities yet
+          You haven&apos;t joined any communities yet
         </Heading>
         <Text color="gray.700" textAlign="center" mt={1}>
-          Without communities, you're missing out on important updates and
+          Without communities, you&apos;re missing out on important updates and
           discussions
         </Text>
       </Flex>
@@ -295,7 +295,7 @@ export default function CommunitiesPage() {
             No Paper Notifications
           </Heading>
           <Text fontSize="sm" color="gray.600">
-            You won't be notified when new research papers are published
+            You won&apos;t be notified when new research papers are published
           </Text>
         </Flex>
 
@@ -307,7 +307,7 @@ export default function CommunitiesPage() {
             Missing Discussions
           </Heading>
           <Text fontSize="sm" color="gray.600">
-            You'll miss discussions and comments from fellow users
+            You&apos;ll miss discussions and comments from fellow users
           </Text>
         </Flex>
       </SimpleGrid>
