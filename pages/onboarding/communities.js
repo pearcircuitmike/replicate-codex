@@ -257,11 +257,10 @@ export default function CommunitiesOnboardingPage() {
 
         <VStack spacing={6} align="stretch">
           <Heading size="lg" textAlign="center">
-            Join your first communities
+            Pick your communities
           </Heading>
           <Text textAlign="center" color="gray.600" fontSize="lg">
-            Join a community to get updates on the relevant papers and models.
-            You can join or leave at any time.
+            Join any groups that interest you
           </Text>
 
           <InputGroup my={4}>
