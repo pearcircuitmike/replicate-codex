@@ -1,18 +1,28 @@
 import supabase from "../utils/supabaseClient";
 
+/**
+ * API endpoint for managing chat messages
+ */
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  if (req.method === "POST") {
+    return saveMessage(req, res);
+  } else {
     return res.status(405).json({ message: "Method not allowed" });
   }
+}
 
-  const { session_id, role, content, rag_context, user_id } = req.body;
+/**
+ * Save a new message
+ */
+async function saveMessage(req, res) {
+  const { session_id, role, content, user_id, rag_context } = req.body;
 
-  if (!session_id || !role || !content || !user_id) {
+  if (!session_id || !content || !user_id || !role) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
-    // First verify that the user owns this session
+    // Verify this session belongs to the user
     const { data: session, error: sessionError } = await supabase
       .from("chat_sessions")
       .select("id")
@@ -26,7 +36,7 @@ export default async function handler(req, res) {
         .json({ message: "Unauthorized to add messages to this session" });
     }
 
-    // Add the message
+    // Save the message
     const { data, error } = await supabase
       .from("chat_messages")
       .insert([
@@ -41,9 +51,15 @@ export default async function handler(req, res) {
 
     if (error) throw new Error(error.message);
 
+    // Update the session timestamp
+    await supabase
+      .from("chat_sessions")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", session_id);
+
     return res.status(201).json({ message: data[0] });
   } catch (error) {
-    console.error("Error adding chat message:", error);
+    console.error("Error saving message:", error);
     return res.status(500).json({ message: error.message });
   }
 }

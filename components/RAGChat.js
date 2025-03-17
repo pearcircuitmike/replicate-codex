@@ -21,6 +21,7 @@ import { trackEvent } from "@/pages/api/utils/analytics-util";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/router";
 import ChatSidebar from "./ChatSidebar";
+import { chatService } from "../services/chatService";
 
 const customMarkdownTheme = ChakraUIRenderer({
   img: ({ src, alt }) => (
@@ -42,66 +43,18 @@ export default function RAGchat() {
   const toast = useToast();
   const { user, hasActiveSubscription } = useAuth();
   const router = useRouter();
+  const messagesContainerRef = useRef(null);
   const submissionLockRef = useRef(false);
 
-  // State for chat sessions
+  // State
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
-  const [initialMessages, setInitialMessages] = useState([]);
-  const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [sessions, setSessions] = useState([]);
-  const [sessionsLoaded, setSessionsLoaded] = useState(false);
-
-  // Local state to immediately lock the Send button and trigger the placeholder
+  const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [immediateLoading, setImmediateLoading] = useState(false);
-
-  // State for blinking ellipsis
   const [dots, setDots] = useState(".");
-
-  // Usage state for free users
   const [usageCount, setUsageCount] = useState(0);
   const [usageChecked, setUsageChecked] = useState(false);
-
-  // Fetch the usage count for free users
-  useEffect(() => {
-    if (!hasActiveSubscription && user) {
-      fetch(`/api/chat/rag-usage?user_id=${user.id}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch usage");
-          return res.json();
-        })
-        .then((data) => {
-          setUsageCount(data.count || 0);
-          setUsageChecked(true);
-        })
-        .catch((err) => {
-          toast({
-            title: "Error checking usage",
-            description: err.message,
-            status: "error",
-            duration: 5000,
-          });
-          setUsageChecked(true);
-        });
-    } else {
-      setUsageChecked(true);
-    }
-  }, [user, hasActiveSubscription, toast]);
-
-  // Create a blinking ellipsis effect while immediateLoading is true
-  useEffect(() => {
-    let intervalId;
-    if (immediateLoading) {
-      intervalId = setInterval(() => {
-        setDots((prev) => (prev === "..." ? "." : prev + "."));
-      }, 500);
-    } else {
-      setDots(".");
-    }
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [immediateLoading]);
 
   const {
     messages,
@@ -113,7 +66,7 @@ export default function RAGchat() {
     setMessages,
   } = useChat({
     api: "/api/chat/rag",
-    initialMessages: initialMessages,
+    initialMessages: [],
     body: {
       userId: user?.id,
       sessionId: activeSessionId,
@@ -125,18 +78,13 @@ export default function RAGchat() {
         setActiveSessionId(sessionId);
 
         // Fetch the session details and add to the sessions list
-        if (user && sessionsLoaded) {
+        if (user) {
           try {
-            const sessionRes = await fetch(`/api/chat/sessions/${sessionId}`, {
-              headers: { "x-user-id": user.id },
-            });
-
-            if (sessionRes.ok) {
-              const { session } = await sessionRes.json();
-
-              // Add the new session to the beginning of the list
-              setSessions((prevSessions) => [session, ...prevSessions]);
-            }
+            const { session } = await chatService.getSession(
+              sessionId,
+              user.id
+            );
+            setSessions((prev) => [session, ...prev]);
           } catch (error) {
             console.error("Error fetching new session details:", error);
           }
@@ -165,16 +113,45 @@ export default function RAGchat() {
     },
   });
 
-  const messagesContainerRef = useRef(null);
-
+  // Fetch the usage count for free users
   useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+    if (!hasActiveSubscription && user) {
+      chatService
+        .getUsage(user.id)
+        .then((data) => {
+          setUsageCount(data.count || 0);
+          setUsageChecked(true);
+        })
+        .catch((err) => {
+          toast({
+            title: "Error checking usage",
+            description: err.message,
+            status: "error",
+            duration: 5000,
+          });
+          setUsageChecked(true);
+        });
+    } else {
+      setUsageChecked(true);
     }
-  }, [messages]);
+  }, [user, hasActiveSubscription, toast]);
 
-  // When isLoading turns off, clear our lock and immediate loading state
+  // Create a blinking ellipsis effect
+  useEffect(() => {
+    let intervalId;
+    if (immediateLoading) {
+      intervalId = setInterval(() => {
+        setDots((prev) => (prev === "..." ? "." : prev + "."));
+      }, 500);
+    } else {
+      setDots(".");
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [immediateLoading]);
+
+  // Reset loading state when isLoading changes
   useEffect(() => {
     if (!isLoading) {
       submissionLockRef.current = false;
@@ -182,32 +159,13 @@ export default function RAGchat() {
     }
   }, [isLoading]);
 
-  // Load sessions when the component mounts
+  // Auto-scroll to bottom of messages
   useEffect(() => {
-    if (user && !sessionsLoaded) {
-      fetchSessions();
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
     }
-  }, [user, sessionsLoaded]);
-
-  // Fetch all sessions
-  async function fetchSessions() {
-    try {
-      const res = await fetch(`/api/chat/sessions?user_id=${user.id}`);
-      if (!res.ok) throw new Error("Failed to fetch sessions");
-
-      const data = await res.json();
-      setSessions(data.sessions || []);
-      setSessionsLoaded(true);
-    } catch (error) {
-      console.error("Error loading chat sessions:", error);
-      toast({
-        title: "Error loading chat history",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-      });
-    }
-  }
+  }, [messages]);
 
   // Load a specific chat session
   async function loadChatSession(sessionId) {
@@ -215,15 +173,10 @@ export default function RAGchat() {
 
     setIsLoadingSession(true);
     try {
-      const res = await fetch(`/api/chat/sessions/${sessionId}`, {
-        headers: {
-          "x-user-id": user.id,
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to load chat session");
-
-      const { messages: sessionMessages } = await res.json();
+      const { messages: sessionMessages } = await chatService.getSession(
+        sessionId,
+        user.id
+      );
 
       // Format messages for the useChat hook
       const formattedMessages = sessionMessages.map((msg) => ({
@@ -232,7 +185,6 @@ export default function RAGchat() {
         id: msg.id,
       }));
 
-      setInitialMessages(formattedMessages);
       setMessages(formattedMessages);
       setActiveSessionId(sessionId);
     } catch (error) {
@@ -250,45 +202,10 @@ export default function RAGchat() {
   // Create a new chat session
   function handleNewChat() {
     setActiveSessionId(null);
-    setInitialMessages([]);
     setMessages([]);
   }
 
-  // Handle selecting a session from the sidebar
-  function handleSelectSession(sessionId) {
-    if (sessionId !== activeSessionId) {
-      loadChatSession(sessionId);
-    }
-  }
-
-  async function retrieveModelsAndPapers(query) {
-    const [modelsRes, papersRes] = await Promise.all([
-      fetch("/api/search/semantic-search-models", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      }),
-      fetch("/api/search/semantic-search-papers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      }),
-    ]);
-
-    if (!modelsRes.ok) throw new Error("Failed to retrieve models");
-    if (!papersRes.ok) throw new Error("Failed to retrieve papers");
-
-    const [modelsJson, papersJson] = await Promise.all([
-      modelsRes.json(),
-      papersRes.json(),
-    ]);
-
-    return {
-      models: modelsJson.data || [],
-      papers: papersJson.data || [],
-    };
-  }
-
+  // Send a message
   async function handleMessageSend(e) {
     e.preventDefault();
 
@@ -307,7 +224,7 @@ export default function RAGchat() {
       return;
     }
 
-    // Free users now have a limit of 15 messages.
+    // Free users have a limit of 15 messages
     if (!hasActiveSubscription && usageCount >= 15) {
       toast({
         title: "Free chat limit reached",
@@ -329,11 +246,12 @@ export default function RAGchat() {
     }
 
     try {
-      const retrieved = await retrieveModelsAndPapers(userQuery);
+      const retrieved = await chatService.retrieveContext(userQuery);
       handleSubmit(e, {
         body: {
           userId: user.id,
           ragContext: retrieved,
+          userQuery,
           sessionId: activeSessionId,
         },
       });
@@ -360,19 +278,10 @@ export default function RAGchat() {
     }
   }
 
-  // Toggle sidebar visibility for mobile
-  function toggleSidebar() {
-    setShowSidebar(!showSidebar);
-  }
-
-  // Combined loading flag
   const effectiveLoading = immediateLoading || isLoading;
-
-  // Show the placeholder if immediateLoading is true and the last message isn't from the assistant
   const lastMessage = messages[messages.length - 1];
   const showPlaceholder =
     immediateLoading && (!lastMessage || lastMessage.role !== "assistant");
-
   const isEmptyChat = messages.length === 0 && !isLoadingSession;
 
   return (
@@ -389,7 +298,7 @@ export default function RAGchat() {
           >
             <ChatSidebar
               activeSessionId={activeSessionId}
-              onSelectSession={handleSelectSession}
+              onSelectSession={loadChatSession}
               onNewChat={handleNewChat}
               sessions={sessions}
               setSessions={setSessions}
@@ -435,7 +344,7 @@ export default function RAGchat() {
             <IconButton
               icon={showSidebar ? <CloseIcon /> : <HamburgerIcon />}
               variant="ghost"
-              onClick={toggleSidebar}
+              onClick={() => setShowSidebar(!showSidebar)}
               aria-label={showSidebar ? "Hide sidebar" : "Show sidebar"}
               display={{ base: "flex", md: "none" }}
             />

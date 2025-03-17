@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, ChatIcon, DeleteIcon } from "@chakra-ui/icons";
 import { useAuth } from "../context/AuthContext";
+import { chatService } from "../services/chatService";
 
 export default function ChatSidebar({
   activeSessionId,
@@ -21,30 +22,19 @@ export default function ChatSidebar({
   sessions,
   setSessions,
 }) {
-  // If sessions are passed as props, use those, otherwise manage them locally
-  const [localSessions, setLocalSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Use the provided sessions if available, otherwise use local state
-  const displaySessions = sessions || localSessions;
-  const updateSessions = setSessions || setLocalSessions;
   const { user } = useAuth();
   const toast = useToast();
 
   useEffect(() => {
-    if (user) {
-      fetchSessions();
-    }
+    if (user) fetchSessions();
   }, [user]);
 
   async function fetchSessions() {
     try {
       setLoading(true);
-      const res = await fetch(`/api/chat/sessions?user_id=${user.id}`);
-      if (!res.ok) throw new Error("Failed to fetch sessions");
-
-      const data = await res.json();
-      updateSessions(data.sessions || []);
+      const sessions = await chatService.getSessions(user.id);
+      setSessions(sessions);
     } catch (error) {
       toast({
         title: "Error loading chat history",
@@ -57,34 +47,12 @@ export default function ChatSidebar({
     }
   }
 
-  function handleNewChat() {
-    if (onNewChat) {
-      onNewChat();
-    }
-  }
-
-  function handleSelectSession(sessionId) {
-    if (onSelectSession) {
-      onSelectSession(sessionId);
-    }
-  }
-
   async function handleDeleteSession(sessionId, e) {
     e.stopPropagation();
 
     if (confirm("Are you sure you want to delete this chat?")) {
       try {
-        const res = await fetch(`/api/chat/sessions/${sessionId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-          }),
-        });
-
-        if (!res.ok) throw new Error("Failed to delete chat");
+        await chatService.deleteSession(sessionId, user.id);
 
         toast({
           title: "Chat deleted",
@@ -92,12 +60,10 @@ export default function ChatSidebar({
           duration: 3000,
         });
 
-        // Remove from state
-        updateSessions(displaySessions.filter((s) => s.id !== sessionId));
+        setSessions(sessions.filter((s) => s.id !== sessionId));
 
-        // If this was the active session, create a new chat
         if (sessionId === activeSessionId) {
-          handleNewChat();
+          onNewChat();
         }
       } catch (error) {
         toast({
@@ -136,13 +102,12 @@ export default function ChatSidebar({
         variant="solid"
         width="full"
         mb={4}
-        onClick={handleNewChat}
+        onClick={onNewChat}
       >
         New Chat
       </Button>
 
       <Divider mb={4} />
-
       <Text fontWeight="bold" mb={2}>
         Recent Chats
       </Text>
@@ -151,7 +116,7 @@ export default function ChatSidebar({
         <Box textAlign="center" py={8}>
           <Spinner />
         </Box>
-      ) : displaySessions.length === 0 ? (
+      ) : sessions.length === 0 ? (
         <Box textAlign="center" py={8} color="gray.500">
           <Icon as={ChatIcon} w={10} h={10} mb={2} />
           <Text>No chat history yet</Text>
@@ -163,19 +128,15 @@ export default function ChatSidebar({
           flex="1"
           overflowY="auto"
           css={{
-            "&::-webkit-scrollbar": {
-              width: "4px",
-            },
-            "&::-webkit-scrollbar-track": {
-              width: "6px",
-            },
+            "&::-webkit-scrollbar": { width: "4px" },
+            "&::-webkit-scrollbar-track": { width: "6px" },
             "&::-webkit-scrollbar-thumb": {
               background: "gray.200",
               borderRadius: "24px",
             },
           }}
         >
-          {displaySessions.map((session) => (
+          {sessions.map((session) => (
             <Flex
               key={session.id}
               p={3}
@@ -185,7 +146,7 @@ export default function ChatSidebar({
               _hover={{
                 bg: activeSessionId === session.id ? "blue.50" : "gray.100",
               }}
-              onClick={() => handleSelectSession(session.id)}
+              onClick={() => onSelectSession(session.id)}
               justifyContent="space-between"
               alignItems="center"
             >

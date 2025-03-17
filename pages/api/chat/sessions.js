@@ -1,5 +1,8 @@
 import supabase from "../utils/supabaseClient";
 
+/**
+ * API endpoint for managing chat sessions
+ */
 export default async function handler(req, res) {
   if (req.method === "GET") {
     return getSessions(req, res);
@@ -10,8 +13,12 @@ export default async function handler(req, res) {
   }
 }
 
+/**
+ * Get all sessions for a user
+ */
 async function getSessions(req, res) {
   const { user_id } = req.query;
+
   if (!user_id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -32,6 +39,9 @@ async function getSessions(req, res) {
   }
 }
 
+/**
+ * Create a new session
+ */
 async function createSession(req, res) {
   const { user_id, title } = req.body;
 

@@ -1,5 +1,8 @@
-import supabase from "../../../utils/supabaseClient";
+import supabase from "@/pages/api/utils/supabaseClient";
 
+/**
+ * API endpoint to update the timestamp of a chat session
+ */
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });

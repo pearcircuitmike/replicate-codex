@@ -1,5 +1,8 @@
 import supabase from "../../utils/supabaseClient";
 
+/**
+ * API endpoint for managing a specific chat session
+ */
 export default async function handler(req, res) {
   const { id } = req.query;
   const user_id = req.body?.user_id || req.headers["x-user-id"];
@@ -48,6 +51,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: error.message });
     }
   }
+
   // PATCH - update session details
   else if (req.method === "PATCH") {
     const { title } = req.body;
@@ -90,6 +94,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: error.message });
     }
   }
+
   // DELETE - delete a session
   else if (req.method === "DELETE") {
     try {
