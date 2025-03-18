@@ -5,81 +5,111 @@ export const config = {
   runtime: "edge",
 };
 
-export default async function handler(req) {
+export default async function handler(req, context) {
+  console.log("[RAG] Handler started", { url: req.url });
+
   if (req.method !== "POST") {
+    console.log("[RAG] Method not allowed", { method: req.method });
     return new Response("Method not allowed", { status: 405 });
   }
 
   try {
     const bodyString = await req.text();
+    console.log("[RAG] Request body length", { length: bodyString.length });
+
     const parsed = JSON.parse(bodyString);
     const { messages = [], userId, userQuery, ragContext, sessionId } = parsed;
+    console.log("[RAG] Request parsed", {
+      userId,
+      sessionId,
+      messagesCount: messages.length,
+    });
 
     if (!userId) {
+      console.log("[RAG] Unauthorized - missing userId");
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const contextString = formatRagContext(ragContext);
     const url = new URL(req.url);
     const baseUrl = `${url.protocol}//${url.host}`;
+    console.log("[RAG] Base URL", { baseUrl });
 
     // Get or create session
-    const activeSessionId = await getOrCreateSession(
-      baseUrl,
-      sessionId,
-      userId,
-      messages
-    );
+    let activeSessionId = sessionId;
     if (!activeSessionId) {
-      return new Response("Failed to create or validate session", {
-        status: 500,
-      });
+      console.log("[RAG] Creating new session");
+      activeSessionId = await createSession(baseUrl, messages, userId);
+      console.log("[RAG] Session created", { activeSessionId });
     }
 
     // Save user message
     const latestUserMessage = messages[messages.length - 1];
-    if (latestUserMessage?.role === "user") {
+    if (activeSessionId && latestUserMessage?.role === "user") {
+      console.log("[RAG] Saving user message");
       await saveUserMessage(
         baseUrl,
         activeSessionId,
         latestUserMessage.content,
         userId
       );
+      console.log("[RAG] User message saved");
     }
 
-    // Prepare system prompt and messages
+    // Prepare context and messages
+    console.log("[RAG] Preparing context");
+    const contextString = formatRagContext(ragContext);
     const systemPrompt = createSystemPrompt(contextString, userQuery);
     const messagesToSend = [
       { role: "system", content: systemPrompt },
       ...messages,
     ];
 
-    // Create a ReadableStream to handle the OpenAI response
-    const { stream, controller } = createResponseStream();
+    // Set up the transform stream for response processing
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
 
-    // Process the AI response using a TransformStream
-    const ai = streamText({
-      model: openai("gpt-4o-mini"),
-      messages: messagesToSend,
-    });
+    // Create response with headers
+    const headers = new Headers();
+    headers.set("Content-Type", "text/event-stream");
+    if (activeSessionId) {
+      headers.set("X-Session-Id", activeSessionId);
+    }
 
-    // Set up content accumulation and response handling
-    processAIResponse(
-      ai,
-      controller,
-      baseUrl,
-      activeSessionId,
-      userId,
-      ragContext
-    );
+    // Setup background processing that continues after response is sent
+    if (context && typeof context.waitUntil === "function") {
+      console.log("[RAG] Using context.waitUntil for background processing");
+      context.waitUntil(
+        processStreamAndSaveResponse(
+          messagesToSend,
+          writer,
+          baseUrl,
+          activeSessionId,
+          userId,
+          ragContext
+        )
+      );
+    } else {
+      console.log(
+        "[RAG] No context.waitUntil available, using alternative approach"
+      );
+      // Alternative approach if waitUntil is not available
+      const processingPromise = processStreamAndSaveResponse(
+        messagesToSend,
+        writer,
+        baseUrl,
+        activeSessionId,
+        userId,
+        ragContext
+      );
 
-    // Return streaming response
-    const headers = new Headers({
-      "Content-Type": "text/event-stream",
-      "X-Session-Id": activeSessionId,
-    });
+      // Ensure promise doesn't get garbage collected
+      processingPromise.catch((error) => {
+        console.error("[RAG] Background processing error:", error);
+      });
+    }
 
-    return new Response(stream, { headers });
+    console.log("[RAG] Returning response stream");
+    return new Response(readable, { headers });
   } catch (error) {
     console.error("[RAG] Fatal error:", error);
     return new Response(`Failed to process chat request: ${error.message}`, {
@@ -88,115 +118,192 @@ export default async function handler(req) {
   }
 }
 
-// Creates a ReadableStream for the response
-function createResponseStream() {
-  const encoder = new TextEncoder();
-  let controller;
-
-  const stream = new ReadableStream({
-    start(c) {
-      controller = c;
-    },
-  });
-
-  return { stream, controller };
-}
-
-// Process the AI response, collect content, and save assistant message
-async function processAIResponse(
-  aiStream,
-  controller,
+// Process AI stream and save the response
+async function processStreamAndSaveResponse(
+  messages,
+  writer,
   baseUrl,
   sessionId,
   userId,
   ragContext
 ) {
-  const encoder = new TextEncoder();
-  const textDecoder = new TextDecoder();
-  let accumulatedContent = "";
+  console.log("[RAG] Processing stream started", { sessionId });
+  let fullContent = "";
 
   try {
-    const response = aiStream.toDataStreamResponse();
-    const reader = response.body.getReader();
+    // Generate AI response
+    console.log("[RAG] Generating AI response");
+    const result = streamText({
+      model: openai("gpt-4o-mini"),
+      messages,
+    });
 
-    // Process stream until complete
+    // Process the response stream
+    console.log("[RAG] Processing response stream");
+    const response = result.toDataStreamResponse();
+    const reader = response.body.getReader();
+    const textDecoder = new TextDecoder();
+
+    // Read and process all chunks
+    let chunkCount = 0;
     while (true) {
       const { done, value } = await reader.read();
 
       if (done) {
-        // Stream complete - finalize
-        controller.close();
+        console.log("[RAG] Stream processing complete", { chunkCount });
         break;
       }
 
-      // Forward the chunk to the client
-      controller.enqueue(value);
+      chunkCount++;
+      // Forward to client
+      await writer.write(value);
 
-      // Extract and accumulate text
+      // Extract text
       const chunk = textDecoder.decode(value, { stream: true });
       const extractedText = extractTextFromChunk(chunk);
       if (extractedText) {
-        accumulatedContent += extractedText;
+        fullContent += extractedText;
+      }
+
+      if (chunkCount % 10 === 0) {
+        console.log("[RAG] Processed chunks", {
+          count: chunkCount,
+          contentLength: fullContent.length,
+        });
       }
     }
 
-    // Save the complete assistant response
-    if (accumulatedContent) {
-      await saveAssistantResponse(
-        baseUrl,
+    // Close the writer when done reading
+    console.log("[RAG] Closing writer");
+    await writer.close();
+
+    // Save the complete content
+    if (sessionId && fullContent) {
+      console.log("[RAG] Saving assistant response", {
         sessionId,
-        userId,
-        accumulatedContent,
-        ragContext
-      );
+        contentLength: fullContent.length,
+      });
+
+      // Process content before saving
+      const processedContent = processContent(fullContent);
+
+      // Save assistant response
+      console.log("[RAG] Sending save request to API");
+      const saveStartTime = Date.now();
+      const saveResponse = await fetch(`${baseUrl}/api/chat/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Connection: "keep-alive",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          role: "assistant",
+          content: processedContent,
+          user_id: userId,
+          rag_context: ragContext || null,
+        }),
+      });
+
+      const saveEndTime = Date.now();
+      console.log("[RAG] Save request completed", {
+        status: saveResponse.status,
+        duration: saveEndTime - saveStartTime,
+      });
+
+      if (!saveResponse.ok) {
+        const errorText = await saveResponse.text();
+        console.error("[RAG] Failed to save assistant message", {
+          status: saveResponse.status,
+          error: errorText,
+        });
+        throw new Error(
+          `Failed to save assistant message: ${saveResponse.status} ${errorText}`
+        );
+      }
+
+      const saveData = await saveResponse.json();
+      console.log("[RAG] Assistant message saved successfully", {
+        messageId: saveData.message?.id,
+        sessionId,
+      });
     }
   } catch (error) {
-    console.error("[RAG] Stream processing error:", error);
-    controller.error(error);
+    console.error("[RAG] Error in processStreamAndSaveResponse:", error);
 
-    // If we've accumulated content, try to save what we have
-    if (accumulatedContent) {
+    // Ensure writer is closed on error
+    try {
+      await writer.close();
+    } catch (e) {
+      console.error("[RAG] Error closing writer:", e);
+    }
+
+    // Try one last save attempt if we have content
+    if (sessionId && fullContent && fullContent.length > 0) {
+      console.log("[RAG] Attempting final save after error");
       try {
-        await saveAssistantResponse(
-          baseUrl,
-          sessionId,
-          userId,
-          accumulatedContent,
-          ragContext
-        );
+        const finalSaveResponse = await fetch(`${baseUrl}/api/chat/messages`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Connection: "keep-alive",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            role: "assistant",
+            content: processContent(fullContent),
+            user_id: userId,
+            rag_context: ragContext || null,
+          }),
+        });
+
+        if (finalSaveResponse.ok) {
+          console.log("[RAG] Final save attempt succeeded");
+        } else {
+          console.error("[RAG] Final save attempt failed", {
+            status: finalSaveResponse.status,
+          });
+        }
       } catch (saveError) {
-        console.error(
-          "[RAG] Failed to save partial assistant response:",
-          saveError
-        );
+        console.error("[RAG] Final save attempt error:", saveError);
       }
     }
+
+    throw error; // Re-throw for proper error handling
   }
 }
 
-// Get existing session or create a new one
-async function getOrCreateSession(baseUrl, sessionId, userId, messages) {
-  if (sessionId) return sessionId;
-
+// Create a new session
+async function createSession(baseUrl, messages, userId) {
   try {
     const newSessionTitle = getSessionTitle(messages);
-    const response = await fetch(`${baseUrl}/api/chat/sessions`, {
+    console.log("[RAG] Creating session", { title: newSessionTitle });
+
+    const sessionRes = await fetch(`${baseUrl}/api/chat/sessions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
       body: JSON.stringify({
         user_id: userId,
         title: newSessionTitle,
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Failed to create session: ${response.status} ${errorText}`
-      );
+    if (!sessionRes.ok) {
+      const errorText = await sessionRes.text();
+      console.error("[RAG] Session creation failed", {
+        status: sessionRes.status,
+        error: errorText,
+      });
+      return null;
     }
 
-    const sessionData = await response.json();
+    const sessionData = await sessionRes.json();
+    console.log("[RAG] Session created", { sessionId: sessionData.session.id });
     return sessionData.session.id;
   } catch (error) {
     console.error("[RAG] Session creation error:", error);
@@ -204,9 +311,14 @@ async function getOrCreateSession(baseUrl, sessionId, userId, messages) {
   }
 }
 
-// Save user message to database
+// Save user message
 async function saveUserMessage(baseUrl, sessionId, content, userId) {
   try {
+    console.log("[RAG] Saving user message", {
+      sessionId,
+      contentLength: content.length,
+    });
+
     const response = await fetch(`${baseUrl}/api/chat/messages`, {
       method: "POST",
       headers: {
@@ -223,74 +335,31 @@ async function saveUserMessage(baseUrl, sessionId, content, userId) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(
-        `Failed to save user message: ${response.status} ${errorText}`
-      );
+      console.error("[RAG] User message save failed", {
+        status: response.status,
+        error: errorText,
+      });
+      return;
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log("[RAG] User message saved", { messageId: data.message?.id });
+    return data;
   } catch (error) {
     console.error("[RAG] Error saving user message:", error);
-    throw error;
   }
 }
 
-// Save assistant response to database
-async function saveAssistantResponse(
-  baseUrl,
-  sessionId,
-  userId,
-  rawContent,
-  ragContext
-) {
-  if (!rawContent || rawContent.length === 0) {
-    throw new Error("[RAG] Empty content, cannot save assistant response");
-  }
-
-  // Process the content
-  const content = rawContent
+// Process content for saving
+function processContent(rawContent) {
+  return rawContent
     .replace(/\\n/g, "\n")
     .replace(/\n\n/g, "<DOUBLE_NEWLINE>")
     .replace(/\n/g, "\n")
     .replace(/<DOUBLE_NEWLINE>/g, "\n\n");
-
-  try {
-    const response = await fetch(`${baseUrl}/api/chat/messages`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        session_id: sessionId,
-        role: "assistant",
-        content,
-        user_id: userId,
-        rag_context: ragContext || null,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Failed to save assistant message: ${response.status} ${errorText}`
-      );
-    }
-
-    const data = await response.json();
-    console.info(
-      `[RAG] Successfully saved assistant message with ID: ${
-        data.message?.id || "unknown"
-      }`
-    );
-    return data;
-  } catch (error) {
-    console.error("[RAG] Error saving assistant response:", error);
-    throw error;
-  }
 }
 
-// Extract text content from AI stream chunks
+// Extract text from stream chunks
 function extractTextFromChunk(chunk) {
   if (chunk.includes('"text":')) {
     try {
