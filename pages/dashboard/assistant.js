@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Container } from "@chakra-ui/react";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "../../components/MetaTags";
-import RAGchat from "../../components/RAGChat";
+import RAGchat from "../../components/RagChat";
 
 export default function AssistantPage() {
   return (
@@ -14,7 +14,7 @@ export default function AssistantPage() {
       <DashboardLayout>
         <Container maxW="8xl">
           <Box>
-            {/* Always render RAGchat so free users can use up to 5 chats */}
+            {/* RAGchat will get user from AuthContext */}
             <RAGchat />
           </Box>
         </Container>

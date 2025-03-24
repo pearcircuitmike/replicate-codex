@@ -1,467 +1,470 @@
-import React, { useRef, useEffect, useState } from "react";
 import { useChat } from "ai/react";
+import { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 import {
   Box,
-  Flex,
-  VStack,
-  Text,
-  Textarea,
+  Input,
   Button,
-  Image,
+  Flex,
+  Text,
+  VStack,
+  Heading,
+  Spinner,
   useToast,
-  Container,
-  Link as ChakraLink,
-  IconButton,
+  Link,
+  Divider,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import ChakraUIRenderer from "chakra-ui-markdown-renderer";
-import { trackEvent } from "@/pages/api/utils/analytics-util";
 import { useAuth } from "../context/AuthContext";
-import { useRouter } from "next/router";
-import ChatSidebar from "./ChatSidebar";
-import { chatService } from "../services/chatService";
+import supabase from "@/pages/api/utils/supabaseClient";
 
-const customMarkdownTheme = ChakraUIRenderer({
-  img: ({ src, alt }) => (
-    <Image src={src} alt={alt} maxWidth="150px" borderRadius="md" my={4} />
-  ),
-  a: ({ href, children }) => (
-    <ChakraLink
-      href={href}
-      color="blue.500"
-      textDecoration="underline"
-      isExternal
-    >
-      {children}
-    </ChakraLink>
-  ),
-});
-
-export default function RAGchat() {
+export default function RAGchat({ sessionId: initialSessionId = null }) {
+  const { user } = useAuth();
   const toast = useToast();
-  const { user, hasActiveSubscription } = useAuth();
-  const router = useRouter();
-  const messagesContainerRef = useRef(null);
-  const submissionLockRef = useRef(false);
-
-  // State
-  const [activeSessionId, setActiveSessionId] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(true);
+  const [sessionId, setSessionId] = useState(initialSessionId);
   const [sessions, setSessions] = useState([]);
-  const [isLoadingSession, setIsLoadingSession] = useState(false);
-  const [immediateLoading, setImmediateLoading] = useState(false);
-  const [dots, setDots] = useState(".");
-  const [usageCount, setUsageCount] = useState(0);
-  const [usageChecked, setUsageChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState({
+    papers: [],
+    models: [],
+  });
 
+  // For tracking first message and title updates
+  const hasCreatedNewSession = useRef(false);
+  const firstUserMessage = useRef("");
+
+  // Initialize chat with fixed settings
   const {
     messages,
     input,
     handleInputChange,
-    handleSubmit,
-    isLoading,
-    stop,
+    handleSubmit: submitMessage,
+    isLoading: isMessageLoading,
     setMessages,
   } = useChat({
-    api: "/api/chat/rag",
+    api: "/api/chat/stream",
     initialMessages: [],
     body: {
       userId: user?.id,
-      sessionId: activeSessionId,
+      sessionId,
+      ragEnabled: true, // Always enabled
+      model: "gpt-4o-mini", // Fixed model
     },
-    onResponse: async (response) => {
-      // Check for session ID in headers (for new sessions)
-      const sessionId = response.headers.get("X-Session-Id");
-      if (sessionId && sessionId !== "none" && !activeSessionId) {
-        setActiveSessionId(sessionId);
+    onFinish: (message) => {
+      console.log("Message finished, session:", sessionId);
 
-        // Fetch the session details and add to the sessions list
-        if (user) {
-          try {
-            const { session } = await chatService.getSession(
-              sessionId,
-              user.id
-            );
-            setSessions((prev) => [session, ...prev]);
-          } catch (error) {
-            console.error("Error fetching new session details:", error);
-          }
-        }
+      // Only update title after first message exchange in a new session
+      if (hasCreatedNewSession.current && firstUserMessage.current) {
+        updateSessionTitle(firstUserMessage.current);
+        hasCreatedNewSession.current = false;
+        firstUserMessage.current = "";
       }
-    },
-    onError: (err) => {
-      toast({
-        title: "Error",
-        description: err.message,
-        status: "error",
-        duration: 5000,
-      });
-    },
-    onFinish: (finalAssistantMessage) => {
-      if (user && finalAssistantMessage.role === "assistant") {
-        trackEvent("ragchat", {
-          userId: user.id,
-          messages,
-          sessionId: activeSessionId,
-        });
-        if (!hasActiveSubscription) {
-          setUsageCount((prev) => prev + 1);
-        }
-      }
+
+      fetchSessions();
     },
   });
 
-  // Fetch the usage count for free users
-  useEffect(() => {
-    if (!hasActiveSubscription && user) {
-      chatService
-        .getUsage(user.id)
-        .then((data) => {
-          setUsageCount(data.count || 0);
-          setUsageChecked(true);
-        })
-        .catch((err) => {
-          toast({
-            title: "Error checking usage",
-            description: err.message,
-            status: "error",
-            duration: 5000,
-          });
-          setUsageChecked(true);
-        });
-    } else {
-      setUsageChecked(true);
-    }
-  }, [user, hasActiveSubscription, toast]);
+  // Update session title
+  const updateSessionTitle = async (userMessage) => {
+    if (!sessionId) return;
 
-  // Create a blinking ellipsis effect
-  useEffect(() => {
-    let intervalId;
-    if (immediateLoading) {
-      intervalId = setInterval(() => {
-        setDots((prev) => (prev === "..." ? "." : prev + "."));
-      }, 500);
-    } else {
-      setDots(".");
-    }
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [immediateLoading]);
+    const newTitle =
+      userMessage.substring(0, 50) + (userMessage.length > 50 ? "..." : "");
 
-  // Reset loading state when isLoading changes
-  useEffect(() => {
-    if (!isLoading) {
-      submissionLockRef.current = false;
-      setImmediateLoading(false);
-    }
-  }, [isLoading]);
-
-  // Auto-scroll to bottom of messages
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  // Load a specific chat session
-  async function loadChatSession(sessionId) {
-    if (!user || !sessionId) return;
-
-    setIsLoadingSession(true);
-    try {
-      const { messages: sessionMessages } = await chatService.getSession(
-        sessionId,
-        user.id
-      );
-
-      // Format messages for the useChat hook
-      const formattedMessages = sessionMessages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-        id: msg.id,
-      }));
-
-      setMessages(formattedMessages);
-      setActiveSessionId(sessionId);
-    } catch (error) {
-      toast({
-        title: "Error loading chat",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-      });
-    } finally {
-      setIsLoadingSession(false);
-    }
-  }
-
-  // Create a new chat session
-  function handleNewChat() {
-    setActiveSessionId(null);
-    setMessages([]);
-  }
-
-  // Send a message
-  async function handleMessageSend(e) {
-    e.preventDefault();
-
-    if (isLoading || submissionLockRef.current) return;
-    submissionLockRef.current = true;
-    setImmediateLoading(true);
-
-    if (!user) {
-      toast({
-        title: "Please log in to chat.",
-        status: "info",
-        duration: 3000,
-      });
-      submissionLockRef.current = false;
-      setImmediateLoading(false);
-      return;
-    }
-
-    // Free users have a limit of 15 messages
-    if (!hasActiveSubscription && usageCount >= 15) {
-      toast({
-        title: "Free chat limit reached",
-        description:
-          "You have reached your limit for free chats. Upgrade to Premium to continue chatting.",
-        status: "warning",
-        duration: 5000,
-      });
-      submissionLockRef.current = false;
-      setImmediateLoading(false);
-      return;
-    }
-
-    const userQuery = input.trim();
-    if (!userQuery) {
-      submissionLockRef.current = false;
-      setImmediateLoading(false);
-      return;
-    }
+    console.log(`Updating session ${sessionId} title to: ${newTitle}`);
 
     try {
-      const retrieved = await chatService.retrieveContext(userQuery);
-      handleSubmit(e, {
-        body: {
-          userId: user.id,
-          ragContext: retrieved,
-          userQuery,
-          sessionId: activeSessionId,
+      const { error } = await supabase
+        .from("chat_sessions")
+        .update({ title: newTitle })
+        .eq("id", sessionId);
+
+      if (error) {
+        console.error("Error updating session title:", error);
+      } else {
+        console.log("Session title updated successfully");
+        fetchSessions();
+      }
+    } catch (err) {
+      console.error("Error in title update:", err);
+    }
+  };
+
+  // Fetch sessions on load
+  useEffect(() => {
+    if (user?.id) {
+      fetchSessions();
+      if (sessionId) {
+        fetchSessionMessages(sessionId);
+      }
+    }
+  }, [user?.id, sessionId]);
+
+  // Fetch all user's sessions
+  async function fetchSessions() {
+    if (!user?.id) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/chat/sessions", {
+        headers: {
+          "x-user-id": user.id,
         },
       });
-    } catch (err) {
+      if (response.ok) {
+        const data = await response.json();
+        setSessions(data.sessions || []);
+      }
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
       toast({
-        title: "Error retrieving data",
-        description: err.message,
+        title: "Error fetching chat history",
         status: "error",
-        duration: 5000,
+        duration: 3000,
+        isClosable: true,
       });
-      submissionLockRef.current = false;
-      setImmediateLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   }
 
-  function handleKeyDown(e) {
-    if (isLoading && e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
+  // Fetch messages for a specific session
+  async function fetchSessionMessages(sessId) {
+    if (!user?.id || !sessId) return;
+    setIsLoading(true);
+    try {
+      // Reset flags when loading an existing session
+      hasCreatedNewSession.current = false;
+      firstUserMessage.current = "";
+
+      const response = await fetch(`/api/chat/sessions/${sessId}`, {
+        headers: {
+          "x-user-id": user.id,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.messages && Array.isArray(data.messages)) {
+          setMessages(
+            data.messages.map((msg) => ({
+              id: msg.id,
+              role: msg.role,
+              content: msg.content,
+            }))
+          );
+          console.log(
+            `Loaded ${data.messages.length} messages for session ${sessId}`
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
+      toast({
+        title: "Error loading conversation",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // Create a new session
+  async function createSession() {
+    if (!user?.id) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/chat/sessions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.id,
+        },
+        body: JSON.stringify({
+          title: "New Chat", // Initial placeholder title
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Created new session:", data.session.id);
+        setSessionId(data.session.id);
+        setMessages([]);
+
+        // Set flag to indicate we've created a new session
+        hasCreatedNewSession.current = true;
+        firstUserMessage.current = "";
+
+        await fetchSessions();
+      }
+    } catch (error) {
+      console.error("Error creating session:", error);
+      toast({
+        title: "Error creating new chat",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  // Select an existing session
+  function selectSession(sessId) {
+    console.log("Selecting session:", sessId);
+    setSessionId(sessId);
+    fetchSessionMessages(sessId);
+  }
+
+  // Delete a session
+  async function deleteSession(sessId, e) {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this conversation?")) return;
+    try {
+      const response = await fetch(`/api/chat/sessions/${sessId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.id,
+        },
+        body: JSON.stringify({ user_id: user.id }),
+      });
+      if (response.ok) {
+        toast({
+          title: "Conversation deleted",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        if (sessId === sessionId) {
+          setSessionId(null);
+          setMessages([]);
+        }
+        fetchSessions();
+      }
+    } catch (error) {
+      console.error("Error deleting session:", error);
+      toast({
+        title: "Error deleting conversation",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }
+
+  // Handle chat submission
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    // If this is a new session, store the first message for title
+    if (hasCreatedNewSession.current) {
+      firstUserMessage.current = input;
+    }
+
+    // If no session exists, create one
+    if (!sessionId) {
+      createSession().then(() => {
+        firstUserMessage.current = input;
+        submitMessage(e);
+      });
       return;
     }
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleMessageSend(e);
-    }
+
+    // Otherwise submit the message
+    submitMessage(e);
   }
 
-  const effectiveLoading = immediateLoading || isLoading;
-  const lastMessage = messages[messages.length - 1];
-  const showPlaceholder =
-    immediateLoading && (!lastMessage || lastMessage.role !== "assistant");
-  const isEmptyChat = messages.length === 0 && !isLoadingSession;
+  // Custom component to render markdown content with proper styles
+  const MarkdownContent = ({ content }) => (
+    <Box className="markdown-content">
+      <ReactMarkdown
+        components={{
+          p: (props) => <Text mb={4} {...props} />,
+          h1: (props) => <Heading as="h1" size="xl" mt={6} mb={4} {...props} />,
+          h2: (props) => <Heading as="h2" size="lg" mt={5} mb={3} {...props} />,
+          h3: (props) => <Heading as="h3" size="md" mt={4} mb={2} {...props} />,
+          ul: (props) => <Box as="ul" pl={5} mb={4} {...props} />,
+          ol: (props) => <Box as="ol" pl={5} mb={4} {...props} />,
+          li: (props) => <Box as="li" ml={2} mb={1} {...props} />,
+          a: (props) => <Link color="blue.500" isExternal {...props} />,
+          blockquote: (props) => (
+            <Box
+              as="blockquote"
+              borderLeftWidth="4px"
+              borderLeftColor="gray.200"
+              pl={4}
+              py={2}
+              my={4}
+              color="gray.700"
+              {...props}
+            />
+          ),
+          code: (props) => {
+            const { children, inline } = props;
+            return inline ? (
+              <Box
+                as="code"
+                bg="gray.100"
+                p={1}
+                borderRadius="sm"
+                fontSize="sm"
+                fontFamily="monospace"
+                {...props}
+              />
+            ) : (
+              <Box
+                as="pre"
+                bg="gray.100"
+                p={3}
+                borderRadius="md"
+                overflowX="auto"
+                fontSize="sm"
+                fontFamily="monospace"
+                my={4}
+                {...props}
+              />
+            );
+          },
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </Box>
+  );
 
   return (
-    <Container maxW="container.8xl" p={0}>
-      <Flex height={{ base: "80vh", md: "85vh" }}>
-        {/* Chat History Sidebar - conditionally shown */}
-        {showSidebar && (
-          <Box
-            display={{ base: showSidebar ? "block" : "none", md: "block" }}
-            width={{ base: "full", md: "300px" }}
-            position={{ base: "absolute", md: "relative" }}
-            zIndex={{ base: 10, md: 1 }}
-            height="full"
-          >
-            <ChatSidebar
-              activeSessionId={activeSessionId}
-              onSelectSession={loadChatSession}
-              onNewChat={handleNewChat}
-              sessions={sessions}
-              setSessions={setSessions}
-            />
-          </Box>
-        )}
-
-        {/* Main Chat Area */}
-        <Box
-          display="flex"
-          flexDirection="column"
-          height="full"
-          border="1px solid #ccc"
-          borderRadius="md"
-          flex="1"
-          width={{ base: showSidebar ? "0" : "full", md: "auto" }}
-          position="relative"
-        >
-          <Box
-            py={2}
-            px={4}
-            borderBottom="1px solid #e2e2e2"
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Text fontSize="xl" fontWeight="bold">
-                Research Assistant
-              </Text>
-              <Text fontSize="sm" color="gray.600" mt={1}>
-                Describe what you are working on and get models and papers that
-                can help.
-              </Text>
-              {!hasActiveSubscription && usageChecked && (
-                <Text fontSize="sm" color="red.600" mt={1}>
-                  Free chats used: {usageCount} / 15
+    <Flex h="calc(100vh - 180px)" minH="600px">
+      {/* Sessions sidebar */}
+      <Box
+        w="250px"
+        borderRight="1px solid"
+        borderColor="gray.200"
+        p={4}
+        overflowY="auto"
+      >
+        <VStack align="stretch" spacing={4}>
+          <Button colorScheme="blue" onClick={createSession}>
+            New Chat
+          </Button>
+          <Divider />
+          <VStack align="stretch" spacing={2}>
+            {isLoading && <Spinner size="sm" alignSelf="center" />}
+            {sessions.map((session) => (
+              <Box
+                key={session.id}
+                p={2}
+                borderRadius="md"
+                cursor="pointer"
+                bg={session.id === sessionId ? "blue.50" : "transparent"}
+                _hover={{ bg: "gray.100" }}
+                onClick={() => selectSession(session.id)}
+                position="relative"
+              >
+                <Text fontSize="sm" noOfLines={1}>
+                  {session.title}
                 </Text>
+                <Text fontSize="xs" color="gray.500">
+                  {new Date(session.updated_at).toLocaleDateString()}
+                </Text>
+                <Button
+                  size="xs"
+                  colorScheme="red"
+                  variant="ghost"
+                  position="absolute"
+                  right={1}
+                  top={1}
+                  onClick={(e) => deleteSession(session.id, e)}
+                >
+                  ×
+                </Button>
+              </Box>
+            ))}
+          </VStack>
+        </VStack>
+      </Box>
+      {/* Main chat area */}
+      <Flex flex={1} direction="column" p={4}>
+        {/* Header without controls */}
+        <Flex justify="space-between" mb={4} align="center">
+          <Heading size="md">AI Assistant</Heading>
+        </Flex>
+        {/* Messages area */}
+        <VStack
+          flex={1}
+          spacing={4}
+          align="stretch"
+          overflowY="auto"
+          mb={4}
+          p={2}
+          borderRadius="md"
+          bg="gray.50"
+        >
+          {messages.length === 0 && !isMessageLoading && (
+            <Flex h="100%" justify="center" align="center" color="gray.500">
+              <Text>Start a new conversation</Text>
+            </Flex>
+          )}
+          {messages.map((message) => (
+            <Box
+              key={message.id}
+              alignSelf={message.role === "user" ? "flex-end" : "flex-start"}
+              bg={message.role === "user" ? "blue.100" : "white"}
+              p={3}
+              borderRadius="lg"
+              maxW="80%"
+              boxShadow="sm"
+            >
+              <Text fontWeight="bold" mb={1}>
+                {message.role === "user" ? "You" : "AI Assistant"}
+              </Text>
+              {message.role === "user" ? (
+                <Text whiteSpace="pre-wrap">{message.content}</Text>
+              ) : (
+                <MarkdownContent content={message.content} />
               )}
             </Box>
-
-            {/* Hamburger menu for mobile */}
-            <IconButton
-              icon={showSidebar ? <CloseIcon /> : <HamburgerIcon />}
-              variant="ghost"
-              onClick={() => setShowSidebar(!showSidebar)}
-              aria-label={showSidebar ? "Hide sidebar" : "Show sidebar"}
-              display={{ base: "flex", md: "none" }}
-            />
-          </Box>
-
-          {/* Messages area */}
-          <Box
-            ref={messagesContainerRef}
-            flex="1"
-            overflowY="auto"
-            p={4}
-            bg="gray.50"
-          >
-            {isLoadingSession ? (
-              <Box textAlign="center" color="gray.500" mt={8}>
-                <Text>Loading chat history...</Text>
-              </Box>
-            ) : isEmptyChat ? (
-              <Box textAlign="center" color="gray.500" mt={8}>
-                <Text mb={3}>Ask a question! Examples...</Text>
-                <Text>
-                  What are some good models to colorize a line drawing?
-                </Text>
-                <Text>
-                  What is the latest research on ASR error correction?
-                </Text>
-                <Text>Can you explain the multi-armed bandit problem?</Text>
-              </Box>
-            ) : (
-              <VStack align="stretch" spacing={4}>
-                {messages.map((msg, i) => (
-                  <Box key={i}>
-                    <Text
-                      fontWeight="bold"
-                      mb={1}
-                      color={
-                        msg.role === "assistant" ? "blue.600" : "green.600"
-                      }
-                    >
-                      {msg.role === "assistant" ? "🤖 Assistant" : "You"}
-                    </Text>
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={customMarkdownTheme}
-                    >
-                      {msg.content}
-                    </ReactMarkdown>
-                  </Box>
-                ))}
-                {showPlaceholder && (
-                  <Box>
-                    <Text fontWeight="bold" mb={1} color="gray.500">
-                      🤖 Assistant
-                    </Text>
-                    <Text color="gray.500">Assistant is thinking{dots}</Text>
-                  </Box>
-                )}
-              </VStack>
-            )}
-          </Box>
-
-          {/* Chat input area */}
-          {!hasActiveSubscription && usageChecked && usageCount >= 15 ? (
+          ))}
+          {isMessageLoading && (
             <Box
-              textAlign="center"
-              p={3}
-              borderTop="1px solid #e2e2e2"
+              alignSelf="flex-start"
               bg="white"
+              p={3}
+              borderRadius="lg"
+              maxW="80%"
+              boxShadow="sm"
             >
-              <Text mb={3}>
-                You have reached your free chat limit. Upgrade to Premium to
-                continue chatting.
+              <Text fontWeight="bold" mb={1}>
+                AI Assistant
               </Text>
-              <Button
-                onClick={() => router.push("/pricing")}
-                colorScheme="blue"
-              >
-                Upgrade to Premium
-              </Button>
-            </Box>
-          ) : (
-            <Box
-              as="form"
-              onSubmit={handleMessageSend}
-              position="sticky"
-              bottom="0"
-              borderTop="1px solid #e2e2e2"
-              bg="white"
-              p={3}
-            >
-              <Textarea
-                placeholder="Type your question here..."
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                rows={2}
-                disabled={effectiveLoading || isLoadingSession}
-              />
-              <Flex justify="flex-end" mt={2}>
-                {effectiveLoading ? (
-                  <Button onClick={stop} colorScheme="red">
-                    ■ Stop
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    colorScheme="blue"
-                    isDisabled={isLoadingSession}
-                  >
-                    Send
-                  </Button>
-                )}
+              <Flex align="center">
+                <Spinner size="sm" mr={2} />
+                <Text>Thinking...</Text>
               </Flex>
             </Box>
           )}
-        </Box>
+        </VStack>
+        {/* Input area */}
+        <form onSubmit={handleSubmit}>
+          <Flex>
+            <Input
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Ask about AI models, research papers, or techniques..."
+              mr={2}
+              disabled={isMessageLoading}
+            />
+            <Button
+              type="submit"
+              colorScheme="blue"
+              isDisabled={isMessageLoading || !input.trim()}
+              isLoading={isMessageLoading}
+            >
+              Send
+            </Button>
+          </Flex>
+        </form>
       </Flex>
-    </Container>
+    </Flex>
   );
 }

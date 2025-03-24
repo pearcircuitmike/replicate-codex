@@ -5,7 +5,7 @@ import supabase from "../../utils/supabaseClient";
  */
 export default async function handler(req, res) {
   const { id } = req.query;
-  const user_id = req.body?.user_id || req.headers["x-user-id"];
+  const user_id = req.headers["x-user-id"] || req.body?.user_id;
 
   if (!id || !user_id) {
     return res.status(400).json({ message: "Missing session ID or user ID" });
@@ -40,10 +40,11 @@ export default async function handler(req, res) {
       return res.status(200).json({
         session,
         messages: messages.map((msg) => ({
+          id: msg.id,
           role: msg.role,
           content: msg.content,
-          id: msg.id,
           created_at: msg.created_at,
+          rag_context: msg.rag_context,
         })),
       });
     } catch (error) {
