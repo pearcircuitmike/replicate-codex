@@ -1,8 +1,10 @@
+// pages/api/chat/stream.js
+
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import supabase from "@/pages/api/utils/supabaseClient";
-import { formatRagContext, createSystemPrompt } from "@/lib/context";
-import { getRelevantContext } from "@/lib/retriever";
+import { formatRagContext, createSystemPrompt } from "../lib/context";
+import { getRelevantContext } from "../lib/retriever";
 
 // Configuration
 const CONFIG = {

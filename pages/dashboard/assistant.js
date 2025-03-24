@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "../../components/MetaTags";
 import RAGchat from "../../components/RagChat";
@@ -12,12 +12,10 @@ export default function AssistantPage() {
         description="Describe what you are working on and get models and papers that can help."
       />
       <DashboardLayout>
-        <Container maxW="8xl">
-          <Box>
-            {/* RAGchat will get user from AuthContext */}
-            <RAGchat />
-          </Box>
-        </Container>
+        <Box height="calc(100vh - 128px)" overflow="hidden">
+          {/* Adjust the height value based on your navbar height */}
+          <RAGchat />
+        </Box>
       </DashboardLayout>
     </>
   );

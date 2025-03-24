@@ -1,3 +1,5 @@
+// pages/api/chat/sessions/index.js
+
 import supabase from "../../utils/supabaseClient";
 
 /**

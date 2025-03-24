@@ -15,7 +15,6 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
-import supabase from "@/pages/api/utils/supabaseClient";
 
 export default function RAGchat({ sessionId: initialSessionId = null }) {
   const { user } = useAuth();
@@ -27,6 +26,9 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
     papers: [],
     models: [],
   });
+
+  // Add reference for message container
+  const messagesContainerRef = useRef(null);
 
   // For tracking first message and title updates
   const hasCreatedNewSession = useRef(false);
@@ -63,7 +65,20 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
     },
   });
 
-  // Update session title
+  // Function to scroll to bottom of messages
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Scroll to bottom when messages change or loading state changes
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isMessageLoading]);
+
+  // Update session title using the API endpoint instead of direct DB access
   const updateSessionTitle = async (userMessage) => {
     if (!sessionId) return;
 
@@ -73,19 +88,36 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
     console.log(`Updating session ${sessionId} title to: ${newTitle}`);
 
     try {
-      const { error } = await supabase
-        .from("chat_sessions")
-        .update({ title: newTitle })
-        .eq("id", sessionId);
+      const response = await fetch(`/api/chat/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.id,
+        },
+        body: JSON.stringify({ title: newTitle }),
+      });
 
-      if (error) {
-        console.error("Error updating session title:", error);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error updating session title:", errorData);
+        toast({
+          title: "Error updating chat title",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
         console.log("Session title updated successfully");
         fetchSessions();
       }
     } catch (err) {
       console.error("Error in title update:", err);
+      toast({
+        title: "Error updating chat title",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -257,84 +289,96 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // If this is a new session, store the first message for title
-    if (hasCreatedNewSession.current) {
-      firstUserMessage.current = input;
-    }
-
     // If no session exists, create one
     if (!sessionId) {
       createSession().then(() => {
-        firstUserMessage.current = input;
+        // CRITICAL: Directly update the title after getting sessionId
+        updateSessionTitle(input);
         submitMessage(e);
       });
       return;
     }
 
-    // Otherwise submit the message
+    // If this is first message of a new session, update title directly
+    if (messages.length === 0) {
+      updateSessionTitle(input);
+    }
+
+    // Submit the message
     submitMessage(e);
   }
 
   // Custom component to render markdown content with proper styles
-  const MarkdownContent = ({ content }) => (
-    <Box className="markdown-content">
-      <ReactMarkdown
-        components={{
-          p: (props) => <Text mb={4} {...props} />,
-          h1: (props) => <Heading as="h1" size="xl" mt={6} mb={4} {...props} />,
-          h2: (props) => <Heading as="h2" size="lg" mt={5} mb={3} {...props} />,
-          h3: (props) => <Heading as="h3" size="md" mt={4} mb={2} {...props} />,
-          ul: (props) => <Box as="ul" pl={5} mb={4} {...props} />,
-          ol: (props) => <Box as="ol" pl={5} mb={4} {...props} />,
-          li: (props) => <Box as="li" ml={2} mb={1} {...props} />,
-          a: (props) => <Link color="blue.500" isExternal {...props} />,
-          blockquote: (props) => (
-            <Box
-              as="blockquote"
-              borderLeftWidth="4px"
-              borderLeftColor="gray.200"
-              pl={4}
-              py={2}
-              my={4}
-              color="gray.700"
-              {...props}
-            />
-          ),
-          code: (props) => {
-            const { children, inline } = props;
-            return inline ? (
+  const MarkdownContent = ({ content }) => {
+    // Replace escaped newlines with actual newlines before rendering
+    const processedContent = content.replace(/\\n/g, "\n");
+
+    return (
+      <Box className="markdown-content">
+        <ReactMarkdown
+          components={{
+            p: (props) => <Text mb={4} {...props} />,
+            h1: (props) => (
+              <Heading as="h1" size="xl" mt={6} mb={4} {...props} />
+            ),
+            h2: (props) => (
+              <Heading as="h2" size="lg" mt={5} mb={3} {...props} />
+            ),
+            h3: (props) => (
+              <Heading as="h3" size="md" mt={4} mb={2} {...props} />
+            ),
+            ul: (props) => <Box as="ul" pl={5} mb={4} {...props} />,
+            ol: (props) => <Box as="ol" pl={5} mb={4} {...props} />,
+            li: (props) => <Box as="li" ml={2} mb={1} {...props} />,
+            a: (props) => <Link color="blue.500" isExternal {...props} />,
+            blockquote: (props) => (
               <Box
-                as="code"
-                bg="gray.100"
-                p={1}
-                borderRadius="sm"
-                fontSize="sm"
-                fontFamily="monospace"
-                {...props}
-              />
-            ) : (
-              <Box
-                as="pre"
-                bg="gray.100"
-                p={3}
-                borderRadius="md"
-                overflowX="auto"
-                fontSize="sm"
-                fontFamily="monospace"
+                as="blockquote"
+                borderLeftWidth="4px"
+                borderLeftColor="gray.200"
+                pl={4}
+                py={2}
                 my={4}
+                color="gray.700"
                 {...props}
               />
-            );
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </Box>
-  );
+            ),
+            code: (props) => {
+              const { children, inline } = props;
+              return inline ? (
+                <Box
+                  as="code"
+                  bg="gray.100"
+                  p={1}
+                  borderRadius="sm"
+                  fontSize="sm"
+                  fontFamily="monospace"
+                  {...props}
+                />
+              ) : (
+                <Box
+                  as="pre"
+                  bg="gray.100"
+                  p={3}
+                  borderRadius="md"
+                  overflowX="auto"
+                  fontSize="sm"
+                  fontFamily="monospace"
+                  my={4}
+                  {...props}
+                />
+              );
+            },
+          }}
+        >
+          {processedContent}
+        </ReactMarkdown>
+      </Box>
+    );
+  };
 
   return (
-    <Flex h="calc(100vh - 180px)" minH="600px">
+    <Flex h="100%" w="100%">
       {/* Sessions sidebar */}
       <Box
         w="250px"
@@ -342,6 +386,7 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
         borderColor="gray.200"
         p={4}
         overflowY="auto"
+        h="100%"
       >
         <VStack align="stretch" spacing={4}>
           <Button colorScheme="blue" onClick={createSession}>
@@ -383,14 +428,17 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
           </VStack>
         </VStack>
       </Box>
+
       {/* Main chat area */}
-      <Flex flex={1} direction="column" p={4}>
+      <Flex flex={1} direction="column" p={4} h="100%" overflow="hidden">
         {/* Header without controls */}
         <Flex justify="space-between" mb={4} align="center">
           <Heading size="md">AI Assistant</Heading>
         </Flex>
+
         {/* Messages area */}
         <VStack
+          ref={messagesContainerRef}
           flex={1}
           spacing={4}
           align="stretch"
@@ -399,6 +447,7 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
           p={2}
           borderRadius="md"
           bg="gray.50"
+          maxH="calc(100% - 80px)"
         >
           {messages.length === 0 && !isMessageLoading && (
             <Flex h="100%" justify="center" align="center" color="gray.500">
@@ -444,26 +493,29 @@ export default function RAGchat({ sessionId: initialSessionId = null }) {
             </Box>
           )}
         </VStack>
+
         {/* Input area */}
-        <form onSubmit={handleSubmit}>
-          <Flex>
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Ask about AI models, research papers, or techniques..."
-              mr={2}
-              disabled={isMessageLoading}
-            />
-            <Button
-              type="submit"
-              colorScheme="blue"
-              isDisabled={isMessageLoading || !input.trim()}
-              isLoading={isMessageLoading}
-            >
-              Send
-            </Button>
-          </Flex>
-        </form>
+        <Box position="sticky" bottom="0" bg="white" pt={2}>
+          <form onSubmit={handleSubmit}>
+            <Flex>
+              <Input
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Ask about AI models, research papers, or techniques..."
+                mr={2}
+                disabled={isMessageLoading}
+              />
+              <Button
+                type="submit"
+                colorScheme="blue"
+                isDisabled={isMessageLoading || !input.trim()}
+                isLoading={isMessageLoading}
+              >
+                Send
+              </Button>
+            </Flex>
+          </form>
+        </Box>
       </Flex>
     </Flex>
   );

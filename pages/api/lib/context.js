@@ -1,3 +1,5 @@
+// pages/api/chat/lib/context.js
+
 /**
  * Format retrieved documents into a context string for the AI model
  */
