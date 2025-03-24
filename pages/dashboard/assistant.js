@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "../../components/MetaTags";
-import RAGchat from "../../components/RagChat";
+import RagChat from "../../components/RagChat";
 
 export default function AssistantPage() {
   return (
@@ -14,7 +14,7 @@ export default function AssistantPage() {
       <DashboardLayout>
         <Box height="calc(100vh - 128px)" overflow="hidden">
           {/* Adjust the height value based on your navbar height */}
-          <RAGchat />
+          <RagChat />
         </Box>
       </DashboardLayout>
     </>
