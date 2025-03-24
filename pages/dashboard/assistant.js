@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import DashboardLayout from "../../components/Dashboard/Layout/DashboardLayout";
 import MetaTags from "../../components/MetaTags";
-import RagChat from "../../components/RagChat";
+import RagChat from "@/components/RagChat";
 
 export default function AssistantPage() {
   return (
