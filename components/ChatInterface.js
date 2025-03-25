@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 
-export default function RagChat({ sessionId: initialSessionId = null }) {
+export default function ChatInterface({ sessionId: initialSessionId = null }) {
   const { user } = useAuth();
   const toast = useToast();
   const [sessionId, setSessionId] = useState(initialSessionId);
