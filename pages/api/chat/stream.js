@@ -99,10 +99,35 @@ export default async function handler(req) {
     // Clone the response for background processing
     const clonedResponse = response.clone();
 
-    // Process and save in the background without awaiting
-    processAndSaveResponse(clonedResponse, activeSessionId, ragContext);
+    // Get proper Vercel execution context for waitUntil
+    const ctx =
+      req.platform?.context ||
+      (req.signal ? { waitUntil: (promise) => promise } : null);
 
-    // Return the stream directly to the client
+    // This is the key change: properly use waitUntil for Vercel Edge functions
+    if (ctx && typeof ctx.waitUntil === "function") {
+      console.log("Using waitUntil for background processing");
+      ctx.waitUntil(
+        processAndSaveResponse(clonedResponse, activeSessionId, ragContext)
+      );
+    } else {
+      // Alternative approach: collect content before returning response
+      console.log("No waitUntil available, using alternative processing");
+      const fullContent = await collectStreamContent(clonedResponse.clone());
+
+      // Return response immediately to client
+      const clientResponse = new Response(response.body, {
+        headers,
+        status: response.status,
+      });
+
+      // Then save the message after response is sent
+      saveCompleteMessage(fullContent, activeSessionId, ragContext);
+
+      return clientResponse;
+    }
+
+    // Return the stream directly to the client when using waitUntil
     return new Response(response.body, {
       headers,
       status: response.status,
@@ -115,39 +140,106 @@ export default async function handler(req) {
   }
 }
 
-// Process and save complete response to database
+// Collect full content from stream upfront
+async function collectStreamContent(response) {
+  try {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let extractedContent = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+    }
+    buffer += decoder.decode(); // Flush the decoder
+
+    // AI-SDK specific format parsing
+    const textRegex = /0:"([^"]*)"/g;
+    let match;
+    while ((match = textRegex.exec(buffer)) !== null) {
+      extractedContent += match[1];
+    }
+
+    return extractedContent;
+  } catch (error) {
+    console.error("Error collecting stream content:", error);
+    return "";
+  }
+}
+
+// Process and save when not using waitUntil
+async function saveCompleteMessage(content, sessionId, ragContext) {
+  if (!sessionId || content.length === 0) {
+    console.warn("Cannot save message: missing sessionId or empty content");
+    return;
+  }
+
+  try {
+    await saveMessage({
+      session_id: sessionId,
+      role: "assistant",
+      content: content,
+      rag_context: ragContext || null,
+    });
+
+    // Record analytics for RAG usage
+    if (
+      ragContext &&
+      (ragContext.papers?.length > 0 || ragContext.models?.length > 0)
+    ) {
+      const { data: sessionData } = await supabase
+        .from("chat_sessions")
+        .select("user_id")
+        .eq("id", sessionId)
+        .single();
+
+      if (sessionData?.user_id) {
+        await recordRagUsage(sessionData.user_id, sessionId);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to save complete message:", error);
+  }
+}
+
+// Process and save complete response to database (for waitUntil)
 async function processAndSaveResponse(response, sessionId, ragContext) {
   console.log("Processing response for session:", sessionId);
+
+  if (!sessionId) {
+    console.warn("No sessionId provided, cannot save response");
+    return;
+  }
+
   let extractedContent = "";
 
   try {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
-    // Read the entire stream
-    let chunks = [];
+    // Read the entire stream into buffer
+    let buffer = "";
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      chunks.push(decoder.decode(value, { stream: true }));
+      buffer += decoder.decode(value, { stream: true });
     }
-
-    // Combine all chunks
-    const rawContent = chunks.join("");
+    buffer += decoder.decode(); // Ensure final bytes are decoded
 
     // AI-SDK specific format parsing
-    // Extract all "0:" prefixed text parts which contain the actual content
     const textRegex = /0:"([^"]*)"/g;
     let match;
-    while ((match = textRegex.exec(rawContent)) !== null) {
+    while ((match = textRegex.exec(buffer)) !== null) {
       extractedContent += match[1];
     }
 
     console.log("Extracted content length:", extractedContent.length);
     console.log("Content preview:", extractedContent.substring(0, 100));
 
-    // Save only if we have content and a session
-    if (sessionId && extractedContent.length > 0) {
+    // Save only if we have content
+    if (extractedContent.length > 0) {
       try {
         const savedMessage = await saveMessage({
           session_id: sessionId,
@@ -158,37 +250,34 @@ async function processAndSaveResponse(response, sessionId, ragContext) {
         console.log("Message saved successfully with ID:", savedMessage?.id);
       } catch (error) {
         console.error("Failed to save assistant message:", error);
+        throw error;
+      }
+
+      // Record analytics for RAG usage if context was provided
+      if (
+        ragContext &&
+        (ragContext.papers?.length > 0 || ragContext.models?.length > 0)
+      ) {
+        try {
+          const { data: sessionData } = await supabase
+            .from("chat_sessions")
+            .select("user_id")
+            .eq("id", sessionId)
+            .single();
+
+          if (sessionData?.user_id) {
+            await recordRagUsage(sessionData.user_id, sessionId);
+          }
+        } catch (error) {
+          console.error("Failed to record analytics:", error);
+        }
       }
     } else {
-      console.warn(
-        "Not saving: sessionId exists:",
-        !!sessionId,
-        "Content length:",
-        extractedContent.length
-      );
-    }
-
-    // Record analytics for RAG usage if context was provided
-    if (
-      ragContext &&
-      (ragContext.papers?.length > 0 || ragContext.models?.length > 0)
-    ) {
-      try {
-        const { data: sessionData } = await supabase
-          .from("chat_sessions")
-          .select("user_id")
-          .eq("id", sessionId)
-          .single();
-
-        if (sessionData?.user_id) {
-          await recordRagUsage(sessionData.user_id, sessionId);
-        }
-      } catch (error) {
-        console.error("Failed to record analytics:", error);
-      }
+      console.warn("No content extracted, not saving message");
     }
   } catch (error) {
     console.error("Error processing response:", error);
+    throw error; // Rethrow so waitUntil can track the failure
   }
 }
 
