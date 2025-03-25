@@ -17,27 +17,52 @@ export const config = {
   runtime: "edge",
 };
 
+// Utility for consistent timestamped logging
+function logWithTimestamp(type, message, data = null) {
+  const timestamp = new Date().toISOString();
+  const logPrefix = `[${timestamp}] [${type}]`;
+
+  if (data) {
+    console.log(`${logPrefix} ${message}`, data);
+  } else {
+    console.log(`${logPrefix} ${message}`);
+  }
+}
+
 export default async function handler(req) {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
 
   try {
+    logWithTimestamp("DEBUG", "Starting request handler");
+
     // Parse request
+    const body = await req.json();
     const {
       messages = [],
       userId,
       sessionId = null,
       model = "gpt-4o-mini",
       ragEnabled = true,
-    } = await req.json();
+    } = body;
+
+    logWithTimestamp("INFO", "Request parsed", {
+      userId,
+      sessionId,
+      messageCount: messages.length,
+      model,
+      ragEnabled,
+    });
 
     if (!userId || !messages.length) {
+      logWithTimestamp("ERROR", "Missing user ID or messages");
       return new Response("Missing user ID or messages", { status: 400 });
     }
 
     const userMessage = messages[messages.length - 1];
     if (userMessage.role !== "user") {
+      logWithTimestamp("ERROR", "Last message not from user");
       return new Response("Last message must be from the user", {
         status: 400,
       });
@@ -46,11 +71,14 @@ export default async function handler(req) {
     // Get or create session
     let activeSessionId = sessionId;
     if (!activeSessionId) {
+      logWithTimestamp("INFO", "Creating new session");
       activeSessionId = await createSession(messages, userId);
+      logWithTimestamp("INFO", "Session created", { activeSessionId });
     }
 
     // Save user message
     if (activeSessionId) {
+      logWithTimestamp("INFO", "Saving user message", { activeSessionId });
       await saveUserMessage(activeSessionId, userMessage.content);
     }
 
@@ -58,12 +86,17 @@ export default async function handler(req) {
     let ragContext = null;
     if (ragEnabled) {
       try {
+        logWithTimestamp("INFO", "Retrieving context");
         ragContext = await getRelevantContext(
           userMessage.content,
           CONFIG.limits.maxContextSize
         );
+        logWithTimestamp("INFO", "Context retrieved", {
+          paperCount: ragContext?.papers?.length || 0,
+          modelCount: ragContext?.models?.length || 0,
+        });
       } catch (error) {
-        console.error("Error retrieving context:", error);
+        logWithTimestamp("ERROR", "Error retrieving context", error);
         // Continue without context if retrieval fails
         ragContext = { papers: [], models: [] };
       }
@@ -72,6 +105,9 @@ export default async function handler(req) {
     // Prepare system prompt with context
     const contextString = formatRagContext(ragContext);
     const systemPrompt = createSystemPrompt(contextString, userMessage.content);
+    logWithTimestamp("DEBUG", "System prompt created", {
+      promptLength: systemPrompt.length,
+    });
 
     // Prepare messages for AI
     const messagesToSend = [
@@ -79,6 +115,11 @@ export default async function handler(req) {
       ...messages.slice(0, -1), // Previous messages
       userMessage, // Latest user message
     ];
+
+    logWithTimestamp("INFO", "Sending request to AI", {
+      modelUsed: model,
+      messageCount: messagesToSend.length,
+    });
 
     // Get AI stream directly
     const result = streamText({
@@ -88,6 +129,7 @@ export default async function handler(req) {
 
     // Get the response directly from the AI SDK
     const response = result.toDataStreamResponse();
+    logWithTimestamp("INFO", "Got response from AI");
 
     // Add session ID header if available
     const headers = new Headers(response.headers);
@@ -96,211 +138,205 @@ export default async function handler(req) {
       headers.set("X-Session-Id", activeSessionId);
     }
 
-    // Clone the response for background processing
-    const clonedResponse = response.clone();
+    // Instead of trying to be clever with background processing,
+    // let's use the simplest possible approach and fully process
+    // the response before returning to client
 
-    // Get proper Vercel execution context for waitUntil
-    const ctx =
-      req.platform?.context ||
-      (req.signal ? { waitUntil: (promise) => promise } : null);
+    logWithTimestamp("DEBUG", "Starting to collect complete response");
+    // Critical: We need to consume the entire stream before returning
+    const fullContent = await fullProcessResponse(
+      response.clone(),
+      activeSessionId,
+      ragContext
+    );
+    logWithTimestamp("INFO", "Collected full response", {
+      contentLength: fullContent.length,
+      sessionId: activeSessionId,
+    });
 
-    // This is the key change: properly use waitUntil for Vercel Edge functions
-    if (ctx && typeof ctx.waitUntil === "function") {
-      console.log("Using waitUntil for background processing");
-      ctx.waitUntil(
-        processAndSaveResponse(clonedResponse, activeSessionId, ragContext)
-      );
-    } else {
-      // Alternative approach: collect content before returning response
-      console.log("No waitUntil available, using alternative processing");
-      const fullContent = await collectStreamContent(clonedResponse.clone());
+    // Now save in a more direct way
+    try {
+      if (activeSessionId && fullContent.length > 0) {
+        logWithTimestamp("INFO", "Saving assistant message to DB", {
+          sessionId: activeSessionId,
+          contentPreview: fullContent.substring(0, 50) + "...",
+        });
 
-      // Return response immediately to client
-      const clientResponse = new Response(response.body, {
-        headers,
-        status: response.status,
-      });
+        const savedMessage = await saveMessage({
+          session_id: activeSessionId,
+          role: "assistant",
+          content: fullContent,
+          rag_context: ragContext || null,
+        });
 
-      // Then save the message after response is sent
-      saveCompleteMessage(fullContent, activeSessionId, ragContext);
-
-      return clientResponse;
+        logWithTimestamp("INFO", "Assistant message saved successfully", {
+          messageId: savedMessage?.id,
+        });
+      } else {
+        logWithTimestamp("WARN", "Not saving assistant message", {
+          hasSessionId: !!activeSessionId,
+          contentLength: fullContent?.length || 0,
+        });
+      }
+    } catch (saveError) {
+      logWithTimestamp("ERROR", "Failed to save assistant message", saveError);
+      // Continue despite error - return response to client
     }
 
-    // Return the stream directly to the client when using waitUntil
+    // Return the original response to client
+    logWithTimestamp("INFO", "Returning response to client");
     return new Response(response.body, {
       headers,
       status: response.status,
     });
   } catch (error) {
-    console.error("Chat stream error:", error);
+    logWithTimestamp("ERROR", "Chat stream handler error", {
+      message: error.message,
+      stack: error.stack,
+    });
     return new Response(`Error processing request: ${error.message}`, {
       status: 500,
     });
   }
 }
 
-// Collect full content from stream upfront
-async function collectStreamContent(response) {
+// Process the full response with detailed logging
+async function fullProcessResponse(response, sessionId, ragContext) {
+  const startTime = Date.now();
+  logWithTimestamp("DEBUG", "Starting response processing", { sessionId });
+
   try {
+    // Read the entire response
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = "";
-    let extractedContent = "";
+
+    let chunks = [];
+    let bytesRead = 0;
+    let partial = "";
 
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
+      if (done) {
+        logWithTimestamp("DEBUG", "Stream reading complete");
+        break;
+      }
+
+      bytesRead += value.length;
+      const decoded = decoder.decode(value, { stream: true });
+      chunks.push(decoded);
+      partial += decoded;
+
+      // Log progress periodically
+      if (chunks.length % 5 === 0) {
+        logWithTimestamp("DEBUG", "Stream reading progress", {
+          chunksReceived: chunks.length,
+          bytesRead,
+          recentContent: decoded.substring(0, 20) + "...",
+        });
+      }
     }
-    buffer += decoder.decode(); // Flush the decoder
+
+    // Add final chunk with end-of-stream flag
+    chunks.push(decoder.decode());
+    const fullResponse = chunks.join("");
+
+    logWithTimestamp("DEBUG", "Response stream fully read", {
+      totalChunks: chunks.length,
+      totalBytes: bytesRead,
+      fullResponseLength: fullResponse.length,
+      decodingTimeMs: Date.now() - startTime,
+    });
+
+    // Extract the actual content from AI SDK format
+    logWithTimestamp("DEBUG", "Sample of raw response", {
+      sample: fullResponse.substring(0, 200),
+    });
 
     // AI-SDK specific format parsing
     const textRegex = /0:"([^"]*)"/g;
+    let extractedContent = "";
     let match;
-    while ((match = textRegex.exec(buffer)) !== null) {
+    let matchCount = 0;
+
+    while ((match = textRegex.exec(fullResponse)) !== null) {
       extractedContent += match[1];
+      matchCount++;
+    }
+
+    logWithTimestamp("DEBUG", "Content extraction complete", {
+      matchCount,
+      extractedLength: extractedContent.length,
+      extractionTimeMs: Date.now() - startTime,
+      sample: extractedContent.substring(0, 100) + "...",
+    });
+
+    // Alternative extraction method if first one failed
+    if (extractedContent.length === 0) {
+      logWithTimestamp(
+        "WARN",
+        "Primary extraction method yielded no content, trying alternatives"
+      );
+
+      // Try alternative pattern
+      const altRegex = /"text":"([^"]*)"/g;
+      while ((match = altRegex.exec(fullResponse)) !== null) {
+        extractedContent += match[1];
+        matchCount++;
+      }
+
+      logWithTimestamp("DEBUG", "Alternative extraction results", {
+        matchCount,
+        extractedLength: extractedContent.length,
+      });
+
+      // If still nothing, log the full response for debugging
+      if (extractedContent.length === 0) {
+        logWithTimestamp("ERROR", "Content extraction failed", {
+          fullResponse: fullResponse,
+        });
+      }
     }
 
     return extractedContent;
   } catch (error) {
-    console.error("Error collecting stream content:", error);
-    return "";
-  }
-}
-
-// Process and save when not using waitUntil
-async function saveCompleteMessage(content, sessionId, ragContext) {
-  if (!sessionId || content.length === 0) {
-    console.warn("Cannot save message: missing sessionId or empty content");
-    return;
-  }
-
-  try {
-    await saveMessage({
-      session_id: sessionId,
-      role: "assistant",
-      content: content,
-      rag_context: ragContext || null,
+    logWithTimestamp("ERROR", "Error processing response stream", {
+      message: error.message,
+      stack: error.stack,
+      sessionId,
     });
-
-    // Record analytics for RAG usage
-    if (
-      ragContext &&
-      (ragContext.papers?.length > 0 || ragContext.models?.length > 0)
-    ) {
-      const { data: sessionData } = await supabase
-        .from("chat_sessions")
-        .select("user_id")
-        .eq("id", sessionId)
-        .single();
-
-      if (sessionData?.user_id) {
-        await recordRagUsage(sessionData.user_id, sessionId);
-      }
-    }
-  } catch (error) {
-    console.error("Failed to save complete message:", error);
-  }
-}
-
-// Process and save complete response to database (for waitUntil)
-async function processAndSaveResponse(response, sessionId, ragContext) {
-  console.log("Processing response for session:", sessionId);
-
-  if (!sessionId) {
-    console.warn("No sessionId provided, cannot save response");
-    return;
-  }
-
-  let extractedContent = "";
-
-  try {
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    // Read the entire stream into buffer
-    let buffer = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-    }
-    buffer += decoder.decode(); // Ensure final bytes are decoded
-
-    // AI-SDK specific format parsing
-    const textRegex = /0:"([^"]*)"/g;
-    let match;
-    while ((match = textRegex.exec(buffer)) !== null) {
-      extractedContent += match[1];
-    }
-
-    console.log("Extracted content length:", extractedContent.length);
-    console.log("Content preview:", extractedContent.substring(0, 100));
-
-    // Save only if we have content
-    if (extractedContent.length > 0) {
-      try {
-        const savedMessage = await saveMessage({
-          session_id: sessionId,
-          role: "assistant",
-          content: extractedContent,
-          rag_context: ragContext || null,
-        });
-        console.log("Message saved successfully with ID:", savedMessage?.id);
-      } catch (error) {
-        console.error("Failed to save assistant message:", error);
-        throw error;
-      }
-
-      // Record analytics for RAG usage if context was provided
-      if (
-        ragContext &&
-        (ragContext.papers?.length > 0 || ragContext.models?.length > 0)
-      ) {
-        try {
-          const { data: sessionData } = await supabase
-            .from("chat_sessions")
-            .select("user_id")
-            .eq("id", sessionId)
-            .single();
-
-          if (sessionData?.user_id) {
-            await recordRagUsage(sessionData.user_id, sessionId);
-          }
-        } catch (error) {
-          console.error("Failed to record analytics:", error);
-        }
-      }
-    } else {
-      console.warn("No content extracted, not saving message");
-    }
-  } catch (error) {
-    console.error("Error processing response:", error);
-    throw error; // Rethrow so waitUntil can track the failure
+    return "";
   }
 }
 
 // Record RAG usage
 async function recordRagUsage(userId, sessionId) {
-  const { error } = await supabase.from("analytics_events").insert([
-    {
-      user_id: userId,
-      session_id: sessionId,
-      event_type: "ragchat",
-      event_data: { session_id: sessionId },
-    },
-  ]);
+  try {
+    logWithTimestamp("INFO", "Recording RAG usage", { userId, sessionId });
+    const { error } = await supabase.from("analytics_events").insert([
+      {
+        user_id: userId,
+        session_id: sessionId,
+        event_type: "ragchat",
+        event_data: { session_id: sessionId },
+      },
+    ]);
 
-  if (error) throw error;
-  return true;
+    if (error) {
+      logWithTimestamp("ERROR", "Failed to record RAG usage", error);
+      throw error;
+    }
+    return true;
+  } catch (error) {
+    logWithTimestamp("ERROR", "Exception in recordRagUsage", error);
+    return false;
+  }
 }
 
 // Create a new session
 async function createSession(messages, userId) {
   try {
     const title = getSessionTitle(messages);
-    console.log("Creating new session with title:", title);
+    logWithTimestamp("INFO", "Creating new session", { userId, title });
 
     // Insert directly with Supabase
     const { data, error } = await supabase
@@ -314,11 +350,17 @@ async function createSession(messages, userId) {
       .select()
       .single();
 
-    if (error) throw error;
-    console.log("Session created with ID:", data.id);
+    if (error) {
+      logWithTimestamp("ERROR", "Failed to create session", error);
+      throw error;
+    }
+
+    logWithTimestamp("INFO", "Session created successfully", {
+      sessionId: data.id,
+    });
     return data.id;
   } catch (error) {
-    console.error("Error creating session:", error);
+    logWithTimestamp("ERROR", "Exception in createSession", error);
     return null;
   }
 }
@@ -326,9 +368,11 @@ async function createSession(messages, userId) {
 // Save a message directly to Supabase
 async function saveMessage(messageData) {
   try {
-    console.log(
-      `Saving ${messageData.role} message to session ${messageData.session_id}`
-    );
+    logWithTimestamp("INFO", "Saving message", {
+      role: messageData.role,
+      sessionId: messageData.session_id,
+      contentLength: messageData.content?.length || 0,
+    });
 
     const { data, error } = await supabase
       .from("chat_messages")
@@ -336,23 +380,34 @@ async function saveMessage(messageData) {
       .select();
 
     if (error) {
-      console.error("Supabase insert error:", error);
+      logWithTimestamp("ERROR", "Supabase insert error", error);
       throw error;
     }
 
     // Update session timestamp
+    logWithTimestamp("DEBUG", "Updating session timestamp", {
+      sessionId: messageData.session_id,
+    });
+
     const { error: updateError } = await supabase
       .from("chat_sessions")
       .update({ updated_at: new Date().toISOString() })
       .eq("id", messageData.session_id);
 
     if (updateError) {
-      console.error("Error updating session timestamp:", updateError);
+      logWithTimestamp(
+        "ERROR",
+        "Error updating session timestamp",
+        updateError
+      );
     }
 
+    logWithTimestamp("INFO", "Message saved successfully", {
+      messageId: data[0]?.id,
+    });
     return data[0];
   } catch (error) {
-    console.error("Error saving message:", error);
+    logWithTimestamp("ERROR", "Exception in saveMessage", error);
     throw error;
   }
 }
@@ -360,13 +415,18 @@ async function saveMessage(messageData) {
 // Save user message
 async function saveUserMessage(sessionId, content) {
   try {
+    logWithTimestamp("INFO", "Saving user message", {
+      sessionId,
+      contentLength: content?.length || 0,
+    });
+
     return await saveMessage({
       session_id: sessionId,
       role: "user",
       content,
     });
   } catch (error) {
-    console.error("Error saving user message:", error);
+    logWithTimestamp("ERROR", "Error saving user message", error);
     // Continue even if message save fails
   }
 }
