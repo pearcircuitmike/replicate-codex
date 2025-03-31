@@ -1,6 +1,6 @@
 // pages/api/chat/stream.js
 
-import { streamText, createDataStreamResponse } from "ai";
+import { smoothStream, streamText, createDataStreamResponse } from "ai";
 import { openai } from "@ai-sdk/openai";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { formatRagContext, createSystemPrompt } from "../lib/context";
@@ -164,6 +164,7 @@ export default async function handler(req) {
           const aiStream = streamText({
             model: openai(model),
             messages: messagesToSend,
+            experimental_transform: smoothStream(),
           });
 
           // Clone for saving to DB
