@@ -1,6 +1,6 @@
 // pages/api/chat/stream.js
 
-import { streamText } from "ai";
+import { streamText, createDataStreamResponse } from "ai";
 import { openai } from "@ai-sdk/openai";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { formatRagContext, createSystemPrompt } from "../lib/context";
@@ -9,7 +9,7 @@ import { getRelevantContext } from "../lib/retriever";
 // Configuration
 const CONFIG = {
   limits: {
-    maxContextSize: 10, // Max number of context items to include (models + papers)
+    maxContextSize: 10, // Max number of context items to include
   },
 };
 
@@ -33,6 +33,11 @@ export default async function handler(req) {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
+
+  // Set up headers for the response
+  const headers = {
+    "Cache-Control": "no-cache",
+  };
 
   try {
     logWithTimestamp("DEBUG", "Starting request handler");
@@ -82,112 +87,144 @@ export default async function handler(req) {
       await saveUserMessage(activeSessionId, userMessage.content);
     }
 
-    // Retrieve relevant context if RAG is enabled
-    let ragContext = null;
-    if (ragEnabled) {
-      try {
-        logWithTimestamp("INFO", "Retrieving context");
-        ragContext = await getRelevantContext(
-          userMessage.content,
-          CONFIG.limits.maxContextSize
-        );
-        logWithTimestamp("INFO", "Context retrieved", {
-          paperCount: ragContext?.papers?.length || 0,
-          modelCount: ragContext?.models?.length || 0,
-        });
-      } catch (error) {
-        logWithTimestamp("ERROR", "Error retrieving context", error);
-        // Continue without context if retrieval fails
-        ragContext = { papers: [], models: [] };
-      }
-    }
-
-    // Prepare system prompt with context
-    const contextString = formatRagContext(ragContext);
-    const systemPrompt = createSystemPrompt(contextString, userMessage.content);
-    logWithTimestamp("DEBUG", "System prompt created", {
-      promptLength: systemPrompt.length,
-    });
-
-    // Prepare messages for AI
-    const messagesToSend = [
-      { role: "system", content: systemPrompt },
-      ...messages.slice(0, -1), // Previous messages
-      userMessage, // Latest user message
-    ];
-
-    logWithTimestamp("INFO", "Sending request to AI", {
-      modelUsed: model,
-      messageCount: messagesToSend.length,
-    });
-
-    // Get AI stream directly
-    const result = streamText({
-      model: openai(model),
-      messages: messagesToSend,
-    });
-
-    // Get the response directly from the AI SDK
-    const response = result.toDataStreamResponse();
-    logWithTimestamp("INFO", "Got response from AI");
-
-    // Add session ID header if available
-    const headers = new Headers(response.headers);
-    headers.set("Cache-Control", "no-cache");
+    // Add session ID to headers if available
     if (activeSessionId) {
-      headers.set("X-Session-Id", activeSessionId);
+      headers["X-Session-Id"] = activeSessionId;
     }
 
-    // Instead of trying to be clever with background processing,
-    // let's use the simplest possible approach and fully process
-    // the response before returning to client
-
-    logWithTimestamp("DEBUG", "Starting to collect complete response");
-    // Critical: We need to consume the entire stream before returning
-    const fullContent = await fullProcessResponse(
-      response.clone(),
-      activeSessionId,
-      ragContext
-    );
-    logWithTimestamp("INFO", "Collected full response", {
-      contentLength: fullContent.length,
-      sessionId: activeSessionId,
-    });
-
-    // Now save in a more direct way
-    try {
-      if (activeSessionId && fullContent.length > 0) {
-        logWithTimestamp("INFO", "Saving assistant message to DB", {
-          sessionId: activeSessionId,
-          contentPreview: fullContent.substring(0, 50) + "...",
-        });
-
-        const savedMessage = await saveMessage({
-          session_id: activeSessionId,
-          role: "assistant",
-          content: fullContent,
-          rag_context: ragContext || null,
-        });
-
-        logWithTimestamp("INFO", "Assistant message saved successfully", {
-          messageId: savedMessage?.id,
-        });
-      } else {
-        logWithTimestamp("WARN", "Not saving assistant message", {
-          hasSessionId: !!activeSessionId,
-          contentLength: fullContent?.length || 0,
-        });
-      }
-    } catch (saveError) {
-      logWithTimestamp("ERROR", "Failed to save assistant message", saveError);
-      // Continue despite error - return response to client
-    }
-
-    // Return the original response to client
-    logWithTimestamp("INFO", "Returning response to client");
-    return new Response(response.body, {
+    return createDataStreamResponse({
       headers,
-      status: response.status,
+      execute: async (dataStream) => {
+        try {
+          // Initial loading indicator
+          dataStream.writeData({
+            type: "status",
+            content: "Searching for relevant papers and models...",
+          });
+
+          // Get relevant context
+          logWithTimestamp("INFO", "Retrieving context");
+          const ragContext = await getRelevantContext(
+            userMessage.content,
+            CONFIG.limits.maxContextSize
+          );
+
+          logWithTimestamp("INFO", "Context retrieved", {
+            paperCount: ragContext?.papers?.length || 0,
+            modelCount: ragContext?.models?.length || 0,
+          });
+
+          // Stream papers as sources
+          if (ragContext?.papers) {
+            for (const paper of ragContext.papers) {
+              dataStream.writeData({
+                type: "source",
+                title: paper.title,
+                url: paper.paperUrl || null,
+                abstract: paper.abstract?.substring(0, 200) + "..." || null,
+              });
+            }
+          }
+
+          // Stream models
+          if (ragContext?.models) {
+            for (const model of ragContext.models) {
+              dataStream.writeData({
+                type: "model",
+                name: model.modelName,
+                description:
+                  model.description?.substring(0, 200) + "..." || null,
+              });
+            }
+          }
+
+          // Prepare system prompt
+          const contextString = formatRagContext(ragContext);
+          const systemPrompt = createSystemPrompt(
+            contextString,
+            userMessage.content
+          );
+          logWithTimestamp("DEBUG", "System prompt created", {
+            promptLength: systemPrompt.length,
+          });
+
+          // Prepare messages for AI
+          const messagesToSend = [
+            { role: "system", content: systemPrompt },
+            ...messages.slice(0, -1), // Previous messages
+            userMessage, // Latest user message
+          ];
+
+          logWithTimestamp("INFO", "Sending request to AI", {
+            modelUsed: model,
+            messageCount: messagesToSend.length,
+          });
+
+          // Create AI response stream
+          const aiStream = streamText({
+            model: openai(model),
+            messages: messagesToSend,
+          });
+
+          // Clone for saving to DB
+          const responseClone = aiStream.toDataStreamResponse();
+
+          // Process in parallel for saving to DB
+          fullProcessResponse(responseClone, activeSessionId, ragContext).then(
+            (fullContent) => {
+              if (fullContent && fullContent.length > 0) {
+                logWithTimestamp("INFO", "Collected full response", {
+                  contentLength: fullContent.length,
+                  sessionId: activeSessionId,
+                });
+
+                try {
+                  if (activeSessionId) {
+                    logWithTimestamp("INFO", "Saving assistant message to DB", {
+                      sessionId: activeSessionId,
+                      contentPreview: fullContent.substring(0, 50) + "...",
+                    });
+
+                    saveMessage({
+                      session_id: activeSessionId,
+                      role: "assistant",
+                      content: fullContent,
+                      rag_context: ragContext || null,
+                    }).then((savedMessage) => {
+                      logWithTimestamp(
+                        "INFO",
+                        "Assistant message saved successfully",
+                        {
+                          messageId: savedMessage?.id,
+                        }
+                      );
+                    });
+                  }
+                } catch (saveError) {
+                  logWithTimestamp(
+                    "ERROR",
+                    "Failed to save assistant message",
+                    saveError
+                  );
+                }
+              }
+            }
+          );
+
+          // Merge AI response into data stream
+          aiStream.mergeIntoDataStream(dataStream);
+        } catch (error) {
+          logWithTimestamp("ERROR", "Error in stream execution", {
+            message: error.message,
+            stack: error.stack,
+          });
+          // Write error to the stream
+          dataStream.writeData({
+            type: "error",
+            message: error.message,
+          });
+        }
+      },
     });
   } catch (error) {
     logWithTimestamp("ERROR", "Chat stream handler error", {
