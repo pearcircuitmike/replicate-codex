@@ -29,12 +29,16 @@ import {
 // Custom Image component with modal functionality
 const EnhancedImage = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   // Responsive styling based on screen size
   const imageWidth = useBreakpointValue({ base: "100%", md: "120%" });
+  const imagePosition = useBreakpointValue({ base: "static", md: "relative" });
+  const imageLeft = useBreakpointValue({ base: "auto", md: "50%" });
   const imageTransform = useBreakpointValue({
     base: "none",
-    md: "translateX(-10%)",
+    md: "translateX(-50%)",
   });
+
   return (
     <>
       {/* Use a span element instead of div/Box to avoid hydration errors in paragraphs */}
@@ -49,17 +53,20 @@ const EnhancedImage = (props) => {
         transition="all 0.3s ease"
         style={{
           transform: imageTransform,
+          position: imagePosition,
+          left: imageLeft,
         }}
         _hover={{
           boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12)",
           transform: useBreakpointValue({
             base: "translateY(-2px)",
-            md: "translateX(-10%) translateY(-2px)",
+            md: "translateX(-50%) translateY(-2px)",
           }),
         }}
         onClick={onOpen}
         {...props}
       />
+
       <Modal isOpen={isOpen} onClose={onClose} size="full" isCentered>
         <ModalOverlay bg="blackAlpha.800" backdropFilter="blur(5px)" />
         <ModalContent
@@ -188,7 +195,6 @@ const processContent = (content) => {
 
     // Add the equation component
     segments.push(<MathEquation key={match.index} tex={match[1]} />);
-
     lastIndex = match.index + match[0].length;
   }
 
@@ -207,6 +213,7 @@ const EnhancedParagraph = (props) => {
   React.Children.forEach(props.children, (child) => {
     if (typeof child === "string") {
       const processed = processContent(child);
+
       if (Array.isArray(processed)) {
         processedChildren = [...processedChildren, ...processed];
       } else {
@@ -396,22 +403,27 @@ const customTheme = {
     />
   ),
 
-  // Table styling based on the example image
+  // Updated table styling to handle horizontal overflow properly
   table: (props) => (
-    <Table
-      fontFamily="Inter"
-      fontSize="18px"
-      color="#000"
-      width="100%"
-      borderCollapse="collapse"
-      border="1px solid #d9d9d9"
-      my="3em"
-      {...props}
-    />
+    <Box overflowX="auto" width="100%" mb="3em">
+      <Table
+        fontFamily="Inter"
+        fontSize="18px"
+        color="#000"
+        style={{ width: "100%", tableLayout: "fixed" }}
+        borderCollapse="collapse"
+        border="1px solid #d9d9d9"
+        {...props}
+      />
+    </Box>
   ),
+
   thead: (props) => <Thead backgroundColor="#ffffff" {...props} />,
+
   tbody: (props) => <Tbody {...props} />,
+
   tr: (props) => <Tr borderBottom="1px solid #d9d9d9" {...props} />,
+
   th: (props) => (
     <Th
       border="1px solid #d9d9d9"
@@ -422,9 +434,11 @@ const customTheme = {
       fontWeight="700"
       color="#000"
       textTransform="none"
+      whiteSpace="nowrap"
       {...props}
     />
   ),
+
   td: (props) => (
     <Td
       border="1px solid #d9d9d9"
