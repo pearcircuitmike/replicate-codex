@@ -19,7 +19,6 @@ const PDFViewer = dynamic(
   }
 );
 
-import PaperFigures from "./PaperFigures";
 import LimitMessage from "@/components/LimitMessage";
 import customTheme from "@/components/MarkdownTheme";
 import { useAuth } from "@/context/AuthContext";
@@ -39,7 +38,7 @@ function PaperContent({
   const toast = useToast();
 
   return (
-    <Box bg="white" rounded="lg" p={{ base: 3, md: 6 }} maxW="100%">
+    <Box bg="white" px={4} maxW="100%">
       <VStack spacing={5} align="stretch">
         {!hasActiveSubscription && !viewCounts?.canViewFullArticle ? (
           <LimitMessage />
@@ -70,10 +69,6 @@ function PaperContent({
           <Box mt={4}>
             <PDFViewer url={paper.pdfUrl} />
           </Box>
-        )}
-
-        {paper.figures && paper.figures.length > 0 && (
-          <PaperFigures figures={paper.figures} />
         )}
       </VStack>
     </Box>

@@ -233,7 +233,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                   <PaperVote paperId={paper.id} variant="vertical" size="md" />
                 </Box>
                 <Box flex="1">
-                  <Heading as="h1" size="lg">
+                  <Heading as="h1" size="2xl">
                     {paper.title}
                   </Heading>
                   <Box fontSize="sm" color="gray.600" mt={1}>
@@ -265,7 +265,12 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
 
               {/* Desktop title section (large screens) - full width */}
               <Box display={{ base: "none", lg: "block" }}>
-                <Heading as="h1" size="lg">
+                <Heading
+                  as="h1"
+                  fontSize="48px"
+                  fontWeight={700}
+                  lineHeight="56px"
+                >
                   {paper.title}
                 </Heading>
                 <Box fontSize="sm" color="gray.600" mt={1}>

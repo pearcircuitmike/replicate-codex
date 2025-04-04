@@ -33,7 +33,8 @@ const HighlightSidebar = ({
 
   return (
     <Box
-      p={2}
+      px={2}
+      mt={"2em"}
       borderLeft="1px solid"
       borderColor="gray.200"
       height="100%"
