@@ -1,8 +1,14 @@
+// components/PaperDetailsPage/PaperContent.js
+
 import React, { useRef } from "react";
 import { Box, VStack, useToast } from "@chakra-ui/react";
 import ReactMarkdown from "react-markdown";
-import ChakraUIRenderer from "chakra-ui-markdown-renderer";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math"; // for math support in Markdown
 import rehypeRaw from "rehype-raw";
+import rehypeKatex from "rehype-katex"; // to render math equations
+import "katex/dist/katex.min.css"; // KaTeX CSS for styling math equations
+import ChakraUIRenderer from "chakra-ui-markdown-renderer";
 import dynamic from "next/dynamic";
 
 const PDFViewer = dynamic(
@@ -14,7 +20,6 @@ const PDFViewer = dynamic(
 );
 
 import PaperFigures from "./PaperFigures";
-import PaperTables from "./PaperTables";
 import LimitMessage from "@/components/LimitMessage";
 import customTheme from "@/components/MarkdownTheme";
 import { useAuth } from "@/context/AuthContext";
@@ -47,7 +52,8 @@ function PaperContent({
             >
               <ReactMarkdown
                 components={ChakraUIRenderer(customTheme)}
-                rehypePlugins={[rehypeRaw]}
+                remarkPlugins={[remarkGfm, remarkMath]} // Enable GFM and math support
+                rehypePlugins={[rehypeRaw, rehypeKatex]} // Render raw HTML and math equations
               >
                 {paper.generatedSummary}
               </ReactMarkdown>
@@ -59,16 +65,15 @@ function PaperContent({
             </Box>
           </ContextualHighlighter>
         )}
+
         {paper.pdfUrl && (
           <Box mt={4}>
             <PDFViewer url={paper.pdfUrl} />
           </Box>
         )}
+
         {paper.figures && paper.figures.length > 0 && (
           <PaperFigures figures={paper.figures} />
-        )}
-        {paper.tables && paper.tables.length > 0 && (
-          <PaperTables tables={paper.tables} />
         )}
       </VStack>
     </Box>

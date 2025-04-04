@@ -1,3 +1,4 @@
+// components/ChatInterface.js
 import { useChat } from "ai/react";
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
@@ -8,11 +9,16 @@ import {
   Flex,
   Text,
   VStack,
+  HStack,
   Heading,
   Spinner,
   useToast,
   Link,
   Divider,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 
@@ -26,6 +32,12 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
     papers: [],
     models: [],
   });
+
+  // Rate limit state
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [rateLimitMessage, setRateLimitMessage] = useState("");
+  const [rateLimitResetTime, setRateLimitResetTime] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState("");
 
   // Add reference for message container
   const messagesContainerRef = useRef(null);
@@ -42,19 +54,19 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
     handleSubmit: submitMessage,
     isLoading: isMessageLoading,
     setMessages,
+    error: chatError,
   } = useChat({
     api: "/api/chat/stream",
     initialMessages: [],
     body: {
       userId: user?.id,
       sessionId,
-      ragEnabled: true, // Always enabled
-      model: "gpt-4o-mini", // Fixed model
+      ragEnabled: true,
+      model: "gpt-4o-mini",
     },
     onFinish: (message) => {
       console.log("Message finished, session:", sessionId);
 
-      // Only update title after first message exchange in a new session
       if (hasCreatedNewSession.current && firstUserMessage.current) {
         updateSessionTitle(firstUserMessage.current);
         hasCreatedNewSession.current = false;
@@ -62,6 +74,68 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
       }
 
       fetchSessions();
+      checkRateLimit(); // Check rate limit after message
+    },
+    onError: (error) => {
+      console.error("Chat error:", error);
+
+      // Check for rate limit errors from the SDK
+      try {
+        // The SDK might provide the error in different formats
+        let errorData = null;
+
+        // Try to parse JSON from error message if it's a string
+        if (typeof error === "string" || typeof error.message === "string") {
+          const errorText = typeof error === "string" ? error : error.message;
+          const match = errorText.match(/\{.*\}/s);
+          if (match) {
+            try {
+              errorData = JSON.parse(match[0]);
+            } catch (e) {
+              console.error("Error parsing JSON from error message:", e);
+            }
+          }
+        }
+        // If error or error.data is already an object, use it directly
+        else if (error && typeof error === "object") {
+          if (error.data && typeof error.data === "object") {
+            errorData = error.data;
+          } else {
+            errorData = error;
+          }
+        }
+
+        // If we found rate limit info, handle it
+        if (errorData && errorData.error === "rate_limit_exceeded") {
+          setIsRateLimited(true);
+          setRateLimitMessage(errorData.message || "Rate limit exceeded");
+
+          if (errorData.resetTime) {
+            setRateLimitResetTime(new Date(errorData.resetTime));
+          }
+
+          toast({
+            title: "Rate limit exceeded",
+            description: errorData.message,
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+          });
+
+          return;
+        }
+      } catch (e) {
+        console.error("Error handling rate limit error:", e);
+      }
+
+      // If it's not a rate limit error, show generic error
+      toast({
+        title: "Error sending message",
+        description: "Something went wrong. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     },
   });
 
@@ -78,7 +152,81 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
     scrollToBottom();
   }, [messages, isMessageLoading]);
 
-  // Update session title using the API endpoint instead of direct DB access
+  // Update time remaining timer
+  useEffect(() => {
+    if (!rateLimitResetTime) return;
+
+    const updateTimeRemaining = () => {
+      const now = new Date();
+      const diffMs = rateLimitResetTime - now;
+
+      if (diffMs <= 0) {
+        setIsRateLimited(false);
+        setRateLimitResetTime(null);
+        checkRateLimit(); // Check again after reset time
+        return;
+      }
+
+      const diffSecs = Math.floor(diffMs / 1000);
+
+      if (diffSecs < 60) {
+        setTimeRemaining(`${diffSecs} second${diffSecs !== 1 ? "s" : ""}`);
+      } else {
+        const diffMins = Math.floor(diffSecs / 60);
+        const remainingSecs = diffSecs % 60;
+        setTimeRemaining(`${diffMins}m ${remainingSecs}s`);
+      }
+    };
+
+    updateTimeRemaining();
+    const interval = setInterval(updateTimeRemaining, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitResetTime]);
+
+  // Check rate limit periodically
+  useEffect(() => {
+    if (user?.id) {
+      checkRateLimit();
+      const interval = setInterval(checkRateLimit, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [user?.id]);
+
+  // Check if user is rate limited
+  async function checkRateLimit() {
+    if (!user?.id) return;
+
+    try {
+      const response = await fetch("/api/chat/usage", {
+        headers: {
+          "x-user-id": user.id,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Update rate limit status
+        if (!data.allowed) {
+          setIsRateLimited(true);
+          setRateLimitMessage(data.reason || "Rate limit exceeded");
+          if (data.resetTime) {
+            setRateLimitResetTime(new Date(data.resetTime));
+          }
+        } else {
+          // Only clear if we're not in the middle of a timer countdown
+          if (!rateLimitResetTime || new Date() >= rateLimitResetTime) {
+            setIsRateLimited(false);
+            setRateLimitResetTime(null);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking rate limit:", error);
+    }
+  }
+
+  // Update session title using the API endpoint
   const updateSessionTitle = async (userMessage) => {
     if (!sessionId) return;
 
@@ -212,7 +360,7 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
           "x-user-id": user.id,
         },
         body: JSON.stringify({
-          title: "New Chat", // Initial placeholder title
+          title: "New Chat",
         }),
       });
       if (response.ok) {
@@ -220,11 +368,8 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
         console.log("Created new session:", data.session.id);
         setSessionId(data.session.id);
         setMessages([]);
-
-        // Set flag to indicate we've created a new session
         hasCreatedNewSession.current = true;
         firstUserMessage.current = "";
-
         await fetchSessions();
       }
     } catch (error) {
@@ -289,90 +434,43 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // If no session exists, create one
-    if (!sessionId) {
-      createSession().then(() => {
-        // CRITICAL: Directly update the title after getting sessionId
-        updateSessionTitle(input);
-        submitMessage(e);
+    // Store the user's message for title update
+    if (messages.length === 0) {
+      firstUserMessage.current = input;
+    }
+
+    // Check if rate limited before submitting
+    if (isRateLimited) {
+      toast({
+        title: "Rate limit exceeded",
+        description: rateLimitMessage,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
       });
       return;
     }
 
-    // If this is first message of a new session, update title directly
-    if (messages.length === 0) {
-      updateSessionTitle(input);
+    // If no session exists, create one
+    if (!sessionId) {
+      createSession().then(() => {
+        // Set the message before submitting to ensure it's available for the title update
+        submitMessage(e);
+      });
+      return;
     }
 
     // Submit the message
     submitMessage(e);
   }
 
-  // Custom component to render markdown content with proper styles
+  // Custom component to render markdown content
   const MarkdownContent = ({ content }) => {
-    // Replace escaped newlines with actual newlines before rendering
     const processedContent = content.replace(/\\n/g, "\n");
 
     return (
       <Box className="markdown-content">
-        <ReactMarkdown
-          components={{
-            p: (props) => <Text mb={4} {...props} />,
-            h1: (props) => (
-              <Heading as="h1" size="xl" mt={6} mb={4} {...props} />
-            ),
-            h2: (props) => (
-              <Heading as="h2" size="lg" mt={5} mb={3} {...props} />
-            ),
-            h3: (props) => (
-              <Heading as="h3" size="md" mt={4} mb={2} {...props} />
-            ),
-            ul: (props) => <Box as="ul" pl={5} mb={4} {...props} />,
-            ol: (props) => <Box as="ol" pl={5} mb={4} {...props} />,
-            li: (props) => <Box as="li" ml={2} mb={1} {...props} />,
-            a: (props) => <Link color="blue.500" isExternal {...props} />,
-            blockquote: (props) => (
-              <Box
-                as="blockquote"
-                borderLeftWidth="4px"
-                borderLeftColor="gray.200"
-                pl={4}
-                py={2}
-                my={4}
-                color="gray.700"
-                {...props}
-              />
-            ),
-            code: (props) => {
-              const { children, inline } = props;
-              return inline ? (
-                <Box
-                  as="code"
-                  bg="gray.100"
-                  p={1}
-                  borderRadius="sm"
-                  fontSize="sm"
-                  fontFamily="monospace"
-                  {...props}
-                />
-              ) : (
-                <Box
-                  as="pre"
-                  bg="gray.100"
-                  p={3}
-                  borderRadius="md"
-                  overflowX="auto"
-                  fontSize="sm"
-                  fontFamily="monospace"
-                  my={4}
-                  {...props}
-                />
-              );
-            },
-          }}
-        >
-          {processedContent}
-        </ReactMarkdown>
+        <ReactMarkdown>{processedContent}</ReactMarkdown>
       </Box>
     );
   };
@@ -392,6 +490,7 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
           <Button colorScheme="blue" onClick={createSession}>
             New Chat
           </Button>
+
           <Divider />
           <VStack align="stretch" spacing={2}>
             {isLoading && <Spinner size="sm" alignSelf="center" />}
@@ -435,6 +534,22 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
         <Flex justify="space-between" mb={4} align="center">
           <Heading size="md">AI Assistant</Heading>
         </Flex>
+
+        {/* Rate limit error message */}
+        {isRateLimited && (
+          <Alert status="error" mb={4}>
+            <AlertIcon />
+            <Box>
+              <AlertTitle>Rate Limit Exceeded</AlertTitle>
+              <AlertDescription>
+                {rateLimitMessage}
+                {timeRemaining && (
+                  <Text mt={1}>Try again in: {timeRemaining}</Text>
+                )}
+              </AlertDescription>
+            </Box>
+          </Alert>
+        )}
 
         {/* Messages area */}
         <VStack
@@ -503,12 +618,12 @@ export default function ChatInterface({ sessionId: initialSessionId = null }) {
                 onChange={handleInputChange}
                 placeholder="Ask about AI models, research papers, or techniques..."
                 mr={2}
-                disabled={isMessageLoading}
+                disabled={isMessageLoading || isRateLimited}
               />
               <Button
                 type="submit"
                 colorScheme="blue"
-                isDisabled={isMessageLoading || !input.trim()}
+                isDisabled={isMessageLoading || !input.trim() || isRateLimited}
                 isLoading={isMessageLoading}
               >
                 Send

@@ -1,4 +1,3 @@
-// MarkdownTheme.js
 import React from "react";
 import {
   Text,
@@ -8,95 +7,225 @@ import {
   ListItem,
   Heading,
   Code,
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Image,
 } from "@chakra-ui/react";
 
 const customTheme = {
-  p: (props) => {
-    const { children } = props;
-    return (
-      <Text my="15px" fontSize="md" lineHeight="1.45em">
-        {children}
-      </Text>
-    );
-  },
-  a: (props) => {
-    const { children, href } = props;
-    const linkText = children?.toString();
-    const linkUrl = linkText?.match(/\\\[(.*?)\\\]\((.*?)\)/)?.[2] || href;
-    const displayText =
-      linkText?.match(/\\\[(.*?)\\\]\((.*?)\)/)?.[1] || linkText;
-    return (
-      <Link color="blue.500" href={linkUrl}>
-        {displayText}
-      </Link>
-    );
-  },
-  em: (props) => {
-    const { children } = props;
-    return (
-      <figcaption
-        style={{
-          textAlign: "center",
-          fontStyle: "italic",
-          fontSize: "small",
-        }}
-      >
-        {children}
-      </figcaption>
-    );
-  },
-  ul: (props) => {
-    const { children } = props;
-    return (
-      <UnorderedList my="18px" lineHeight="1.45em">
-        {children}
-      </UnorderedList>
-    );
-  },
-  ol: (props) => {
-    const { children } = props;
-    return (
-      <OrderedList my="18px" lineHeight="1.45em">
-        {children}
-      </OrderedList>
-    );
-  },
-  li: (props) => {
-    const { children } = props;
-    return (
-      <ListItem fontSize="md" my="9px" lineHeight="1.45em">
-        {children}
-      </ListItem>
-    );
-  },
-  h2: (props) => {
-    const { children } = props;
-    return (
-      <Heading as="h2" size="lg" lineHeight="1.45em">
-        {children}
-      </Heading>
-    );
-  },
-  h3: (props) => {
-    const { children } = props;
-    return (
-      <Heading as="h3" size="md" lineHeight="1.38em">
-        {children}
-      </Heading>
-    );
-  },
-  h4: (props) => {
-    const { children } = props;
-    return (
-      <Heading as="h4" size="sm" lineHeight="1.45em">
-        {children}
-      </Heading>
-    );
-  },
-  code: (props) => {
-    const { children } = props;
-    return <Code py="0px">{children}</Code>;
-  },
+  // Paragraph text
+  p: (props) => (
+    <Text
+      fontFamily="Inter"
+      fontSize="18px"
+      color="#000"
+      lineHeight="27px"
+      mb="1.25em"
+      sx={{ WebkitFontSmoothing: "antialiased" }}
+    >
+      {props.children}
+    </Text>
+  ),
+  // Links using site's blue color from screenshot (#0060df)
+  a: (props) => (
+    <Link
+      color="#0060df"
+      textDecoration="none"
+      _hover={{ color: "#0250bb", textDecoration: "none" }}
+      _active={{ backgroundColor: "rgba(0,0,0,0.05)" }}
+      _visited={{ color: "#b833e1" }}
+      fontWeight="normal"
+      {...props}
+    >
+      {props.children}
+    </Link>
+  ),
+  // Images with full-width styling that extends beyond text margins
+  img: (props) => (
+    <Image
+      src={props.src}
+      alt={props.alt || ""}
+      width="112%"
+      marginLeft="-6%"
+      marginY="3em"
+      borderRadius="2px"
+      display="block"
+      {...props}
+    />
+  ),
+  // Unordered list styling
+  ul: (props) => (
+    <UnorderedList
+      fontFamily="Inter"
+      fontSize="18px"
+      color="#000"
+      lineHeight="27px"
+      mb="1.25em"
+      ml="32px"
+      {...props}
+    />
+  ),
+  // Ordered list styling
+  ol: (props) => (
+    <OrderedList
+      fontFamily="Inter"
+      fontSize="18px"
+      color="#000"
+      lineHeight="27px"
+      mb="1.25em"
+      ml="32px"
+      {...props}
+    />
+  ),
+  // List item styling
+  li: (props) => (
+    <ListItem
+      fontFamily="Inter"
+      fontSize="18px"
+      color="#000"
+      mb="0.25em"
+      {...props}
+    />
+  ),
+  // h1 styling
+  h1: (props) => (
+    <Heading
+      as="h1"
+      fontFamily="Inter"
+      fontSize="40px"
+      lineHeight="44px"
+      fontWeight="700"
+      color="#000"
+      mb="0.25em"
+      {...props}
+    />
+  ),
+  // h2 styling
+  h2: (props) => (
+    <Heading
+      as="h2"
+      fontFamily="Inter"
+      fontSize="32px"
+      lineHeight="36px"
+      fontWeight="700"
+      color="#000"
+      mb="0.45em"
+      mt="1em"
+      {...props}
+    />
+  ),
+  // h3 styling
+  h3: (props) => (
+    <Heading
+      as="h3"
+      fontFamily="Inter"
+      fontSize="24px"
+      lineHeight="28px"
+      fontWeight="700"
+      color="#000"
+      mb="0.5em"
+      mt="1em"
+      {...props}
+    />
+  ),
+  // h4 styling
+  h4: (props) => (
+    <Heading
+      as="h4"
+      fontFamily="Inter"
+      fontSize="20px"
+      lineHeight="24px"
+      fontWeight="700"
+      color="#000"
+      mb="0.5em"
+      mt="1em"
+      {...props}
+    />
+  ),
+  // Blockquotes with site styling
+  blockquote: (props) => (
+    <Box
+      as="blockquote"
+      fontFamily="Inter"
+      borderLeft="5px solid"
+      borderColor="#ededf0"
+      fontWeight="700"
+      fontSize="18px"
+      pl="24px"
+      color="#000"
+      mb="24px"
+      {...props}
+    />
+  ),
+  // Horizontal rule
+  hr: (props) => (
+    <Box
+      as="hr"
+      border="0 solid #ededf0"
+      borderTopWidth="4px"
+      my="1.25em"
+      {...props}
+    />
+  ),
+  // Inline code styling
+  code: (props) => <Code fontFamily="Inter" fontSize="inherit" {...props} />,
+  // Preformatted blocks
+  pre: (props) => (
+    <Box
+      as="pre"
+      fontFamily="Inter"
+      overflowX="auto"
+      p="1em"
+      borderRadius="2px"
+      mb="1.25em"
+      {...props}
+    />
+  ),
+  // Table styling based on the example image
+  table: (props) => (
+    <Table
+      fontFamily="Inter"
+      fontSize="18px"
+      color="#000"
+      width="100%"
+      borderCollapse="collapse"
+      border="1px solid #d9d9d9"
+      my="3em"
+      {...props}
+    />
+  ),
+  thead: (props) => <Thead backgroundColor="#ffffff" {...props} />,
+  tbody: (props) => <Tbody {...props} />,
+  tr: (props) => <Tr borderBottom="1px solid #d9d9d9" {...props} />,
+  th: (props) => (
+    <Th
+      border="1px solid #d9d9d9"
+      padding="16px"
+      textAlign="left"
+      fontFamily="Inter"
+      fontSize="18px"
+      fontWeight="700"
+      color="#000"
+      textTransform="none"
+      {...props}
+    />
+  ),
+  td: (props) => (
+    <Td
+      border="1px solid #d9d9d9"
+      padding="16px"
+      textAlign="left"
+      fontFamily="Inter"
+      fontSize="18px"
+      verticalAlign="top"
+      {...props}
+    />
+  ),
 };
 
 export default customTheme;

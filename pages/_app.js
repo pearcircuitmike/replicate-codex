@@ -22,8 +22,10 @@ import AuthForm from "@/components/AuthForm";
 import { usePageView } from "../hooks/usePageView";
 import Head from "next/head";
 import { FoldersProvider } from "@/context/FoldersContext";
-
 import supabase from "@/pages/api/utils/supabaseClient";
+
+// Import your custom theme from the styles folder
+import customTheme from "../styles/theme";
 
 function AppContent({ Component, pageProps }) {
   const { user, loading } = useAuth();
@@ -183,12 +185,10 @@ function AppContent({ Component, pageProps }) {
 
 export default function App({ Component, pageProps }) {
   return (
-    <>
-      <ChakraProvider>
-        <AuthProvider>
-          <AppContent Component={Component} pageProps={pageProps} />
-        </AuthProvider>
-      </ChakraProvider>
-    </>
+    <ChakraProvider theme={customTheme}>
+      <AuthProvider>
+        <AppContent Component={Component} pageProps={pageProps} />
+      </AuthProvider>
+    </ChakraProvider>
   );
 }

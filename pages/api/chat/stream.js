@@ -5,6 +5,7 @@ import { openai } from "@ai-sdk/openai";
 import supabase from "@/pages/api/utils/supabaseClient";
 import { formatRagContext, createSystemPrompt } from "../lib/context";
 import { getRelevantContext } from "../lib/retriever";
+import { checkRateLimit } from "../utils/rateLimit";
 
 // Configuration
 const CONFIG = {
@@ -65,6 +66,34 @@ export default async function handler(req) {
       return new Response("Missing user ID or messages", { status: 400 });
     }
 
+    // CHECK RATE LIMITS - Critical server-side enforcement
+    logWithTimestamp("INFO", "Checking rate limits", { userId });
+    const rateLimitCheck = await checkRateLimit(userId);
+
+    if (!rateLimitCheck.allowed) {
+      logWithTimestamp("WARN", "Rate limit exceeded", {
+        userId,
+        reason: rateLimitCheck.reason,
+        resetTime: rateLimitCheck.resetTime,
+      });
+
+      // Return a proper 429 rate limit response
+      return new Response(
+        JSON.stringify({
+          error: "rate_limit_exceeded",
+          message: rateLimitCheck.reason,
+          resetTime: rateLimitCheck.resetTime?.toISOString(),
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "X-RateLimit-Reset": rateLimitCheck.resetTime?.toISOString() || "",
+          },
+        }
+      );
+    }
+
     const userMessage = messages[messages.length - 1];
     if (userMessage.role !== "user") {
       logWithTimestamp("ERROR", "Last message not from user");
@@ -95,6 +124,7 @@ export default async function handler(req) {
     return createDataStreamResponse({
       headers,
       execute: async (dataStream) => {
+        // Rest of the function remains the same
         try {
           // Initial loading indicator
           dataStream.writeData({
@@ -238,138 +268,6 @@ export default async function handler(req) {
   }
 }
 
-// Process the full response with detailed logging
-async function fullProcessResponse(response, sessionId, ragContext) {
-  const startTime = Date.now();
-  logWithTimestamp("DEBUG", "Starting response processing", { sessionId });
-
-  try {
-    // Read the entire response
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    let chunks = [];
-    let bytesRead = 0;
-    let partial = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        logWithTimestamp("DEBUG", "Stream reading complete");
-        break;
-      }
-
-      bytesRead += value.length;
-      const decoded = decoder.decode(value, { stream: true });
-      chunks.push(decoded);
-      partial += decoded;
-
-      // Log progress periodically
-      if (chunks.length % 5 === 0) {
-        logWithTimestamp("DEBUG", "Stream reading progress", {
-          chunksReceived: chunks.length,
-          bytesRead,
-          recentContent: decoded.substring(0, 20) + "...",
-        });
-      }
-    }
-
-    // Add final chunk with end-of-stream flag
-    chunks.push(decoder.decode());
-    const fullResponse = chunks.join("");
-
-    logWithTimestamp("DEBUG", "Response stream fully read", {
-      totalChunks: chunks.length,
-      totalBytes: bytesRead,
-      fullResponseLength: fullResponse.length,
-      decodingTimeMs: Date.now() - startTime,
-    });
-
-    // Extract the actual content from AI SDK format
-    logWithTimestamp("DEBUG", "Sample of raw response", {
-      sample: fullResponse.substring(0, 200),
-    });
-
-    // AI-SDK specific format parsing
-    const textRegex = /0:"([^"]*)"/g;
-    let extractedContent = "";
-    let match;
-    let matchCount = 0;
-
-    while ((match = textRegex.exec(fullResponse)) !== null) {
-      extractedContent += match[1];
-      matchCount++;
-    }
-
-    logWithTimestamp("DEBUG", "Content extraction complete", {
-      matchCount,
-      extractedLength: extractedContent.length,
-      extractionTimeMs: Date.now() - startTime,
-      sample: extractedContent.substring(0, 100) + "...",
-    });
-
-    // Alternative extraction method if first one failed
-    if (extractedContent.length === 0) {
-      logWithTimestamp(
-        "WARN",
-        "Primary extraction method yielded no content, trying alternatives"
-      );
-
-      // Try alternative pattern
-      const altRegex = /"text":"([^"]*)"/g;
-      while ((match = altRegex.exec(fullResponse)) !== null) {
-        extractedContent += match[1];
-        matchCount++;
-      }
-
-      logWithTimestamp("DEBUG", "Alternative extraction results", {
-        matchCount,
-        extractedLength: extractedContent.length,
-      });
-
-      // If still nothing, log the full response for debugging
-      if (extractedContent.length === 0) {
-        logWithTimestamp("ERROR", "Content extraction failed", {
-          fullResponse: fullResponse,
-        });
-      }
-    }
-
-    return extractedContent;
-  } catch (error) {
-    logWithTimestamp("ERROR", "Error processing response stream", {
-      message: error.message,
-      stack: error.stack,
-      sessionId,
-    });
-    return "";
-  }
-}
-
-// Record RAG usage
-async function recordRagUsage(userId, sessionId) {
-  try {
-    logWithTimestamp("INFO", "Recording RAG usage", { userId, sessionId });
-    const { error } = await supabase.from("analytics_events").insert([
-      {
-        user_id: userId,
-        session_id: sessionId,
-        event_type: "ragchat",
-        event_data: { session_id: sessionId },
-      },
-    ]);
-
-    if (error) {
-      logWithTimestamp("ERROR", "Failed to record RAG usage", error);
-      throw error;
-    }
-    return true;
-  } catch (error) {
-    logWithTimestamp("ERROR", "Exception in recordRagUsage", error);
-    return false;
-  }
-}
-
 // Create a new session
 async function createSession(messages, userId) {
   try {
@@ -475,4 +373,113 @@ function getSessionTitle(messages) {
     ? messages[0].content.substring(0, 50) +
         (messages[0].content.length > 50 ? "..." : "")
     : "New Chat";
+}
+
+// Process the full response with detailed logging
+async function fullProcessResponse(response, sessionId, ragContext) {
+  // Existing implementation remains the same
+  const startTime = Date.now();
+  logWithTimestamp("DEBUG", "Starting response processing", { sessionId });
+
+  try {
+    // Read the entire response
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    let chunks = [];
+    let bytesRead = 0;
+    let partial = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        logWithTimestamp("DEBUG", "Stream reading complete");
+        break;
+      }
+
+      bytesRead += value.length;
+      const decoded = decoder.decode(value, { stream: true });
+      chunks.push(decoded);
+      partial += decoded;
+
+      // Log progress periodically
+      if (chunks.length % 5 === 0) {
+        logWithTimestamp("DEBUG", "Stream reading progress", {
+          chunksReceived: chunks.length,
+          bytesRead,
+          recentContent: decoded.substring(0, 20) + "...",
+        });
+      }
+    }
+
+    // Add final chunk with end-of-stream flag
+    chunks.push(decoder.decode());
+    const fullResponse = chunks.join("");
+
+    logWithTimestamp("DEBUG", "Response stream fully read", {
+      totalChunks: chunks.length,
+      totalBytes: bytesRead,
+      fullResponseLength: fullResponse.length,
+      decodingTimeMs: Date.now() - startTime,
+    });
+
+    // Extract the actual content from AI SDK format
+    logWithTimestamp("DEBUG", "Sample of raw response", {
+      sample: fullResponse.substring(0, 200),
+    });
+
+    // AI-SDK specific format parsing
+    const textRegex = /0:"([^"]*)"/g;
+    let extractedContent = "";
+    let match;
+    let matchCount = 0;
+
+    while ((match = textRegex.exec(fullResponse)) !== null) {
+      extractedContent += match[1];
+      matchCount++;
+    }
+
+    logWithTimestamp("DEBUG", "Content extraction complete", {
+      matchCount,
+      extractedLength: extractedContent.length,
+      extractionTimeMs: Date.now() - startTime,
+      sample: extractedContent.substring(0, 100) + "...",
+    });
+
+    // Alternative extraction method if first one failed
+    if (extractedContent.length === 0) {
+      logWithTimestamp(
+        "WARN",
+        "Primary extraction method yielded no content, trying alternatives"
+      );
+
+      // Try alternative pattern
+      const altRegex = /"text":"([^"]*)"/g;
+      while ((match = altRegex.exec(fullResponse)) !== null) {
+        extractedContent += match[1];
+        matchCount++;
+      }
+
+      logWithTimestamp("DEBUG", "Alternative extraction results", {
+        matchCount,
+        extractedLength: extractedContent.length,
+      });
+
+      // If still nothing, log the full response for debugging
+      if (extractedContent.length === 0) {
+        logWithTimestamp("ERROR", "Content extraction failed", {
+          fullResponse: fullResponse,
+        });
+      }
+    }
+
+    return extractedContent;
+  } catch (error) {
+    logWithTimestamp("ERROR", "Error processing response stream", {
+      message: error.message,
+      stack: error.stack,
+      sessionId,
+    });
+    return "";
+  }
 }
