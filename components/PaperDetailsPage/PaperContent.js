@@ -38,7 +38,7 @@ function PaperContent({
   const toast = useToast();
 
   return (
-    <Box bg="white" px={4} maxW="100%">
+    <Box bg="white" px={4}>
       <VStack spacing={5} align="stretch">
         {!hasActiveSubscription && !viewCounts?.canViewFullArticle ? (
           <LimitMessage />

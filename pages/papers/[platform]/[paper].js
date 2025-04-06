@@ -199,18 +199,17 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         mx="auto"
       >
         <Grid
-          templateColumns={{ base: "1fr", lg: "300px 1fr 250px" }}
+          templateColumns="repeat(12, 1fr)"
           templateRows="auto auto"
           rowGap={6}
           columnGap={{ base: 4, lg: 6 }}
           mt={6}
           minH="100vh"
         >
-          {/* Header - Left Column */}
-          <GridItem display={{ base: "none", lg: "block" }} />
+          {/* Header Row */}
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={2} />
 
-          {/* Header - Middle Column */}
-          <GridItem>
+          <GridItem colSpan={{ base: 12, lg: 8 }}>
             <Box bg="white" rounded="md" p={4} position="relative">
               {/* Desktop layout (large screens) - vote outside left margin */}
               <Box
@@ -301,11 +300,10 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             </Box>
           </GridItem>
 
-          {/* Header - Right Column */}
-          <GridItem display={{ base: "none", lg: "block" }} />
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={2} />
 
-          {/* MAIN CONTENT - Left Column: Highlights */}
-          <GridItem display={{ base: "none", lg: "block" }}>
+          {/* Main Content Row */}
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={2}>
             <Box bg="white" p={2} borderRadius="md">
               <HighlightSidebar
                 highlights={highlights}
@@ -316,9 +314,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             </Box>
           </GridItem>
 
-          {/* MAIN CONTENT - Middle Column */}
-          <GridItem>
-            {/* "Get Notified" block goes here, just above PaperContent */}
+          <GridItem colSpan={{ base: 12, lg: 8 }}>
             {!user && (
               <Box
                 my={6}
@@ -348,8 +344,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
             </Box>
           </GridItem>
 
-          {/* MAIN CONTENT - Right Column: Paper Notes */}
-          <GridItem display={{ base: "none", lg: "block" }}>
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={2}>
             <Box
               position="sticky"
               top="0"

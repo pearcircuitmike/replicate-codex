@@ -9,6 +9,7 @@ import {
   Code,
   Box,
   Table,
+  TableContainer,
   Thead,
   Tbody,
   Tr,
@@ -385,7 +386,7 @@ const customTheme = {
   ),
 
   // Inline code styling
-  code: (props) => <Code fontFamily="Inter" fontSize="inherit" {...props} />,
+  code: (props) => <Code fontSize="inherit" {...props} />,
 
   // Preformatted blocks
   pre: (props) => (
@@ -402,17 +403,17 @@ const customTheme = {
 
   // Updated table styling to handle horizontal overflow properly
   table: (props) => (
-    <Box overflowX="auto" width="100%" mb="3em">
+    <TableContainer overflowX="auto" overflowY="auto" maxH="500px" mb={4}>
       <Table
+        display="block"
+        maxW="fit-content"
+        whiteSpace="nowrap"
         fontFamily="Inter"
         fontSize="18px"
         color="#000"
-        style={{ width: "100%", tableLayout: "fixed" }}
-        borderCollapse="collapse"
-        border="1px solid #d9d9d9"
         {...props}
       />
-    </Box>
+    </TableContainer>
   ),
 
   thead: (props) => <Thead backgroundColor="#ffffff" {...props} />,
@@ -424,14 +425,11 @@ const customTheme = {
   th: (props) => (
     <Th
       border="1px solid #d9d9d9"
-      padding="16px"
       textAlign="left"
       fontFamily="Inter"
       fontSize="18px"
       fontWeight="700"
       color="#000"
-      textTransform="none"
-      whiteSpace="nowrap"
       {...props}
     />
   ),
@@ -439,7 +437,6 @@ const customTheme = {
   td: (props) => (
     <Td
       border="1px solid #d9d9d9"
-      padding="16px"
       textAlign="left"
       fontFamily="Inter"
       fontSize="18px"
