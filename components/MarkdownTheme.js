@@ -30,10 +30,10 @@ import {
 const EnhancedImage = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Responsive styling based on screen size
+  // Fixed responsive styling - ensuring mobile proper containment
   const imageWidth = useBreakpointValue({ base: "100%", md: "120%" });
   const imagePosition = useBreakpointValue({ base: "static", md: "relative" });
-  const imageLeft = useBreakpointValue({ base: "auto", md: "50%" });
+  const imageLeft = useBreakpointValue({ base: "0", md: "50%" });
   const imageTransform = useBreakpointValue({
     base: "none",
     md: "translateX(-50%)",
@@ -41,21 +41,19 @@ const EnhancedImage = (props) => {
 
   return (
     <>
-      {/* Use a span element instead of div/Box to avoid hydration errors in paragraphs */}
       <Image
         src={props.src}
         alt={props.alt || ""}
-        width={imageWidth}
+        width="100%" // Force 100% max width
+        maxWidth="100vw" // Ensure it never exceeds viewport width
         display="block"
         cursor="zoom-in"
         borderRadius="4px"
         marginY="3em"
         transition="all 0.3s ease"
-        style={{
-          transform: imageTransform,
-          position: imagePosition,
-          left: imageLeft,
-        }}
+        position={imagePosition}
+        left={imageLeft}
+        transform={imageTransform} // Use Chakra's responsive prop instead of inline style
         _hover={{
           boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12)",
           transform: useBreakpointValue({
@@ -116,7 +114,6 @@ const EnhancedImage = (props) => {
     </>
   );
 };
-
 // Load KaTeX script and CSS once
 const loadKaTeX = () => {
   if (typeof window === "undefined") return;
