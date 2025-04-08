@@ -14,7 +14,6 @@ import {
   FaChartLine,
   FaFlask,
   FaCubes,
-  FaStar,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
   FaUsers,
@@ -104,11 +103,6 @@ const DashboardLayout = ({ children }) => {
       icon: <FaRobot />,
       label: "Assistant",
       href: "/dashboard/assistant",
-    },
-    {
-      icon: <FaStar />,
-      label: "Following",
-      href: "/dashboard/followed-tasks",
     },
     {
       icon: <FaChartLine />,
