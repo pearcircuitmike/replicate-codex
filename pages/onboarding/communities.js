@@ -12,19 +12,21 @@ import {
   Button,
   VStack,
   useToast,
-  Wrap,
-  WrapItem,
   Tag,
-  TagLabel,
   Progress,
   Input,
   InputGroup,
   InputLeftElement,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
-import { ChevronRightIcon, SearchIcon } from "@chakra-ui/icons";
+import { ChevronRightIcon, SearchIcon, StarIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-import JoinLeaveButton from "@/components/Community/JoinLeaveButton";
 import MetaTags from "@/components/MetaTags";
 
 export default function CommunitiesOnboardingPage() {
@@ -36,7 +38,11 @@ export default function CommunitiesOnboardingPage() {
   const [communities, setCommunities] = useState([]);
   const [avatarMap, setAvatarMap] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [joinedCount, setJoinedCount] = useState(0);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
+  // Load communities once on mount
   useEffect(() => {
     if (!user?.id) {
       setLoading(false);
@@ -44,6 +50,12 @@ export default function CommunitiesOnboardingPage() {
     }
     loadCommunitiesData();
   }, [user]);
+
+  // Track joined count
+  useEffect(() => {
+    const count = communities.filter((c) => c.isMember).length;
+    setJoinedCount(count);
+  }, [communities]);
 
   async function loadCommunitiesData() {
     setLoading(true);
@@ -54,17 +66,74 @@ export default function CommunitiesOnboardingPage() {
       }
       const data = await resp.json();
 
+      // Get currently joined communities
       const mine = (data.myCommunities || []).map((c) => ({
         ...c,
         isMember: true,
       }));
+
+      // Get other communities
       const others = (data.otherCommunities || []).map((c) => ({
         ...c,
         isMember: false,
       }));
-      const merged = [...mine, ...others].sort(() => Math.random() - 0.5);
 
-      setCommunities(merged);
+      // Process and add member counts
+      const allCommunities = [...mine, ...others].map((comm) => {
+        const members = (data.avatarMap[comm.id] || []).length;
+        return {
+          ...comm,
+          memberCount: members,
+          isPopular: members > 5, // Lower threshold to make sure we have some popular communities
+        };
+      });
+
+      // Auto-select communities if none are joined (only if myCommunities is null or empty)
+      let joinedCommunities = [...allCommunities];
+
+      if (
+        mine.length === 0 &&
+        (!data.myCommunities || data.myCommunities.length === 0)
+      ) {
+        // ALWAYS select the top 2 communities by member count, regardless of popularity
+        const topCommunities = allCommunities
+          .filter((c) => !c.isMember)
+          .sort((a, b) => b.memberCount - a.memberCount)
+          .slice(0, 2);
+
+        // Mark them as joined directly in the UI
+        joinedCommunities = allCommunities.map((comm) => {
+          const shouldAutoJoin = topCommunities.some((p) => p.id === comm.id);
+          if (shouldAutoJoin) {
+            return {
+              ...comm,
+              isMember: true,
+              isRecommended: true,
+            };
+          }
+          return comm;
+        });
+
+        // Also update them on the server
+        topCommunities.forEach((comm) => {
+          fetch("/api/community/toggle-membership", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              communityId: comm.id,
+              join: true,
+            }),
+          }).catch((err) => {
+            console.error("Auto-join error:", err);
+          });
+        });
+      }
+
+      setCommunities(joinedCommunities);
       setAvatarMap(data.avatarMap || {});
     } catch (err) {
       console.error("loadCommunitiesData error:", err);
@@ -79,9 +148,11 @@ export default function CommunitiesOnboardingPage() {
   }
 
   async function handleToggleMembership(communityId, joined) {
+    // Update UI immediately for responsiveness
     setCommunities((prev) =>
       prev.map((c) => (c.id === communityId ? { ...c, isMember: joined } : c))
     );
+
     try {
       const resp = await fetch("/api/community/toggle-membership", {
         method: "POST",
@@ -95,8 +166,9 @@ export default function CommunitiesOnboardingPage() {
           join: joined,
         }),
       });
+
       if (!resp.ok) {
-        throw new Error("Failed to toggle membership.");
+        throw new Error("Failed to toggle membership");
       }
     } catch (err) {
       console.error("toggleMembership error:", err);
@@ -107,6 +179,13 @@ export default function CommunitiesOnboardingPage() {
         duration: 3000,
         isClosable: true,
       });
+
+      // Revert UI on error
+      setCommunities((prev) =>
+        prev.map((c) =>
+          c.id === communityId ? { ...c, isMember: !joined } : c
+        )
+      );
     }
   }
 
@@ -115,12 +194,6 @@ export default function CommunitiesOnboardingPage() {
     const lower = term.toLowerCase();
     if (community.name?.toLowerCase().includes(lower)) return true;
     if (community.description?.toLowerCase().includes(lower)) return true;
-    if (community.community_tasks) {
-      for (const ct of community.community_tasks) {
-        const taskName = ct.tasks?.task?.toLowerCase() || "";
-        if (taskName.includes(lower)) return true;
-      }
-    }
     return false;
   }
 
@@ -128,8 +201,23 @@ export default function CommunitiesOnboardingPage() {
     matchesSearch(c, searchTerm)
   );
 
+  // Limit visible communities on mobile
+  const visibleCommunities = showAll
+    ? filteredCommunities
+    : filteredCommunities.slice(0, 4);
+
   async function handleContinue() {
     if (!user?.id) return;
+
+    // Check if user has joined any communities
+    const hasJoined = communities.some((c) => c.isMember);
+
+    if (!hasJoined) {
+      // Show confirmation dialog
+      setShowConfirmation(true);
+      return;
+    }
+
     try {
       const response = await fetch("/api/onboarding/complete-communities", {
         method: "POST",
@@ -139,9 +227,11 @@ export default function CommunitiesOnboardingPage() {
         },
         body: JSON.stringify({ userId: user.id }),
       });
+
       if (!response.ok) {
         throw new Error("Failed to update communities onboarding");
       }
+
       router.push("/onboarding/frequency");
     } catch (error) {
       console.error("Error finalizing communities onboarding:", error);
@@ -156,13 +246,56 @@ export default function CommunitiesOnboardingPage() {
   }
 
   function CommunityCard({ community }) {
-    const { id, name, description, community_tasks, isMember } = community;
+    const {
+      id,
+      name,
+      description,
+      isMember,
+      isPopular,
+      memberCount,
+      isRecommended,
+    } = community;
+
     const previewArr = avatarMap[id] || [];
     const shown = previewArr.slice(0, 3);
     const leftover = Math.max(0, previewArr.length - 3);
 
     return (
-      <Box p={4} borderWidth="1px" borderRadius="md" bg="white" boxShadow="sm">
+      <Box
+        p={4}
+        borderWidth="1px"
+        borderRadius="md"
+        bg={isPopular ? "blue.50" : "white"}
+        boxShadow={isPopular ? "md" : "sm"}
+        position="relative"
+      >
+        {/* Popular badge */}
+        {isPopular && (
+          <Tag
+            position="absolute"
+            top={2}
+            right={2}
+            colorScheme="blue"
+            size="sm"
+          >
+            <StarIcon mr={1} boxSize={3} />
+            Popular in AI
+          </Tag>
+        )}
+
+        {/* Recommended badge */}
+        {isRecommended && (
+          <Tag
+            position="absolute"
+            top={isPopular ? 8 : 2}
+            right={2}
+            colorScheme="green"
+            size="sm"
+          >
+            Recommended
+          </Tag>
+        )}
+
         <Heading as="h3" size="md" mb={1}>
           {name}
         </Heading>
@@ -170,25 +303,16 @@ export default function CommunitiesOnboardingPage() {
           Created by Mike Young
         </Text>
 
-        <Text fontSize="sm" color="gray.700" mb={2}>
+        <Text fontSize="sm" color="gray.700" mb={2} noOfLines={2}>
           {description || "No description provided."}
         </Text>
 
-        {community_tasks?.length > 0 ? (
-          <Wrap mb={4}>
-            {community_tasks.map((ct) => (
-              <WrapItem key={ct.task_id}>
-                <Tag variant="subtle" colorScheme="blue">
-                  <TagLabel>{ct.tasks?.task || "Unknown Task"}</TagLabel>
-                </Tag>
-              </WrapItem>
-            ))}
-          </Wrap>
-        ) : (
-          <Text fontSize="sm" color="gray.500" mb={3}>
-            (No tasks linked)
-          </Text>
-        )}
+        {/* Member count */}
+        <Tag colorScheme="purple" size="sm" mb={2}>
+          {memberCount}+ members
+        </Tag>
+
+        {/* Task tags removed as requested */}
 
         <Flex align="center" mb={3}>
           {shown.map((m) => (
@@ -208,16 +332,55 @@ export default function CommunitiesOnboardingPage() {
         </Flex>
 
         {user && (
-          <JoinLeaveButton
-            communityId={id}
-            userId={user.id}
-            isMember={isMember}
-            onToggle={(communityId, joined) =>
-              handleToggleMembership(communityId, joined)
-            }
-          />
+          <Button
+            size="sm"
+            colorScheme={isMember ? "gray" : "blue"}
+            onClick={() => handleToggleMembership(id, !isMember)}
+          >
+            {isMember ? "Leave" : "Join"}
+          </Button>
         )}
       </Box>
+    );
+  }
+
+  function ConfirmationDialog() {
+    return (
+      <AlertDialog
+        isOpen={showConfirmation}
+        leastDestructiveRef={undefined}
+        onClose={() => setShowConfirmation(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              No Communities Selected
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Joining communities helps you connect with like-minded people and
+              discover relevant AI content. Are you sure you want to continue
+              without joining any?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button onClick={() => setShowConfirmation(false)}>
+                Go Back
+              </Button>
+              <Button
+                colorScheme="blue"
+                onClick={() => {
+                  setShowConfirmation(false);
+                  router.push("/onboarding/frequency");
+                }}
+                ml={3}
+              >
+                Continue Anyway
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     );
   }
 
@@ -232,7 +395,6 @@ export default function CommunitiesOnboardingPage() {
       <Container maxW="4xl" py={8}>
         <Box mb={8}>
           <Flex justify="space-between" align="center" mb={4}>
-            {/* Removed the back button */}
             <Box />
             <Text fontSize="sm" color="gray.600" textAlign="center">
               Step 2 of 3 - Communities
@@ -283,20 +445,74 @@ export default function CommunitiesOnboardingPage() {
               No communities found.
             </Text>
           ) : (
-            <SimpleGrid columns={[1, 1, 2, 3]} spacing={4}>
-              {filteredCommunities.map((comm) => (
-                <CommunityCard key={comm.id} community={comm} />
-              ))}
-            </SimpleGrid>
+            <>
+              <SimpleGrid columns={[1, 1, 2, 3]} spacing={4}>
+                {visibleCommunities.map((comm) => (
+                  <CommunityCard key={comm.id} community={comm} />
+                ))}
+              </SimpleGrid>
+
+              {/* Show more button for mobile */}
+              {!showAll && filteredCommunities.length > 4 && (
+                <Button
+                  mt={4}
+                  variant="outline"
+                  onClick={() => setShowAll(true)}
+                  size="sm"
+                >
+                  Show all {filteredCommunities.length} communities
+                </Button>
+              )}
+            </>
           )}
         </VStack>
 
-        <Box textAlign="center" pt={8}>
+        {/* Desktop Continue Button */}
+        <Box textAlign="center" pt={8} display={["none", "none", "block"]}>
           <Button colorScheme="blue" size="lg" px={8} onClick={handleContinue}>
-            Continue
+            Continue{" "}
+            {joinedCount > 0
+              ? `with ${joinedCount} ${
+                  joinedCount === 1 ? "community" : "communities"
+                }`
+              : ""}
           </Button>
         </Box>
       </Container>
+
+      {/* Mobile Floating Continue Button */}
+      <Box
+        position="fixed"
+        bottom="0"
+        left="0"
+        right="0"
+        py={4}
+        px={6}
+        bg="white"
+        borderTopWidth="1px"
+        borderTopColor="gray.200"
+        textAlign="center"
+        zIndex={10}
+        display={["block", "block", "none"]}
+        boxShadow="0 -2px 10px rgba(0,0,0,0.05)"
+      >
+        <Button
+          colorScheme="blue"
+          size="lg"
+          width="100%"
+          onClick={handleContinue}
+        >
+          Continue{" "}
+          {joinedCount > 0
+            ? `with ${joinedCount} ${
+                joinedCount === 1 ? "community" : "communities"
+              }`
+            : ""}
+        </Button>
+      </Box>
+
+      {/* Confirmation dialog */}
+      <ConfirmationDialog />
     </>
   );
 }
