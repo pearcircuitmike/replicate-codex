@@ -52,7 +52,6 @@ const FrequencyPage = () => {
   // Defaulting to "daily" so the user sees that selected on mount
   // If they never change anything, "daily" is what's sent to the API
   const [frequency, setFrequency] = useState("daily");
-
   const { user, accessToken, hasActiveSubscription } = useAuth();
   const router = useRouter();
   const toast = useToast();
@@ -93,6 +92,10 @@ const FrequencyPage = () => {
     }
   };
 
+  const handleBack = () => {
+    router.push("/onboarding/communities");
+  };
+
   return (
     <>
       <MetaTags
@@ -104,18 +107,27 @@ const FrequencyPage = () => {
       <Container maxW="4xl" py={8}>
         <Box mb={8}>
           <Flex justify="space-between" align="center" mb={4}>
+            {/* Back button (desktop) */}
             <Button
               variant="ghost"
               size="sm"
               leftIcon={<ChevronLeftIcon />}
-              onClick={() => router.push("/onboarding/communities")}
+              onClick={handleBack}
+              display={["none", "none", "flex"]}
+              width="100px"
             >
               Back
             </Button>
-            <Text fontSize="sm" color="gray.600">
-              Step 3 of 3 - Choose Frequency
+
+            {/* Empty box for mobile layout balance */}
+            <Box w="50px" display={["flex", "flex", "none"]} />
+
+            <Text fontSize="sm" color="gray.600" textAlign="center">
+              Step 3 of 3 - Frequency
             </Text>
-            <Box w={16} />
+
+            {/* Empty box for layout balance */}
+            <Box w="50px" />
           </Flex>
           <Progress
             value={90}
@@ -124,14 +136,13 @@ const FrequencyPage = () => {
             borderRadius="full"
           />
         </Box>
-
         <VStack spacing={8} align="stretch">
           <Box textAlign="center">
             <Heading size="lg" mb={3}>
               How often would you like updates?
             </Heading>
             <Text color="gray.600" fontSize="lg">
-              Choose how frequently you&apos;d like to receive research updates
+              You can change this at any time in your settings.
             </Text>
           </Box>
 
@@ -152,7 +163,25 @@ const FrequencyPage = () => {
             />
           </SimpleGrid>
 
-          <Box display="flex" justifyContent="center" pt={8}>
+          {/* Mobile Back link */}
+          <Text
+            textAlign="center"
+            color="gray"
+            fontSize="sm"
+            cursor="pointer"
+            onClick={handleBack}
+            display={["block", "block", "none"]}
+            mt={2}
+          >
+            Back to communities
+          </Text>
+
+          {/* Desktop Continue Button */}
+          <Box
+            justifyContent="center"
+            pt={8}
+            display={["none", "none", "flex"]}
+          >
             <Button
               colorScheme="blue"
               onClick={handleContinue}
@@ -164,6 +193,32 @@ const FrequencyPage = () => {
           </Box>
         </VStack>
       </Container>
+
+      {/* Mobile Floating Continue Button */}
+      <Box
+        position="fixed"
+        bottom="0"
+        left="0"
+        right="0"
+        py={4}
+        px={6}
+        bg="white"
+        borderTopWidth="1px"
+        borderTopColor="gray.200"
+        textAlign="center"
+        zIndex={10}
+        display={["block", "block", "none"]}
+        boxShadow="0 -2px 10px rgba(0,0,0,0.05)"
+      >
+        <Button
+          colorScheme="blue"
+          size="lg"
+          width="100%"
+          onClick={handleContinue}
+        >
+          Continue
+        </Button>
+      </Box>
     </>
   );
 };

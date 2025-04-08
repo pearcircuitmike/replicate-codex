@@ -1,4 +1,3 @@
-// /pages/onboarding/communities.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -395,18 +394,30 @@ export default function CommunitiesOnboardingPage() {
       <Container maxW="4xl" py={8}>
         <Box mb={8}>
           <Flex justify="space-between" align="center" mb={4}>
-            <Box />
+            {/* Empty box with consistent width */}
+            <Box w="50px" display={["flex", "flex", "none"]} />
+
+            {/* Left spacer on desktop (same width as button) */}
+            <Box w="100px" display={["none", "none", "flex"]} />
+
             <Text fontSize="sm" color="gray.600" textAlign="center">
               Step 2 of 3 - Communities
             </Text>
+
+            {/* Next button (desktop) */}
             <Button
               variant="ghost"
               size="sm"
               rightIcon={<ChevronRightIcon />}
               onClick={handleContinue}
+              display={["none", "none", "flex"]}
+              width="100px"
             >
               Next
             </Button>
+
+            {/* Empty box on mobile with same width */}
+            <Box w="50px" display={["flex", "flex", "none"]} />
           </Flex>
 
           <Progress
@@ -422,7 +433,8 @@ export default function CommunitiesOnboardingPage() {
             Pick your communities
           </Heading>
           <Text textAlign="center" color="gray.600" fontSize="lg">
-            Join any groups that interest you
+            Join communities to get updates on their papers. We already picked 2
+            you may like.
           </Text>
 
           <InputGroup my={4}>
