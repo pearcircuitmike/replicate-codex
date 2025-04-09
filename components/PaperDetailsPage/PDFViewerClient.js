@@ -73,10 +73,10 @@ const PDFViewerClient = ({ url }) => {
             imageUrl: canvas.toDataURL("image/jpeg", 0.8),
           });
 
+          // Set pages and immediately hide spinner when we have at least one page
           setPages([...renderedPages]);
+          setLoading(false);
         }
-
-        setLoading(false);
       } catch (err) {
         console.error("Error in PDF processing:", err);
         if (isSubscribed) {
@@ -142,10 +142,29 @@ const PDFViewerClient = ({ url }) => {
 
       <Box>
         {loading && (
-          <Flex justify="center" align="center" h="100px" mb={4}>
-            <Spinner size="xl" />
-            <Text ml={4}>Loading PDF pages...</Text>
-          </Flex>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
+            {Array.from({ length: 8 }).map((_, index) => (
+              <Box
+                key={`skeleton-${index}`}
+                borderWidth="1px"
+                borderRadius="lg"
+                overflow="hidden"
+                boxShadow="lg"
+                height="300px"
+                bg="gray.100"
+                position="relative"
+              >
+                <Flex
+                  height="100%"
+                  width="100%"
+                  justify="center"
+                  align="center"
+                >
+                  <Spinner size="md" />
+                </Flex>
+              </Box>
+            ))}
+          </SimpleGrid>
         )}
 
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>

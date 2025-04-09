@@ -1,5 +1,3 @@
-// pages/papers/[platform]/[paper].js
-
 import React, { useState, useEffect } from "react";
 import {
   Container,
@@ -16,12 +14,15 @@ import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import AuthForm from "@/components/AuthForm"; // <-- For "Get Notified" signup
+import AuthForm from "@/components/AuthForm"; // For "Get Notified" signup
 import MetaTags from "@/components/MetaTags";
 import dynamic from "next/dynamic";
 
 // Paper Vote
 import PaperVote from "@/components/PaperDetailsPage/PaperVote";
+
+// -- IMPORT YOUR EXISTING BOOKMARK BUTTON:
+import BookmarkButton from "@/components/BookmarkButton";
 
 // Dynamically imported components
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
@@ -340,7 +341,12 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
               }}
             >
               <Flex flexDirection="column">
-                {/* Notes section positioned above highlights */}
+                {/* ADD YOUR EXISTING BOOKMARK BUTTON ABOVE THE NOTES */}
+                <Box py={4}>
+                  <BookmarkButton resourceId={paper.id} resourceType="paper" />
+                </Box>
+
+                {/* Notes section */}
                 <Box py={4} mb={4}>
                   <PaperNotes paperId={paper.id} />
                 </Box>
