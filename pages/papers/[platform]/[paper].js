@@ -24,7 +24,6 @@ import dynamic from "next/dynamic";
 import PaperVote from "@/components/PaperDetailsPage/PaperVote";
 
 // Dynamically imported components
-const RelatedPapers = dynamic(() => import("@/components/RelatedPapers"));
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
 });
@@ -170,7 +169,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
 
   if (error || !paper) {
     return (
-      <Box maxW="100vw" overflowX="hidden" p={8}>
+      <Box maxW="100vw" p={8}>
         <Heading as="h1" fontSize="1.2rem" fontWeight="bold" mb="1rem">
           Paper Temporarily Unavailable
         </Heading>
@@ -183,7 +182,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
   }
 
   return (
-    <Box maxW="100vw" overflowX="hidden">
+    <Box maxW="100vw">
       <MetaTags
         title={`${paper.title} | AI Research Paper Details`}
         description={paper.abstract}
@@ -195,23 +194,24 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
 
       <Container
         maxW={{ base: "100%", xl: "8xl" }}
-        px={{ base: 2, md: 4 }}
+        px={{ base: 3, md: 4 }}
         mx="auto"
       >
         <Grid
           templateColumns="repeat(12, 1fr)"
-          templateRows="auto auto"
           rowGap={6}
           columnGap={{ base: 4, lg: 6 }}
           mt={6}
           minH="100vh"
         >
-          {/* Header Row */}
-          <GridItem display={{ base: "none", lg: "block" }} colSpan={2} />
+          {/* 1-column gutter for upvote button */}
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={1} />
 
+          {/* Main content column - 8 columns */}
           <GridItem colSpan={{ base: 12, lg: 8 }}>
-            <Box bg="white" rounded="md" p={4} position="relative">
-              {/* Desktop layout (large screens) - vote outside left margin */}
+            {/* Paper header */}
+            <Box bg="white" rounded="md" p={4} position="relative" mb={6}>
+              {/* Desktop layout - vote outside left margin */}
               <Box
                 position="absolute"
                 left="-12"
@@ -228,7 +228,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 mb={4}
                 alignItems="flex-start"
               >
-                <Box flex="none">
+                <Box flex="none" display={{ base: "none", md: "block" }}>
                   <PaperVote paperId={paper.id} variant="vertical" size="md" />
                 </Box>
                 <Box flex="1">
@@ -262,7 +262,7 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 </Box>
               </Flex>
 
-              {/* Desktop title section (large screens) - full width */}
+              {/* Desktop title section - full width */}
               <Box display={{ base: "none", lg: "block" }}>
                 <Heading
                   as="h1"
@@ -298,23 +298,8 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 </Box>
               </Box>
             </Box>
-          </GridItem>
 
-          <GridItem display={{ base: "none", lg: "block" }} colSpan={2} />
-
-          {/* Main Content Row */}
-          <GridItem display={{ base: "none", lg: "block" }} colSpan={2}>
-            <Box bg="white" p={2} borderRadius="md">
-              <HighlightSidebar
-                highlights={highlights}
-                onHighlightClick={handleHighlightClick}
-                onHighlightRemove={handleHighlightRemove}
-                selectedHighlightId={selectedHighlightId}
-              />
-            </Box>
-          </GridItem>
-
-          <GridItem colSpan={{ base: 12, lg: 8 }}>
+            {/* Paper content */}
             {!user && (
               <Box
                 my={6}
@@ -338,17 +323,12 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
               onHighlightClick={handleHighlightClick}
               onHighlight={handleNewHighlight}
             />
-
-            <Box mt={6} bg="white" p={4} borderRadius="md">
-              <RelatedPapers slug={paper.slug} platform={paper.platform} />
-            </Box>
           </GridItem>
 
-          <GridItem display={{ base: "none", lg: "block" }} colSpan={2}>
+          {/* Right sidebar - 3 columns */}
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={3}>
             <Box
-              position="sticky"
-              top="0"
-              height="100vh"
+              maxHeight="100vh"
               overflowY="auto"
               css={{
                 "&::-webkit-scrollbar": { width: "4px" },
@@ -359,11 +339,20 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 },
               }}
             >
-              <Flex flexDirection="column" height="100%" position="relative">
-                <Box py={8}>
-                  <Box mt={6}>
-                    <PaperNotes paperId={paper.id} />
-                  </Box>
+              <Flex flexDirection="column">
+                {/* Notes section positioned above highlights */}
+                <Box py={4} mb={4}>
+                  <PaperNotes paperId={paper.id} />
+                </Box>
+
+                {/* Highlight sidebar below notes */}
+                <Box bg="white" p={2} borderRadius="md">
+                  <HighlightSidebar
+                    highlights={highlights}
+                    onHighlightClick={handleHighlightClick}
+                    onHighlightRemove={handleHighlightRemove}
+                    selectedHighlightId={selectedHighlightId}
+                  />
                 </Box>
               </Flex>
             </Box>
