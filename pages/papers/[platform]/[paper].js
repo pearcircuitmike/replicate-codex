@@ -13,17 +13,13 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-
 import AuthForm from "@/components/AuthForm"; // For "Get Notified" signup
 import MetaTags from "@/components/MetaTags";
 import dynamic from "next/dynamic";
-
 // Paper Vote
 import PaperVote from "@/components/PaperDetailsPage/PaperVote";
-
 // -- IMPORT YOUR EXISTING BOOKMARK BUTTON:
 import BookmarkButton from "@/components/BookmarkButton";
-
 // Dynamically imported components
 const PaperNotes = dynamic(() => import("@/components/Notes/PaperNotes"), {
   ssr: false,
@@ -32,17 +28,14 @@ const PaperContent = dynamic(() =>
   import("@/components/PaperDetailsPage/PaperContent")
 );
 const HighlightSidebar = dynamic(() => import("@/components/HighlightSidebar"));
-
 // Utilities
 import {
   fetchPaperDataBySlug,
   fetchPapersPaginated,
 } from "@/pages/api/utils/fetchPapers";
-
 function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
   const { hasActiveSubscription, user } = useAuth();
   const toast = useToast();
-
   const [viewCounts, setViewCounts] = useState({
     totalUniqueViews: 0,
     uniqueResources: [],
@@ -50,7 +43,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
   });
   const [highlights, setHighlights] = useState([]);
   const [selectedHighlightId, setSelectedHighlightId] = useState(null);
-
   useEffect(() => {
     if (!paper?.slug) return;
     let sessionId = localStorage.getItem("sessionId");
@@ -70,12 +62,10 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         console.error("Error fetching view counts:", err);
       });
   }, [paper?.slug]);
-
   useEffect(() => {
     if (!paper?.id) return;
     fetchHighlights();
   }, [paper?.id]);
-
   const fetchHighlights = async () => {
     try {
       const response = await axios.get("/api/highlights/manage-highlights", {
@@ -93,7 +83,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
       });
     }
   };
-
   const handleNewHighlight = async (anchor) => {
     if (!user) {
       toast({
@@ -116,7 +105,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         context_snippet:
           `${anchor.prefix}${anchor.exact}${anchor.suffix}`.slice(0, 500),
       };
-
       const response = await axios.post(
         "/api/highlights/manage-highlights",
         newHighlight
@@ -138,11 +126,9 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
       });
     }
   };
-
   const handleHighlightClick = (highlight) => {
     setSelectedHighlightId(highlight.id);
   };
-
   const handleHighlightRemove = async (highlightId) => {
     if (!user) return;
     try {
@@ -167,7 +153,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
       });
     }
   };
-
   if (error || !paper) {
     return (
       <Box maxW="100vw" p={8}>
@@ -181,7 +166,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
       </Box>
     );
   }
-
   return (
     <Box maxW="100vw">
       <MetaTags
@@ -192,7 +176,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
         socialPreviewSubtitle={paper.abstract}
         canonicalUrl={canonicalUrl}
       />
-
       <Container
         maxW={{ base: "100%", xl: "8xl" }}
         px={{ base: 3, md: 4 }}
@@ -205,11 +188,10 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
           mt={6}
           minH="100vh"
         >
-          {/* 1-column gutter for upvote button */}
-          <GridItem display={{ base: "none", lg: "block" }} colSpan={1} />
-
-          {/* Main content column - 8 columns */}
-          <GridItem colSpan={{ base: 12, lg: 8 }}>
+          {/* 2-column gutter for upvote button */}
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={2} />
+          {/* Main content column - 6 columns */}
+          <GridItem colSpan={{ base: 12, lg: 6 }}>
             {/* Paper header */}
             <Box bg="white" rounded="md" p={4} position="relative" mb={6}>
               {/* Desktop layout - vote outside left margin */}
@@ -221,7 +203,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
               >
                 <PaperVote paperId={paper.id} variant="vertical" size="md" />
               </Box>
-
               {/* Mobile/Medium layout - flex container with vote inside */}
               <Flex
                 display={{ base: "flex", lg: "none" }}
@@ -262,7 +243,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                   </Box>
                 </Box>
               </Flex>
-
               {/* Desktop title section - full width */}
               <Box display={{ base: "none", lg: "block" }}>
                 <Heading
@@ -299,7 +279,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 </Box>
               </Box>
             </Box>
-
             {/* Paper content */}
             {!user && (
               <Box
@@ -315,7 +294,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 <AuthForm signupSource="auth-form-embed" isUpgradeFlow />
               </Box>
             )}
-
             <PaperContent
               paper={{ ...paper, tasks: paper.tasks || [] }}
               hasActiveSubscription={hasActiveSubscription}
@@ -325,7 +303,6 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
               onHighlight={handleNewHighlight}
             />
           </GridItem>
-
           {/* Right sidebar - 3 columns */}
           <GridItem display={{ base: "none", lg: "block" }} colSpan={3}>
             <Box
@@ -345,12 +322,10 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
                 <Box py={4}>
                   <BookmarkButton resourceId={paper.id} resourceType="paper" />
                 </Box>
-
                 {/* Notes section */}
                 <Box py={4} mb={4}>
                   <PaperNotes paperId={paper.id} />
                 </Box>
-
                 {/* Highlight sidebar below notes */}
                 <Box bg="white" p={2} borderRadius="md">
                   <HighlightSidebar
@@ -363,12 +338,13 @@ function PaperDetailsPage({ paper, slug, error, canonicalUrl }) {
               </Flex>
             </Box>
           </GridItem>
+          {/* Empty column on the right side */}
+          <GridItem display={{ base: "none", lg: "block" }} colSpan={1} />
         </Grid>
       </Container>
     </Box>
   );
 }
-
 // -----------------------------------------------------
 // getStaticPaths
 // -----------------------------------------------------
@@ -377,7 +353,6 @@ export async function getStaticPaths() {
   const paths = [];
   const pageSize = 1000;
   const totalLimit = 10000;
-
   for (const platform of platforms) {
     let currentPage = 1;
     let totalFetched = 0;
@@ -388,22 +363,18 @@ export async function getStaticPaths() {
         currentPage,
       });
       if (!papers || papers.length === 0) break;
-
       for (const p of papers) {
         paths.push({
           params: { paper: p.slug.toString(), platform },
         });
       }
-
       totalFetched += papers.length;
       if (papers.length < pageSize || totalFetched >= totalLimit) break;
       currentPage += 1;
     }
   }
-
   return { paths, fallback: true };
 }
-
 // -----------------------------------------------------
 // getStaticProps
 // -----------------------------------------------------
@@ -411,25 +382,21 @@ export async function getStaticProps({ params }) {
   const { platform, paper: slug } = params;
   let paperData = null;
   let error = false;
-
   try {
     paperData = await fetchPaperDataBySlug(slug, platform);
   } catch (err) {
     console.error("Error fetching paper data:", err);
     error = true;
   }
-
   // If we can't load the data or the paper is missing crucial fields, fallback
   if (!paperData || !paperData.abstract || !paperData.generatedSummary) {
     return { props: { error: true, slug }, revalidate: false };
   }
-
   // Build canonical URL
   const DOMAIN = "https://www.aimodels.fyi";
   const canonicalUrl = `${DOMAIN}/papers/${encodeURIComponent(
     platform
   )}/${encodeURIComponent(slug)}`;
-
   return {
     props: {
       paper: paperData,
@@ -440,5 +407,4 @@ export async function getStaticProps({ params }) {
     revalidate: false,
   };
 }
-
 export default PaperDetailsPage;

@@ -409,8 +409,9 @@ const customTheme = {
         maxW="fit-content"
         whiteSpace="nowrap"
         fontFamily="Inter"
-        fontSize="18px"
+        fontSize="12px"
         color="#000"
+        size="sm"
         {...props}
       />
     </TableContainer>
@@ -427,7 +428,7 @@ const customTheme = {
       border="1px solid #d9d9d9"
       textAlign="left"
       fontFamily="Inter"
-      fontSize="18px"
+      fontSize="16px"
       fontWeight="700"
       color="#000"
       {...props}
@@ -439,7 +440,7 @@ const customTheme = {
       border="1px solid #d9d9d9"
       textAlign="left"
       fontFamily="Inter"
-      fontSize="18px"
+      fontSize="14px"
       verticalAlign="top"
       {...props}
     />
